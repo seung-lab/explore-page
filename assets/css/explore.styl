@@ -1,10 +1,35 @@
 
+html, body
+    font-family Roboto, 'Lucida Grande', sans-serif
+    font-weight 400
+
+    -moz-box-sizing border-box
+    box-sizing border-box
+    
+    width 100%
+    height 100%
+
 div.container
 	width 100%
 	height 100%
 
 div.container.gateway
-	background-image url('images/background.jpg')
+	background black url("/images/background.jpg") no-repeat center center fixed
+	-webkit-background-size cover
+	-moz-background-size cover
+	-o-background-size cover
+	background-size cover
+
+	/* Fix a bug with cover in Android Chrome
+	   where it appearently doesn't work on html/body
+	   but works in other situations. */
+	   
+	height 100%
+	margin 0
+	overflow-x hidden
+	overflow-y auto
+	padding 0
+	width 100%
 	
 
 

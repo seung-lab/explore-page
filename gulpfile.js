@@ -26,7 +26,11 @@ gulp.task('js', function () {
 });
 
 gulp.task('css', function () {
-	gulp.src('assets/css/*.styl')
+	gulp.src([
+		'assets/css/normalize.css',
+		'assets/css/*.css',
+		'assets/css/*.styl'
+	])
 		.pipe(concat('all.styl'))
 		.pipe(stylus())
 		.pipe(gulp.dest('public/css/'))

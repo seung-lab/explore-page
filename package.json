@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm test",
-    "start": "node app.js"
+    "start": "gulp make; node app.js"
   },
   "keywords": [
     "wow"
@@ -14,17 +14,17 @@
   "author": "William Silversmith <william.silversmith+npm@gmail.com>",
   "license": "None",
   "dependencies": {
-    "express": "^4.13.2",
-    "ejs": "^1.0.0",
-    "stylus": "^0.49.3",
+    "body-parser": "^1.9.3",
     "compression": "^1.2.1",
+    "debug": "^2.1.0",
+    "ejs": "^1.0.0",
+    "express": "^4.13.2",
+    "method-override": "^2.3.0",
+    "morgan": "^1.5.0",
+    "sax": "^0.6.1",
     "serve-favicon": "^2.1.7",
     "serve-static": "^1.7.1",
-    "morgan": "^1.5.0",
-    "body-parser": "^1.9.3",
-    "method-override": "^2.3.0",
-    "sax": "^0.6.1",
-    "debug": "^2.1.0"
+    "stylus": "^0.49.3"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
