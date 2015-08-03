@@ -7,6 +7,7 @@ var argv = require('yargs').argv,
 	rsync = require('gulp-rsync'),
 	print = require('gulp-print')
 	sourcemaps = require('gulp-sourcemaps'),
+	babel = require("gulp-babel"),
 	shell = require('gulp-shell'),
 	GulpSSH = require('gulp-ssh');
 
@@ -21,6 +22,7 @@ gulp.task('js', function () {
 		'assets/js/jquery-2.1.4.js',
 		'assets/js/*',
 	])
+		.pipe(babel())
 		.pipe(concat('all.js'))
 		.pipe(gulp.dest('public/js/'))
 });
