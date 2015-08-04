@@ -12,19 +12,41 @@ var argv = require('yargs').argv,
 	GulpSSH = require('gulp-ssh');
 
 var fs = require('fs');
+var del = require('del');
 var path = require('path');
 var extend = require('node.extend');
 
-gulp.task('make', ['js', 'css'], function () {}); 
+gulp.task('make', ['images', 'js', 'css', 'jsx' ]);
+
+gulp.task('images', function () {
+	gulp
+		.src('assets/images/*')
+		.pipe(gulp.dest('build/public/images/'))
+});
+
+gulp.task('clean', function () {
+	del([
+		'build/**'
+	]);
+});
 
 gulp.task('js', function () {
 	gulp.src([
 		'assets/js/jquery-2.1.4.js',
-		'assets/js/*',
+		'assets/js/*'
 	])
-		.pipe(babel())
 		.pipe(concat('all.js'))
-		.pipe(gulp.dest('public/js/'))
+		.pipe(gulp.dest('build/public/js/'));
+});
+
+gulp.task('jsx', function () {
+	gulp.src('views/components/*')
+		.pipe(babel())
+		.pipe(gulp.dest('build/public/components/')) // for script tag src
+		.pipe(gulp.dest('build/views/components/')); // for direct embedding <% include .... %>
+
+	gulp.src('views/pages/*')
+		.pipe(gulp.dest('build/views/'))
 });
 
 gulp.task('css', function () {
@@ -35,5 +57,15 @@ gulp.task('css', function () {
 	])
 		.pipe(concat('all.styl'))
 		.pipe(stylus())
-		.pipe(gulp.dest('public/css/'))
+		.pipe(gulp.dest('build/public/css/'))
+});
+
+gulp.task('watch', function () {
+	gulp.watch([
+		'assets/css/*'
+	], [ 'css' ]);
+
+	gulp.watch([
+		'views/**'
+	], [ 'jsx' ]);
 });
