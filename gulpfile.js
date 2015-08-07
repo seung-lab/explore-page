@@ -32,7 +32,7 @@ gulp.task('clean', function () {
 
 gulp.task('js', function () {
 	gulp.src([
-		'assets/js/jquery-2.1.4.js',
+		'assets/js/zepto.js',
 		'assets/js/*'
 	])
 		.pipe(concat('all.js'))
@@ -64,6 +64,14 @@ gulp.task('watch', function () {
 	gulp.watch([
 		'assets/css/*'
 	], [ 'css' ]);
+
+	gulp.watch([
+		'assets/images/*'
+	], [ 'images' ]);
+
+	gulp.watch([
+		'assets/js/*'
+	], [ 'js' ]);
 
 	gulp.watch([
 		'views/**'

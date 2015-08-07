@@ -180,3 +180,90 @@
 		return Utils.compose(fns);
 	}
 })(jQuery);
+
+// e.g. If using Zepto.js instead of jQuery proper.
+// Feel free to remove if necessary.
+
+(function ($) {
+	if (!$.fn.innerHeight) {
+		$.fn.innerHeight = function () {
+			var selector = $(this).first();
+
+			if (selector[0] == document) {
+				return "innerHeight" in window 
+               		? window.innerHeight
+               		: document.documentElement.offsetHeight; 
+			}
+
+			var style = window.getComputedStyle(selector[0]) || { 
+				"padding-top": 0, 
+				"padding-bottom": 0,
+			};
+
+			return selector.height() + parseFloat(style["padding-top"], 10) + parseFloat(style["padding-bottom"], 10);
+		};
+	}
+
+	if (!$.fn.innerWidth) {
+		$.fn.innerWidth = function () {
+			var selector = $(this).first();
+
+			if (selector[0] == document) {
+				return "innerHeight" in window 
+               		? window.innerWidth
+               		: document.documentElement.offsetWidth; 
+			}
+
+			var style = window.getComputedStyle(selector[0]) || { 
+				"padding-left": 0, 
+				"padding-right": 0,
+			};
+
+			return selector.width() + parseFloat(style["padding-left"], 10) + parseFloat(style["padding-right"], 10);
+		};
+	}
+
+	if (!$.fn.outerHeight) {
+		$.fn.outerHeight = function (include_margin) {
+			var selector = $(this).first();
+			var style = window.getComputedStyle(selector[0]) || { 
+				"border-top-width": 0, 
+				"border-bottom-width": 0,
+				"margin-top": 0,
+				"margin-bottom": 0,
+			};
+
+			var height = selector.innerHeight();
+			height += parseFloat(style['border-top-width'], 10) + parseFloat(style['border-bottom-width'], 10);
+
+			if (include_margin) {
+				height += parseFloat(style['margin-top'], 10) + parseFloat(style['margin-bottom'], 10);
+			}
+
+			return height;
+		};
+	}
+
+	if (!$.fn.outerWidth) {
+		$.fn.outerWidth = function (include_margin) {
+			var selector = $(this).first();
+			var style = window.getComputedStyle(selector[0]) || { 
+				"border-left-width": 0, 
+				"border-right-width": 0,
+				"margin-left": 0,
+				"margin-right": 0,
+			};
+
+			var width = selector.innerWidth();
+			width += parseFloat(style['border-left-width'], 10) + parseFloat(style['border-right-width'], 10);
+
+			if (include_margin) {
+				width += parseFloat(style['margin-left'], 10) + parseFloat(style['margin-right'], 10);
+			}
+
+			return width;
+		};
+	}
+})(jQuery || Zepto);
+
+

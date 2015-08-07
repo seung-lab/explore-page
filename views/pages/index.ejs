@@ -6,38 +6,22 @@
 	<meta charset='UTF-8'>
 	
 	<link href="css/all.css" rel="stylesheet" type="text/css">
-	<!-- <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,' rel='stylesheet' type='text/css'> -->
+	<link href='//fonts.googleapis.com/css?family=Roboto:100,400,400italic,' rel='stylesheet' type='text/css'>
 
-	<script type="text/javascript" src="js/all.js"></script>
-
-	<script>
-		var GLOBAL = {
-			mode: '<%= mode %>', // 'login' or 'registration'
-			takenusernames: {}, // cache for quick evaluation
-			takenemails: {},
-			registration: {
-				lastclick: "standard" // for determining the action of the enter key
-			}
-		}; 
-
-		$(document).ready(function () {
-			_.setTranslation(<%= translation %>);
-			Login.configurePage(GLOBAL.mode);
-		});
-	</script>
+	<script type="text/javascript" src="js/all.js"></script> 
 </head>
 <body>
-	<div class="container gateway">
-		<div class="eyewire"></div>
-		<div class="share"></div>
-	</div> 
+	<section id="gateway" class="container gateway">
+		<script> <% include /components/opening.js %> </script>
+		<div class="logotype"></div>
+		<div class="sharing"></div>
+		<div class="share"></div> 
+	</section> 
 
-	<div class="container">
+	<section class="container">
 		
-	</div>
-	<div id="example" class="container"></div>
-
-	<script> <% include ../components/hello.js %> </script>
+	</section>
+	<section id="example" class="container"></section>
 
  </body>
  </html>
