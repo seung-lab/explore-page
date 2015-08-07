@@ -1,0 +1,11 @@
+center-horizontal()
+	position absolute
+	left s("calc(50% - %s / 2)", @width)
+
+center-vertical()
+	position absolute
+	top s("calc(50% - %s / 2)", @height)
+	
+center()
+	center-vertical()
+	center-horizontal()

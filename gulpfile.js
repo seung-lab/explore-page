@@ -53,6 +53,7 @@ gulp.task('css', function () {
 	gulp.src([
 		'assets/css/normalize.css',
 		'assets/css/*.css',
+		'assets/css/mixins.styl',
 		'assets/css/*.styl'
 	])
 		.pipe(concat('all.styl'))

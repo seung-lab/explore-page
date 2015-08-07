@@ -1,3 +1,4 @@
+@import 'mixins.styl'
 
 html, body
     font-family Roboto, 'Lucida Grande', sans-serif
@@ -53,13 +54,22 @@ div.pitch
 	font-weight: 300;
 	letter-spacing: 5px;
 
-
 .gateway .logo
 	position absolute
-	top -150px
-	height 45px
+	top 10%
 	
+	width 45px
+	center-horizontal()
 
+	transition: top 150ms, left 150ms
 
+.gateway .explorebtn
+	width 45px
+	height @width
+	
+	background-color red
+	
+	center-horizontal()
+	bottom 10%
 
 
