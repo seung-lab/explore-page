@@ -45,6 +45,7 @@ section.container.gateway
 	color #FFF
 	align-items center
 	justify-content center
+	flex-direction column
 
 div.pitch
 	position relative
@@ -62,14 +63,37 @@ div.pitch
 	center-horizontal()
 
 	transition: top 150ms, left 150ms
+	
+.gateway .logotype
+	position absolute
+	top 10%
+	left 5%
+	
+	background-size: 100px 30px;
+	background-position: 0px 0px;
+	width: 120px;
+	height: 35px;
+	background-color: #F00;
+	
+	// background-image url("/images/registration-sprite.png")
+	// background-size 100px 30px
+	// background-position 0px 0px
+
+.gateway .share 
+	position absolute
+	top 10%
+	right 5%
+	
+	width 35px
+	height @width
+	background-color #F00
+	border-radius 100%
 
 .gateway .explorebtn
-	width 45px
-	height @width
-	
-	background-color red
-	
 	center-horizontal()
 	bottom 10%
+
+.gateway #continuebtn
+	margin-top 30px
 
 

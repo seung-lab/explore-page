@@ -1,7 +1,7 @@
 var Welcome = React.createClass({
 	getInitialState: function () {
 		return {
-			neuron_open: false,
+			
 		};
 	},
 	render: function () {
@@ -15,6 +15,6 @@ var Welcome = React.createClass({
 
 React.render(
 	<Welcome></Welcome>,
-	document.getElementById('gateway')
+	document.getElementById('opening')
 );
 
