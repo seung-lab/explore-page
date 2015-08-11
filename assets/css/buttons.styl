@@ -16,15 +16,26 @@ $primary_width = 200px
 
 button.primary,
 button.secondary
+	font-size 10px
+	
 	border-radius 15px
+	
 	background-color #FEDE7D
-	font-size 8px
 	color #4C4C4C
+	
 	height 45px
 	width $primary_width
 	
+	transition color 150ms, background-color 150ms, border-color 150ms
+	
 	border none
 	outline none
+	
+button.primary:hover 
+	background-color #F7DD8D
+	
+button.primary:active
+	background-color #E8CD7A
 
 button.secondary 
 	width  ($primary_width / $PHI)
@@ -33,3 +44,13 @@ button.secondary
 	color #737373
 	background-color transparent
 	border 1px solid #565656
+	
+button.secondary:hover 
+	background-color #51B4C3
+	color #FFF
+	border-color transparent
+	font-weight 400
+	
+button.secondary:active
+	background-color #409DAB
+	

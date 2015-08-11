@@ -7,6 +7,7 @@ var Welcome = React.createClass({
 	render: function () {
 		return (
 			<div className="pitch">
+				<img className="logo" src="images/ew.png" />
 				<div>Play a Game to Map the Brain</div>
 			</div>
 		);
