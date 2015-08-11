@@ -1,6 +1,4 @@
-//=require login.jsx
-
-var Welcome = React.createClass({
+var Login = React.createClass({
 	getInitialState: function () {
 		return {
 			
@@ -15,9 +13,4 @@ var Welcome = React.createClass({
 		);
 	},
 });
-
-React.render(
-	<Welcome></Welcome>,
-	document.getElementById('opening')
-);
 
