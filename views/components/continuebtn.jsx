@@ -1,7 +1,7 @@
 var ContinueBtn = React.createClass({
 	getInitialState: function () {
 		return {
-			text: "Start Playing"
+			text: "Start Playing",
 		};
 	},
 	render: function () {
