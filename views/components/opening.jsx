@@ -1,3 +1,14 @@
+// var Login = React.createClass({
+// 	getInitialState: function () {
+// 		return {};
+// 	},
+// 	render: function () {
+// 		return (
+			
+// 		);
+// 	},
+// });
+
 var Welcome = React.createClass({
 	getInitialState: function () {
 		return {
@@ -12,7 +23,7 @@ var Welcome = React.createClass({
 			</div>
 		);
 	},
-})
+});
 
 React.render(
 	<Welcome></Welcome>,
