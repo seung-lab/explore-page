@@ -12,23 +12,24 @@ button
 	letter-spacing 1px
 	font-weight 600
 
-primary_width = 175px
+$primary_width = 200px
 
-button.primary
-	border-radius 15px
-	background-color #FFDA64
-	font-size 8px
-	color #4C4C4C
-	height 40px
-	width primary_width
-	
-
+button.primary,
 button.secondary
-	width  {primary_width / PHI} "px"
 	border-radius 15px
-	
+	background-color #FEDE7D
 	font-size 8px
 	color #4C4C4C
-	height 40px
-	width 175px
+	height 45px
+	width $primary_width
 	
+	border none
+	outline none
+
+button.secondary 
+	width  ($primary_width / $PHI)
+	height 40px
+
+	color #737373
+	background-color transparent
+	border 1px solid #565656

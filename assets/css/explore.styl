@@ -1,4 +1,5 @@
 @import 'mixins.styl'
+@import 'buttons.styl'
 
 html, body
     font-family Roboto, 'Lucida Grande', sans-serif
@@ -64,16 +65,18 @@ div.pitch
 
 	transition: top 150ms, left 150ms
 	
+$corner_offset = 5%
+
 .gateway .logotype
 	position absolute
-	top 10%
-	left 5%
+	top $corner_offset
+	left $corner_offset
 	
-	background-size: 100px 30px;
-	background-position: 0px 0px;
-	width: 120px;
-	height: 35px;
-	background-color: #F00;
+	background-size 100px 30px
+	background-position 0px 0px
+	width 120px
+	height 35px
+	background-color #F00
 	
 	// background-image url("/images/registration-sprite.png")
 	// background-size 100px 30px
@@ -81,8 +84,8 @@ div.pitch
 
 .gateway .share 
 	position absolute
-	top 10%
-	right 5%
+	top $corner_offset
+	right $corner_offset
 	
 	width 35px
 	height @width
@@ -90,6 +93,7 @@ div.pitch
 	border-radius 100%
 
 .gateway .explorebtn
+	width ($primary_width / $PHI)
 	center-horizontal()
 	bottom 10%
 
