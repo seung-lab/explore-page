@@ -1,5 +1,6 @@
 @import 'mixins.styl'
 @import 'buttons.styl'
+@import 'parallax.styl'
 
 html, body
     font-family Roboto, 'Lucida Grande', sans-serif
@@ -11,11 +12,6 @@ html, body
     width 100%
     height 100%
 
-div.eyewire
-	background-image url("/images/registration-sprite.png")
-	width 100px
-	
-	background-position 0px 0px
 
 section.intake
 	width 100%
@@ -90,5 +86,15 @@ $corner_offset = 5%
 
 .gateway #continuebtn
 	margin-top 40px
+	
+/* parallax layers */
+
+.intake-front
+.intake-middle
+.intake-rear
+.intake-carpet
+.gateway
+	width: 5px
+	parallax(1px)
 
 
