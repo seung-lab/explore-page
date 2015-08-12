@@ -1,6 +1,4 @@
-//=require login.jsx
-
-var Welcome = React.createClass({
+var Login = React.createClass({
 	getInitialState: function () {
 		return {
 			
@@ -8,16 +6,11 @@ var Welcome = React.createClass({
 	},
 	render: function () {
 		return (
-			<div className="pitch">
+			<div className="login">
 				<img className="logo" src="images/ew.png" />
 				<div>Play a Game to Map the Brain</div>
 			</div>
 		);
 	},
 });
-
-React.render(
-	<Welcome></Welcome>,
-	document.getElementById('opening')
-);
 

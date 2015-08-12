@@ -3,6 +3,7 @@ var argv = require('yargs').argv,
 	concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
 	stylus = require('gulp-stylus'),
+	include = require('gulp-include'),
 	minifyCss = require('gulp-minify-css'),
 	rsync = require('gulp-rsync'),
 	print = require('gulp-print')
@@ -41,6 +42,7 @@ gulp.task('js', function () {
 
 gulp.task('jsx', function () {
 	gulp.src('views/components/*')
+		.pipe(include())
 		.pipe(babel())
 		.pipe(gulp.dest('build/public/components/')) // for script tag src
 		.pipe(gulp.dest('build/views/components/')); // for direct embedding <% include .... %>
