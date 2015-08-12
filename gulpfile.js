@@ -5,6 +5,7 @@ var argv = require('yargs').argv,
 	stylus = require('gulp-stylus'),
 	include = require('gulp-include'),
 	minifyCss = require('gulp-minify-css'),
+	autoprefixer = require('gulp-autoprefixer'),
 	rsync = require('gulp-rsync'),
 	print = require('gulp-print')
 	sourcemaps = require('gulp-sourcemaps'),
@@ -16,6 +17,8 @@ var fs = require('fs');
 var del = require('del');
 var path = require('path');
 var extend = require('node.extend');
+
+gulp.task('default', ['make']);
 
 gulp.task('make', ['images', 'js', 'css', 'jsx' ]);
 
@@ -60,6 +63,9 @@ gulp.task('css', function () {
 	])
 		.pipe(concat('all.styl'))
 		.pipe(stylus())
+		.pipe(autoprefixer({
+			browser: "> 1%, last 2 versions, Firefox ESR"
+		}))
 		.pipe(gulp.dest('build/public/css/'))
 });
 

@@ -10,9 +10,7 @@
 	overflow-y auto
 
 
-.parallax-layer,
-.parallax-layer-base,
-.parallax-layer-back
+.parallax-layer
 	position absolute
 	top 0
 	right 0
@@ -20,13 +18,6 @@
 	left 0
 	
 	transform-origin-x: 100%;
-
-.parallax-layer-base 
-	transform translateZ(0)
-
-.parallax-layer-back 
-	transform translateZ(-1px)
-
 
 // Excerpt from "Pure CSS Parallax Websites"
 // The scale factor can be calculated with 1 + (translateZ * -1) / perspective. 
