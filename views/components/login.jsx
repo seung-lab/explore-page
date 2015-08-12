@@ -6,7 +6,7 @@ var Login = React.createClass({
 	},
 	render: function () {
 		return (
-			<div className="pitch">
+			<div className="login">
 				<img className="logo" src="images/ew.png" />
 				<div>Play a Game to Map the Brain</div>
 			</div>
