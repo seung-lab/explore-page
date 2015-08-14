@@ -44,12 +44,23 @@
  	var start_time = new Date();
  	var start_pos = this.scrollTop();
 
+ 	// if you simply use overflow-y: hidden, the animation is laggy 
+ 	// so here are some hacks to display like scrolling is allowed without 
+ 	// actually allowing it
+ 	_this
+ 		.addClass('autoscrolling') 
+ 		.on('mousewheel DOMMouseScroll', function (evt) {
+ 			evt.preventDefault();
+ 			evt.stopPropagation();
+ 		});
+
  	function animate () {
- 		var now = new Date();
+		var now = new Date();
  		var t = (now - start_time) / msec;
 
  		if (position_offset - distance_traveled <= 0.0001 || t >= 1) {
  			_this.scrollTop(start_pos + position_offset);
+ 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
  			return;
  		}
  		
