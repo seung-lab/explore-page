@@ -25,7 +25,11 @@ gulp.task('make', ['images', 'js', 'css', 'jsx' ]);
 gulp.task('images', function () {
 	gulp
 		.src('assets/images/**')
-		.pipe(gulp.dest('build/public/images/'))
+		.pipe(gulp.dest('build/public/images/'));
+
+	gulp
+		.src('assets/favicon*')
+		.pipe(gulp.dest('build/public/'));
 });
 
 gulp.task('clean', function () {

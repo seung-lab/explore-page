@@ -31,6 +31,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(serveStatic('build/public'));
+app.use(favicon('build/public/favicon.ico'));
 
 app.get('/', routes.index);
 
