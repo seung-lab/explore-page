@@ -46,8 +46,10 @@ parallax-neuron($url, $side, $dx, $dy)
 	
 	if $side is 'left'
 		left $computation
-	else
+	else if $side is 'right'
 		right $computation
+	else if $side is 'center'
+		left s("calc(50% - %s / 2)", @width)
 		
 
 
