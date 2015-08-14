@@ -24,7 +24,7 @@ gulp.task('make', ['images', 'js', 'css', 'jsx' ]);
 
 gulp.task('images', function () {
 	gulp
-		.src('assets/images/*')
+		.src('assets/images/**')
 		.pipe(gulp.dest('build/public/images/'))
 });
 
@@ -75,7 +75,7 @@ gulp.task('watch', function () {
 	], [ 'css' ]);
 
 	gulp.watch([
-		'assets/images/*'
+		'assets/images/**'
 	], [ 'images' ]);
 
 	gulp.watch([

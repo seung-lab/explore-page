@@ -1,0 +1,200 @@
+@import 'mixins.styl'
+@import 'buttons.styl'
+@import 'parallax.styl'
+
+html, body
+    font-family Roboto, 'Lucida Grande', sans-serif
+    font-weight 400
+
+    -moz-box-sizing border-box
+    box-sizing border-box
+    
+    width 100%
+    height 100%
+    
+    overflow hidden
+
+
+section.intake
+	width 100%
+	height 100%
+	overflow-x hidden
+	overflow-y auto
+		
+	background rgb(1, 19, 34) 
+
+.intake > div,
+.intake > section
+	position absolute
+	overflow-y visible
+	
+	height 100%
+	width 100%
+	
+
+section.gateway
+	/* Fix a bug with cover in Android Chrome
+	   where it appearently doesn't work on html/body
+	   but works in other situations. */
+	   
+	height 100vh
+	margin 0
+	overflow-x hidden
+	overflow-y auto
+	padding 0
+	width 100%
+
+	display flex
+	color white
+	align-items center
+	justify-content center
+	flex-direction column
+
+div.pitch
+	position relative
+	text-transform uppercase
+	
+	font-size 30px
+	font-weight 100
+	letter-spacing 5px
+
+.gateway .logo
+	position absolute
+	top -150px
+	
+	width 45px
+	center-horizontal()
+
+	transition: top 150ms, left 150ms
+	
+$corner_offset = 5%
+
+.gateway .logotype
+	position absolute
+	top $corner_offset
+	left $corner_offset
+	
+	background-image url('/images/logotype.svg') 
+	background-size 100px 30px
+	background-repeat no-repeat
+	width 120px
+	height 35px
+	
+.gateway .share 
+	position absolute
+	top $corner_offset
+	right $corner_offset
+	
+	width 20px
+	height @width
+	background-color #F00
+	border-radius 100%
+
+.gateway .explorebtn
+	width ($primary_width / $PHI)
+	center-horizontal()
+	bottom 10%
+
+.gateway #continuebtn
+	margin-top 40px
+	
+/* parallax layers */	
+
+.intake .neuron
+	position absolute
+	background-size contain
+	background-repeat no-repeat
+	
+	width 600px
+	height 100%
+	
+	
+.intake .left
+	1 // no-op
+	
+.intake .right 
+	1 // no-op
+
+.intake .intake-front
+	z-index 50
+	parallax(150px)
+	
+.intake .intake-front .left
+	parallax-neuron(
+		$url: '/images/background/front-left.png', 
+		$side: 'left', 
+		$dx: 0.5, 
+		$dy: 275px
+	)
+	
+	
+.intake .intake-front .right
+	parallax-neuron(
+		$url: '/images/background/front-right.png', 
+		$side: 'right', 
+		$dx: 1, 
+		$dy: 200px
+	)
+	
+.intake .intake-middle
+	z-index 40
+	parallax(100px)
+	
+.intake .intake-middle .left
+	parallax-neuron(
+		$width: 1547px,
+		$url: '/images/background/middle-left-blur.png', 
+		$side: 'left', 
+		$dx: 1, 
+		$dy: 200px
+	)
+	
+.intake .intake-middle .right
+	parallax-neuron(
+		$url: '/images/background/middle-right-blur.png', 
+		$side: 'right', 
+		$dx: 1, 
+		$dy: 200px
+	)
+	
+.intake .intake-rear
+	z-index 30
+	parallax(50px)
+	
+.intake .intake-rear .left
+	parallax-neuron(
+		$url: '/images/background/rear-left-blur.png', 
+		$side: 'left', 
+		$dx: 1, 
+		$dy: 200px
+	)
+	
+.intake .intake-rear .right
+	parallax-neuron(
+		$url: '/images/background/middle-right-blur.png', 
+		$side: 'right', 
+		$dx: 1, 
+		$dy: 200px
+	)
+	
+.intake .intake-carpet
+	z-index 20
+	parallax(25px)
+	
+
+.intake .intake-carpet .neuron
+	$url = '/images/background/neural-carpet-blur.png'
+	parallax-neuron(
+		$url: $url,
+		$side: 'right', 
+		$dx: 1, 
+		$dy: 100px
+	)
+	
+.gateway
+	z-index 60
+	parallax(1px)
+
+
+.explore 
+	height 100%
