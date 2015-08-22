@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="<%= language %>"> 
+<head>
+	<title><%= title %></title>
+	<meta charset='UTF-8'>
+
+	<link rel="shortcut icon" sizes="16x16" href="favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" sizes="32x32" href="favicon32x32.png" type="image/png">
+	<link rel="shortcut icon" sizes="64x64" href="favicon64x64.png" type="image/png">
+	
+	<link href="css/all.css" rel="stylesheet" type="text/css">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700,800' rel='stylesheet' type='text/css'>
+
+	<script type="text/javascript" src="js/all.js"></script> 
+
+	<script>
+		var GLOBAL = {
+			mode: '<%= mode %>', // 'login' or 'registration'
+			takenusernames: {}, // cache for quick evaluation
+			takenemails: {},
+			registration: {
+				lastclick: "standard" // for determining the action of the enter key
+			}
+		}; 
+
+		$(document).ready(function () {
+			_.setTranslation(<%= translation %>);
+			//Login.configurePage(GLOBAL.mode);
+
+			$('.intake').scrollTo('.gateway', {
+				msec: 1500,
+			});
+		});
+	</script>
+</head>
+<body>
+	<section class="intake parallax parallax-group">
+		<div class="intake-front parallax-layer">
+			<div class="left neuron"></div>
+			<div class="right neuron"></div>
+		</div>
+		<div class="intake-middle parallax-layer">
+			<div class="left neuron"></div>
+			<div class="right neuron"></div>
+		</div> 
+		<div class="intake-rear parallax-layer">
+			<div class="left neuron"></div>
+			<div class="right neuron"></div>
+		</div>
+		<div class="intake-carpet parallax-layer">
+			<div class="neuron"></div>
+		</div>
+		<section class="gateway parallax-layer">
+			<div class="logotype"></div>
+			<div class="share"></div>
+
+			<div id="opening">
+				<script> <% include /components/opening.js %> </script>
+			</div>
+			<div id="continuebtn">
+				<script> <% include /components/continuebtn.js %> </script>
+			</div>
+
+			<button class="explorebtn secondary">Explore</button>
+		</section> 
+	</section>
+	<section class="explore">
+
+	</section>
+ </body>
+ </html>
