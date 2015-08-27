@@ -2,17 +2,17 @@ $PHI = 1.618
 
 $IMAGES_DIR = ".."
 
-center-horizontal()
+center-horizontal(offset=0px)
 	position absolute
-	left s("calc(50% - %s / 2)", @width)
+	left s("calc(50% - %s / 2 + %s)", @width, offset)
 
-center-vertical()
+center-vertical(offset=0px)
 	position absolute
-	top s("calc(50% - %s / 2)", @height)
+	top s("calc(50% - %s / 2 + %s)", @height, offset)
 	
-center()
-	center-vertical()
-	center-horizontal()
+center(dx=0px, dy=0px)
+	center-vertical(dx)
+	center-horizontal(dy)
 	
 preserve-aspect-ratio($path)
 	height unit(@width / aspect-ratio($path), 'px')

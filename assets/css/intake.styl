@@ -1,5 +1,6 @@
 @import 'mixins.styl'
 @import 'buttons.styl'
+@import 'colors.styl'
 @import 'parallax.styl'
 
 html, body
@@ -15,7 +16,7 @@ html, body
     overflow hidden
 
 
-section.intake
+.intake
 	width 100%
 	height 100%
 	overflow-x hidden
@@ -24,8 +25,8 @@ section.intake
 	background rgb(1, 19, 34) url("/images/intake-background.png")
 	background-size cover
 
-.intake > div,
-.intake > section
+.intake .parallax > div,
+.intake .parallax > section
 	position absolute
 	overflow-y visible
 	
@@ -33,6 +34,84 @@ section.intake
 	height 100%
 	width 100%
 	
+
+$logo_width = 200px
+
+.intake .parallax .logo
+	position fixed
+	
+	background-image url("/images/loader.gif")
+	background-repeat no-repeat
+
+	width $logo_width
+	height @width
+	
+	center()
+
+.logo::before,
+.logo::after
+	content " "
+	display block
+	width 0px
+	height 1px
+	
+	background-color $BLUE
+	border none
+	outline none
+	position absolute
+	top 50%
+	
+	animation-iteration-count 1
+	animation-timing-function linear
+	animation-delay 1.45s
+	animation-duration 1.5s
+
+$logo_rule_start_pos = 85%
+
+.logo::after
+	animation-name motion-rule-right
+	left $logo_rule_start_pos
+	
+.logo::before
+	animation-name motion-rule-left
+	right $logo_rule_start_pos
+
+@keyframes motion-rule-right {
+	0% {
+		width 0%
+		left $logo_rule_start_pos
+	}
+	50% {
+		width 200%
+		left $logo_rule_start_pos
+	}
+	80% {
+		width 300%
+	}
+	100% {
+		width 300%
+		left 800%
+	}
+}	
+
+@keyframes motion-rule-left {
+	0% {
+		width 0%
+		right $logo_rule_start_pos
+	}
+	50% {
+		width 200%
+		right $logo_rule_start_pos
+	}
+	80% {
+		width 300%
+	}
+	100% {
+		width 300%
+		right 800%
+	}
+}
+
 
 section.gateway
 	/* Fix a bug with cover in Android Chrome
@@ -60,18 +139,17 @@ div.pitch
 	font-weight 100
 	letter-spacing 5px
 
-.gateway .logo
-	position absolute
-	top -150px
+header
+	position fixed
+	top 0
+	left 0
 	
-	width 45px
-	center-horizontal()
+	width 100%
+	height 100%
 
-	transition: top 150ms, left 150ms
-	
 $corner_offset = 5%
 
-.gateway .logotype
+header .logotype
 	position absolute
 	top $corner_offset
 	left $corner_offset
@@ -82,14 +160,20 @@ $corner_offset = 5%
 	width 120px
 	height 35px
 	
-.gateway .share 
+	transition opacity 150ms
+	
+header .logotype.invisible
+	opacity 0
+	
+header .share 
 	position absolute
 	top $corner_offset
 	right $corner_offset
 	
 	opacity 0.3
 	
-	
+header .share.invisible
+	opacity 0
 
 .gateway .explorebtn
 	width ($primary_width / $PHI)
@@ -100,6 +184,11 @@ $corner_offset = 5%
 	margin-top 40px
 	
 /* parallax layers */	
+
+.intake .logo
+	position absolute
+	z-index 60
+	parallax(-700px)
 
 .intake .neuron
 	position absolute

@@ -16,7 +16,7 @@
  * Return: void
  */
  $.fn.scrollTo = function (target, options, callback) {
- 	callback = Utils.findCallback(arguments);
+ 	callback = Utils.findCallback(arguments) || function () {};
 
  	var _this = $(this);
 
@@ -40,8 +40,10 @@
  	offset += _this.scrollTop() + position_offset;
  	offset = Math.max(offset, 0);
 
+ 	window.performance.now = window.performance.now || Date.now;
+
  	var distance_traveled = 0;
- 	var start_time = new Date();
+ 	var start_time = window.performance.now();
  	var start_pos = this.scrollTop();
 
  	// if you simply use overflow-y: hidden, the animation is laggy 
@@ -55,12 +57,13 @@
  		});
 
  	function animate () {
-		var now = new Date();
+		var now = window.performance.now();
  		var t = (now - start_time) / msec;
 
  		if (position_offset - distance_traveled <= 0.0001 || t >= 1) {
  			_this.scrollTop(start_pos + position_offset);
  			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
+ 			callback();
  			return;
  		}
  		
