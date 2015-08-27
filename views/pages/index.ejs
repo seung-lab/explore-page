@@ -28,45 +28,56 @@
 			_.setTranslation(<%= translation %>);
 			//Login.configurePage(GLOBAL.mode);
 
-			$('.intake').scrollTo('.gateway', {
-				msec: 1500,
-			});
+			
+			setTimeout(function () {
+				$('.logo').addClass('fixed');
+				$('.intake .parallax').scrollTo('.gateway', {
+					msec: 1750,
+				}, function () {
+					$('header').children().removeClass('invisible');
+				});
+			}, 2500);
 		});
 	</script>
 </head>
 <body>
-	<section class="intake parallax parallax-group">
-		<div class="intake-front parallax-layer">
-			<div class="left neuron"></div>
-			<div class="right neuron"></div>
-		</div>
-		<div class="intake-middle parallax-layer">
-			<div class="left neuron"></div>
-			<div class="right neuron"></div>
-		</div> 
-		<div class="intake-rear parallax-layer">
-			<div class="left neuron"></div>
-			<div class="right neuron"></div>
-		</div>
-		<div class="intake-carpet parallax-layer">
-			<div class="neuron"></div>
-		</div>
-		<section class="gateway parallax-layer">
-			<div class="logotype"></div>
-			<div class="share"></div>
-
-			<div id="opening">
-				<script> <% include /components/opening.js %> </script>
+	<section class="intake">
+		<div class="parallax parallax-group">
+			<div class="logo parallax-layer"></div>
+			<div class="intake-front parallax-layer">
+				<div class="left neuron"></div>
+				<div class="right neuron"></div>
 			</div>
-			<div id="continuebtn">
-				<script> <% include /components/continuebtn.js %> </script>
+			<div class="intake-middle parallax-layer">
+				<div class="left neuron"></div>
+				<div class="right neuron"></div>
+			</div> 
+			<div class="intake-rear parallax-layer">
+				<div class="left neuron"></div>
+				<div class="right neuron"></div>
 			</div>
+			<div class="intake-carpet parallax-layer">
+				<div class="neuron"></div>
+			</div>
+			<section class="gateway parallax-layer">
+				<div id="opening">
+					<script> <% include /components/opening.js %> </script>
+				</div>
+				<div id="continuebtn">
+					<script> <% include /components/continuebtn.js %> </script>
+				</div>
 
-			<button class="explorebtn secondary">Explore</button>
-		</section> 
+				<button class="explorebtn secondary">Explore</button>
+			</section> 
+		</div>
 	</section>
 	<section class="explore">
 
 	</section>
+	<header>
+		<div class="logotype invisible"></div>
+		<div class="share invisible"></div>
+	</header>
+
  </body>
  </html>
