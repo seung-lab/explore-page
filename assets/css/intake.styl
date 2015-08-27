@@ -42,11 +42,18 @@ $logo_width = 200px
 	
 	background-image url("/images/loader.gif")
 	background-repeat no-repeat
+	background-size contain
 
 	width $logo_width
 	height @width
 	
 	center()
+
+	transition height 2s ease-out, width 2s ease-out
+
+.intake .parallax .logo.fixed
+	width ($logo_width * 0.75)
+	height ($logo_width * 0.75)
 
 .logo::before,
 .logo::after
