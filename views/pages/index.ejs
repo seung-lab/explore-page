@@ -32,7 +32,8 @@
 			setTimeout(function () {
 				$('.logo').addClass('fixed');
 				$('.intake .parallax').scrollTo('.gateway', {
-					msec: 1750,
+					msec: 3000,
+					easing: Easing.springFactory(.5, 2),
 				}, function () {
 					$('header').children().removeClass('invisible');
 				});
