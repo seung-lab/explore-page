@@ -12,12 +12,20 @@ Easing = {};
 	 * Solve for the boundary conditions: x(0) = 1, x(1) = 0
 	 *
 	 * Required:
-	 *   [0] zeta: Damping constant in [0, 1] (< 1: underdamped, 1: critically damped)
+	 *   [0] zeta: Damping constant in [0, 1) (0: undamped, < 1: underdamped)
 	 *   [1] k: integer in [0..inf], 
 	 *
 	 * Returns: f(t), t in 0..1
 	 */
 	Easing.springFactory = function (zeta, k) {
+		if (zeta < 0 || zeta >= 1) {
+			throw new Error("Parameter 1 (zeta) must be in range [0, 1). Given: " + zeta);
+		}
+
+		if (k < 0 || Math.floor(k) !== k) {
+			throw new Error("Parameter 2 (k) must be an integer in range [0, inf). Given: " + k);
+		}
+
 		var odd_number = 1 + 2 * k;
 
 		var omega = odd_number / 4 / Math.sqrt(1 - zeta * zeta); // solution set for x(1) = 0
