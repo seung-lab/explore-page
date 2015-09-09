@@ -20,7 +20,7 @@ var extend = require('node.extend');
 
 gulp.task('default', ['make']);
 
-gulp.task('make', ['images', 'js', 'css', 'jsx' ]);
+gulp.task('make', ['images', 'animations', 'js', 'css', 'jsx' ]);
 
 gulp.task('images', function () {
 	gulp
@@ -30,6 +30,12 @@ gulp.task('images', function () {
 	gulp
 		.src('assets/favicon*')
 		.pipe(gulp.dest('build/public/'));
+});
+
+gulp.task('animations', function () {
+	gulp
+		.src('assets/animations/**')
+		.pipe(gulp.dest('build/public/animations/'));
 });
 
 gulp.task('clean', function () {

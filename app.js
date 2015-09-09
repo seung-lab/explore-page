@@ -34,6 +34,9 @@ app.use(serveStatic('build/public'));
 app.use(favicon('build/public/favicon.ico'));
 
 app.get('/', routes.index);
+app.get('/test', function (req, res) {
+	res.render('test');
+})
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
