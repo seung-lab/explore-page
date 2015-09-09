@@ -1,4 +1,4 @@
-/* Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
+/* @license Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
 
 var Zepto = (function() {
   var undefined, key, $, classList, emptyArray = [], slice = emptyArray.slice, filter = emptyArray.filter,
