@@ -28,12 +28,13 @@
 			_.setTranslation(<%= translation %>);
 			//Login.configurePage(GLOBAL.mode);
 
-			
+			var pixels = $('.gateway').position().top;
+
 			setTimeout(function () {
 				$('.logo').addClass('fixed');
 				$('.intake .parallax').scrollTo('.gateway', {
 					msec: 10000,
-					easing: Easing.springFactory(.15, 14),
+					easing: Easing.springFactory(.15, 14, pixels, 5),
 				}, function () {
 					$('header').children().removeClass('invisible');
 				});
@@ -71,10 +72,10 @@
 				</div>
 
 				<button class="explorebtn secondary">Explore</button>
-			</section> 
+			</section> <!-- 
 			<section id="registration">
 				<script> <% include /components/registration.js %> </script>
-			</section>
+			</section> -->
 		</div>
 	</section>
 	<section class="explore">

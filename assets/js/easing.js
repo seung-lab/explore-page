@@ -11,13 +11,21 @@ Easing = {};
 	 *
 	 * Solve for the boundary conditions: x(0) = 1, x(1) = 0
 	 *
+	 * The bounce can look jerky towards the end because the motion is less than a pixel
+	 * per frame. Use the optional arguments to create a minimum motion if you can't use
+	 * anti-aliasing.
+	 *
 	 * Required:
 	 *   [0] zeta: Damping constant in [0, 1) (0: undamped, < 1: underdamped)
-	 *   [1] k: integer in [0..inf], 
+	 *   [1] k: integer in [0..inf]
+	 *
+	 * Optional:
+	 *   [1] pixels: total distance in pixels we're moving
+	 *   [2] dynamics: number of pixels above 0 for undamped sinusoidal component
 	 *
 	 * Returns: f(t), t in 0..1
 	 */
-	Easing.springFactory = function (zeta, k) {
+	Easing.springFactory = function (zeta, k, pixels, dynamics) {
 		if (zeta < 0 || zeta >= 1) {
 			throw new Error("Parameter 1 (zeta) must be in range [0, 1). Given: " + zeta);
 		}
@@ -31,9 +39,26 @@ Easing = {};
 		var omega = odd_number / 4 / Math.sqrt(1 - zeta * zeta); // solution set for x(1) = 0
 		omega *= 2 * Math.PI; // normalize sinusoid period to 0..1
 
+		var decayfn = function (t) {
+			return Math.exp(-t * zeta * omega);
+		};
+
+		// subpixel correction
+		if (pixels) {
+			dynamics = dynamics || 1;
+
+			decayfn = (function (fn) {
+				var ipx = dynamics / pixels;
+
+				return function (t) {
+					return ipx + (1 - ipx) * fn(t);
+				};
+			})(decayfn);
+		}
+
 		return function (t) {
 			t = Utils.clamp(t, 0, 1);
-			return 1 - Math.exp(-t * zeta * omega) * Math.cos(Math.sqrt(1 - zeta * zeta) * omega * t);
+			return 1 - decayfn(t) * Math.cos(Math.sqrt(1 - zeta * zeta) * omega * t);
 		};
 	};
 	
