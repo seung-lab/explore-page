@@ -652,6 +652,7 @@
 
 	// if we have a global version of jQuery we'll automatically attach the script as a plugin
 	if (window.jQuery){ attachSelfAsPlugin(window.jQuery); }
+	if (window.Zepto){ attachSelfAsPlugin(window.Zepto); }
 
 	var elementStore = new Store();
 
