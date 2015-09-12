@@ -4,6 +4,8 @@ Login = {};
 	"use strict";
 
 	Login.introductoryAnimation = function () {
+		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
+
 		var pixels = $('.gateway').position().top;
 
 		setTimeout(function () {
@@ -17,7 +19,5 @@ Login = {};
 			});
 		}, 2500);
 	};
-
-
 
 })(jQuery);

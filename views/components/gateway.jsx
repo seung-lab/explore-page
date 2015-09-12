@@ -5,14 +5,14 @@ var Gateway = React.createClass({
 	},
 	gotoRegistration: function () {
 		$('.intake .parallax').scrollTo('#registration', {
-			msec: 2500,
-			easing: Easing.springFactory(.7, 1),
+			msec: 1000,
+			easing: Easing.springFactory(.4, 0),
 		});
 	},
 	gotoExplore: function () {
 		$('body').scrollTo('.explore', {
 			msec: 2500,
-			easing: Easing.springFactory(.7, 1),
+			easing: Easing.springFactory(.9, 0),
 		});
 	},
 	render: function () {
