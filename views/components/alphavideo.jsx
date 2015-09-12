@@ -102,8 +102,3 @@ var AlphaVideo = React.createClass({
 	},
 });
 
-React.render(
-	<AlphaVideo></AlphaVideo>,
-	document.getElementById('registration')
-);
-

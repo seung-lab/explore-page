@@ -1,6 +1,3 @@
-
-
-
 var Registration = React.createClass({
 	displayName: "Registration",
 	getInitialState: function () {
@@ -17,7 +14,7 @@ var Registration = React.createClass({
 		var btnlabel = this.buttonName();
 
 		return (
-			<div>
+			<div className="registration">
 				<img src="/images/ew.png" alt="EyeWire Logo"></img>
 				<div className="location-text">{this.state.locationName}</div>
 				<div className="progress-indicator"></div>
@@ -33,9 +30,3 @@ var Registration = React.createClass({
 		);
 	},
 });
-
-React.render(
-	<Registration></Registration>,
-	document.getElementById('registration')
-);
-

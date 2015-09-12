@@ -14,7 +14,13 @@
 
 	<script type="text/javascript" src="js/all.js"></script> 
 
+	<script> <% include /react/components.js %> </script>
+
 	<script>
+		function react_render (klass, selector) {
+			React.render(React.createElement(klass, null), $(selector)[0]);
+		}
+
 		var GLOBAL = {
 			mode: '<%= mode %>', // 'login' or 'registration'
 			takenusernames: {}, // cache for quick evaluation
@@ -28,17 +34,7 @@
 			_.setTranslation(<%= translation %>);
 			//Login.configurePage(GLOBAL.mode);
 
-			var pixels = $('.gateway').position().top;
-
-			setTimeout(function () {
-				$('.logo').addClass('fixed');
-				$('.intake .parallax').scrollTo('.gateway', {
-					msec: 2500,
-					easing: Easing.springFactory(.7, 1),
-				}, function () {
-					$('header').children().removeClass('invisible');
-				});
-			}, 2500);
+			Login.introductoryAnimation();
 		});
 	</script>
 </head>
@@ -62,20 +58,11 @@
 				<div class="neuron"></div>
 			</div>
 			<section class="gateway parallax-layer">
-				<div id="opening">
-					<div class="login">
-						<div>A Game to Map the Brain</div>
-					</div>
-				</div>
-				<div id="continuebtn">
-					<button class="primary">Start Playing</button>
-				</div>
-
-				<button class="explorebtn secondary">Explore</button>
-			</section> <!-- 
+				<script> react_render(Gateway, '.gateway') </script>
+			</section> 
 			<section id="registration">
-				<script> <% include /components/registration.js %> </script>
-			</section> -->
+				<script> react_render(Registration, '#registration') </script>
+			</section>
 		</div>
 	</section>
 	<section class="explore">

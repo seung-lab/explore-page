@@ -57,8 +57,9 @@ gulp.task('jsx', function () {
 	gulp.src('views/components/*')
 		.pipe(include())
 		.pipe(babel())
-		.pipe(gulp.dest('build/public/components/')) // for script tag src
-		.pipe(gulp.dest('build/views/components/')); // for direct embedding <% include .... %>
+		.pipe(concat('components.js'))
+		.pipe(gulp.dest('build/public/react/')) // for script tag src
+		.pipe(gulp.dest('build/views/react/')); // for direct embedding <% include .... %>
 
 	gulp.src('views/pages/*')
 		.pipe(gulp.dest('build/views/'))
@@ -80,6 +81,10 @@ gulp.task('css', function () {
 });
 
 gulp.task('watch', function () {
+	gulp.watch([
+		'assets/animations/**'
+	], [ 'animations' ]);
+
 	gulp.watch([
 		'assets/css/*'
 	], [ 'css' ]);
