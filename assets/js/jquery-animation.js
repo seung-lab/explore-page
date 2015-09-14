@@ -11,13 +11,10 @@
  *     msec: defaults to 250 msec
  *     easing: defaults to ease-in-out-cubic
  *     offset: in pixels (positive scrolls downward more)
- *   [last] callback
  *
  * Return: void
  */
- $.fn.scrollTo = function (target, options, callback) {
- 	callback = Utils.findCallback(arguments) || function () {};
-
+ $.fn.scrollTo = function (target, options) {
  	var _this = $(this);
 
  	if (target === null) {
@@ -57,14 +54,27 @@
  			evt.stopPropagation();
  		});
 
+ 	var req;
+
+ 	var deferred = $.Deferred()
+ 		.done(function () {
+ 			_this.scrollTop(start_pos + position_offset);
+ 		})
+ 		.fail(function () {
+ 			if (req) {
+ 				cancelAnimationFrame(req);
+ 			}
+ 		})
+ 		.always(function () {
+ 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
+ 		});
+
  	function animate () {
 		var now = window.performance.now();
  		var t = (now - start_time) / msec;
 
  		if (t >= 1) {
- 			_this.scrollTop(start_pos + position_offset);
- 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
- 			callback();
+ 			deferred.resolve();
  			return;
  		}
  		
@@ -73,12 +83,12 @@
  		distance_traveled = proportion * position_offset;
  		_this.scrollTop(start_pos + distance_traveled);
 
- 		requestAnimationFrame(animate);
+ 		req = requestAnimationFrame(animate);
  	}
 
- 	requestAnimationFrame(animate);
+ 	req = requestAnimationFrame(animate);
 
- 	return this;
+ 	return deferred;
  };
 
 })(jQuery);

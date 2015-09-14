@@ -4,7 +4,7 @@
 @import 'parallax.styl'
 
 html, body
-    font-family Roboto, 'Lucida Grande', sans-serif
+    font-family Lato, 'Lucida Grande', sans-serif
     font-weight 400
 
     -moz-box-sizing border-box
@@ -13,8 +13,9 @@ html, body
     width 100%
     height 100%
     
-    overflow hidden
-
+    //overflow hidden
+body
+	overflow-y hidden
 
 .intake
 	width 100%
@@ -143,9 +144,11 @@ div.pitch
 	position relative
 	text-transform uppercase
 	
+	font-weight 300
 	font-size 30px
-	font-weight 100
-	letter-spacing 5px
+	text-transform uppercase
+	letter-spacing 2px
+	word-spacing 5px
 
 header
 	position fixed
