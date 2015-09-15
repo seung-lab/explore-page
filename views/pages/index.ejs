@@ -17,11 +17,8 @@
 	<script> <% include /react/components.js %> </script>
 
 	<script>
-		function react_render (klass, selector) {
-			React.render(React.createElement(klass, null), $(selector)[0]);
-		}
-
 		var GLOBAL = {
+			components: {},
 			mode: '<%= mode %>', // 'login' or 'registration'
 			takenusernames: {}, // cache for quick evaluation
 			takenemails: {},
@@ -30,47 +27,49 @@
 			}
 		}; 
 
+		var _intakectrl = new Login.IntakeController();
+
+
 		$(document).ready(function () {
 			_.setTranslation(<%= translation %>);
 			//Login.configurePage(GLOBAL.mode);
 
-			Login.introductoryAnimation();
+			_intakectrl.playIntro();
 		});
 	</script>
 </head>
 <body>
-	<section class="intake">
-		<div class="parallax parallax-group">
-			<div class="logo parallax-layer"></div>
-			<div class="intake-front parallax-layer">
+	<section id="viewport" class="parallax">
+		<div class="parallax-group">
+			<div id="intake-logo" class="logo parallax-layer"></div>
+			<div class="intake-front parallax-layer neuron-layer">
 				<div class="left neuron"></div>
 				<div class="right neuron"></div>
 			</div>
-			<div class="intake-middle parallax-layer">
+			<div class="intake-middle parallax-layer neuron-layer">
 				<div class="left neuron"></div>
 				<div class="right neuron"></div>
 			</div> 
-			<div class="intake-rear parallax-layer">
+			<div class="intake-rear parallax-layer neuron-layer">
 				<div class="left neuron"></div>
 				<div class="right neuron"></div>
 			</div>
-			<div class="intake-carpet parallax-layer">
+			<div class="intake-carpet parallax-layer neuron-layer">
 				<div class="neuron"></div>
 			</div>
 			<section class="gateway parallax-layer">
-				<script> react_render(Gateway, '.gateway') </script>
+				<script> Login.component('gateway', Gateway, '.gateway') </script>
 			</section> 
-			<section id="registration">
-				<script> react_render(Registration, '#registration') </script>
+			<section id="registration" class="parallax-layer">
+				<script> Login.component('registration', Registration, '#registration') </script>
 			</section>
+			<!-- <section class="explore parallax-layer">
+			a
+			</section> -->
 		</div>
 	</section>
-	<section class="explore">
-		a
-	</section>
 	<header>
-		<div class="logotype invisible"></div>
-		<div class="share invisible"></div>
+		<script> Login.component('header', FixedHeader, 'header') </script>
 	</header>
 
  </body>

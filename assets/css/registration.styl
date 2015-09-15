@@ -1,8 +1,7 @@
-@import 'mixins.styl'
-@import 'buttons.styl'
-@import 'colors.styl'
-@import 'parallax.styl'
-
+@require 'mixins.styl'
+@require 'controls.styl'
+@require 'colors.styl'
+@require 'parallax.styl'
 
 #registration 
 	top: 225%
@@ -12,10 +11,15 @@
 	height 200px
 	
 	center()
+	
+
+.registration .username 
+	background-image url("/images/icons/username.svg")
+	background-repeat no-repeat
+	background-size 15px
+	background-position 10px
 
 
-
-
-
-
-
+.registration .logo 
+	width 200px
+	height @width
