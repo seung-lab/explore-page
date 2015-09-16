@@ -5,8 +5,8 @@ var Gateway = React.createClass({
 	},
 	gotoRegistration: function () {
 		$('#viewport').scrollTo('#registration', {
-			msec: 1000,
-			easing: Easing.springFactory(.4, 0),
+			msec: 4000,
+			easing: Easing.springFactory(.9, 1),
 		});
 	},
 	gotoExplore: function () {

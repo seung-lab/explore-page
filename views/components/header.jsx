@@ -6,9 +6,6 @@ var FixedHeader = React.createClass({
 			visible: false,
 		};
 	},
-	componentWillMount: function () {
-
-	},
 	renderGateway: function () {
 		var cx = React.addons.classSet;
 

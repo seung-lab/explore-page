@@ -10,7 +10,6 @@
  * Optional:
  *     msec: defaults to 250 msec
  *     easing: defaults to ease-in-out-cubic
- *     offset: in pixels (positive scrolls downward more)
  *
  * Return: void
  */
@@ -26,17 +25,11 @@
  	}
 
  	var msec = options.msec || 250;
- 	var offset = options.offset || 0;
  	var easing = options.easing || Easing.easeInOut;
 
  	target = $(target).first();
  	
- 	var position_offset = target[0] === this[0]
- 		? 0
- 		: target.position().top;
-
- 	offset += _this.scrollTop() + position_offset;
- 	offset = Math.max(offset, 0);
+ 	var position_offset = target.position().top - this.scrollTop();
 
  	window.performance.now = window.performance.now || Date.now;
 

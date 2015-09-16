@@ -12,14 +12,30 @@
 	
 	center()
 	
+	margin-bottom 100vh
 
-.registration .username 
-	background-image url("/images/icons/username.svg")
+.registration .icon
 	background-repeat no-repeat
 	background-size 15px
 	background-position 10px
 
 
+.registration .username 
+	@extend .registration .icon
+	background-image url("/images/icons/username.svg")
+
+.registration .email 
+	@extend .registration .icon
+	background-image url("/images/icons/email.svg")
+	
+.registration .password
+	@extend .registration .icon
+	background-image url("/images/icons/password.svg")
+
 .registration .logo 
-	width 200px
+	width 150px
 	height @width
+
+.registration button,
+.registration input
+	width 150px

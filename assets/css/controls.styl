@@ -13,7 +13,8 @@ button
 	letter-spacing 1px
 	font-weight 600
 
-$primary_width = 200px
+$primary_width = 150px
+$primary_height = 35px
 
 button.primary,
 button.secondary
@@ -24,7 +25,7 @@ button.secondary
 	background-color #FEDE7D
 	color #4C4C4C
 	
-	height 45px
+	height $primary_height
 	width $primary_width
 	
 	transition color 150ms, background-color 150ms, border-color 150ms
@@ -67,9 +68,15 @@ button.secondary:hover
 :-ms-input-placeholder /* Internet Explorer 10-11 */
 	color #ECECEC
    
-input[type=text] 
-	height 20px
+input[type=text],
+input[type=password]
+	width $primary_width
+	height $primary_height
+	
+	box-sizing border-box
+	
 	padding 5px
+	
 	border-radius 10px
 	margin 5px
 	padding-left 30px
