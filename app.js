@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+require('node-jsx').install();
+
 var express = require('express');
 var compression = require('compression');
 var favicon = require('serve-favicon');
