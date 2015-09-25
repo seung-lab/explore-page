@@ -1,4 +1,4 @@
-/* Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
+/* @license Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
 
 var Zepto = (function() {
   var undefined, key, $, classList, emptyArray = [], slice = emptyArray.slice, filter = emptyArray.filter,
@@ -1588,6 +1588,130 @@ window.$ === undefined && (window.$ = Zepto)
   }
 })(Zepto)
 
+//     Zepto.js
+//     (c) 2010-2015 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
+
+;(function($){
+  // Create a collection of callbacks to be fired in a sequence, with configurable behaviour
+  // Option flags:
+  //   - once: Callbacks fired at most one time.
+  //   - memory: Remember the most recent context and arguments
+  //   - stopOnFalse: Cease iterating over callback list
+  //   - unique: Permit adding at most one instance of the same callback
+  $.Callbacks = function(options) {
+    options = $.extend({}, options)
+
+    var memory, // Last fire value (for non-forgettable lists)
+        fired,  // Flag to know if list was already fired
+        firing, // Flag to know if list is currently firing
+        firingStart, // First callback to fire (used internally by add and fireWith)
+        firingLength, // End of the loop when firing
+        firingIndex, // Index of currently firing callback (modified by remove if needed)
+        list = [], // Actual callback list
+        stack = !options.once && [], // Stack of fire calls for repeatable lists
+        fire = function(data) {
+          memory = options.memory && data
+          fired = true
+          firingIndex = firingStart || 0
+          firingStart = 0
+          firingLength = list.length
+          firing = true
+          for ( ; list && firingIndex < firingLength ; ++firingIndex ) {
+            if (list[firingIndex].apply(data[0], data[1]) === false && options.stopOnFalse) {
+              memory = false
+              break
+            }
+          }
+          firing = false
+          if (list) {
+            if (stack) stack.length && fire(stack.shift())
+            else if (memory) list.length = 0
+            else Callbacks.disable()
+          }
+        },
+
+        Callbacks = {
+          add: function() {
+            if (list) {
+              var start = list.length,
+                  add = function(args) {
+                    $.each(args, function(_, arg){
+                      if (typeof arg === "function") {
+                        if (!options.unique || !Callbacks.has(arg)) list.push(arg)
+                      }
+                      else if (arg && arg.length && typeof arg !== 'string') add(arg)
+                    })
+                  }
+              add(arguments)
+              if (firing) firingLength = list.length
+              else if (memory) {
+                firingStart = start
+                fire(memory)
+              }
+            }
+            return this
+          },
+          remove: function() {
+            if (list) {
+              $.each(arguments, function(_, arg){
+                var index
+                while ((index = $.inArray(arg, list, index)) > -1) {
+                  list.splice(index, 1)
+                  // Handle firing indexes
+                  if (firing) {
+                    if (index <= firingLength) --firingLength
+                    if (index <= firingIndex) --firingIndex
+                  }
+                }
+              })
+            }
+            return this
+          },
+          has: function(fn) {
+            return !!(list && (fn ? $.inArray(fn, list) > -1 : list.length))
+          },
+          empty: function() {
+            firingLength = list.length = 0
+            return this
+          },
+          disable: function() {
+            list = stack = memory = undefined
+            return this
+          },
+          disabled: function() {
+            return !list
+          },
+          lock: function() {
+            stack = undefined;
+            if (!memory) Callbacks.disable()
+            return this
+          },
+          locked: function() {
+            return !stack
+          },
+          fireWith: function(context, args) {
+            if (list && (!fired || stack)) {
+              args = args || []
+              args = [context, args.slice ? args.slice() : args]
+              if (firing) stack.push(args)
+              else fire(args)
+            }
+            return this
+          },
+          fire: function() {
+            return Callbacks.fireWith(this, arguments)
+          },
+          fired: function() {
+            return !!fired
+          }
+        }
+
+    return Callbacks
+  }
+})(Zepto)
+
+
 ;(function($){
   var slice = Array.prototype.slice
 
@@ -1703,276 +1827,2005 @@ window.$ === undefined && (window.$ = Zepto)
 
 
 
-/* centerIn.js
+/* Conditional.js
  *
- * jQuery plugin that allows you to center an element within an element.
+ * This is essentially an if/else block with
+ * conditions that can be updated dynamically
+ * to trigger behavior.
  *
- * e.g. 
+ * When writing forms, often mutliple pieces of
+ * data must be validated before submission is
+ * acceptable. Because the conditions are fufilled
+ * in a non-sequential manner accross a page, this 
+ * is often implemented with global variables.
  *
- * $(element).centerIn(); // centers horizontally and vertically in parent
- * $(element).centerIn(window); // centers horizontally and vertically in window
- * $(element).centerIn(window, { direction: 'vertical' ); // centers vertically in window
- * $(element).centerIn(window, { top: "-20%" }); // centers vertically in window offset upwards by 20%
- * $(element).alwaysCenterIn(window); // deals with resize events
+ * This class produces an object that can register
+ * several conditions and perform a callback when
+ * they evaluate to true and another when they 
+ * evaluate to false. For instance, if a user
+ * enters valid data into all fields then 
+ * screws one up. 
+ *
+ * This is essentially a type of event aggregator
+ * that focuses on validation.
+ * 
+ * Dependencies: None (EMCAScript 5)
  *
  * Author: William Silversmith
  * Affiliation: Seung Lab, Brain and Cognitive Sciences Dept., MIT
- * Date: August 2013 - February 2014
+ * Date: August 2013
  */
-;(function($, undefined) {
 
-	/* centerIn
+ Conditional = {};
+
+ (function (undefined) {
+ 	"use strict";
+
+ 	/* Conditional
+ 	 *
+ 	 * Creates a new conditional object.
+ 	 *
+ 	 * Optional:
+ 	 *   set: { name1: true, name2: false, etc }, a way of initializing some conditions
+ 	 *   data: { name2: something, name2: something, etc } link some data to conditions
+ 	 *	 success: callback when test returns true. 
+ 	 *   failure: callback when test returns false. 
+ 	 *   test: callback that returns a boolean based on status of registered conditions
+ 	 *      defaults to ANDing all of them.
+     *
+ 	 *   All callbacks are of the following form:
+ 	 *
+ 	 *   function (conditions, data) { ... }
+ 	 *   
+ 	 *   Where:
+ 	 *		conditions: { name1: bool, name2: bool, etc }
+ 	 *      data: { name1: somedata, name2: somedata, etc }
+ 	 *
+ 	 * Returns: Conditional object (use new)
+ 	 */
+	 Conditional.Conditional = function (args) {
+	 	args = args || {};
+
+	 	var noop = function (conds, data) {};
+
+	 	var _this = this;
+
+	 	this.conds = {};
+	 	this.data = {};
+
+	 	Object.keys(args.set).forEach(function (cond) {
+	 		_this.lazySet(cond, args.set[cond]);
+	 	});
+
+	 	this.failure = args.failure || noop;
+	 	this.success = args.success || noop;
+	 	this.test = args.test || Conditional.and;
+	 	this.data = args.data || {};
+	 };
+
+	 /* assess
+	  *
+	  * Peek at the test state without executing anything.
+	  *
+	  * Required: void
+	  *    
+	  * Returns: boolean result of test
+	  */
+	  Conditional.Conditional.prototype.assess = function () {
+	  	return this.test(this.conds, this.data);
+	  };
+
+	 /* execute
+	  *
+	  * Executes the test and appropriate callbacks.
+	  *
+	  * Required: void
+	  *
+	  * Returns: boolean result of test
+	  */
+	 Conditional.Conditional.prototype.execute = function () {
+	 	if (this.test(this.conds, this.data)) {
+	 		this.success(this.conds, this.data);
+	 		return true;
+	 	}
+	 	else {
+	 		this.failure(this.conds, this.data);
+	 		return false;
+	 	}
+	 };
+
+	 /* set
+	  *
+	  * Add or reset the value of a registered condition and executes.
+	  *
+	  * Required:
+	  *    [0] name: Name of the condition
+	  *    [1] value: boolean
+	  *
+	  * Optional:
+	  *    [2] data: Some sort of data structure to associate with 
+	  *       this name. 
+	  *
+	  * Returns: void
+	  */
+	 Conditional.Conditional.prototype.set = function (name, value, data) {
+	 	this.lazySet(name, value, data);
+		this.execute();
+	 };
+
+	 /* lazySet
+	  *
+	  * Sets a condition.
+	  *
+	  * Parameters: same as set
+	  *
+	  * Returns: void
+	  */
+	 Conditional.Conditional.prototype.lazySet = function (name, value, data) {
+	 	value = value || false;
+
+	 	if (typeof value !== 'function') {
+	 		value = (function (v) { return v }).bind(this, value);
+	 	}
+
+	 	this.conds[name] = value;
+
+	 	if (data !== undefined) {
+	 		this.data[name] = data;
+	 	}
+	 	else {
+	 		this.data[name] = null;
+	 	}
+	 };
+
+	 /* remove
+	  *
+	  * Deletes a condition and executes.
+	  *
+	  * Required: 
+	  *   [0] name: Name of the condition 
+	  *
+	  * Returns: void
+	  */
+	 Conditional.Conditional.prototype.remove = function (name) {
+	 	this.lazyRemove(name);
+		this.execute();
+	 };
+
+	 /* lazyRemove
+	  *
+	  * Deletes a condition and does not execute.
+	  *
+	  * Required:
+	  *   [0] name: The name of the condition
+	  * Returns: void
+	  */
+	 Conditional.Conditional.prototype.lazyRemove = function (name) {
+	 	delete this.conds[name];
+	 	delete this.data[name];
+	 };
+
+	 /* The following functions are not part of the Conditional object,
+	  * however, they may be useful in constructing test functions.
+	  */
+
+	 /* and
+	  *
+	  * Simply ANDs every conditional together.
+	  *
+	  * Required:
+	  *   [0] conds
+	  *   [1] data
+	  *
+	  * Returns: boolean
+	  */
+	 Conditional.and = function (conds, data) {
+ 		var values = Object.keys(conds).map(function (key) { return conds[key]() });
+ 		return values.reduce(function (a, b) { return a && b }, true);
+ 	};
+
+ 	 /* nand
+	  *
+	  * Simply nots the conjuntion of every conditional.
+	  *
+	  * Required: same as and
+	  *
+	  * Returns: boolean
+	  */
+	 Conditional.nand = function () {
+ 		return !Conditional.and.apply(this, arguments);
+ 	};
+
+	/* or
 	 *
-	 * Centers the element with respect to
-	 * the first element of the given selector
-	 * both horizontally and vertically.
+	 * Simply ORs every conditional together.
 	 *
 	 * Required:
-	 *	 [0] selector: The element to center within
-	 *   [1] options or callback
-	 *   [2] callback (if [1] is options): Mostly useful for alwaysCenterIn
+	 *   [0] conds
+	 *   [1] data
 	 *
-	 * Options:
-	 *	 direction: 'horizontal', 'vertical', 'both' (default)
-	 *	 top: Additional offset in px
-	 *	 left: Additional offset in px
+	 * Returns: boolean
+	 */
+ 	Conditional.or = function (conds, data) {
+		var values = Object.keys(conds).map(function (key) { return conds[key]() });
+ 		return values.reduce(function (a, b) { return a || b }, true);
+ 	};
+
+	/* nor
+	 *
+	 * Negation of: the disjunction of all the conditions.
+	 *
+	 * Required: same as or
+	 *
+	 * Returns: boolean
+	 */
+ 	Conditional.nor = function () {
+		return !Conditional.or.apply(this, arguments);
+ 	};
+
+	/* xor
+	 *
+	 * Simply XORs every conditional together.
+	 *
+	 * Required:
+	 *   [0] conds
+	 *   [1] data
+	 *
+	 * Returns: boolean
+	 */
+ 	Conditional.xor = function (conds, data) {
+		var values = Object.keys(conds).map(function (key) { return conds[key]() });
+ 		return values.reduce(function (a, b) { return !(a && b) && (a || b) }, true);
+ 	};
+
+ })();
+ 
+
+var PasswordUtils = {};
+
+
+(function ($, undefined) {
+	"use strict";
+
+	/* adjustPasswordMeter
+	 *
+	 * Given a password sets the meter to one of four 
+	 * levels depending on the password quality:
+	 * 
+	 * Gray: No password entered
+	 * Red: The system will not accept it
+	 * Orange: Acceptable
+	 * Green: Very strong
+	 *
+	 * Required:
+	 *    meter
+	 *    passwordfield
+	 *    usernamefield
+	 *    coordinator
 	 *
 	 * Returns: void
 	 */
-	$.fn.centerIn = function (selector, options, callback) {
-		var elements = this;
-		options = options || {};
+	PasswordUtils.adjustPasswordMeter = function (args) {
+		args = args || {};
 
-        if (typeof(options) === 'function') {
-            callback = options;
-            options = {};
-        }
+		var meter = args.meter;
+		var passwordfield = args.passwordfield;
+		var usernamefield = args.usernamefield;
+		var coordinator = args.coordinator;
 
-		var direction = options.direction || $.fn.centerIn.defaults.direction;
-		var extraleft = options.left || 0;
-		var extratop = options.top || 0;
 
-		if (selector) {
-			selector = $(selector).first();
-		}
-		else {
-			selector = elements.first().parent();
+		meter.removeClass('terrible poor acceptable good strong');
+
+		var password = $(passwordfield).val();
+
+		if (!password) {
+			return;	
 		}
 
-		try {
-			if (!selector.css('position') || selector.css('position') === 'static') {
-				selector.css('position', 'relative'); 
-			}
-		}
-		catch (e) {
-			// selector was something like window, document, html, or body
-			// which doesn't have a position attribute
-		}
-
-		var horizontal = function (element) {
-			var left = Math.round((selector.innerWidth() - element.outerWidth(false)) / 2);
-			left += translateDisplacement(selector, extraleft, 'width');
-			element.css('left', left + "px");
-		};
-
-		var vertical = function (element) {
-			var top = Math.round((selector.innerHeight() - element.outerHeight(false)) / 2);
-			top += translateDisplacement(selector, extratop, 'height');
-			element.css('top', top + "px");
-		};
-
-		var centerfn = constructCenterFn(horizontal, vertical, callback, direction);
-
-		elements.each(function (index, element) {
-			element = $(element);
-
-			if (element.css("position") !== 'fixed') {
-				element.css("position", 'absolute');
-			}
-			centerfn(element);
-		});
-
-		return this;
+		var quality = PasswordUtils.qualifyPassword(passwordfield, usernamefield, coordinator);
+		meter.addClass(quality);
 	};
 
-	/* alwaysCenterIn
-	 * 
-	 * Maintains centering even on window resize.
+
+	/* configurePasswordMeter
+	 *
+	 * Configures the password meter.
+	 *
+	 * Required:
+	 *   [0] meter
+	 *
+	 * Returns: void
 	 */
-	$.fn.alwaysCenterIn = function () {
-		var args = arguments || []; 
-		var selector = $(this);
-
-		selector.centerIn.apply(selector, args);
-
-		var evt = 'resize.centerIn';
-        if (selector.attr('id')) {
-            evt += '.' + selector.attr('id');
-        }
-
-        $(window).off(evt).on(evt, function () {
-			selector.centerIn.apply(selector, args);
-		});
-
-		return this;
-	 };
-
-	/* Defaults */
-
-	$.fn.centerIn.defaults = {
-		direction: 'both'
+	PasswordUtils.configurePasswordMeter = function (meter) {
+		for (var i = 0; i < 5; i++) {
+			$(meter).append($('<div>'));
+		}
 	};
 
-    /* translateDisplacement
-     *
-     * Translates dimensionless units, pixel measures, and percent
-     * measures into px.
-     *
-     * Required: 
-     *   [0] selector: Container, relevant for percent measures
-     *   [1] value: Amount to displace. e.g. 5, "5px", or "5%"
-     *   [2] direction: 'width' or 'height'
-     * 
-     * Returns: px
-     */
-    function translateDisplacement(selector, value, direction) {
-        if (typeof(value) === 'number') {
-            return value;
-        }
-        else if (/px$/i.test(value)) {
-            return parseFloat(value.replace('px', ''), 10);
-        }
-        else if (/%$/.test(value)) {
-            var total = (direction === 'width')
-                ? $(selector).innerWidth()
-                : $(selector).innerHeight();
+	/* quickValidatePassword
+	 *
+	 * Evaluates the password along dimensions that do not
+	 * require the server.
+	 *
+	 * Required:
+	 *    [0] passwordfield
+	 *    [1] playcoordinator
+	 *
+	 * Returns: boolean
+	 */
+	PasswordUtils.quickValidatePassword = function (passwordfield, usernamefield, coordinator) {
+		var password = $(passwordfield).val();
 
-            value = parseFloat(value.replace('%', ''), 10);
-            value /= 100;
-
-            return value * total;
-        }
-
-        return parseFloat(value, 10);
-    }
-
-    /* constructCenterFn
-     *
-     * Constructs an appropriate centering function
-     * that includes vertical, horizontal, and callback
-     * functions as applicable.
-     *
-     * Returns: fn
-     */
-	function constructCenterFn(horizontal, vertical, callback, direction) {
-        var fns = []
-
-		if (!direction || direction === 'both') {
-			fns.push(vertical);
-            fns.push(horizontal);
+		if (!password) {
+			coordinator.lazySet('password', false, 'zero-length');
+			return false;
 		}
-		else if (direction === 'horizontal') {
-            fns.push(horizontal);
-		}
-		else if (direction === 'vertical') {
-            fns.push(vertical);
+		else if (password.length < 6) {
+			coordinator.lazySet('password', false, 'minimum-length');
+			return false;
 		}
 
-        if (callback) {
-            fns.push(callback);
-        }
+		return PasswordUtils.quickValidatePasswordNoLength(passwordfield, usernamefield, coordinator);
+	};
 
-		return Utils.compose(fns);
+	PasswordUtils.quickValidatePasswordNoLength = function (passwordfield, usernamefield, coordinator) {
+		var password = $(passwordfield).val();
+		var username = $.trim($(usernamefield).val());
+
+		if (!password || password.length <= 4) {
+			coordinator.lazySet('password', true);
+			return true;
+		}
+
+		if (username.length >= 4) {
+			var parts = username.split(/[_\.]/);
+			for (var i = 0; i < parts.length; i++) {
+				if (parts[i].length < 4) { 
+					continue; 
+				}
+
+				var partsre = new RegExp(parts[i], "i");
+				if (partsre.test(password)) {
+					coordinator.lazySet('password', false, 'username');
+					return false;
+				}
+			}
+
+			var wholere = new RegExp(username, "i");
+			if (wholere.test(password)) {
+				coordinator.lazySet('password', false, 'username');
+				return false;
+			}
+		}
+
+		var streak = passwordStreakCheck(password);
+
+		if (streak * 2 >= password.length) {
+			coordinator.lazySet('password', false, 'streak');
+			return false;
+		}
+
+		var ratio = passwordRatioCheck(password);
+
+		if (ratio >= 0.59) {
+			coordinator.lazySet('password', false, 'ratio');
+			return false;
+		}
+
+		coordinator.lazySet('password', true);
+		return true;
+	};
+
+	/* qualifyPassword
+	 *
+	 * Returns a qualitative assessment of a given password
+	 * by scoring the password and measuring it to the equivilent
+	 * strength of another type of password.
+	 *
+	 * Required:
+	 *    [0] passwordfield
+	 *    [1] usernamefield
+	 *    [2] coordinator
+	 *
+	 * Returns one of: "terrible", "poor", "acceptable", "good", "strong"
+	 */
+	PasswordUtils.qualifyPassword = function (passwordfield, usernamefield, coordinator) {
+		var valid = PasswordUtils.quickValidatePasswordNoLength(passwordfield, usernamefield, coordinator);
+		
+		if (!valid) {
+			return 'terrible';
+		}
+
+		var password = passwordfield.val();
+		var score = scorePassword(password);
+
+		var poor = 6 * Math.log(10); // 6 characters, lowest classes
+		var acceptable = 8 * Math.log(10 + 26); // 8 characters, two classes
+		var good = 8 * Math.log(10 + 26 + 26 + 30); // 8 characters, three classes
+		var strong = 10 * Math.log(10 + 26 + 26 + 30); // 10 characters, 4 classes
+
+		if (score >= strong) {
+			return 'strong';
+		}
+		else if (score >= good) {
+			return 'good';
+		}
+		else if (score >= acceptable) {
+			return 'acceptable';
+		}
+		else if (score >= poor) {
+			return 'poor';
+		}
+		
+		return "terrible";
+	};
+	
+	/* scorePassword
+	 * 
+	 * The password is scored by the following 
+	 * algorithm:
+	 *
+	 * N = number of possibilities per character
+	 *  l = # of lowercase (26)
+	 *  u = # of uppercase (26)
+	 *  d = # of digits (10)
+	 *  s = # of symbols
+	 *
+	 * The algorithm checks for the number of classes
+	 * inherent in the password, and then assumes
+	 * that an attacker would then have to search
+	 * those classes at each position in the password.
+	 *
+	 * This may not be an awesome assumption, but it allows
+	 * for the following calculation:
+	 *
+	 * N = l + u + d (for example, as the password contained those three classes)
+	 *
+	 * The number of permutations possible is N^(password length)
+	 *
+	 * Since this is a very large number, it's best to express it as a logarithm:
+	 *
+	 * Score = (password length) * ln(N)
+	 *
+	 * The minimum acceptable score = 8 * ln(10 + 26 + 26) = 33.017
+	 *
+	 * Required:
+	 *   [0] password
+	 *
+	 * Returns: score
+	 */
+	function scorePassword (password) {
+		password = password || "";
+
+		var classes = [
+			[ /[a-z]/, 26 ],
+			[ /[A-Z]/, 26 ],
+			[ /\d/, 10], 
+			[ /[^\da-zA-Z]/, 33], // non-alphanumeric (33) on en-US keyboards
+		];
+
+		var n = 0;
+		for (var i = 0; i < classes.length; i++) {
+			var re = classes[i][0];
+			var val = classes[i][1];
+
+			if (password.match(re)) {
+				n += val;
+			}
+		}
+
+		return password.length * Math.log(n);
 	}
+
+	/* mapSequenceToNumberInARow
+	 *
+	 * Converts an array like: ['a', 'a', 'a', 'b', 'a', 'c']
+	 * to [1, 2, 3, 1, 1, 1]. i.e.  it counts how many characters
+	 * are in a row.
+	 *
+	 * Required:
+	 *   [0] sequence
+	 *
+	 * Returns: sequence mapped to integer values
+	 */
+	function mapSequenceToNumberInARow (sequence) {
+		var currentchar = sequence[0];
+		var ct = 1;
+		for (var i = 0; i < sequence.length; i++) {
+			if (sequence[i] === currentchar) {
+				sequence[i] = ct;
+				ct++;
+			}
+			else {
+				currentchar = sequence[i];
+				ct = 1;
+				sequence[i] = ct;
+			}
+		}
+
+		return sequence;
+	}
+
+	/* passwordRatioCheck
+	 *
+	 * Required:
+	 *    [0] password
+	 *
+	 * Returns: ratio of most frequent character to the password length
+	 */
+	function passwordRatioCheck (password) {
+		password = password || "";
+
+		var chars = password.split(''); 
+		chars.sort();
+
+		chars = mapSequenceToNumberInARow(chars);
+		return Math.max.apply(undefined, chars) / password.length;
+	}
+
+	/* passwordStreakCheck
+	 *
+	 * Required:
+	 *   [0] password
+	 *
+	 * Returns: Highest number of consecutive characters
+	 */
+	function passwordStreakCheck (password) {
+		password = password || "";
+
+		var chars = password.split(''); 
+		chars = mapSequenceToNumberInARow(chars);
+		return Math.max.apply(undefined, chars);
+	}
+
+}(jQuery));
+
+/* Thinking.js
+ *
+ * An idle timer designed to integrate well with 
+ * jQuery that is oriented toward allowing a user
+ * to get more information while they are thinking.
+ * 
+ *   Example use case:
+ *
+ *    $('#username')
+ *		.thinking(function () {
+ *			validate(this.value); // validates when user pauses to think for a bit
+ *		})
+ *		.on('blur', function () {
+ *			validate(this.value); 
+ *	   	});
+ *
+ *    ...sometime later...
+ *   
+ *    $('#username').thinking('clear'); // Removes all thinking related events.
+ *
+ * The delay and events that reset the clock are configurable. See the function
+ * signature of thinking for more information.
+ *
+ * Dependencies: 
+ *	jQuery
+ *  Utils.js
+ *
+ * Author: William Silversmith
+ * Affiliation: Seung Lab, Brain and Cognitive Sciences Dept., MIT
+ * Date: August 2013
+ *
+ * Based on Henrique Boaventura's jquery.idle.js:
+ *
+ * ------------------- LICENSE FOR jquery.idle.js -----------------------
+ *   Copyright (C) 2013, Henrique Boaventura (hboaventura@gmail.com).
+ *
+ *   MIT License:
+ *   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *   - The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *   - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * -----------------------------------------------------------------------
+ * 
+ * You can find jquery.idle.js at https://github.com/kidh0/jquery.idle as of this writing. (Aug. 2013)
+ */
+
+;(function ($, undefined) {
+	"use strict";
+
+	/* thinking
+	 *
+	 * Create an event handler for 'thinking' similar to $(element).click(...).
+	 * Except, this time the action... is inaction! Use this to assist the
+	 * user in cases where they have paused in the middle of an activity,
+	 * probably because they were thinking.
+	 *
+	 * Signature: .thinking([[settings], thinkingEventHandler])
+	 *
+	 * This lends itself to the following patterns:
+	 *
+	 * 1) $(element).thinking('start').on('thinking', fn);
+	 * 2) $(element).thinking(fn); // same effect as (1)
+	 * 3) $(element).thinking({ idle: 5000 }); // set delay to 5000 msec, no handler
+	 * 4) $(element).thinking({ idle: 5000 }, fn); // set delay to 5000 msec, handler set
+	 * 5) $(element).thinking({ idle: 5000 }).on('thinking', fn); // same as (4)
+	 *
+	 * // triggers 'thinking' event iff startThinking has already been called
+	 * // Same semantics as $(element).click(), except a process must be started first
+	 * 6) $(element).thinking(); 
+	 *
+	 * Parameter Variations:
+	 *
+	 * 1) Configurable Event Handler
+	 *   i) [0] callback - elem.thinking(function () { ... })
+	 *  ii) [0] options [1] callback
+	 *  		e.g. elem.thinking({ idle: msec, resetevents: "keyup" }, function () { ... })
+	 *
+	 * 2) Manual Control
+	 *   i) [0] command - 'start', 'done', 'clear', etc
+	 *       e.g. elem.thinking('start');
+	 *  ii) [0] options: { idle, resetevents }
+	 *			idle: msec
+	 *			resetevents: Any jQuery event, will be added to the events that reset the timer 
+	 *      [1] command - 'start', 'done', 'clear', etc
+	 *  
+	 *    Command Summaries:
+	 *      'start' - starts triggering 'thinking' events, though no listener may be present
+	 *      'cancel' - terminates outstanding timers
+	 *      'done' - terminates outstanding timers and clears clock reset triggers
+	 *      'clear' - 'done' + removes blur/focus listeners that restart the clock 
+	 *           and removes 'thinking' event handlers
+	 *      'elapsed' - Get the time since the last timer reset in msec
+	 *      'running' - Get whether the timer is running
+	 *
+	 * Returns: this (for chaining)
+	 */
+	$.fn.thinking = function () {
+		if (!arguments.length) {
+			return $(this).trigger('thinking');
+		}
+
+		var selector = this;
+
+		var fn = Utils.findCallback(arguments);	
+
+		if (fn) {
+			selector.each(function (index, elem) {
+				$(elem).on('thinking', fn);
+			});
+		}
+
+		var options = {};
+		if (typeof(arguments[0]) === 'string') {
+			options = $.extend(options, arguments[1]);
+			return command(selector, arguments[0], options);
+		}
+		else if (typeof(arguments[0]) === 'object') { 
+			options = arguments[0]; // thinking({idle: 500})
+			
+			if (typeof(arguments[1]) === 'string') {
+				return command(selector, arguments[1], options); // thinking({idle: 500}, 'start')
+			}
+		}
+
+		// Defaults for the form validation use case
+
+		options.startevents = options.startevents || $.fn.thinking.defaults.startevents;
+		options.cancelevents = options.cancelevents || $.fn.thinking.defaults.cancelevents;
+		options.doneevents = options.doneevents || $.fn.thinking.defaults.doneevents;
+		
+		options.startevents = namespaceEvents(options.startevents);
+		options.cancelevents = namespaceEvents(options.cancelevents);
+		options.doneevents = namespaceEvents(options.doneevents);
+
+		if (options.startevents) {
+			selector.on(options.startevents, function () {
+				startThinking(selector, options);
+			});
+		}
+
+		if (options.cancelevents) {
+			selector.on(options.startevents, function () {
+				cancelThinking(selector);
+			});
+		}
+
+		if (options.doneevents) {
+			selector.on(options.doneevents, function () {
+				doneThinking(selector);
+			});
+		}
+
+		return selector;
+	};
+
+	/* defaults */
+
+	$.fn.thinking.defaults = {
+		idle: 1500, // idle time in ms
+
+		// events that will trigger the idle resetter
+		resetevents: 'keydown keypress mousedown', // will be namespaced with .thinking 
+
+		// Events that trigger the done event
+		doneevents: "blur",
+
+		// Events that start the timer
+		startevents: "focus",
+	};
+
+	/* command
+	 *
+	 * Figures out the right command to execute based on string
+	 * input.
+	 *
+	 * Required:
+	 *   [0] selector: jQuery object
+	 *   [1] command: 'start', 'done', or 'clear'
+	 *   [2] options: { idle, resetevents }
+	 *
+	 * Returns: selector (for chaining)
+	 */
+	function command(selector, command, options) {
+		if (command === 'start') {
+			return startThinking(selector, options, true); // thinking('start', { idle: 500 })
+		}
+		else if (command === 'cancel') {
+			return cancelThinking(selector); // thinking('cancel')
+		}
+		else if (command === 'done') {
+			return doneThinking(selector); // thinking('done')
+		}
+		else if (command === 'clear') {
+			return clearThinking(selector); // thinking('clear')
+		}
+		else if (command === 'running') {
+			return selector.data('thinking') === 'active';
+		}
+		else if (command === 'elapsed') {
+			if (selector.data('thinking') === 'active') {
+				return (new Date()) - selector.data('thinking-lastreset');
+			}
+
+			return undefined;
+		}
+
+		return selector;
+	}
+
+	/* startThinking
+	 *
+	 * Allows manual control of when to start listening for
+	 * events that reset the idle timer. Most use cases
+	 * should use $.fn.thinking.
+	 *
+	 * Optional:
+	 *  [0] options
+	 *    idle - wait time in milliseconds (default above)
+	 *    resetevents - e.g. "mousedown mouseover keyup"
+	 *   [1] immediate: boolean, initiate timer immediately without reset event
+	 *
+	 * Returns: this (for chaining)
+	 */
+	function startThinking (selector, options, immediate) {
+		var settings = $(selector).data('thinking-configuration') || $.fn.thinking.defaults;
+
+		if (options) {
+			settings = $.extend(settings, options);
+			
+			if (options.resetevents) {
+				settings.resetevents = namespaceEvents(settings.resetevents);
+			}
+
+			$(selector).data('thinking-configuration', settings);	
+		}
+
+		var timeout = function (settings) {
+			var id = setTimeout(function() {
+				selector.data('thinking', 'idle');
+				selector.trigger('thinking');
+			}, settings.idle);
+
+			var outstanding = selector.data('thinking-outstanding') || [];
+			outstanding.push(id);
+			selector.data('thinking.outstanding', outstanding);
+
+			return id;
+		};
+
+		var resetTimeout = function (id, settings) {
+			if (id) {
+				clearTimeout(id);
+
+				var outstandingids = selector.data('thinking-outstanding') || [];
+				outstandingids = $.grep(outstandingids, function (outstanding) { return outstanding !== id; });
+				selector.data('thinking-outstanding', outstandingids);
+			}
+
+			selector.data('thinking', 'active');
+			selector.data('thinking-lastreset', new Date());
+			return timeout(settings);
+		};
+
+		var timerid;
+
+		if (immediate) {
+			timerid = resetTimeout(timerid, settings);
+		}
+
+		return selector.each(function (index, elem) {
+			$(elem).on(settings.resetevents, function (evt) {
+				timerid = resetTimeout(timerid, settings);
+			});
+		});
+	}
+
+	/* cancelThinking
+	 *
+	 * Manually cancels outstanding 'thinking' events.
+	 *
+	 * Required:
+	 *   [0] selector
+	 *
+	 * Returns: selector (for chaining)
+	 */
+	function cancelThinking (selector) {
+		var outstandingids = selector.data('thinking-outstanding') || [];
+		for (var i = outstandingids.length - 1; i >= 0; i--) { 
+			clearTimeout(outstandingids[i]);
+		}
+
+		selector.removeData('thinking-lastreset');
+		selector.removeData('thinking-outstanding');
+
+		return selector;
+	}
+
+	/* doneThinking
+	 *
+	 * Manually cancels outstanding 'thinking' events and clears 
+	 * out residual data.
+	 *
+	 * Required:
+	 *   [0] selector
+	 *
+	 * Returns: selector (for chaining)
+	 */
+	function doneThinking (selector) {
+		cancelThinking(selector);
+		selector.off(".thinking-trigger"); // Removes clock resets (e.g. keydown)
+		selector.removeData('thinking');
+
+		return selector;
+	}
+
+	/* clearThinking
+	 *
+	 * Performs same actions as doneThinking but also
+	 * removes the relevant focus/blur events, handlers, 
+	 * and configuration as well.
+	 *
+	 * Required: 
+	 *   [0] selector
+	 *
+	 * Returns: selector (for chaining)
+	 */
+	function clearThinking (selector) {
+		$(selector).data('thinking-configuration', undefined);
+
+		return selector
+			.thinking('done')    // stop the clock and remove clock resets
+			.off('thinking')   // clear event handlers
+			.off('.thinking'); // clear focus / blur activation
+	}
+
+	/* namespaceEvents
+	 *
+	 * Namespaces every event in a jQuery event specifier string.
+	 * 
+	 * e.g. "keyup keypress.thinking mousedown.rawr.thinking-trigger" 
+	 *   => "keyup.thinking-trigger keypress.thinking-trigger mousedown.rawr.thinking-trigger"
+	 *
+	 * Required:
+	 *    [0] specifier (see example)
+	 *
+	 * Returns: event string namespaced with '.thinking-trigger'
+	 */
+	function namespaceEvents (specifier) {
+		specifier = $.trim(specifier) || '';
+		if (!specifier) {
+			return '';
+		}
+
+		var specifiers = specifier.replace(/\.thinking(-trigger)?/g, '').split(/\s+/);
+		specifier = "";
+
+		for (var i = 0; i < specifiers.length; i++) {
+			var item = specifiers[i];
+			specifier += item + ".thinking-trigger ";
+		}
+
+		return $.trim(specifier);
+	}
+
 })(jQuery);
 
-// e.g. If using Zepto.js instead of jQuery proper.
-// Feel free to remove if necessary.
+/*
+ *	Utils.js
+ *
+ *	This is a grab bag of utility functions that would be useful
+ *	througout the program that mostly manipulate data.
+ *
+ * Dependencies: 
+ *   jQuery (tested with 1.7.1)
+ *
+ * Author: William Silversmith
+ * Affiliation: Seung Lab, MIT 
+ * Date: June-August 2013
+ */
 
-(function ($) {
-	if (!$.fn.innerHeight) {
-		$.fn.innerHeight = function () {
-			var selector = $(this).first();
+var Utils = Utils || {};
 
-			if (selector[0] == document) {
-				return "innerHeight" in window 
-               		? window.innerHeight
-               		: document.documentElement.offsetHeight; 
+(function ($, undefined) {
+	"use strict";
+
+	/* getDomainName
+	 *
+	 * Gets the top level domain for this website to avoid
+	 * doing things like hard coding cookies.
+	 *
+	 * e.g. play.eyewire.org => eyewire.org
+	 *
+	 * Required: None
+	 *
+	 * Return: highest level domain string
+	 */
+	Utils.getDomainName = function () {
+		var host = document.location.hostname;
+		host = host.replace(/https?(:\/\/)?/, '');
+
+		var matches = /\.(\w+\.(:?com|org|net|gov|edu|mil|us|ca|eu|co\\.uk))$/.exec(host);
+
+		return matches[1];
+	};
+	
+	/* toCollection
+	 *
+	 * Converts arrays to jQuery collections.
+	 *
+	 * Required:
+	 *   [0] array
+	 *
+	 * Return: jQuery collection
+	 */
+	Utils.toCollection = function (array) {
+		return array.reduce(function (jqo, x) {
+			return jqo.add(x);
+		}, $())
+	};
+
+	/* fScore
+	 *
+	 * Computes 
+	 *
+	 * Required:
+	 *  tp: True Positives
+	 *  fp: False Positives
+	 *  fn: False negatives
+	 *
+	 * Returns: { fscore, precision, recall }
+	 */
+	Utils.fScore = function (args) {
+		args = args || {};
+
+		var tp = args.tp;
+		var fp = args.fp;
+		var fn = args.fn;
+
+		if (!tp) {
+			return {
+				fscore: null,
+				precision: null,
+				recall: null
+			};
+		}
+
+		var precision = tp / (tp + fp);
+		var recall = tp / (tp + fn);
+
+		var fscore = 2 * precision * recall / (precision + recall);
+
+		return {
+			fscore: fscore,
+			precision: precision,
+			recall: recall
+		};
+	};
+
+	/* significandAndMagnitude
+	 * 
+	 * Converts a number into a significand and magnitude.
+	 *
+	 * e.g. 2412479.24 => { significand: 2.4, magnitude: 6 }
+	 *
+	 * Required:
+	 *   number: The number to convert
+	 * 
+	 * Optional:
+	 *   precision: The number of places past the decimal to leave
+	 *
+	 * Returns: { number, magnitude }
+	 */
+	Utils.significandAndMagnitude = function (args) {
+		var precision = args.precision || null;
+		var number = args.number;
+		var negative = false;
+
+		if (number === 0) {
+			return {
+				significand: 0,
+				magnitude: 1,
+			};
+		}
+		else if (number < 0) {
+			negative = true;
+			number = Math.abs(number);
+		}
+
+		Math.log10 = Math.log10 || function (x) {	
+  			return Utils.round(Math.log(x) / Math.LN10, 10);
+		};
+
+		var magnitude = Math.floor(Math.log10(number));
+		var significand = number / Math.pow(10, magnitude);
+
+		if (precision !== null) {
+			significand = significand.toFixed(precision);
+		}
+
+		if (negative) {
+			significand = -significand;
+		}
+
+		return {
+			significand: significand,
+			magnitude: magnitude
+		};
+	};
+
+	/* round
+	 * 
+	 * Same as Math.round, but you can pick which decimal
+	 * place to round to. Defaults to the same as Math.round.
+	 *
+	 * Required:
+	 *   [0] x: Floating point
+	 *   [1] precison: How many decimal places? Can be positive or negative int.
+	 *
+	 * Return: rounded float
+	 */
+	Utils.round = function (x, precision) {
+		precision = precision || 0;
+		return Math.round(x * Math.pow(10, precision)) / Math.pow(10, precision);
+	};
+
+	/* numberToCondensedSI
+	 * 
+	 * Converts a number into the most condensed SI notation possible.
+	 *
+	 * e.g. 2412479.24 => 2.4M
+	 *
+	 * Required:
+	 *   number: The number to convert
+	 * 
+	 * Optional:
+	 *   conversionminimum: (int) Don't perform the conversion below and at this threshold
+	 *   maxchars: (int) Don't perform the conversion below and at this number of characters
+	 * 
+	 *   Mutually Exclusive:
+	 *     fit: (int) Set the precision to fit this number of characters.
+	 *         This value must be > 2 to be meaningful (X.X is 3 characters).
+	 *         If the amount of space is too small to accomodate a decimal point,
+	 *         fit will simply remove the decimal to provide more space for the integer
+	 *         component.
+	 *     precision: (int) The number of places past the decimal to leave (defaults to 1)
+	 *
+	 * Returns: HTML encoded string representing significand and a letter indicating the magnitude
+	 */
+	Utils.numberToCondensedSI = function (args) {
+		var precision = args.precision;
+		var fit = args.fit;
+		var number = args.number || 0;
+
+		if (precision === undefined) {
+			precision = 1;
+		}
+
+		var precisenum;
+		if (number === 0) {
+			precisenum = "0";
+			for (var i = 0; i < precision; i++) {
+				precisenum += "0";
+			};
+		}
+		else {
+			precisenum = Math.round(number * Math.pow(10, precision)).toString();
+		}
+
+		if (precision > 0) {
+			precisenum = precisenum.substr(0, precisenum.length - precision) + 
+				"." + precisenum.substr(precisenum.length - 1, precision);
+		}
+
+		if (args.maxchars && precisenum.length <= args.maxchars) {
+			return precisenum;
+		}
+		else if (args.conversionminimum && Math.abs(number) <= args.conversionminimum) {
+			return number.toString();
+		}
+		else if (fit && number === 0) {
+			return precisenum.substr(0, fit);
+		}
+
+		var components = Utils.significandAndMagnitude({
+			number: number,
+		});
+
+		var magnitude = components.magnitude;
+
+		var suffixes = {
+			"-10": "p", "-11": "p", "-12": "p",
+			"-7": "n", "-8": "n", "-9": "n",
+			"-4": "&mu;", "-5": "&mu;", "-6": "&mu;",
+			"-1": "m", "-2": "m", "-3": "m",
+			0: "", 1: "", 2: "",
+			3: "k", 4: "k", 5: "k",
+			6: "M", 7: "M", 8: "M",
+			9: "G", 10: "G", 11: "G",
+			12: "P", 13: "P", 14: "P",
+			15: "E", 16: "E", 17: "E"
+		};
+
+		var significand;
+
+		// Get significand to be as large as possible within three orders of magnitude
+		// i.e. 121,024,141 (1.21024141, magnitude 6) should look like 121.024141
+		// and 1,131,141 should look like 1.131141
+		if (magnitude >= 0) {
+			significand = components.significand * Math.pow(10, (Math.abs(magnitude) % 3));
+		}
+		else {
+			significand = components.significand * Math.pow(10, 3 - (Math.abs(magnitude) % 3));	
+		}
+
+		if (fit) {
+			var wholepart = Utils.truncate(significand) + "";
+
+			var adjustments = 1; // room for decimal point
+
+			if (suffixes[magnitude] !== "") {
+				adjustments += 1; // room for SI letter
 			}
 
-			var style = window.getComputedStyle(selector[0]) || { 
-				"padding-top": 0, 
-				"padding-bottom": 0,
-			};
+			if (wholepart.length >= fit - adjustments) {
+				precision = 0;
+			}
+			else {
+				precision = fit - wholepart.length - adjustments;
+			}
+		}
 
-			return selector.height() + parseFloat(style["padding-top"], 10) + parseFloat(style["padding-bottom"], 10);
-		};
-	}
+		// Fix floating point issues
+		var value = significand * Math.pow(10, precision);
 
-	if (!$.fn.innerWidth) {
-		$.fn.innerWidth = function () {
-			var selector = $(this).first();
+		value = Utils.truncate(value) + ""; // convert to string so we can be precise
 
-			if (selector[0] == document) {
-				return "innerHeight" in window 
-               		? window.innerWidth
-               		: document.documentElement.offsetWidth; 
+		if (precision > 0) {
+			// insert the decimal point in the right place
+			value = value.slice(0, value.length - precision) + "." + value.slice(-precision);
+		}
+
+		return value + suffixes[magnitude];
+	};
+
+	/* ellipsisText
+	 *
+	 * Take a long string and return it trimed to a particular length
+	 * with trailing ellipses.
+	 *
+	 * Required:
+	 *   [0] str
+	 *   [1] maxlen: int >= 3
+	 *
+	 * Return: Possibly truncated string
+	 */
+	Utils.ellipsisText = function (str, maxlen) {
+		if (maxlen < 3) {
+			throw "Unable to trim string to less than size 3. String: " + Utils.ellipsisText(str, 100);
+		}
+
+		if (str.length <= maxlen) {
+			return str;
+		}
+
+		return str.substr(0, maxlen - 3) + "...";
+	};
+	
+	/* nvl
+	 *
+	 * "Null value." Usually you should use
+	 * x = x || y, however sometimes a valid
+	 * value of x is 0 or false (especially in array indicies). 
+	 *
+	 * This function makes things into a neat one liner.
+	 * nvl(x, y)
+	 *
+	 * Required:
+	 *   [0] val
+	 *   [1] ifnull 
+	 *
+	 * Return: val || ifnull (but accounting for false and 0)
+	 */
+	Utils.nvl = function (val, ifnull) {
+		return !(val === undefined || val === null)
+			? val
+			: ifnull;
+	};
+
+	/* plural
+	 *
+	 * Given a count and a string encoded as described below,
+	 * parse it so that it is either singular or plural.
+	 *
+	 * Strings may be written as such:
+	 *
+	 * var x = 1;
+	 * Utils.plural(x, "I have " + x + " cars[[s]]")
+	 * => "I have 1 car"
+	 *
+	 * x = ['porshe']
+	 * Utils.plural(x, "I have [[a|some]] car[[s]]. [[It|The first]] is a " + x[0]) 
+     * => "I have a car. It is a porshe".
+	 * 
+	 * x = 2;
+	 * Utils.plural(x, "Do you have [[a child|children]]?")
+	 * => "Do you have children?"
+	 *
+	 * Required:
+	 *   [0] ct: A number or an array whose quantity 
+	 *          or length indicates the singularness or plurality
+	 *   [1] phrase: A suitably encoded phrase
+	 *
+	 * Returns: A pluralized string
+	 */
+	Utils.plural = function (ct, phrase) {
+		var isplural = false;
+
+		if (typeof(ct) === 'number') {
+			isplural = (ct !== 1);
+		}
+		else {
+			isplural = (ct.length !== 1);
+		}
+
+		var multicapture = /\[\[([^\]])+?\]\]/g;
+		var singlecapture = /\[\[([^\]])+?\]\]/;
+
+		var phrasecopy = phrase;
+
+		var match;
+		while (match = multicapture.exec(phrase)) {
+			var maybepair = match[1].split(/\|/);
+
+			var singular;
+			var pluralversion;
+			if (maybepair.length === 2) {
+				singular = maybepair[0];
+				pluralversion = maybepair[1];
+			}
+			else {
+				singular = "";
+				pluralversion = maybepair[0];
 			}
 
-			var style = window.getComputedStyle(selector[0]) || { 
-				"padding-left": 0, 
-				"padding-right": 0,
-			};
+			var replacement = isplural 
+				? pluralversion
+				: singular;
 
-			return selector.width() + parseFloat(style["padding-left"], 10) + parseFloat(style["padding-right"], 10);
+			phrasecopy = phrasecopy.replace(singlecapture, replacement);
+		}
+
+		return phrasecopy;
+	};
+
+	/* numberToText
+	 *
+	 * Follows AP style and spells out 0-9 
+	 * and certain special high numbers
+	 *
+	 * e.g. 1 => one
+	 *     -1 => negative one
+	 *
+	 * Required:
+	 *   [0] number
+	 *
+	 * Return: text or number
+	 */
+	Utils.numberToText = function (number) {
+		var mappings = {
+			0: _("zero"),
+			1: _("one"),
+			2: _("two"),
+			3: _("three"),
+			4: _("four"),
+			5: _("five"),
+			6: _("six"),
+			7: _("seven"),
+			8: _("eight"),
+			9: _("nine"),
+			100: _("a hundred"),
+			1000: _("a thousand"),
+			1000000: _("a million"),
 		};
-	}
 
-	if (!$.fn.outerHeight) {
-		$.fn.outerHeight = function (include_margin) {
-			var selector = $(this).first();
-			var style = window.getComputedStyle(selector[0]) || { 
-				"border-top-width": 0, 
-				"border-bottom-width": 0,
-				"margin-top": 0,
-				"margin-bottom": 0,
-			};
+		var positive = Math.abs(number);
 
-			var height = selector.innerHeight();
-			height += parseFloat(style['border-top-width'], 10) + parseFloat(style['border-bottom-width'], 10);
-
-			if (include_margin) {
-				height += parseFloat(style['margin-top'], 10) + parseFloat(style['margin-bottom'], 10);
+		var text = "";
+		if (mappings[positive]) {				
+			if (number < 0) {
+				text = _("negative ");
 			}
 
-			return height;
+			text += mappings[positive];
+		} 
+		else {
+			text = number;
+		}
+
+		return text;
+	};
+
+	/* findCallback
+	 *
+	 * Often functions are designed so that the final positional
+	 * argument is the callback. The problem occurs when you can have
+	 * multiple optional positional arguments.
+	 *
+	 * Pass "arguments" to this function and it'll find the callback
+	 * for you.
+	 *
+	 * Required:
+	 *   [0] args: literally the "arguments" special variable
+	 *
+	 * Return: fn or null
+	 */
+	 Utils.findCallback = function (args) {
+	 	var callback = null;
+
+	 	for (var i = args.length - 1; i >= 0; i--) {
+	 		if (typeof(args[i] === 'function')) {
+	 			callback = args[i];
+	 			break;
+	 		}
+	 	}
+
+	 	return callback;
+	 };
+
+	/* compose
+	 *
+	 * Compose N functions into a single function call.
+	 *
+	 * Required: 
+	 *   [0-n] functions or arrays of functions
+	 * 
+	 * Returns: function
+	 */
+	Utils.compose = function () {
+		var fns = Utils.flatten(arguments);
+
+		return function () {
+			for (var i = 0; i < fns.length; i++) {
+				fns[i].apply(this, arguments);
+			}
 		};
-	}
+	};
 
-	if (!$.fn.outerWidth) {
-		$.fn.outerWidth = function (include_margin) {
-			var selector = $(this).first();
-			var style = window.getComputedStyle(selector[0]) || { 
-				"border-left-width": 0, 
-				"border-right-width": 0,
-				"margin-left": 0,
-				"margin-right": 0,
-			};
+	/* listeq
+	 *
+	 * Tests if the contents of two scalar
+	 * arrays are equal. 
+	 *
+	 * Required:
+	 *   [0] a: array
+	 *	 [1] b: array
+	 *
+	 * Return: boolean
+	 */
+	Utils.listeq = function (a, b) {
+		if (!Array.isArray(a) || !Array.isArray(b)) {
+			return false;
+		}
+		else if (a.length !== b.length) {
+			return false;
+		}
 
-			var width = selector.innerWidth();
-			width += parseFloat(style['border-left-width'], 10) + parseFloat(style['border-right-width'], 10);
+		for (var i = 0; i < a.length; i++) {
+			if (a[i] !== b[i]) {
+				return false;
+			}
+		}
 
-			if (include_margin) {
-				width += parseFloat(style['margin-left'], 10) + parseFloat(style['margin-right'], 10);
+		return true;
+	};
+
+	/* hasheq
+	 *
+	 * Tests if two objects are equal at a 
+	 * shallow level. Intended to be used with
+	 * scalar values.
+	 *
+	 * Required:
+	 *   [0] a
+	 *   [1] b
+	 *
+	 * Return: bool 
+	 */
+	Utils.hasheq = function (a, b) {
+		var akeys = Object.keys(a);
+
+		if (!Utils.listeq(akeys, Object.keys(b))) {
+			return false;
+		}
+
+		for (var i = 0; i < akeys.length; i++) {
+			var key = akeys[i];
+
+			if (a[key] !== b[key]) {
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	/* flatten
+	 *
+	 * Take an array that potentially contains other arrays 
+	 * and return them as a single array.
+	 *
+	 * e.g. flatten([1, 2, [3, [4]], 5]) => [1,2,3,4,5]
+	 *
+	 * Required: 
+	 *   [0] array
+	 * 
+	 * Returns: array
+	 */
+	Utils.flatten = function (array) {
+		array = array || [];
+
+		var flat = [];
+
+		var len = array.length;
+		for (var i = 0; i < len; i++) {
+			var item = array[i];
+
+			if (typeof(item) === 'object' && Array.isArray(item)) {
+				flat = flat.concat(Utils.flatten(item));
+			}
+			else {
+				flat.push(item);
+			}
+		} 
+
+		return flat;
+	};
+
+	/* arrayToHashKeys
+	 *
+	 * Converts [1,2,3,'a','b','c'] into
+	 * { 1: true, 2: true, 3: true, 'a': true, 'b': true, 'c': true }
+	 * so that you can e.g. efficiently test for existence.
+	 *
+	 * Required: 
+	 *   [0] array: Contains only scalar values
+	 * 
+	 * Returns: { index1: true, ... }
+	 */
+	Utils.arrayToHashKeys = function (array) {
+		var hash = {};
+		for (var i = array.length - 1; i >= 0; i--) {
+			hash[array[i]] = true;
+		}
+
+		return hash;
+	};
+
+	/* forEachItem
+	 *
+	 * Iterate through each key/value in the hash
+	 *
+	 * Required:
+	 *   [0] hash
+	 *   [1] fn(key, value)
+	 *
+	 * Return: void (iteration construct)
+	 */
+	Utils.forEachItem = function (hash, fn) {
+		hash = hash || {};
+
+		var keys = Object.keys(hash);
+		keys.sort();
+
+		keys.forEach(function (key) {
+			fn(key, hash[key]);
+		});
+	};
+
+	/* unique
+	 *
+	 * Take an array of elements and return only 
+	 * unique values. This function respects
+	 * the stability of the array based on
+	 * first occurrence.
+	 *
+	 * Required:
+	 *   [0] list: e.g. [ 1, 1, 4, 5, 2, 4 ]
+	 *
+	 * Return: [ e.g. 1, 4, 5, 2 ]
+	 */
+	Utils.unique = function (list) {
+		var obj = {};
+		var order = [];
+		list.forEach(function (item) {
+			if (!obj[item]) {
+				order.push(item);
 			}
 
-			return width;
+			obj[item] = true;
+		});
+
+		return order;
+	};
+
+	/* slice
+	 *
+	 * Gives a subset of the given hash.
+	 *
+	 * Required:
+	 *   [0] hash
+	 *   [1..n] keys to slice
+	 *
+	 * Return: hash slice
+	 */
+	Utils.slice = function (hash) {
+		var sliced = {};
+		
+		for (var i = 1; i < arguments.length; i++) {
+			var key = arguments[i];
+			sliced[key] = hash[key];
+		}
+
+		return sliced;
+	};
+
+	/* clamp
+	 *
+	 * Bound a value between a minimum and maximum value.
+	 *
+	 * Required: 
+	 *   [0] value: The number to evaluate
+	 *   [1] min: The minimum possible value
+	 *   [2] max: The maximum possible value
+	 * 
+	 * Returns: value if value in [min,max], min if less, max if more
+	 */
+	Utils.clamp = function (value, min, max) {
+		return Math.max(Math.min(value, max), min);
+	};
+
+	/* indexOfAttr
+	 *
+	 * For use with arrays of objects. It's
+	 * Array.indexOf but against an attribute
+	 * of the array.
+	 *
+	 * Required: 
+	 *   [0] value: searching for this
+	 *   [1] array
+	 *   [2] attr: e.g. description in [ { description }, { description } ]
+	 * 
+	 * Returns: index or -1 if not found
+	 */
+	Utils.indexOfAttr = function (value, array, attr) {
+		for (var i in array) {
+			if (array[i][attr] === value) {
+				return i;
+			}
+		}
+
+		return -1;
+	};
+
+	/* invertHash
+	 *
+	 * Turns a key => value into value => key.
+	 *
+	 * Required:
+	 *   [0] hash
+	 *
+	 * Return: inverted hash { value: key }
+	 */
+	Utils.invertHash = function (hash) {
+		hash = hash || {};
+
+		var inversion = {};
+		for (var key in hash) {
+			if (!hash.hasOwnProperty(key)) { continue; }
+			inversion[hash[key]] = key;
+		}
+
+		return inversion;
+	};
+
+	/* sumattr
+	 *
+	 * Since javascript doesn't do summing maps very gracefully,
+	 * here's a hack to take care of a common case of a single
+	 * level of depth.
+	 *
+	 * Required:
+	 *   [0] list: array of numbers
+	 *   [1] attr: The name of an attribute common to all the elements in list (e.g. list[0].attr )
+	 *
+	 * Returns: sum of all the attributes
+	 */
+	Utils.sumattr = function (list, attr) {
+		var total = 0;
+		for (var i = list.length - 1; i >= 0; i--) {
+			total += list[i][attr];
 		};
+
+		return total;		
+	};
+
+	/* sum
+	 *
+	 * Returns the sum off all the elements of an array.
+	 *
+	 * Required: 
+	 *  [0] array of numbers
+	 *
+	 * Returns: sum of array
+	 */
+	Utils.sum = function (list) {
+		var total = 0;
+		for (var i = list.length - 1; i >= 0; i--) {
+			total += list[i];
+		};
+
+		return total;
+	};
+
+	/* median
+	 *
+	 * Given an array of numbers, returns the median.
+	 *
+	 * Required: array of numbers
+	 *
+	 * Returns: median
+	 */
+	Utils.median = function (list) {
+		list.sort();
+
+		if (list.length === 0) {
+			return null;
+		}
+
+		var middle = Math.ceil(list.length / 2);
+		if (list.length % 2 === 0) {
+			return (list[middle] + list[middle - 1]) / 2;
+		}
+		return list[middle];
+	};
+
+	/* truncate
+	 *
+	 * Provides a method of truncating the decimal 
+	 * of a javascript number.
+	 *
+	 * Required:
+	 *  [0] n: The number you wish to truncate
+	 *
+	 * Returns: The truncated number
+	 */
+	Utils.truncate = function (n) {
+		if (n > 0) {
+			return Math.floor(n);
+		}
+
+		return Math.ceil(n);
+	};
+
+	/* seemingly_random
+	 *
+	 * A pseudo-random number generator that takes
+	 * a seed. Useful for creating random seeming events
+	 * that are coordinated across all players' computers.
+	 *
+	 * Cribbed from: http://stackoverflow.com/questions/521295/javascript-random-seeds
+	 *
+	 * Required: 
+	 *   [0] seed
+	 * 
+	 * Returns: floating point [0, 1] determined by the seed 
+	 * 
+	 * NOTE: YOU MUST MANUALLY INCREMENT THE SEED YOURSELF
+	 */
+	Utils.seemingly_random = function (seed) {
+		var x = Math.sin(seed) * 10000;
+		return x - Math.floor(x);
+	};
+
+	/* random_choice
+	 *
+	 * Selects a random element from an array with replacement.
+	 *
+	 * Required:
+	 *   [0] array
+	 *
+	 * Returns:
+	 */
+	Utils.random_choice = function (array) {
+		if (!array.length) {
+			return undefined;
+		}
+
+		var random_int = Math.round(Math.random() * (array.length - 1));
+
+		return array[random_int];
+	};
+
+	/* biased_random_choice
+	 *
+	 * Select an index at random with a probability equal to its relative
+	 * proportion of weight.
+	 * 
+	 * Algorithm: 
+	 *   1. Generate a random number betwen 0 and sum(weight)
+	 *   2. Considering each cell as a bin of cubes on the number line
+	 *      lined up next to each other, select the cell whose bin the random
+	 *      number lands in.
+	 *   3. If all the weights are 0, make a uniformly random choice.
+     *
+	 * Required: 
+	 *   [0] array: A list of objects or numbers (if objects, you must set property)
+	 *   
+	 * Optional:
+	 *   [1] property: If set, the weights will be assigned by mapping this property
+	 *
+	 * Returns: An index
+	 */
+	Utils.biased_random_choice = function (array, property) {
+		if (!array.length) {
+			return undefined;
+		}
+
+		var weights = array;
+		if (property !== undefined) {
+			weights = array.map(function (x) { return x[property]; });
+		}
+
+		var total = Utils.sum(weights);
+
+		if (total === 0) {
+			return Utils.random_choice(array);
+		}
+
+		var magicnumber = Math.round(Math.random() * total);
+
+		var accumulation = 0;
+		for (var i = 0; i < weights.length; i++) {
+			accumulation += weights[i];
+			if (accumulation >= magicnumber) {
+				return array[i];
+			}
+		}
+
+		return Utils.random_choice(array);
 	}
-})(jQuery || Zepto);
 
+	/* numberWithCommas
+	 *
+	 * Renders a given number with a delimiter for
+	 * ease of reading. e.g. 1412000 => 1,412,000
+	 *
+	 * TODO: We may want to condition on locale as
+	 * commas and decimals are reversed in other
+	 * parts of the world.
+	 *
+	 * Required:
+	 *   [0] x: The number to render
+	 *   [1] delimiter: defaults to ','
+	 */
+	Utils.numberWithCommas = function (x, delimiter) {
+		delimiter = delimiter || ",";
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
+	};
 
+	/**
+	 * Randomize array element order in-place.
+	 * Using Fisher-Yates shuffle algorithm.
+	 * from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+	 */
+	Utils.shuffleArray = function (array) {
+	    for (var i = array.length - 1; i > 0; i--) {
+	        var j = Math.floor(Math.random() * (i + 1));
+	        var temp = array[i];
+	        array[i] = array[j];
+	        array[j] = temp;
+	    }
+	    return array;
+	}
 
+	/* ellipsisText
+	 *
+	 * Take a long string and return it trimed to a particular length
+	 * with trailing ellipses.
+	 *
+	 * Required:
+	 *   [0] str
+	 *   [1] maxlen: int >= 3
+	 *
+	 * Return: Possibly truncated string
+	 */
+	Utils.ellipsisText = function (str, maxlen) {
+		if (maxlen < 3) {
+			throw "Unable to trim string to less than size 3. String: " + Utils.ellipsisText(str, 100);
+		}
+
+		if (str.length <= maxlen) {
+			return str;
+		}
+
+		return str.substr(0, maxlen - 3) + "...";
+	};
+
+	/**
+	 * Merge the queries from the first url with the second url
+	 * Params from the second url's query will overwrite those in the first query
+	 */
+	Utils.mergeQueries = function () {
+		var args = Array.prototype.slice.call(arguments);
+
+		var queries = args.map(function (x) {
+			return $.url(x).data.param.query;
+		});
+
+		var mergedQueries = $.extend.apply(null, [{}].concat(queries));
+		var finalQuery = $.param(mergedQueries);
+
+		if (finalQuery) {
+			finalQuery = '?' + finalQuery;
+		}
+
+		return finalQuery;
+	};
+
+	/* xor
+	 *
+	 * Logical xor.
+	 *
+	 * Required:
+	 *   [0] p: boolean
+	 *   [1] q: boolean
+	 *
+	 * Return: p xor q
+	 */
+	Utils.xor = function (p,q) {
+		return !(p && q) && (p || q);
+	}
+
+	/* guid
+	 *
+	 * Generate a globally unique id.
+	 *
+	 * Required: None
+	 *   
+	 * Return: Random string like '7ac4631c-5fce-99c8-de4b-3088479860aa'
+	 */
+	Utils.guid = function () {
+		var S4 = function () {
+			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		};
+
+		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+	};
+
+})(jQuery);
+Easing = {};
+
+(function (undefined) {
+
+	/* springFactory
+	 * 
+	 * Simulate an actual spring.
+	 * 
+	 * c.f. https://en.wikipedia.org/wiki/Harmonic_oscillator#Universal_oscillator_equation
+	 * look for the underdamped solution.
+	 *
+	 * Solve for the boundary conditions: x(0) = 1, x(1) = 0
+	 *
+	 * The bounce can look jerky towards the end because the motion is less than a pixel
+	 * per frame. Use the optional arguments to create a minimum motion if you can't use
+	 * anti-aliasing.
+	 *
+	 * Required:
+	 *   [0] zeta: Damping constant in [0, 1) (0: undamped, < 1: underdamped)
+	 *   [1] k: integer in [0..inf]
+	 *
+	 * Optional:
+	 *   [1] pixels: total distance in pixels we're moving
+	 *   [2] dynamics: number of pixels above 0 for undamped sinusoidal component
+	 *
+	 * Returns: f(t), t in 0..1
+	 */
+	Easing.springFactory = function (zeta, k, pixels, dynamics) {
+		if (zeta < 0 || zeta >= 1) {
+			throw new Error("Parameter 1 (zeta) must be in range [0, 1). Given: " + zeta);
+		}
+
+		if (k < 0 || Math.floor(k) !== k) {
+			throw new Error("Parameter 2 (k) must be an integer in range [0, inf). Given: " + k);
+		}
+
+		var odd_number = 1 + 2 * k;
+
+		var omega = odd_number / 4 / Math.sqrt(1 - zeta * zeta); // solution set for x(1) = 0
+		omega *= 2 * Math.PI; // normalize sinusoid period to 0..1
+
+		var decayfn = function (t) {
+			return Math.exp(-t * zeta * omega);
+		};
+
+		// subpixel correction
+		if (pixels) {
+			dynamics = dynamics || 1;
+
+			decayfn = (function (fn) {
+				var ipx = dynamics / pixels;
+
+				return function (t) {
+					return ipx + (1 - ipx) * fn(t);
+				};
+			})(decayfn);
+		}
+
+		return function (t) {
+			t = Utils.clamp(t, 0, 1);
+			return 1 - decayfn(t) * Math.cos(Math.sqrt(1 - zeta * zeta) * omega * t);
+		};
+	};
+	
+	// Computed as follows:
+	//
+	// Y = ax^3 + bx^2 + cx + d 
+	//
+	// 4 pts chosen: (0,0), (.5,.5), (1,1) and the control point (0.25, .2)
+	//
+	//  b/c (0,0) is one of the points, d = 0, solve for a,b,c
+	//
+	//  A = [ 1 1 1; 1/8 1/4 1/2; 1/64 1/16 1/4 ]
+	//  Y = [ 1; .5; .2 ]
+	//
+	//  AX = Y
+	//  X = inv(A) * Y
+	// 
+	Easing.easeInOut = function (t) {
+		t = Utils.clamp(t, 0, 1);
+
+		var a = -1.067,
+			b = 1.6,
+			c = 0.467;
+
+		return t * (t * ((a * t) + b) + c);
+	};
+})();
 (function ($, undefined) {
 
 /* scrollTo
@@ -1985,14 +3838,10 @@ window.$ === undefined && (window.$ = Zepto)
  * Optional:
  *     msec: defaults to 250 msec
  *     easing: defaults to ease-in-out-cubic
- *     offset: in pixels (positive scrolls downward more)
- *   [last] callback
  *
  * Return: void
  */
- $.fn.scrollTo = function (target, options, callback) {
- 	callback = Utils.findCallback(arguments);
-
+ $.fn.scrollTo = function (target, options) {
  	var _this = $(this);
 
  	if (target === null) {
@@ -2004,19 +3853,16 @@ window.$ === undefined && (window.$ = Zepto)
  	}
 
  	var msec = options.msec || 250;
- 	var offset = options.offset || 0;
+ 	var easing = options.easing || Easing.easeInOut;
 
  	target = $(target).first();
  	
- 	var position_offset = target[0] === this[0]
- 		? 0
- 		: target.position().top;
+ 	var position_offset = target.position().top - this.scrollTop();
 
- 	offset += _this.scrollTop() + position_offset;
- 	offset = Math.max(offset, 0);
+ 	window.performance.now = window.performance.now || Date.now;
 
  	var distance_traveled = 0;
- 	var start_time = new Date();
+ 	var start_time = window.performance.now();
  	var start_pos = this.scrollTop();
 
  	// if you simply use overflow-y: hidden, the animation is laggy 
@@ -2029,60 +3875,312 @@ window.$ === undefined && (window.$ = Zepto)
  			evt.stopPropagation();
  		});
 
+ 	var req;
+
+ 	var deferred = $.Deferred()
+ 		.done(function () {
+ 			_this.scrollTop(start_pos + position_offset);
+ 		})
+ 		.fail(function () {
+ 			if (req) {
+ 				cancelAnimationFrame(req);
+ 			}
+ 		})
+ 		.always(function () {
+ 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
+ 		});
+
  	function animate () {
-		var now = new Date();
+		var now = window.performance.now();
  		var t = (now - start_time) / msec;
 
- 		if (position_offset - distance_traveled <= 0.0001 || t >= 1) {
- 			_this.scrollTop(start_pos + position_offset);
- 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
+ 		if (t >= 1) {
+ 			deferred.resolve();
  			return;
  		}
  		
- 		var proportion = easeInOut(t);
+ 		var proportion = easing(t);
 
  		distance_traveled = proportion * position_offset;
  		_this.scrollTop(start_pos + distance_traveled);
 
- 		requestAnimationFrame(animate);
+ 		req = requestAnimationFrame(animate);
  	}
 
- 	requestAnimationFrame(animate);
+ 	req = requestAnimationFrame(animate);
 
- 	return this;
+ 	return deferred;
  };
 
-// Computed as follows:
-//
-// Y = ax^3 + bx^2 + cx + d 
-//
-// 4 pts chosen: (0,0), (.5,.5), (1,1) and the control point (0.25, .2)
-//
-//  b/c (0,0) is one of the points, d = 0, solve for a,b,c
-//
-//  A = [ 1 1 1; 1/8 1/4 1/2; 1/64 1/16 1/4 ]
-//  Y = [ 1; .5; .2 ]
-//
-//  AX = Y
-//  X = inv(A) * Y
-// 
-function easeInOut (t) {
-	if (t < 0) {
-		return 0;
-	}
-	else if (t > 1) {
-		return 1;
-	}
-
-	var a = -1.067,
-		b = 1.6,
-		c = 0.467;
-
-	return t * (t * ((a * t) + b) + c);
-}
-
-
 })(jQuery);
+/*
+ * Purl (A JavaScript URL parser) v2.3.1
+ * Developed and maintanined by Mark Perkins, mark@allmarkedup.com
+ * Source repository: https://github.com/allmarkedup/jQuery-URL-Parser
+ * Licensed under an MIT-style license. See https://github.com/allmarkedup/jQuery-URL-Parser/blob/master/LICENSE for details.
+ */
+
+;(function(factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+    } else {
+        window.purl = factory();
+    }
+})(function() {
+
+    var tag2attr = {
+            a       : 'href',
+            img     : 'src',
+            form    : 'action',
+            base    : 'href',
+            script  : 'src',
+            iframe  : 'src',
+            link    : 'href',
+            embed   : 'src',
+            object  : 'data'
+        },
+
+        key = ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'host', 'port', 'relative', 'path', 'directory', 'file', 'query', 'fragment'], // keys available to query
+
+        aliases = { 'anchor' : 'fragment' }, // aliases for backwards compatability
+
+        parser = {
+            strict : /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*):?([^:@]*))?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,  //less intuitive, more accurate to the specs
+            loose :  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*):?([^:@]*))?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/ // more intuitive, fails on relative paths and deviates from specs
+        },
+
+        isint = /^[0-9]+$/;
+
+    function parseUri( url, strictMode ) {
+        var str = decodeURI( url ),
+        res   = parser[ strictMode || false ? 'strict' : 'loose' ].exec( str ),
+        uri = { attr : {}, param : {}, seg : {} },
+        i   = 14;
+
+        while ( i-- ) {
+            uri.attr[ key[i] ] = res[i] || '';
+        }
+
+        // build query and fragment parameters
+        uri.param['query'] = parseString(uri.attr['query']);
+        uri.param['fragment'] = parseString(uri.attr['fragment']);
+
+        // split path and fragement into segments
+        uri.seg['path'] = uri.attr.path.replace(/^\/+|\/+$/g,'').split('/');
+        uri.seg['fragment'] = uri.attr.fragment.replace(/^\/+|\/+$/g,'').split('/');
+
+        // compile a 'base' domain attribute
+        uri.attr['base'] = uri.attr.host ? (uri.attr.protocol ?  uri.attr.protocol+'://'+uri.attr.host : uri.attr.host) + (uri.attr.port ? ':'+uri.attr.port : '') : '';
+
+        return uri;
+    }
+
+    function getAttrName( elm ) {
+        var tn = elm.tagName;
+        if ( typeof tn !== 'undefined' ) return tag2attr[tn.toLowerCase()];
+        return tn;
+    }
+
+    function promote(parent, key) {
+        if (parent[key].length === 0) return parent[key] = {};
+        var t = {};
+        for (var i in parent[key]) t[i] = parent[key][i];
+        parent[key] = t;
+        return t;
+    }
+
+    function parse(parts, parent, key, val) {
+        var part = parts.shift();
+        if (!part) {
+            if (isArray(parent[key])) {
+                parent[key].push(val);
+            } else if ('object' == typeof parent[key]) {
+                parent[key] = val;
+            } else if ('undefined' == typeof parent[key]) {
+                parent[key] = val;
+            } else {
+                parent[key] = [parent[key], val];
+            }
+        } else {
+            var obj = parent[key] = parent[key] || [];
+            if (']' == part) {
+                if (isArray(obj)) {
+                    if ('' !== val) obj.push(val);
+                } else if ('object' == typeof obj) {
+                    obj[keys(obj).length] = val;
+                } else {
+                    obj = parent[key] = [parent[key], val];
+                }
+            } else if (~part.indexOf(']')) {
+                part = part.substr(0, part.length - 1);
+                if (!isint.test(part) && isArray(obj)) obj = promote(parent, key);
+                parse(parts, obj, part, val);
+                // key
+            } else {
+                if (!isint.test(part) && isArray(obj)) obj = promote(parent, key);
+                parse(parts, obj, part, val);
+            }
+        }
+    }
+
+    function merge(parent, key, val) {
+        if (~key.indexOf(']')) {
+            var parts = key.split('[');
+            parse(parts, parent, 'base', val);
+        } else {
+            if (!isint.test(key) && isArray(parent.base)) {
+                var t = {};
+                for (var k in parent.base) t[k] = parent.base[k];
+                parent.base = t;
+            }
+            if (key !== '') {
+                set(parent.base, key, val);
+            }
+        }
+        return parent;
+    }
+
+    function parseString(str) {
+        return reduce(String(str).split(/&|;/), function(ret, pair) {
+            try {
+                pair = decodeURIComponent(pair.replace(/\+/g, ' '));
+            } catch(e) {
+                // ignore
+            }
+            var eql = pair.indexOf('='),
+                brace = lastBraceInKey(pair),
+                key = pair.substr(0, brace || eql),
+                val = pair.substr(brace || eql, pair.length);
+
+            val = val.substr(val.indexOf('=') + 1, val.length);
+
+            if (key === '') {
+                key = pair;
+                val = '';
+            }
+
+            return merge(ret, key, val);
+        }, { base: {} }).base;
+    }
+
+    function set(obj, key, val) {
+        var v = obj[key];
+        if (typeof v === 'undefined') {
+            obj[key] = val;
+        } else if (isArray(v)) {
+            v.push(val);
+        } else {
+            obj[key] = [v, val];
+        }
+    }
+
+    function lastBraceInKey(str) {
+        var len = str.length,
+            brace,
+            c;
+        for (var i = 0; i < len; ++i) {
+            c = str[i];
+            if (']' == c) brace = false;
+            if ('[' == c) brace = true;
+            if ('=' == c && !brace) return i;
+        }
+    }
+
+    function reduce(obj, accumulator){
+        var i = 0,
+            l = obj.length >> 0,
+            curr = arguments[2];
+        while (i < l) {
+            if (i in obj) curr = accumulator.call(undefined, curr, obj[i], i, obj);
+            ++i;
+        }
+        return curr;
+    }
+
+    function isArray(vArg) {
+        return Object.prototype.toString.call(vArg) === "[object Array]";
+    }
+
+    function keys(obj) {
+        var key_array = [];
+        for ( var prop in obj ) {
+            if ( obj.hasOwnProperty(prop) ) key_array.push(prop);
+        }
+        return key_array;
+    }
+
+    function purl( url, strictMode ) {
+        if ( arguments.length === 1 && url === true ) {
+            strictMode = true;
+            url = undefined;
+        }
+        strictMode = strictMode || false;
+        url = url || window.location.toString();
+
+        return {
+
+            data : parseUri(url, strictMode),
+
+            // get various attributes from the URI
+            attr : function( attr ) {
+                attr = aliases[attr] || attr;
+                return typeof attr !== 'undefined' ? this.data.attr[attr] : this.data.attr;
+            },
+
+            // return query string parameters
+            param : function( param ) {
+                return typeof param !== 'undefined' ? this.data.param.query[param] : this.data.param.query;
+            },
+
+            // return fragment parameters
+            fparam : function( param ) {
+                return typeof param !== 'undefined' ? this.data.param.fragment[param] : this.data.param.fragment;
+            },
+
+            // return path segments
+            segment : function( seg ) {
+                if ( typeof seg === 'undefined' ) {
+                    return this.data.seg.path;
+                } else {
+                    seg = seg < 0 ? this.data.seg.path.length + seg : seg - 1; // negative segments count from the end
+                    return this.data.seg.path[seg];
+                }
+            },
+
+            // return fragment segments
+            fsegment : function( seg ) {
+                if ( typeof seg === 'undefined' ) {
+                    return this.data.seg.fragment;
+                } else {
+                    seg = seg < 0 ? this.data.seg.fragment.length + seg : seg - 1; // negative segments count from the end
+                    return this.data.seg.fragment[seg];
+                }
+            }
+
+        };
+
+    }
+    
+    purl.jQuery = function($){
+        if ($ != null) {
+            $.fn.url = function( strictMode ) {
+                var url = '';
+                if ( this.length ) {
+                    url = $(this).attr( getAttrName(this[0]) ) || '';
+                }
+                return purl( url, strictMode );
+            };
+
+            $.url = purl;
+        }
+    };
+
+    purl.jQuery(window.jQuery);
+
+    return purl;
+
+});
+
 (function() {
 
 	var dfs = {"am_pm":["AM","PM"],"day_name":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"day_short":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"era":["BC","AD"],"era_name":["Before Christ","Anno Domini"],"month_name":["January","February","March","April","May","June","July","August","September","October","November","December"],"month_short":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"order_full":"MDY","order_long":"MDY","order_medium":"MDY","order_short":"MDY"};
@@ -2186,13 +4284,1315 @@ Login = {};
 (function ($, undefined) {
 	"use strict";
 
+Login.component = function (name, klass, selector) {
+	if (klass !== undefined) {
+		GLOBAL.components[name] = React.render(
+			React.createElement(klass, null), $(selector)[0]
+		);
+	}
+	
+	return GLOBAL.components[name];
+};
+
+Login.progressController = function () {
+	// this will control global t
+};
+
+Login.IntakeView = function () {
+	var _this = this;
+
+
+	_this.playIntro = function () {
+		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
+
+		var pixels = $('.gateway').position().top;
+
+		setTimeout(function () {
+			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
+			
+			$('#viewport').scrollTo('.gateway', {
+				msec: 2500,
+				easing: Easing.springFactory(.7, 1),
+			})
+			.done(function () {
+				Login.component('header').setState({ visible: true });
+			});
+		}, 2500);
+	};
+};
+
+Login.IntakeController = function () {
+	var _this = this;
+
+	_this.view = new Login.IntakeView();
+	
+	_this.playIntro = _this.view.playIntro;
+};
+
+Login.continueOn = function () {
+	var continueParam = $.url().param('continue') || "";
+	document.location.href = "./" + continueParam;
+};
+
+/* togglePasswordVisibility
+ *
+ * Makes paswords visible or invisible depending on
+ * whether a user toggles the show/hide control.
+ *
+ * Optional:
+ *   [0] evt: Event passthrough
+ *
+ * Returns: void
+ */
+Login.togglePasswordVisibility = function (evt) {
+	var password = $(evt.target).parent().find('input[name=password]');
+	var toggle = $(evt.target);
+
+	if (password.attr('type') === 'password') {
+		password.attr('type', 'text');
+		toggle
+			.text(_('hide'))
+			.addClass('visible');
+	}
+	else {
+		password.attr('type', 'password');
+		toggle
+			.text(_('show'))
+			.removeClass('visible');
+	}
+
+	// This is to fix a rendering bug
+	// that centered the text in the field
+	// temporarily.
+	password.focus();
+};
+
+/* standardAuthenticate
+ *
+ * Logs in user and redirects to EyeWire or displays error messages.
+ *
+ * Required:
+ *	username
+ *	password
+ *  coordinator
+ *
+ * Returns: void
+ */
+Login.standardAuthenticate = function (args) {
+	args = args || {};
+
+	var coordinator = args.coordinator;
+
+	loginValidateUsername(args.username, coordinator);
+
+	if (!args.password) {
+		coordinator.lazySet('password', false, 'minimum-length');
+	}
+
+	if (!coordinator.execute()) {
+		focusOnFirstError(coordinator, 'login');
+		return;
+	}
+
+	var postdata = {
+		username: args.username,
+		password: args.password
+	};
+
+	var loginbtn = $('.login button.playnow').addClass('loading');
+	$.post("/1.0/internal/account/authenticate/standard/", postdata, function (response) {
+		loginbtn.removeClass('loading');
+		if (!response) {
+			// error handling
+		}
+		
+		response = $.parseJSON(response);
+
+		if (response.success) {
+			continueOn();
+		}
+		else {
+			var keys = ['username', 'password'];
+
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
+
+				if (response.error[key]) {
+					coordinator.lazySet(key, false, response.error[key]);
+				}
+			}
+			coordinator.execute();
+			focusOnFirstError(coordinator, 'login');
+		}
+	});
+};
+
+/* facebookLogin
+ *
+ * Attempt to login via facebook.
+ *
+ * Required:
+ *    access_token: The authentication token granted by the facebook async api
+ *
+ * Returns: void
+ */
+Login.facebookLogin = function (args) {
+	var postdata = {
+		access_token: args.access_token
+	};
+
+	var loginbtn = $('#fb-login').addClass('loading');
+	$.post("/1.0/internal/account/authenticate/facebook/", postdata, function (response) {
+		loginbtn.removeClass('loading');
+		if (!response) {
+			// error handling
+		}
+		
+		response = $.parseJSON(response);
+		
+		if (response.success) {
+			continueOn();
+		}
+		else {
+			if (response.error.length) {
+				$('#loginsocialerror').text(
+					loginFacebookAccountFixtext(response.error[0])
+				).slideFadeIn();
+			}
+		}
+	});	
+};
+
+function loginFacebookAccountFixtext (reason) {
+	if (reason === 'not-registered') {
+		return _("Please sign up to use this Facebook account.");
+	}
+	else if (reason === 'not-connected') {
+		return _("Sign out of Facebook and try again.");
+	}
+
+	return _("Unknown Facebook error. Please contact support.");
+}
+
+/* standardRegistration
+ *
+ * Attempt to register and sign in using standard
+ * username/password authentication.
+ *
+ * Required:
+ *   username
+ *   password
+ *   email
+ *   coordinator
+ *
+ * Returns: void
+ */
+Login.standardRegistration = function (args) {
+	args = args || {};
+
+	if (!args.username || !args.password || !args.email) {
+		return $.Deferred().reject();
+	}
+
+	var postdata = {
+		username: args.username,
+		password: args.password,
+		email: args.email
+	};
+
+	var coordinator = args.coordinator;
+
+	var deferred = $.Deferred();
+
+	$.post("/1.0/internal/account/register/standard/", postdata, function (response) {
+		if (!response) {
+			deferred.reject();
+			return;
+		}
+		
+		response = $.parseJSON(response);
+		
+		if (response.success) {
+			deferred.resolve();
+		}
+		else {
+			deferred.reject(response);
+			//focusOnFirstError(coordinator, 'register');
+		}
+	})
+	.fail(function () {
+		deferred.reject();
+	});
+
+	return deferred;
+};
+
+Login.facebookRegistration = function (args) {
+	args = args || {};
+
+	var coordinator = args.coordinator;
+
+	validateUsername(coordinator);
+
+	if (!coordinator.execute()) {
+		focusOnFirstError(coordinator, 'register');
+		return;
+	}
+
+	if (!args.username || !args.access_token) {
+		return;
+	}
+
+	var postdata = {
+		username: args.username,
+		access_token: args.access_token
+	};
+
+	$.post("/1.0/internal/account/register/facebook/", postdata, function (response) {
+		response = $.parseJSON(response);
+		
+		if (response.success) {
+			continueOn();
+		}
+		else {
+			if (response.reasons.username) {
+				coordinator.set('username', false, response.reasons.username);
+			}
+			else if (response.reasons.access_token) {
+				$('#registersocialerror').text(
+					registrationAccessTokenFixtext(response.reasons.access_token)
+				).slideFadeIn();
+			}
+			else if (response.reasons.facebook_account) {
+				$('#registersocialerror').text(
+					registrationFacebookAccountFixtext(response.reasons.facebook_account)
+				).slideFadeIn();
+			}
+		}
+	});
+}
+
+function registrationFacebookAccountFixtext (reason) {
+	if (reason === 'taken') {
+		return _("Your Facebook account is already registered.");
+	}
+
+	return _("Please contact support.");
+}
+
+function registrationAccessTokenFixtext (reason) {
+	if (reason === 'missing') {
+		return _("Try signing in to Facebook again.");
+	}
+	else if (reason === 'invalid') {
+		return _("Sign out of Facebook and try again.");
+	}
+
+	return _("Unknown Facebook authorization error. Please contact support.");
+}
+
+/* configurePage
+ *
+ * Since the login page can be in either
+ * login or register mode, different configuration
+ * needs to happen in each case. For instance,
+ * different fields must be filled out and the buttons
+ * and form submission behave differently.
+ *
+ * Required:
+ *    [0] mode: 'login' or 'registration'
+ *
+ * Returns: void
+ */
+Login.configurePage = function (mode) {
+	if (mode === 'login') {
+		Login.configureLoginPage();
+	}
+	else if (mode === 'reset-password') {
+		PasswordReset.configurePage();
+	}
+	else {
+		Login.configureRegistrationPage();
+	}
+
+	Login.keepQueryOnToggle();
+
+	$('.passwordvisibilitytoggle').click(Login.togglePasswordVisibility);
+
+	$('header').click(function (evt) {
+		var href = $('header a').first().attr('href');
+		window.open(href, '_blank');
+	});
+
+	$('header a').click(function (evt) {
+		evt.stopPropagation();
+	});
+
+	$('span[ruled]').each(function (index, elem) {
+		Utils.UI.ruledText(elem);
+	});
+
+	$('#sponsor').maybeAlwaysCenterIn(window, {
+		direction: "horizontal",
+	});
+};
+
+
+Login.keepQueryOnToggle = function () {
+	var linkUrl = $('#togglemode').attr('href');
+
+	var query = Utils.mergeQueries(window.location.href, linkUrl);
+	var linkPath = $.url(linkUrl).data.attr.path;
+
+	$('#togglemode').attr('href', linkPath + query);
+};
+
+/* configureLoginPage
+ *
+ * Required: none
+ *
+ * Returns: void
+ */
+Login.configureLoginPage = function () {
+	var logincoordinator = createLoginCoordinator();
+
+	$('.login').show();
+	$('.playnow').on('click', function (evt) {
+		Login.standardAuthenticate({
+			username: $('#username').val(),
+			password: $('#loginpassword').val(),
+			coordinator: logincoordinator
+		});
+	});
+
+	$('.login .passwordvisibilitytoggle').centerIn('#loginpassword', { 
+		direction: 'vertical',
+		top: -2
+	});
+
+	$('#username')
+		.attr('maxlength', 40)
+		.thinking({ idle: 1000 }, function () {
+			loginValidateUsernameNoLength(this, logincoordinator);
+		})
+		.on('focus', Utils.UI.trim())
+		.on('blur', Utils.UI.trim(function () {
+			loginValidateUsernameNoLength(this, logincoordinator);
+		}))
+		.on('keyup', function () {
+			logincoordinator.set('username', true);
+		});
+
+	$('#loginpassword')
+		.on('keyup', function () {
+			logincoordinator.set('password', true);
+		});
+
+	$('#fb-login').on('click', function () {
+		FB.getLoginStatus(function (response) {
+			if (response.status === 'connected') {
+				Login.facebookLogin({
+					access_token: response.authResponse.accessToken,
+					coordinator: logincoordinator
+				});
+			}
+			else {
+				FB.login(function (loginresponse) {
+					 if (loginresponse.authResponse) {
+					 	Login.facebookLogin({
+							access_token: loginresponse.authResponse.accessToken,
+							coordinator: logincoordinator
+						});
+					 }
+				});
+			}
+		});
+	});
+
+	$(document).keyup(function (evt) {
+		if (evt.keyCode === Keycodes.codes.enter) {
+			Login.standardAuthenticate({
+				username: $('#username').val(),
+				password: $('#loginpassword').val(),
+				coordinator: logincoordinator
+			});
+		}
+	});
+
+	$('#centerpiece').maybeAlwaysCenterIn(window);
+
+	$('#username').focus();
+	configureForgotPassword();
+};
+
+
+/* createLoginCoordinator 
+ *
+ * Refactoring of configureLoginPage
+ *
+ * Returns: Conditional.Conditional coordinator object
+ */
+function createLoginCoordinator () {
+ 	return new Conditional.Conditional({
+		set: { username: true, password: true },
+		test: Conditional.and,
+		failure: function (conds, data) {
+			var stack = [
+				{
+					elem: $('#username'),
+					errorelem: $('#usernameerror'),
+					fixtextfn: loginUsernameFixtext,
+					condition: 'username'
+				},
+				{
+					elem: $('#loginpassword'),
+					errorelem: $('#loginpassworderror'),
+					fixtextfn: loginPasswordFixtext,
+					condition: 'password',
+					onalert: function (msgelem) { 
+						$(msgelem).fadeIn(300); 
+					},
+					onresolved: function (msgelem) { 
+						$(msgelem).fadeOut(300); 
+					}
+				}
+			];
+
+			coordinationFailure(stack, conds, data);
+		},
+		success: function (conds) {
+			$('input').removeClass('error');
+			$('.errormsg').each(function (index, element) {
+				element = $(element);
+
+				if (element.attr('id') === 'loginpassworderror') {
+					element.fadeOut(300);
+				}
+				else {
+					element.slideFadeOut();
+				}
+			});
+		},
+	});	
+}
+
+
+/* configureForgotPassword
+ *
+ * Configures the behavior of the forgot? link.
+ *
+ * Required: None
+ *
+ * Returns: void
+ */
+function configureForgotPassword () {
+	var throttledpost = Utils.UI.throttle(2500, $.post);
+
+	var forgotcoordinator = new Conditional.Conditional({
+		set: { sent: false },
+		success: function (conds, data) {
+			$('#loginpassworderror').text(
+				loginForgotPasswordFixtext('success')
+			).slideFadeIn();		
+		},
+		failure: function (conds, data) {
+			$('#loginpassworderror').text(
+				loginForgotPasswordFixtext(data.sent)
+			).slideFadeIn();
+
+			if (data.sent === 'no-identifier' || data.sent === 'user-not-found') {
+				$('#username').addClass('error').focus();
+			}
+		}
+	});
+
+	$('#forgotpassword').on("click", function () {
+		var username = $.trim($('#username').val());
+
+		if (!username) {
+			forgotcoordinator.set('sent', false, 'no-identifier');
+			return;
+		}
+
+		var data = {
+			identifier: username
+		};
+
+		throttledpost('/1.0/internal/account/password-reset/issue-token/', data, function (response) {
+			if (!response) {
+				return;
+			}
+			response = $.parseJSON(response);
+
+			if (response.success) {
+				forgotcoordinator.set('sent', true);
+			}
+			else {
+				forgotcoordinator.set('sent', false, response.reason);
+			}
+		});
+	});
+
+	var wasreset = $.url(document.location.href).param('password_was_reset');
+	if (wasreset) {
+		$('#pitch')
+			.text(_('Your password was reset.'))
+			.show();
+	}
+}
+
+/* loginForgotPasswordFixtext
+ *
+ * Provides fixtext for various reasons that the server may
+ * accept or reject a reset password request.
+ *
+ * Required:
+ *   [0] reason
+ *
+ * Returns: fixtext string
+ */
+function loginForgotPasswordFixtext (reason) {
+	if (reason === 'success') {
+		return _("An email has been sent.");
+	}
+
+	if (reason === 'no-identifier') {
+		return _("Please enter your username or email.");
+	}
+	else if (reason === 'user-not-found') {
+		return _("This username or email was not registered.");
+	}
+	else if (reason === 'failed' || reason === 'email-failed') {
+		return _("Unable to process. Please contact support.");
+	}
+	else if (reason === 'limit-exceeded') {
+		return _("Too many attempts. Please try back later.");
+	}
+
+	return _("Unknown error. Please contact support.");
+}
+
+/* loginValidateUsername
+ *
+ * Validates the username field checking for emails
+ * and accounts names.
+ *
+ * Required:
+ *   [0] usernamefield
+ *   [1] coordinator
+ *
+ * Returns: void
+ */
+function loginValidateUsername(usernamefield, coordinator) {
+	var username = $(usernamefield).val();
+	username = $.trim(username);
+
+	if (!username.length) {
+		coordinator.set('username', false, 'minimum-length');
+	}
+	else if (username.match(/[,\[\]\s]/i)) {
+		coordinator.set('username', false, 'available-username');
+	}
+	else {
+		var type = 'username';
+		if (username.match(/@/)) {
+			type = 'email';
+		}
+
+		var url = '/1.0/internal/account/available/' + type + '/' + encodeURIComponent(username);
+		$.getJSON(url, function (data) {
+			if (data.available) {
+				coordinator.set('username', false, 'available-' + type);
+			}
+			else {
+				coordinator.set('username', true);
+			}
+		});
+	}
+}
+
+function loginValidateUsernameNoLength(usernamefield, coordinator) {
+	var username = $(usernamefield).val();
+	username = $.trim(username);
+
+	if (!username) {
+		coordinator.set('username', true);
+	}
+	else {
+		loginValidateUsername(usernamefield, coordinator);
+	}
+}
+
+/* loginUsernameFixtext
+ *
+ * Provides fixtext for various reasons that the server may
+ * reject a username.
+ *
+ * Required:
+ *   [0] reason
+ *
+ * Returns: fixtext string
+ */
+function loginUsernameFixtext (reason) {
+	if (reason === 'minimum-length') {
+		return _("Please enter your username or email.");
+	}
+	else if (reason === 'available-username') {
+		return _("This name is not registered. Did you misspell it?");
+	}
+	else if (reason === 'available-email') {
+		return _("This email is not registered. Did you misspell it?");
+	}
+
+	return _("Please contact support and describe what you were doing.");
+}
+
+/* loginPasswordFixtext
+ *
+ * Provides fixtext for various reasons that the server may
+ * reject a password.
+ *
+ * Required:
+ *   [0] reason
+ *
+ * Returns: fixtext string
+ */
+function loginPasswordFixtext (reason) {
+	if (reason === 'minimum-length') {
+		return _("Please enter your password.");
+	}
+	else if (reason === 'invalid') {
+		return _("Please double-check your password.");
+	}
+
+	return _("Please contact support and describe what you were doing.");
+}
+
+/* configureRegistrationPage
+ *
+ * Required: none
+ *
+ * Returns: void
+ */
+Login.configureRegistrationPage = function () {
+	$('#togglemode')
+		.attr('href', '/login')
+		.text(_('LOGIN'));
+
+	$('#signintype').first().text(_('SIGN UP'));
+
+	$('#pitch').show();
+
+	$('#username')
+		.addClass('bottom-rounded')
+		.attr('placeholder', _('Username'))
+		.focus();
+
+	$('.register.step1').show();
+
+	var playcoordinator = new Conditional.Conditional({
+		set: { username: true, password: true, email: true },
+		test: function (conds) { return conds.username; },
+		success: function (conds) {
+			$('#username').removeClass('error');
+			$('#usernameerror').slideFadeOut();
+		},
+		failure: function (conds, data) { 
+			$('#username').addClass('error');
+			$('#usernameerror').text(
+				registrationUsernameFixtext(data.username)
+			).slideFadeIn();
+		}
+	});
+
+	PasswordUtils.configurePasswordMeter($('.register .password-strength'));
+	Login.bindRegistrationAvailabilityHandlers(playcoordinator);
+
+	var playnowclickhandler = function () {
+		validateUsername(playcoordinator, function (data) {
+			Login.playNowContinueHandler(playcoordinator);
+		});
+
+		if (!playcoordinator.execute()) {
+			$('#username').focus();
+		}
+	};
+
+	$('.playnow')
+		.text(_('SIGN UP'))
+		.on('click.Register', playnowclickhandler);
+
+	$(document).on('keyup.Register', function (evt) {
+		if (evt.keyCode === Keycodes.codes.enter) {
+
+			if (GLOBAL.registration.lastclick === 'facebook') {
+				registrationFacebookSelectionHandler(playcoordinator);	
+			}
+			else {
+				playnowclickhandler();	
+			}
+		}
+	});
+
+	$('#centerpiece').maybeAlwaysCenterIn(window, { top: -50 });
+
+	$('#fb-register').on('click', function () {
+		GLOBAL.registration.lastclick = 'facebook';
+		registrationFacebookSelectionHandler(playcoordinator);
+	});
+
+	if (!isWebGLEnabled()) {
+		$('#webGLlink').show();
+	}
+};
+
+function isWebGLEnabled () {
+	var canvas = $('<canvas />')[0];
+
+	var gl = null;
+	try {
+		gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+	} catch(e) {}
+
+	return gl;
+}
+
+function registrationFacebookSelectionHandler (coordinator) {
+	validateUsername(coordinator);
+
+	if (!coordinator.execute()) {
+		return;
+	}
+
+	FB.getLoginStatus(function (response) {
+		if (response.status === 'connected') {
+			Login.facebookRegistration({
+				username: $('#username').val(),
+				access_token: response.authResponse.accessToken,
+				coordinator: coordinator
+			});
+		}
+		else {
+			FB.login(function (loginresponse) {
+				 if (loginresponse.authResponse) {
+				 	Login.facebookRegistration({
+				 		username: $('#username').val(),
+						access_token: loginresponse.authResponse.accessToken,
+						coordinator: coordinator
+					});
+				 }
+			}, {
+				scope: "email"
+			});
+		}
+	});
+}
+
+/* registrationUsernameFixtext
+ *
+ * Provides fixtext for various reasons that the server may
+ * reject a username.
+ *
+ * Required:
+ *   [0] reason
+ *
+ * Returns: fixtext string
+ */
+function registrationUsernameFixtext (reason) {
+	if (reason === 'taken') {
+		return _("This name is taken.");
+	}
+	else if (reason === 'hyperlink') {
+		return _("Your name shouldn't look like a link.");
+	}
+	else if (reason === 'reserved') {
+		return _("Your name may not contain official titles.");
+	}
+	else if (reason === 'PENIS') {
+		return _("Hint: We're not laughing with you.");
+	}
+	else if (reason === 'zero-length') {
+		return _("Please choose a name.");
+	}
+	else if (reason === 'minimum-length') {
+		return _("Please choose a longer name.");
+	}
+	else if (reason === 'maximum-length') {
+		return _("Please choose a name up to twenty characters long.");
+	}
+	else if (reason === 'format') {
+		return _("Please use only letters, numbers, and underscores.");
+	}
+
+	return _("Please contact support if you really want this name.");
+}
+
+/* quickValidateUsername
+ *
+ * In the interests of streamlining, we can evaluate
+ * the username, along dimensions that do not require a
+ * database check, in real time.
+ *
+ * Required:
+ *    [0] playcoordinator: A Conditional.js object
+ *
+ * Returns: boolean
+ */
+function quickValidateUsernameNoLength (coordinator) {
+	var username = $('#username').val();
+	username = $.trim(username);
+
+	if (username.length > 20) {
+		coordinator.set('username', false, 'maximum-length');
+		return false;
+	}
+	else if (!username.match(/^[a-z0-9_\.]*$/i)) {
+		coordinator.set('username', false, 'format');
+		return false;
+	}
+	else if (GLOBAL.takenusernames[username]) {
+		coordinator.set('username', false, GLOBAL.takenusernames[username]);
+		return false;
+	}
+	else {
+		coordinator.set('username', true);
+		return true;
+	}
+}
+
+/* validateUsername
+ *
+ * Performs full validation (including DB checks)
+ * of the username.
+ *
+ * Required:
+ *    [0] coordinator: A Conditional.js object
+ * Optional:
+ *    [1] callback
+ *
+ * Returns: void (because the AJAX call will necessitate delay)
+ */
+function validateUsername (coordinator, callback) {
+	var username = $('#username').val();
+	username = $.trim(username);
+
+	if (!quickValidateUsernameNoLength(coordinator)) {
+		return;
+	}
+	else if (username.length === 0) {
+		coordinator.set('username', false, 'zero-length');
+	}
+
+	var url = '/1.0/internal/account/available/username/' + encodeURIComponent(username);
+	$.getJSON(url, function (data) {
+		if (data.available) {
+			coordinator.set('username', true);
+			GLOBAL.takenusernames[username] = null;
+		}
+		else {
+			GLOBAL.takenusernames[username] = data.reason || 'taken';
+			coordinator.set('username', false, data.reason);
+		}
+
+		if (callback) {
+			callback(data);
+		}
+	});
+}
+
+function validateUsernameNoLength (coordinator, callback) {
+	var username = $('#username').val();
+	username = $.trim(username);
+
+	if (username.length === 0) {
+		coordinator.set('username', true);
+	}
+	else {
+		validateUsername(coordinator, callback);
+	}
+}
+
+/* registrationPasswordFixtext
+ *
+ * Translates validation problems into fixtext.
+ *
+ * Required:
+ *   [0] reason: A string representing a canonicalization of the issue
+ *
+ * Returns: English text 
+ */
+Login.registrationPasswordFixtext = function (reason) {
+	if (reason === 'zero-length') {
+		return _("Please enter a password.");
+	}
+	else if (reason === 'minimum-length') {
+		return _("Please enter at least six characters.");
+	}
+	else if (reason === 'username') {
+		return _("Including your username is not a good idea.");
+	}
+	else if (reason === 'character-classes') {
+		return _("Please use a mixture of lower case, upper case, digits, and symbols.");
+	}
+	else if (reason === 'streak' || reason == 'ratio') {
+		return _("Please use more variation in your password.");
+	}
+	else if (reason === 'simplicity') {
+		return _("Please make your password stronger.");
+	}
+
+	return _("Please contact support if you really want this password.");
+}
+
+/* quickValidateEmail
+ *
+ * Evaluates the email along dimensions that do not
+ * require the server.
+ *
+ * Required:
+ *    [0] emailfield
+ *    [1] coordinator
+ *
+ * Returns: boolean
+ */
+function validateEmailNoLength (emailfield, coordinator) {
+	var email = $(emailfield).val() || "";
+	email = $.trim(email);
+
+	if (email.length === 0) {
+		coordinator.lazySet('email', true);
+		return true;
+	}
+
+	return validateEmail(emailfield, coordinator);
+}
+
+function validateEmail (emailfield, coordinator) {
+	var email = $(emailfield).val() || "";
+
+	if (email.length === 0) {
+		coordinator.lazySet('email', false, 'zero-length');
+		return true;
+	}
+	else if (!email.match(/^.+@.+\.[a-z]{2,4}$/i)) {
+		coordinator.lazySet('email', false, 'format');
+		return false;
+	}
+	else if (GLOBAL.takenemails[email]) {
+		coordinator.lazySet('email', false, GLOBAL.takenemails[email]);
+		return false;
+	}
+
+	var url = '/1.0/internal/account/available/email/' + encodeURIComponent(email);
+	$.getJSON(url, function (data) {
+		if (data.available) {
+			coordinator.set('email', true);
+		}
+		else {
+			GLOBAL.takenemails[email] = data.reason;
+			coordinator.set('email', false, data.reason);
+		}
+	});
+}
+
+/* registrationEmailFixtext
+ *
+ * Translates validation problems into fixtext.
+ *
+ * Required:
+ *   [0] reason: A string representing a canonicalization of the issue
+ *
+ * Returns: English text 
+ */
+function registrationEmailFixtext (reason) {
+	if (reason === 'zero-length') {
+		return _("Please enter an email.");
+	}
+	else if (reason === 'taken') {
+		return _("Please choose another email; this one is taken.");
+	}
+	else if (reason === 'format') {
+		return _("Email may not be correctly formatted.");
+	}
+
+	return _("Please contact support if you really want to use this email.");
+}
+
+/* bindRegistrationAvailabilityHandlers
+ *
+ * Attaches various validation handlers to the username/password/email fields.
+ *
+ * Required:
+ *    [0] playcoordinator: A Conditional.js object
+ *
+ * Returns: void
+ */
+Login.bindRegistrationAvailabilityHandlers = function (playcoordinator) {
+	$('#username')
+		.thinking({ idle: 750 }, function () {
+			validateUsernameNoLength(playcoordinator);
+		})
+		.on('keyup', function () {
+			quickValidateUsernameNoLength(playcoordinator);
+		})
+		.on('focus', Utils.UI.trim())
+		.on('blur', Utils.UI.trim(function () {
+			validateUsernameNoLength(playcoordinator);
+		}));
+
+	$('#registrationpassword')
+		.on('focus', function () {
+			var valid = PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
+			if (valid) {
+				playcoordinator.execute();
+			}
+		})
+		.on('blur', function () {
+			PasswordUtils.quickValidatePasswordNoLength($('#registrationpassword'), $('#username'), playcoordinator);
+			playcoordinator.execute();
+		})
+		.on('keyup keypress', function () {
+			PasswordUtils.adjustPasswordMeter({
+				meter: $('.register .password-strength'),
+				passwordfield: $('#registrationpassword'), 
+				usernamefield: $('#username'), 
+				coordinator: playcoordinator
+			});
+			var valid = PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
+
+			if (valid) {
+				playcoordinator.execute();
+			}
+		})
+		.thinking({ idle: 1500 }, function () {
+			PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
+			playcoordinator.execute();
+		});
+
+	$('#email')
+		.thinking({ idle: 2000 }, function () {
+			validateEmail(this, playcoordinator);
+			playcoordinator.execute();
+		})
+		.on('focus keyup keypress', function () {
+			var valid = validateEmailNoLength(this, playcoordinator);
+
+			if (valid) {
+				playcoordinator.execute();
+			}
+		})
+		.on('blur', Utils.UI.trim(function () {
+			validateEmailNoLength(this, playcoordinator);
+			playcoordinator.execute();
+		}));
+};
+
+/* playNowContinueHandler
+ *
+ * Reconfigures the dialog when the player clicks on 
+ * the normal (non-social) sign up button.
+ *
+ * Required:
+ *    [0] playcoordinator: A Conditional.js object
+ *
+ * Returns: void
+ */
+Login.playNowContinueHandler = function (playcoordinator) {
+	if (!playcoordinator.execute()) {
+		$('#username').focus();
+		return;
+	}
+
+	playcoordinator.test = Conditional.and;
+	playcoordinator.failure = function (conds, data) {
+		var stack = [
+			{
+				elem: $('#username'),
+				errorelem: $('#usernameerror'),
+				fixtextfn: registrationUsernameFixtext,
+				condition: 'username'
+			},
+			{
+				elem: $('#registrationpassword'),
+				errorelem: $('#registrationpassworderror'),
+				fixtextfn: Login.registrationPasswordFixtext,
+				condition: 'password'
+			},
+			{
+				elem: $('#email'),
+				errorelem: $('#emailerror'),
+				fixtextfn: registrationEmailFixtext,
+				condition: 'email'
+			}
+		];
+
+		coordinationFailure(stack, conds, data);
+	};
+	playcoordinator.success = function (conds, data) {
+		$('.errormsg').slideFadeOut();
+		$('input').removeClass('error');
+	};
+
+	var register = Utils.UI.throttle(1000, function () {
+		validateUsername(playcoordinator);
+		PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
+		validateEmail($('#email'), playcoordinator);
+
+		if (!playcoordinator.execute()) {
+			focusOnFirstError(playcoordinator, 'register');
+			return false;
+		}
+
+		Login.standardRegistration({
+			username: $('#username').val(),
+			password: $('#registrationpassword').val(),
+			email: $('#email').val(),
+			coordinator: playcoordinator
+		});
+
+		return true;
+	});
+
+	$(document).ion('keyup.Register', function (evt) {
+		if (evt.keyCode === Keycodes.codes.enter) {
+			register();
+		}
+	});
+
+	$(window).ion('resize', function () {
+		$('#centerpiece').centerIn(window);
+	});
+
+	$('#username')
+		.thinking('done')
+		.off('blur');
+
+	$('.playnow')
+		.text(_("PLAY NOW"))
+		.addClass('fullwidth')
+		.ion('click.Register', register);
+
+	setTimeout(function () { 
+		$('#registrationpassword').focus();
+		$('#username').on('blur', function () {
+			validateUsername(playcoordinator);
+		});
+	}, 0);
+
+	$('#registersocialerror').hide();
+	$('.register.step2').slideFadeIn();
+	$('.register.step1 button').hide();
+	$('#standard-register').css('width', '100%').show();
+};
+
+/* coordinationFailure
+ *
+ * Provides common error prioritizing for
+ * both login and registration coordinators.
+ *
+ * Required:
+ *  [0] stack: [ { elem, condition, errorelem, fixtextfn, onalert, onresolved }, ... ]
+ *  [1] conds: from the coordinator's failure callback
+ *  [2] data: from the coordinator's failure callback
+ *
+ * Returns: void
+ */
+function coordinationFailure(stack, conds, data) {
+	var first = true;
+	for (var i = 0; i < stack.length; i++) {
+		var field = stack[i];
+		var msgelem = field.errorelem;
+
+		if (!conds[field.condition]) {
+			field.elem.addClass('error');
+			if (first) {
+				msgelem.text(
+					field.fixtextfn(data[field.condition])
+				);
+
+				if (!field.onalert) {
+					msgelem.slideFadeIn();
+				}
+				else {
+					field.onalert(msgelem);
+				}
+				
+				first = false;
+			}
+			else {
+				if (!field.onresolved) {
+					msgelem.slideFadeOut();
+				}
+				else {
+					field.onresolved(msgelem);
+				}
+			}
+		}
+		else {
+			if ($.trim($(field.elem).val()) === '') {
+				first = false; // prevents flickering cascades
+			}
+
+			field.elem.removeClass('error');
+			if (!field.onresolved) {
+				msgelem.slideFadeOut();
+			}
+			else {
+				field.onresolved(msgelem);
+			}
+		}
+	}
+}
+
+/* focusOnFirstError
+ *
+ * Moves the focus to the first error in the registration
+ * workflow.
+ *
+ * Required:
+ *   [0] coordinator: a Conditional.js object
+ *
+ * Returns: void
+ */
+function focusOnFirstError (coordinator, mode) {
+	var order; 
+	var translation;
+
+	if (mode == 'login') {
+		order = ['username', 'password'];
+		translation = {
+			username: $("#username"),
+			password: $("#loginpassword")
+		};
+	}
+	else {
+		order = ['username', 'password', 'email'];
+		translation = {
+			username: $("#username"),
+			password: $("#registrationpassword"),
+			email: $("#email")
+		};
+	}
+
+	for (var i = 0; i < order.length; i++) {
+		var key = order[i];
+		if (!coordinator.conds[key]) {
+			translation[key].one('focus', function (evt) {
+				evt.stopImmediatePropagation();
+			}).focus();
+			translation[key].thinking('cancel');
+			return;
+		}
+	}
+}
 
 })(jQuery);
+
 /**
  * React (with addons) v0.13.3
  */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.React = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-/**
+/** @license
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
  *
@@ -23830,996 +27230,669 @@ module.exports = warning;
 
 },{"129":129}]},{},[1])(1)
 });
-/*
- *	Utils.js
- *
- *	This is a grab bag of utility functions that would be useful
- *	througout the program that mostly manipulate data.
- *
- * Dependencies: 
- *   jQuery (tested with 1.7.1)
- *
- * Author: William Silversmith
- * Affiliation: Seung Lab, MIT 
- * Date: June-August 2013
- */
+/** @license
+* jQuery seeThru - transparent HTML5 video - written by Frederik Ring (frederik.ring@gmail.com)
+* based on http://jakearchibald.com/scratch/alphavid/ by Jake Archibald (jaffathecake@gmail.com)
 
-var Utils = Utils || {};
+* Copyright (c) 2015 Frederik Ring
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-(function ($, undefined) {
-	"use strict";
+* see https://github.com/m90/seeThru for documentation
+*/
 
-	/* getDomainName
-	 *
-	 * Gets the top level domain for this website to avoid
-	 * doing things like hard coding cookies.
-	 *
-	 * e.g. play.eyewire.org => eyewire.org
-	 *
-	 * Required: None
-	 *
-	 * Return: highest level domain string
-	 */
-	Utils.getDomainName = function () {
-		var host = document.location.hostname;
-		host = host.replace(/https?(:\/\/)?/, '');
+(function(root, factory){
+	if (typeof define === 'function' && define.amd){
+		define(factory);
+	} else if (typeof exports === 'object') {
+		module.exports = factory();
+	} else {
+		root.seeThru = factory();
+	}
+})(this, function(){
 
-		var matches = /\.(\w+\.(:?com|org|net|gov|edu|mil|us|ca|eu|co\\.uk))$/.exec(host);
+	/**
+	* convert an image's alpha channel into a black & white canvasPixelArray
+	* @param {DOMElement} maskObj
+	* @param {Object} dimensions
+	* @returns {CanvasPixelArray} RGBA
+	*/
+	function convertAlphaMask(maskObj, dimensions){
+		var
+		convertCanvas = document.createElement('canvas')
+		, convertCtx = convertCanvas.getContext('2d')
+		, RGBA;
 
-		return matches[1];
-	};
-	
-	/* toCollection
-	 *
-	 * Converts arrays to jQuery collections.
-	 *
-	 * Required:
-	 *   [0] array
-	 *
-	 * Return: jQuery collection
-	 */
-	Utils.toCollection = function (array) {
-		return array.reduce(function (jqo, x) {
-			return jqo.add(x);
-		}, $())
-	};
+		convertCanvas.width = dimensions.width;
+		convertCanvas.height = dimensions.height;
+		convertCtx.drawImage(maskObj, 0, 0, dimensions.width, dimensions.height);
 
-	/* fScore
-	 *
-	 * Computes 
-	 *
-	 * Required:
-	 *  tp: True Positives
-	 *  fp: False Positives
-	 *  fn: False negatives
-	 *
-	 * Returns: { fscore, precision, recall }
-	 */
-	Utils.fScore = function (args) {
-		args = args || {};
+		RGBA = convertCtx.getImageData(0, 0, dimensions.width, dimensions.height);
 
-		var tp = args.tp;
-		var fp = args.fp;
-		var fn = args.fn;
-
-		if (!tp) {
-			return {
-				fscore: null,
-				precision: null,
-				recall: null
-			};
+		//alpha data is on each 4th position -> [0+(4*n)] => R, [1+(4*n)] => G, [2+(4*n)] => B, [3+(4*n)] => A
+		for (var i = 3, len = RGBA.data.length; i < len; i = i + 4){
+			RGBA.data[i-1] = RGBA.data[i-2] = RGBA.data[i-3] = RGBA.data[i]; //alpha into RGB
+			RGBA.data[i] = 255; //alpha is always 100% opaque
 		}
 
-		var precision = tp / (tp + fp);
-		var recall = tp / (tp + fn);
+		return RGBA;
+	}
 
-		var fscore = 2 * precision * recall / (precision + recall);
+	/**
+	* unmultiply an image with alpha information
+	* @param {Array} rgb - canvasPixelArray representing the image to be unmultiplied
+	* @param {Array} alphaData - canvasPixelArray representing the alpha to use
+	* @returns {Array} rgb
+	*/
+	function unmultiply(rgb, alphaData){
+		for (var i = 3, len = rgb.data.length; i < len; i = i + 4){
+			rgb.data[i] = alphaData[i - 1]; //copy B value into A channel
+			rgb.data[i - 3] = rgb.data[i - 3] / (alphaData[i - 1] ? (alphaData[i - 1] / 255) : 1); //un-premultiply B
+			rgb.data[i - 2] = rgb.data[i - 2] / (alphaData[i - 1] ? (alphaData[i - 1] / 255) : 1); //un-premultiply G
+			rgb.data[i - 1] = rgb.data[i - 1] / (alphaData[i - 1] ? (alphaData[i - 1] / 255) : 1); //un-premultiply R
+		}
+		return rgb;
+	}
 
-		return {
-			fscore: fscore,
-			precision: precision,
-			recall: recall
+	/**
+	* gets a prefixed rAF version or a polyfill to use if window.requestAnimationFrame is not available
+	* @returns {Function}
+	*/
+	function getRequestAnimationFrame(){
+		var
+		lastTime = 0
+		, vendors = ['ms', 'moz', 'webkit', 'o'];
+
+		for (var x = 0; x < vendors.length; x++){
+			if (window[vendors[x] + 'RequestAnimationFrame']){ return window[vendors[x] + 'RequestAnimationFrame']; }
+		}
+
+		return function(callback){
+			var currTime = new Date().getTime();
+			var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+			var id = window.setTimeout(function(){
+				callback(currTime + timeToCall);
+			}, timeToCall);
+			lastTime = currTime + timeToCall;
+			return id;
 		};
-	};
+	}
 
-	/* significandAndMagnitude
-	 * 
-	 * Converts a number into a significand and magnitude.
-	 *
-	 * e.g. 2412479.24 => { significand: 2.4, magnitude: 6 }
-	 *
-	 * Required:
-	 *   number: The number to convert
-	 * 
-	 * Optional:
-	 *   precision: The number of places past the decimal to leave
-	 *
-	 * Returns: { number, magnitude }
-	 */
-	Utils.significandAndMagnitude = function (args) {
-		var precision = args.precision || null;
-		var number = args.number;
-		var negative = false;
+	/**
+	* gets a prefixed cAF version or a polyfill to use if window.cancelAnimationFrame is not available
+	* @returns {Function}
+	*/
+	function getCancelAnimationFrame(){
+		var vendors = ['ms', 'moz', 'webkit', 'o'];
 
-		if (number === 0) {
-			return {
-				significand: 0,
-				magnitude: 1,
-			};
-		}
-		else if (number < 0) {
-			negative = true;
-			number = Math.abs(number);
+		for (var x = 0; x < vendors.length; x++){
+			if (window[vendors[x] + 'CancelAnimationFrame']){ return window[vendors[x] + 'CancelAnimationFrame']; }
+			if (window[vendors[x] + 'CancelRequestAnimationFrame']){ return window[vendors[x] + 'CancelRequestAnimationFrame']; }
 		}
 
-		Math.log10 = Math.log10 || function (x) {	
-  			return Utils.round(Math.log(x) / Math.LN10, 10);
-		};
+		return function(id){ clearTimeout(id); };
+	}
 
-		var magnitude = Math.floor(Math.log10(number));
-		var significand = number / Math.pow(10, magnitude);
+	/**
+	* turn array like object into real array
+	* @param {Object} el
+	* @returns {Array}
+	*/
+	function slice(el){
+		return [].slice.call(el);
+	}
 
-		if (precision !== null) {
-			significand = significand.toFixed(precision);
+	/**
+	* check [[Class]] by calling {}.toString on any object
+	* @param {Object} el
+	* @returns {String}
+	*/
+	function toString(el){
+		return Object.prototype.toString.call(el);
+	}
+
+	/**
+	* insert a DOM Node after another
+	* @param {DOMElement} node
+	* @param {DOMElement} after
+	*/
+	function insertAfter(node, after){
+		if (after.nextSibling) {
+			after.parentNode.insertBefore(node, after.nextSibling);
+		} else {
+			after.parentNode.appendChild(node);
 		}
-
-		if (negative) {
-			significand = -significand;
-		}
-
-		return {
-			significand: significand,
-			magnitude: magnitude
-		};
-	};
-
-	/* round
-	 * 
-	 * Same as Math.round, but you can pick which decimal
-	 * place to round to. Defaults to the same as Math.round.
-	 *
-	 * Required:
-	 *   [0] x: Floating point
-	 *   [1] precison: How many decimal places? Can be positive or negative int.
-	 *
-	 * Return: rounded float
-	 */
-	Utils.round = function (x, precision) {
-		precision = precision || 0;
-		return Math.round(x * Math.pow(10, precision)) / Math.pow(10, precision);
-	};
-
-	/* numberToCondensedSI
-	 * 
-	 * Converts a number into the most condensed SI notation possible.
-	 *
-	 * e.g. 2412479.24 => 2.4M
-	 *
-	 * Required:
-	 *   number: The number to convert
-	 * 
-	 * Optional:
-	 *   conversionminimum: (int) Don't perform the conversion below and at this threshold
-	 *   maxchars: (int) Don't perform the conversion below and at this number of characters
-	 * 
-	 *   Mutually Exclusive:
-	 *     fit: (int) Set the precision to fit this number of characters.
-	 *         This value must be > 2 to be meaningful (X.X is 3 characters).
-	 *         If the amount of space is too small to accomodate a decimal point,
-	 *         fit will simply remove the decimal to provide more space for the integer
-	 *         component.
-	 *     precision: (int) The number of places past the decimal to leave (defaults to 1)
-	 *
-	 * Returns: HTML encoded string representing significand and a letter indicating the magnitude
-	 */
-	Utils.numberToCondensedSI = function (args) {
-		var precision = args.precision;
-		var fit = args.fit;
-		var number = args.number || 0;
-
-		if (precision === undefined) {
-			precision = 1;
-		}
-
-		var precisenum;
-		if (number === 0) {
-			precisenum = "0";
-			for (var i = 0; i < precision; i++) {
-				precisenum += "0";
-			};
-		}
-		else {
-			precisenum = Math.round(number * Math.pow(10, precision)).toString();
-		}
-
-		if (precision > 0) {
-			precisenum = precisenum.substr(0, precisenum.length - precision) + 
-				"." + precisenum.substr(precisenum.length - 1, precision);
-		}
-
-		if (args.maxchars && precisenum.length <= args.maxchars) {
-			return precisenum;
-		}
-		else if (args.conversionminimum && Math.abs(number) <= args.conversionminimum) {
-			return number.toString();
-		}
-		else if (fit && number === 0) {
-			return precisenum.substr(0, fit);
-		}
-
-		var components = Utils.significandAndMagnitude({
-			number: number,
-		});
-
-		var magnitude = components.magnitude;
-
-		var suffixes = {
-			"-10": "p", "-11": "p", "-12": "p",
-			"-7": "n", "-8": "n", "-9": "n",
-			"-4": "&mu;", "-5": "&mu;", "-6": "&mu;",
-			"-1": "m", "-2": "m", "-3": "m",
-			0: "", 1: "", 2: "",
-			3: "k", 4: "k", 5: "k",
-			6: "M", 7: "M", 8: "M",
-			9: "G", 10: "G", 11: "G",
-			12: "P", 13: "P", 14: "P",
-			15: "E", 16: "E", 17: "E"
-		};
-
-		var significand;
-
-		// Get significand to be as large as possible within three orders of magnitude
-		// i.e. 121,024,141 (1.21024141, magnitude 6) should look like 121.024141
-		// and 1,131,141 should look like 1.131141
-		if (magnitude >= 0) {
-			significand = components.significand * Math.pow(10, (Math.abs(magnitude) % 3));
-		}
-		else {
-			significand = components.significand * Math.pow(10, 3 - (Math.abs(magnitude) % 3));	
-		}
-
-		if (fit) {
-			var wholepart = Utils.truncate(significand) + "";
-
-			var adjustments = 1; // room for decimal point
-
-			if (suffixes[magnitude] !== "") {
-				adjustments += 1; // room for SI letter
-			}
-
-			if (wholepart.length >= fit - adjustments) {
-				precision = 0;
-			}
-			else {
-				precision = fit - wholepart.length - adjustments;
-			}
-		}
-
-		// Fix floating point issues
-		var value = significand * Math.pow(10, precision);
-
-		value = Utils.truncate(value) + ""; // convert to string so we can be precise
-
-		if (precision > 0) {
-			// insert the decimal point in the right place
-			value = value.slice(0, value.length - precision) + "." + value.slice(-precision);
-		}
-
-		return value + suffixes[magnitude];
-	};
-
-	/* ellipsisText
-	 *
-	 * Take a long string and return it trimed to a particular length
-	 * with trailing ellipses.
-	 *
-	 * Required:
-	 *   [0] str
-	 *   [1] maxlen: int >= 3
-	 *
-	 * Return: Possibly truncated string
-	 */
-	Utils.ellipsisText = function (str, maxlen) {
-		if (maxlen < 3) {
-			throw "Unable to trim string to less than size 3. String: " + Utils.ellipsisText(str, 100);
-		}
-
-		if (str.length <= maxlen) {
-			return str;
-		}
-
-		return str.substr(0, maxlen - 3) + "...";
-	};
-	
-	/* nvl
-	 *
-	 * "Null value." Usually you should use
-	 * x = x || y, however sometimes a valid
-	 * value of x is 0 or false (especially in array indicies). 
-	 *
-	 * This function makes things into a neat one liner.
-	 * nvl(x, y)
-	 *
-	 * Required:
-	 *   [0] val
-	 *   [1] ifnull 
-	 *
-	 * Return: val || ifnull (but accounting for false and 0)
-	 */
-	Utils.nvl = function (val, ifnull) {
-		return !(val === undefined || val === null)
-			? val
-			: ifnull;
-	};
-
-	/* plural
-	 *
-	 * Given a count and a string encoded as described below,
-	 * parse it so that it is either singular or plural.
-	 *
-	 * Strings may be written as such:
-	 *
-	 * var x = 1;
-	 * Utils.plural(x, "I have " + x + " cars[[s]]")
-	 * => "I have 1 car"
-	 *
-	 * x = ['porshe']
-	 * Utils.plural(x, "I have [[a|some]] car[[s]]. [[It|The first]] is a " + x[0]) 
-     * => "I have a car. It is a porshe".
-	 * 
-	 * x = 2;
-	 * Utils.plural(x, "Do you have [[a child|children]]?")
-	 * => "Do you have children?"
-	 *
-	 * Required:
-	 *   [0] ct: A number or an array whose quantity 
-	 *          or length indicates the singularness or plurality
-	 *   [1] phrase: A suitably encoded phrase
-	 *
-	 * Returns: A pluralized string
-	 */
-	Utils.plural = function (ct, phrase) {
-		var isplural = false;
-
-		if (typeof(ct) === 'number') {
-			isplural = (ct !== 1);
-		}
-		else {
-			isplural = (ct.length !== 1);
-		}
-
-		var multicapture = /\[\[([^\]])+?\]\]/g;
-		var singlecapture = /\[\[([^\]])+?\]\]/;
-
-		var phrasecopy = phrase;
-
-		var match;
-		while (match = multicapture.exec(phrase)) {
-			var maybepair = match[1].split(/\|/);
-
-			var singular;
-			var pluralversion;
-			if (maybepair.length === 2) {
-				singular = maybepair[0];
-				pluralversion = maybepair[1];
-			}
-			else {
-				singular = "";
-				pluralversion = maybepair[0];
-			}
-
-			var replacement = isplural 
-				? pluralversion
-				: singular;
-
-			phrasecopy = phrasecopy.replace(singlecapture, replacement);
-		}
-
-		return phrasecopy;
-	};
-
-	/* numberToText
-	 *
-	 * Follows AP style and spells out 0-9 
-	 * and certain special high numbers
-	 *
-	 * e.g. 1 => one
-	 *     -1 => negative one
-	 *
-	 * Required:
-	 *   [0] number
-	 *
-	 * Return: text or number
-	 */
-	Utils.numberToText = function (number) {
-		var mappings = {
-			0: _("zero"),
-			1: _("one"),
-			2: _("two"),
-			3: _("three"),
-			4: _("four"),
-			5: _("five"),
-			6: _("six"),
-			7: _("seven"),
-			8: _("eight"),
-			9: _("nine"),
-			100: _("a hundred"),
-			1000: _("a thousand"),
-			1000000: _("a million"),
-		};
-
-		var positive = Math.abs(number);
-
-		var text = "";
-		if (mappings[positive]) {				
-			if (number < 0) {
-				text = _("negative ");
-			}
-
-			text += mappings[positive];
-		} 
-		else {
-			text = number;
-		}
-
-		return text;
-	};
-
-	/* findCallback
-	 *
-	 * Often functions are designed so that the final positional
-	 * argument is the callback. The problem occurs when you can have
-	 * multiple optional positional arguments.
-	 *
-	 * Pass "arguments" to this function and it'll find the callback
-	 * for you.
-	 *
-	 * Required:
-	 *   [0] args: literally the "arguments" special variable
-	 *
-	 * Return: fn or null
-	 */
-	 Utils.findCallback = function (args) {
-	 	var callback = null;
-
-	 	for (var i = args.length - 1; i >= 0; i--) {
-	 		if (typeof(args[i] === 'function')) {
-	 			callback = args[i];
-	 			break;
-	 		}
-	 	}
-
-	 	return callback;
-	 };
-
-	/* compose
-	 *
-	 * Compose N functions into a single function call.
-	 *
-	 * Required: 
-	 *   [0-n] functions or arrays of functions
-	 * 
-	 * Returns: function
-	 */
-	Utils.compose = function () {
-		var fns = Utils.flatten(arguments);
-
-		return function () {
-			for (var i = 0; i < fns.length; i++) {
-				fns[i].apply(this, arguments);
-			}
-		};
-	};
-
-	/* listeq
-	 *
-	 * Tests if the contents of two scalar
-	 * arrays are equal. 
-	 *
-	 * Required:
-	 *   [0] a: array
-	 *	 [1] b: array
-	 *
-	 * Return: boolean
-	 */
-	Utils.listeq = function (a, b) {
-		if (!Array.isArray(a) || !Array.isArray(b)) {
-			return false;
-		}
-		else if (a.length !== b.length) {
-			return false;
-		}
-
-		for (var i = 0; i < a.length; i++) {
-			if (a[i] !== b[i]) {
-				return false;
-			}
-		}
-
-		return true;
-	};
-
-	/* hasheq
-	 *
-	 * Tests if two objects are equal at a 
-	 * shallow level. Intended to be used with
-	 * scalar values.
-	 *
-	 * Required:
-	 *   [0] a
-	 *   [1] b
-	 *
-	 * Return: bool 
-	 */
-	Utils.hasheq = function (a, b) {
-		var akeys = Object.keys(a);
-
-		if (!Utils.listeq(akeys, Object.keys(b))) {
-			return false;
-		}
-
-		for (var i = 0; i < akeys.length; i++) {
-			var key = akeys[i];
-
-			if (a[key] !== b[key]) {
-				return false;
-			}
-		}
-
-		return true;
-	};
-
-	/* flatten
-	 *
-	 * Take an array that potentially contains other arrays 
-	 * and return them as a single array.
-	 *
-	 * e.g. flatten([1, 2, [3, [4]], 5]) => [1,2,3,4,5]
-	 *
-	 * Required: 
-	 *   [0] array
-	 * 
-	 * Returns: array
-	 */
-	Utils.flatten = function (array) {
-		array = array || [];
-
-		var flat = [];
-
-		var len = array.length;
-		for (var i = 0; i < len; i++) {
-			var item = array[i];
-
-			if (typeof(item) === 'object' && Array.isArray(item)) {
-				flat = flat.concat(Utils.flatten(item));
-			}
-			else {
-				flat.push(item);
-			}
-		} 
-
-		return flat;
-	};
-
-	/* arrayToHashKeys
-	 *
-	 * Converts [1,2,3,'a','b','c'] into
-	 * { 1: true, 2: true, 3: true, 'a': true, 'b': true, 'c': true }
-	 * so that you can e.g. efficiently test for existence.
-	 *
-	 * Required: 
-	 *   [0] array: Contains only scalar values
-	 * 
-	 * Returns: { index1: true, ... }
-	 */
-	Utils.arrayToHashKeys = function (array) {
-		var hash = {};
-		for (var i = array.length - 1; i >= 0; i--) {
-			hash[array[i]] = true;
-		}
-
-		return hash;
-	};
-
-	/* forEachItem
-	 *
-	 * Iterate through each key/value in the hash
-	 *
-	 * Required:
-	 *   [0] hash
-	 *   [1] fn(key, value)
-	 *
-	 * Return: void (iteration construct)
-	 */
-	Utils.forEachItem = function (hash, fn) {
-		hash = hash || {};
-
-		var keys = Object.keys(hash);
-		keys.sort();
-
-		keys.forEach(function (key) {
-			fn(key, hash[key]);
-		});
-	};
-
-	/* unique
-	 *
-	 * Take an array of elements and return only 
-	 * unique values. This function respects
-	 * the stability of the array based on
-	 * first occurrence.
-	 *
-	 * Required:
-	 *   [0] list: e.g. [ 1, 1, 4, 5, 2, 4 ]
-	 *
-	 * Return: [ e.g. 1, 4, 5, 2 ]
-	 */
-	Utils.unique = function (list) {
-		var obj = {};
-		var order = [];
-		list.forEach(function (item) {
-			if (!obj[item]) {
-				order.push(item);
-			}
-
-			obj[item] = true;
-		});
-
-		return order;
-	};
-
-	/* slice
-	 *
-	 * Gives a subset of the given hash.
-	 *
-	 * Required:
-	 *   [0] hash
-	 *   [1..n] keys to slice
-	 *
-	 * Return: hash slice
-	 */
-	Utils.slice = function (hash) {
-		var sliced = {};
-		
-		for (var i = 1; i < arguments.length; i++) {
-			var key = arguments[i];
-			sliced[key] = hash[key];
-		}
-
-		return sliced;
-	};
-
-	/* cutoff
-	 *
-	 * Bound a value between a minimum and maximum value.
-	 *
-	 * Required: 
-	 *   [0] value: The number to evaluate
-	 *   [1] min: The minimum possible value
-	 *   [2] max: The maximum possible value
-	 * 
-	 * Returns: value if value in [min,max], min if less, max if more
-	 */
-	Utils.cutoff = function (value, min, max) {
-		return Math.max(Math.min(value, max), min);
-	};
-
-	/* indexOfAttr
-	 *
-	 * For use with arrays of objects. It's
-	 * Array.indexOf but against an attribute
-	 * of the array.
-	 *
-	 * Required: 
-	 *   [0] value: searching for this
-	 *   [1] array
-	 *   [2] attr: e.g. description in [ { description }, { description } ]
-	 * 
-	 * Returns: index or -1 if not found
-	 */
-	Utils.indexOfAttr = function (value, array, attr) {
-		for (var i in array) {
-			if (array[i][attr] === value) {
-				return i;
-			}
-		}
-
-		return -1;
-	};
-
-	/* invertHash
-	 *
-	 * Turns a key => value into value => key.
-	 *
-	 * Required:
-	 *   [0] hash
-	 *
-	 * Return: inverted hash { value: key }
-	 */
-	Utils.invertHash = function (hash) {
-		hash = hash || {};
-
-		var inversion = {};
-		for (var key in hash) {
-			if (!hash.hasOwnProperty(key)) { continue; }
-			inversion[hash[key]] = key;
-		}
-
-		return inversion;
-	};
-
-	/* sumattr
-	 *
-	 * Since javascript doesn't do summing maps very gracefully,
-	 * here's a hack to take care of a common case of a single
-	 * level of depth.
-	 *
-	 * Required:
-	 *   [0] list: array of numbers
-	 *   [1] attr: The name of an attribute common to all the elements in list (e.g. list[0].attr )
-	 *
-	 * Returns: sum of all the attributes
-	 */
-	Utils.sumattr = function (list, attr) {
-		var total = 0;
-		for (var i = list.length - 1; i >= 0; i--) {
-			total += list[i][attr];
-		};
-
-		return total;		
-	};
-
-	/* sum
-	 *
-	 * Returns the sum off all the elements of an array.
-	 *
-	 * Required: 
-	 *  [0] array of numbers
-	 *
-	 * Returns: sum of array
-	 */
-	Utils.sum = function (list) {
-		var total = 0;
-		for (var i = list.length - 1; i >= 0; i--) {
-			total += list[i];
-		};
-
-		return total;
-	};
-
-	/* median
-	 *
-	 * Given an array of numbers, returns the median.
-	 *
-	 * Required: array of numbers
-	 *
-	 * Returns: median
-	 */
-	Utils.median = function (list) {
-		list.sort();
-
-		if (list.length === 0) {
+	}
+
+	/**
+	* return a DOM Node matching variable input
+	* input might be a DOMElement, a DOMCollection or a string
+	* @param input
+	* @returns DOMElement
+	*/
+	function getNode(input){
+		if (input.tagName){
+			return input;
+		} else if (toString(input) === '[object String]'){
+			return document.querySelector(input);
+		} else if (input.length){
+			return input[0];
+		} else {
 			return null;
 		}
+	}
 
-		var middle = Math.ceil(list.length / 2);
-		if (list.length % 2 === 0) {
-			return (list[middle] + list[middle - 1]) / 2;
+	/**
+	* serialize an object into a string of CSS to use for style.cssText
+	* @param {Object} obj
+	* @returns {String}
+	*/
+	function cssObjectToString(obj){
+		var res = [];
+		for (var prop in obj){
+			if (obj.hasOwnProperty(prop)){
+				res.push(prop + ': ' + obj[prop] + ';');
+			}
 		}
-		return list[middle];
-	};
+		return res.join('');
+	}
 
-	/* truncate
-	 *
-	 * Provides a method of truncating the decimal 
-	 * of a javascript number.
-	 *
-	 * Required:
-	 *  [0] n: The number you wish to truncate
-	 *
-	 * Returns: The truncated number
-	 */
-	Utils.truncate = function (n) {
-		if (n > 0) {
-			return Math.floor(n);
+	/**
+	* make the script available as a plugin on the passed jQuery instance
+	* @param {jQuery} $
+	*/
+	function attachSelfAsPlugin($){
+
+		if (!$.fn || $.fn.seeThru){ return; }
+
+		$.fn.seeThru = function(){
+
+			var args = slice(arguments);
+
+			return this.each(function(){
+				var $this = $(this);
+				if (!args.length || (args.length === 1 && toString(args[0]) === '[object Object]')){
+					if ($this.data('seeThru')){ return; }
+					$this.data('seeThru', new SeeThru(this, args[0])._init());
+				} else if (args.length && toString(args[0]) === '[object String]'){
+					if (!$this.data('seeThru')){ return; }
+					// all methods other then init will be deferred until `.ready()`
+					$this.data('seeThru').ready(function(){
+						$this.data('seeThru')[args[0]](args[1]);
+						if (args[0] === 'revert'){
+							$this.data('seeThru', null);
+						}
+					});
+				}
+			});
+		};
+	}
+
+	/**
+	* @constructor Store
+	* simple wrapper around [] to keep track of video elements that are currently
+	* handled by the script
+	*/
+	function Store(){
+		var elements = [];
+		this.push = function(el){
+			if (el){
+				elements.push(el);
+				return el;
+			} else {
+				return null;
+			}
+		};
+		this.has = function(el){
+			return elements.some(function(video){
+				return video === el;
+			});
+		};
+		this.remove = function(el){
+			elements = elements.filter(function(video){
+				return video !== el;
+			});
+		};
+	}
+
+	/**
+	* @constructor TransparentVideo
+	* handles the transformation of a video into the canvas elements and keeps track
+	* of intervals and animation loop logic
+	* @param {DOMElement} video
+	* @param {Object options}
+	*/
+	function TransparentVideo(video, options){
+
+		var
+		initialDisplayProp
+		, divisor = options.mask ? 1 : 2 //static alpha data will not cut the image dimensions
+		, dimensions = { // calculate dimensions
+			width : parseInt(options.width, 10)
+			, height : parseInt(options.height, 10)
 		}
+		, bufferCanvas = document.createElement('canvas')
+		, buffer = bufferCanvas.getContext('2d')
+		, displayCanvas = document.createElement('canvas')
+		, display = displayCanvas.getContext('2d')
+		, posterframe
+		, interval
+		, requestAnimationFrame = window.requestAnimationFrame || getRequestAnimationFrame()
+		, cancelAnimationFrame = window.cancelAnimationFrame || getCancelAnimationFrame()
+		, drawFrame = function(recurse){
 
-		return Math.ceil(n);
-	};
+			var image, alphaData, i, len;
 
-	/* seemingly_random
-	 *
-	 * A pseudo-random number generator that takes
-	 * a seed. Useful for creating random seeming events
-	 * that are coordinated across all players' computers.
-	 *
-	 * Cribbed from: http://stackoverflow.com/questions/521295/javascript-random-seeds
-	 *
-	 * Required: 
-	 *   [0] seed
-	 * 
-	 * Returns: floating point [0, 1] determined by the seed 
-	 * 
-	 * NOTE: YOU MUST MANUALLY INCREMENT THE SEED YOURSELF
-	 */
-	Utils.seemingly_random = function (seed) {
-		var x = Math.sin(seed) * 10000;
-		return x - Math.floor(x);
-	};
+			buffer.drawImage(video, 0, 0, dimensions.width, dimensions.height * divisor); //scales if <video>-dimensions are not matching
+			image = buffer.getImageData(0, 0, dimensions.width, dimensions.height);
+			alphaData = buffer.getImageData(0, dimensions.height, dimensions.width, dimensions.height).data; //grab from video;
 
-	/* random_choice
-	 *
-	 * Selects a random element from an array with replacement.
-	 *
-	 * Required:
-	 *   [0] array
-	 *
-	 * Returns:
-	 */
-	Utils.random_choice = function (array) {
-		if (!array.length) {
-			return undefined;
+			if (options.unmult){ unmultiply(image, alphaData); }
+
+			//calculate luminance from buffer part, no weighting needed when alpha mask is used
+			for (i = 3, len = image.data.length; i < len; i = i + 4) {
+				image.data[i] = options.alphaMask ? alphaData[i - 1] : Math.max(alphaData[i - 1], alphaData[i - 2], alphaData[i - 3]);
+			}
+
+			display.putImageData(image, 0, 0, 0, 0, dimensions.width, dimensions.height);
+
+			if (recurse){
+				interval = requestAnimationFrame(function(){
+					drawFrame(true);
+				});
+			}
+
 		}
+		, drawStaticMask = function(node){
 
-		var random_int = Math.round(Math.random() * (array.length - 1));
+			if (node.tagName !== 'IMG'){ throw new Error('Cannot use non-image element as mask!'); }
 
-		return array[random_int];
-	};
+			node.width = dimensions.width;
+			node.height = dimensions.height; //adjust image dimensions to video dimensions
 
-	/* biased_random_choice
-	 *
-	 * Select an index at random with a probability equal to its relative
-	 * proportion of weight.
-	 * 
-	 * Algorithm: 
-	 *   1. Generate a random number betwen 0 and sum(weight)
-	 *   2. Considering each cell as a bin of cubes on the number line
-	 *      lined up next to each other, select the cell whose bin the random
-	 *      number lands in.
-	 *   3. If all the weights are 0, make a uniformly random choice.
-     *
-	 * Required: 
-	 *   [0] array: A list of objects or numbers (if objects, you must set property)
-	 *   
-	 * Optional:
-	 *   [1] property: If set, the weights will be assigned by mapping this property
-	 *
-	 * Returns: An index
-	 */
-	Utils.biased_random_choice = function (array, property) {
-		if (!array.length) {
-			return undefined;
-		}
+			if (options.alphaMask){ //alpha channel has to be converted into RGB
+				buffer.putImageData(convertAlphaMask(node, dimensions), 0, dimensions.height);
+			} else { //no conversion needed, draw image into buffer
+				buffer.drawImage(node, 0, dimensions.height, dimensions.width, dimensions.height);
+			}
 
-		var weights = array;
-		if (property !== undefined) {
-			weights = array.map(function (x) { return x[property]; });
-		}
+			node.style.display = 'none';
 
-		var total = Utils.sum(weights);
+		};
 
-		if (total === 0) {
-			return Utils.random_choice(array);
-		}
 
-		var magicnumber = Math.round(Math.random() * total);
+		/**
+		* @method startRendering
+		* kick off the animation loop
+		* @returns self
+		* @API public
+		*/
+		this.startRendering = function(){
+			drawFrame(true);
+			return this;
+		};
 
-		var accumulation = 0;
-		for (var i = 0; i < weights.length; i++) {
-			accumulation += weights[i];
-			if (accumulation >= magicnumber) {
-				return array[i];
+		/**
+		* @method stopRendering
+		* ends the animation loop
+		* @returns self
+		* @API public
+		*/
+		this.stopRendering = function(){
+			cancelAnimationFrame(interval);
+			return this;
+		};
+
+		/**
+		* @method stopRendering
+		* ends the animation loop, removes the canvas elements and unhides the video
+		* @returns self
+		* @API public
+		*/
+		this.teardown = function(){
+			cancelAnimationFrame(interval);
+			video.parentNode.removeChild(video.nextSibling);
+			video.parentNode.removeChild(video.nextSibling);
+			video.style.display = initialDisplayProp;
+			return this;
+		};
+
+		/**
+		* @method updateMask
+		* draws a new image onto the alpha portion of the buffer
+		* @param {DOMElement} node
+		* @returns self
+		* @API public
+		*/
+		this.updateMask = function(node){
+			drawStaticMask(node);
+			return this;
+		};
+
+		/**
+		* @method getCanvas
+		* gets the visible canvas element that is used for display
+		* @returns {DOMElement}
+		* @API public
+		*/
+		this.getCanvas = function(){
+			return displayCanvas;
+		};
+
+		/**
+		* @method getPoster
+		* gets the posterframe element
+		* @returns {DOMElement}
+		* @API public
+		*/
+		this.getPoster = function(){
+			return posterframe;
+		};
+
+		var elementDimensions = video.getBoundingClientRect();
+
+		if (!dimensions.height || !dimensions.width){ //we need to find out at least one dimension parameter as it is not explicitly set
+			if (!video.width && !video.height){ //<video> has no width- or height-attribute -> source dimensions from video source meta
+				dimensions.width = dimensions.width || video.videoWidth;
+				dimensions.height = dimensions.height || video.videoHeight / divisor;
+			} else if (!video.height){ //<video> has no height-attribute -> source dimensions from video source meta
+				dimensions.width = dimensions.width || elementDimensions.width;
+				dimensions.height = dimensions.height || elementDimensions.width / (video.videoWidth / Math.floor(video.videoHeight / divisor));
+			} else if (!video.width){ //<video> has no height-attribute -> source dimensions from video source meta
+				dimensions.width = dimensions.width || elementDimensions.height * (video.videoWidth / Math.floor(video.videoHeight / divisor));
+				dimensions.height = dimensions.height || elementDimensions.height;
+			} else { //get values from height and width attributes of <video>
+				dimensions.width = dimensions.width || elementDimensions.width;
+				dimensions.height = dimensions.height || elementDimensions.height / divisor;
 			}
 		}
 
-		return Utils.random_choice(array);
-	}
+		bufferCanvas.width = dimensions.width;
+		bufferCanvas.height = dimensions.height * 2;
+		bufferCanvas.style.display = 'none';
+		bufferCanvas.className = 'seeThru-buffer';
 
-	/* numberWithCommas
-	 *
-	 * Renders a given number with a delimiter for
-	 * ease of reading. e.g. 1412000 => 1,412,000
-	 *
-	 * TODO: We may want to condition on locale as
-	 * commas and decimals are reversed in other
-	 * parts of the world.
-	 *
-	 * Required:
-	 *   [0] x: The number to render
-	 *   [1] delimiter: defaults to ','
-	 */
-	Utils.numberWithCommas = function (x, delimiter) {
-		delimiter = delimiter || ",";
-		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
-	};
+		displayCanvas.width = dimensions.width;
+		displayCanvas.height = dimensions.height;
+		displayCanvas.className = 'seeThru-display';
+
+		insertAfter(bufferCanvas, video);
+		insertAfter(displayCanvas, video);
+
+		// draw static mask if needed
+		if (options.mask){ drawStaticMask(getNode(options.mask)); }
+
+		// append "posterframe" if option is set and attribute is present on the video
+		if (options.poster && video.poster){
+			posterframe = document.createElement('div');
+			posterframe.className = 'seeThru-poster';
+			posterframe.style.cssText = cssObjectToString({
+				width : dimensions.width + 'px'
+				, height : dimensions.height + 'px'
+				, position : 'absolute'
+				, top : 0
+				, left : 0
+				, backgroundSize : 'cover'
+				, backgroundPosition : 'center'
+				, backgroundImage : 'url("' + video.poster + '")'
+			});
+			insertAfter(posterframe, video);
+		}
+
+		initialDisplayProp = window.getComputedStyle(video).display;
+		video.style.display = 'none';
+
+		if (options.start === 'autoplay'){ video.play(); }
+
+	}
 
 	/**
-	 * Randomize array element order in-place.
-	 * Using Fisher-Yates shuffle algorithm.
-	 * from http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-	 */
-	Utils.shuffleArray = function (array) {
-	    for (var i = array.length - 1; i > 0; i--) {
-	        var j = Math.floor(Math.random() * (i + 1));
-	        var temp = array[i];
-	        array[i] = array[j];
-	        array[j] = temp;
-	    }
-	    return array;
-	}
+	* @constructor SeeThru
+	* handles a video element turned into a transparent mock version of itself
+	* @param {String|DOMElement|DOMNode} DOMNode
+	* @param {Object} [options]
+	*/
+	function SeeThru(DOMNode, options){
 
-	/* ellipsisText
-	 *
-	 * Take a long string and return it trimed to a particular length
-	 * with trailing ellipses.
-	 *
-	 * Required:
-	 *   [0] str
-	 *   [1] maxlen: int >= 3
-	 *
-	 * Return: Possibly truncated string
-	 */
-	Utils.ellipsisText = function (str, maxlen) {
-		if (maxlen < 3) {
-			throw "Unable to trim string to less than size 3. String: " + Utils.ellipsisText(str, 100);
+		var
+		self = this
+		, ready = false
+		, callbacks = []
+		, defaultOptions = {
+			start : 'autoplay' //'autoplay', 'clicktoplay', 'external' (will display the first frame and make the video wait for an external interface) - defaults to autoplay
+			, end : 'loop' //'loop', 'rewind', 'stop' any other input will default to 'loop'
+			, mask : false //this lets you define a <img> (selected by #id or .class - class will use the first occurence)used as a black and white mask instead of adding the alpha to the video
+			, alphaMask : false //defines if the used `mask` uses black and white or alpha information - defaults to false, i.e. black and white
+			, width : null //lets you specify a pixel value used as width -- overrides all other calculations
+			, height : null //lets you specify a pixel value used as height -- overrides all other calculations
+			, poster : false // the plugin will display the image set in the video's poster-attribute when not playing if set to true
+			, unmult : false //set this to true if your video material is premultiplied on black - might cause performance issues
 		}
+		, canConstructEvents = (function(){
+			try{
+				if (new Event('submit', { bubbles: false }).bubbles !== false) {
+					return false;
+				} else if (new Event('submit', { bubbles: true }).bubbles !== true) {
+					return false;
+				} else {
+					return true;
+				}
+			} catch (e){
+				return false;
+			}
+		})()
+		, eventsToEcho = [
+			'mouseenter'
+			, 'mouseleave'
+			, 'click'
+			, 'mousedown'
+			, 'mouseup'
+			, 'mousemove'
+			, 'mouseover'
+			, 'hover'
+			, 'dblclick'
+			, 'contextmenu'
+			, 'focus'
+			, 'blur'
+		];
 
-		if (str.length <= maxlen) {
-			return str;
-		}
+		options = options || {};
+		this._video = getNode(DOMNode);
 
-		return str.substr(0, maxlen - 3) + "...";
-	};
+		if (!this._video || this._video.tagName !== 'VIDEO'){ throw new Error('Could not use specified source'); }
 
-	/**
-	 * Merge the queries from the first url with the second url
-	 * Params from the second url's query will overwrite those in the first query
-	 */
-	Utils.mergeQueries = function () {
-		var args = Array.prototype.slice.call(arguments);
+		this._options = (function(options){
+			for (var key in defaultOptions){
+				if (defaultOptions.hasOwnProperty(key)){
+					if (!(key in options)){
+						options[key] = defaultOptions[key];
+					}
+				}
+			}
+			return options;
+		})(options);
 
-		var queries = args.map(function (x) {
-			return $.url(x).data.param.query;
-		});
+		/**
+		* @method init
+		* sets up transparent video once the video has metadata
+		* @returns self
+		* @API private
+		*/
+		this._init = function(){
 
-		var mergedQueries = $.extend.apply(null, [{}].concat(queries));
-		var finalQuery = $.param(mergedQueries);
+			var runInit = function(){
 
-		if (finalQuery) {
-			finalQuery = '?' + finalQuery;
-		}
+				function playSelfAndUnbind(){
+					self._video.play();
+					if (self._options.poster){
+						self._seeThru.getPoster().removeEventListener('click', playSelfAndUnbind);
+					} else {
+						self._seeThru.getCanvas().removeEventListener('click', playSelfAndUnbind);
+					}
+				}
 
-		return finalQuery;
-	};
+				if (elementStore.has(this._video)) { throw new Error('seeThru already initialized on passed video element!'); }
 
-	/* xor
-	 *
-	 * Logical xor.
-	 *
-	 * Required:
-	 *   [0] p: boolean
-	 *   [1] q: boolean
-	 *
-	 * Return: p xor q
-	 */
-	Utils.xor = function (p,q) {
-		return !(p && q) && (p || q);
-	}
+				this._seeThru = new TransparentVideo(this._video, this._options);
 
-	/* guid
-	 *
-	 * Generate a globally unique id.
-	 *
-	 * Required: None
-	 *   
-	 * Return: Random string like '7ac4631c-5fce-99c8-de4b-3088479860aa'
-	 */
-	Utils.guid = function () {
-		var S4 = function () {
-			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+				// attach behavior for start options
+				if (this._options.start === 'clicktoplay'){
+					if (this._options.poster){
+						this._seeThru.getPoster().addEventListener('click', playSelfAndUnbind);
+					} else {
+						this._seeThru.getCanvas().addEventListener('click', playSelfAndUnbind);
+					}
+				} else if (this._options.start === 'autoplay' && options.poster){
+					this._seeThru.getPoster().style.display = 'none';
+				}
+
+				// attach behavior for end options
+				if (this._options.end === 'rewind'){
+					this._video.addEventListener('ended', function(){
+						self._video.currentTime = 0;
+						self._seeThru.getCanvas().addEventListener('click', playSelfAndUnbind);
+					});
+				} else if (this._options.end !== 'stop'){
+					this._video.addEventListener('ended', function(){
+						self._video.currentTime = 0;
+						self._video.play();
+					});
+				}
+
+				// attach behavior for posterframe option
+				if (this._options.poster && this._video.poster){
+					this._video.addEventListener('play', function(){
+						self._seeThru.getPoster().style.display = 'none';
+					});
+					this._video.addEventListener('pause', function(){
+						self._seeThru.getPoster().style.display = 'block';
+					});
+				}
+
+				// some events that are registered on the canvas representation
+				// will be echoed on the original video element so that pre-existing
+				// event handlers bound to the video element will keep working
+				// it is recommended to use `.getCanvas()` to bind new behavior though
+				eventsToEcho.forEach(function(eventName){
+					self._seeThru.getCanvas().addEventListener(eventName, function(){
+						var evt;
+						if (canConstructEvents){
+							evt = new Event(eventName);
+						} else {
+							evt = document.createEvent('Event');
+							evt.initEvent(eventName, true, true);
+						}
+						self._video.dispatchEvent(evt);
+					});
+				});
+
+				this._seeThru.startRendering();
+
+				ready = true;
+
+				elementStore.push(this._video);
+
+				callbacks.forEach(function(cb){ cb(self, self._video, self.getCanvas()); });
+
+			}.bind(this);
+
+			if (this._video.readyState > 0){
+				runInit();
+			} else {
+				this._video.addEventListener('loadedmetadata', function(){
+					runInit();
+				});
+			}
+
+			return this;
+
 		};
 
-		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+		/**
+		* @method getCanvas
+		* returns the canvas element that is used for on-screen displaylay
+		* @returns {DOMElement}
+		* @API public
+		*/
+		this.getCanvas = function(){
+			return this._seeThru.getCanvas();
+		};
+
+		/**
+		* @method play
+		* starts playback of the associated video element
+		* @returns self
+		* @API public
+		*/
+		this.play = function(){
+			this._video.play();
+			return this;
+		};
+
+		/**
+		* @method pause
+		* halts playback of the associated video element
+		* @returns self
+		* @API public
+		*/
+		this.pause = function(){
+			this._video.pause();
+			return this;
+		};
+
+		/**
+		* @method revert
+		* reverts the transparent video back to its original state
+		* @API public
+		*/
+		this.revert = function(){
+			this._seeThru.teardown();
+			elementStore.remove(this._video);
+		};
+
+		/**
+		* @method updateMask
+		* @param {String|DOMElement|DOMCollection} mask
+		* swaps the static mask currently used for sourcing alpha
+		* @returns self
+		* @API public
+		*/
+		this.updateMask = function(mask){
+			this._seeThru.updateMask(getNode(mask));
+			return this;
+		};
+
+		/**
+		* @method ready
+		* @param {Function} cb
+		* defers the passed callback until the associated video element has metadata
+		* passes itself as the 1st argument of the callback
+		* @returns self
+		* @API public
+		*/
+		this.ready = function(cb){
+			if (ready){
+				cb(this, this._video, this.getCanvas());
+			} else {
+				callbacks.push(cb);
+			}
+			return this;
+		};
+
+	}
+
+	// if we have a global version of jQuery we'll automatically attach the script as a plugin
+	if (window.jQuery){ attachSelfAsPlugin(window.jQuery); }
+	if (window.Zepto){ attachSelfAsPlugin(window.Zepto); }
+
+	var elementStore = new Store();
+
+	return {
+		create : function(DOMCollection, options){
+			return new SeeThru(DOMCollection, options)._init();
+		}
+		, attach : attachSelfAsPlugin
 	};
 
-})(jQuery);
+});

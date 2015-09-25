@@ -337,16 +337,12 @@ td,
 th {
   padding: 0;
 }
-/* Used for setting the positions of the parallaxing neurons.
- *
- * url: URL of image file
- * side: 'left' or 'right',  the side of the screen to put the neuron relative to
- * dx: Proportion of image width to move over
- * dy: Height in pixels to move up relative to bottom of screen
- */
-button {
-  border: none;
-  outline: none;
+.column {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  text-align: center;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -355,44 +351,11 @@ button {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
-button.primary,
-button.secondary {
-  font-size: 10px;
-  border-radius: 15px;
-  background-color: #fede7d;
-  color: #4c4c4c;
-  height: 45px;
-  width: 200px;
-  -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
-          transition: color 150ms, background-color 150ms, border-color 150ms;
-  border: none;
-  outline: none;
-}
-button.primary:hover {
-  background-color: #f7dd8d;
-}
-button.primary:active {
-  background-color: #e8cd7a;
-}
-button.secondary {
-  width: 123.60939431396785px;
-  height: 40px;
-  color: #dbdbdb;
-  background-color: transparent;
-  border: 1px solid #2d2d2d;
-}
-button.secondary:hover {
-  background-color: #358dd7;
-  color: #fff;
-  border-color: transparent;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 button {
   border: none;
@@ -414,13 +377,14 @@ button {
   font-weight: 600;
 }
 button.primary,
-button.secondary {
+button.secondary,
+div.tertiary {
   font-size: 10px;
   border-radius: 15px;
   background-color: #fede7d;
   color: #4c4c4c;
-  height: 45px;
-  width: 200px;
+  height: 35px;
+  width: 150px;
   -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
           transition: color 150ms, background-color 150ms, border-color 150ms;
   border: none;
@@ -433,7 +397,7 @@ button.primary:active {
   background-color: #e8cd7a;
 }
 button.secondary {
-  width: 123.60939431396785px;
+  width: 92.70704573547589px;
   height: 40px;
   color: #dbdbdb;
   background-color: transparent;
@@ -444,9 +408,10 @@ button.secondary:hover {
   color: #fff;
   border-color: transparent;
 }
-button {
-  border: none;
-  outline: none;
+div.tertiary {
+  background: transparent;
+  color: #ececec;
+  border: 1px solid #ececec;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -459,40 +424,43 @@ button {
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
 }
-button.primary,
-button.secondary {
+div.tertiary::before {
+  content: "";
+  height: 35px;
+  width: 150px;
+  border-right: 1px solid #ececec;
+}
+::-webkit-input-placeholder {
+  color: #ececec;
+}
+:-moz-placeholder {
+  color: #ececec;
+  opacity: 1;
+}
+::-moz-placeholder {
+  color: #ececec;
+  opacity: 1;
+}
+:-ms-input-placeholder {
+  color: #ececec;
+}
+input[type=text],
+input[type=password] {
+  width: 150px;
+  height: 35px;
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 10px;
+  margin: 5px;
+  padding-left: 30px;
   font-size: 10px;
-  border-radius: 15px;
-  background-color: #fede7d;
-  color: #4c4c4c;
-  height: 45px;
-  width: 200px;
-  -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
-          transition: color 150ms, background-color 150ms, border-color 150ms;
-  border: none;
+  background: transparent;
+  border: 1px solid #3b556a;
+  color: #ececec;
   outline: none;
-}
-button.primary:hover {
-  background-color: #f7dd8d;
-}
-button.primary:active {
-  background-color: #e8cd7a;
-}
-button.secondary {
-  width: 123.60939431396785px;
-  height: 40px;
-  color: #dbdbdb;
-  background-color: transparent;
-  border: 1px solid #2d2d2d;
-}
-button.secondary:hover {
-  background-color: #358dd7;
-  color: #fff;
-  border-color: transparent;
+  letter-spacing: 0.5px;
+  font-weight: 300;
 }
 .parallax {
   -webkit-perspective: 300px;
@@ -500,7 +468,7 @@ button.secondary:hover {
   perspective-origin-x: 100%;
   height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 .parallax-layer {
   position: absolute;
@@ -516,30 +484,150 @@ button.secondary:hover {
   -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
 }
+#registration {
+  top: 225%;
+}
+.registration {
+  width: 500px;
+  height: 500px;
+  position: absolute;
+  top: calc(50% - 500px / 2 + 0px);
+  position: absolute;
+  left: calc(50% - 500px / 2 + 0px);
+  margin-bottom: 100vh;
+}
+.registration .icon,
+.registration .username,
+.registration .email,
+.registration .password {
+  background-repeat: no-repeat;
+  background-size: 15px;
+  background-position: 10px;
+}
+.registration .username {
+  background-image: url("/images/icons/username.svg");
+}
+.registration .email {
+  background-image: url("/images/icons/email.svg");
+}
+.registration .password {
+  background-image: url("/images/icons/password.svg");
+}
+.registration .logo {
+  width: 150px;
+  height: 150px;
+}
+.registration button,
+.registration input {
+  width: 150px;
+}
+.registration .location-text {
+  text-transform: uppercase;
+  color: #3b556a;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  background: rgba(27,27,27,0.3);
+}
+.autoscrolling {
+  overflow-y: auto !important;
+}
+.autoscrolling::-webkit-scrollbar {
+  width: 0px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(173,173,173,0.65);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(173,173,173,0.25);
+}
+.explore {
+  position: relative;
+}
 html,
 body {
-  font-family: Roboto, 'Lucida Grande', sans-serif;
+  font-family: Lato, 'Lucida Grande', sans-serif;
   font-weight: 400;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  overflow: hidden;
 }
-section.intake {
+body {
+  overflow-y: hidden;
+}
+#viewport {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
-  background: #011322 url("/images/intake-background.png");
-  background-size: cover;
+  background: -webkit-linear-gradient(bottom, #0b1929, #172e4b);
+  background: linear-gradient(to top, #0b1929, #172e4b);
+  -webkit-transition: background 1s ease-in-out;
+          transition: background 1s ease-in-out;
+  position: relative;
 }
-.intake > div,
-.intake > section {
+.parallax-group > div,
+.parallax-group > section {
   position: absolute;
   overflow-y: visible;
   top: 100%;
   height: 100%;
   width: 100%;
+}
+#intake-logo {
+  position: fixed;
+  background-image: url("/images/loading.gif");
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: calc(50% - 200px / 2 + 0px);
+  position: absolute;
+  left: calc(50% - 200px / 2 + 0px);
+  -webkit-transition: height 2s ease-out, width 2s ease-out;
+          transition: height 2s ease-out, width 2s ease-out;
+}
+#intake-logo.shrink {
+  width: 150px;
+  height: 150px;
+}
+#intake-logo::before,
+#intake-logo::after {
+  content: " ";
+  display: block;
+  width: 0px;
+  height: 1px;
+  background-color: #78bef0;
+  border: none;
+  outline: none;
+  position: absolute;
+  top: 50%;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 1.45s;
+          animation-delay: 1.45s;
+  -webkit-animation-duration: 1.5s;
+          animation-duration: 1.5s;
+}
+#intake-logo::after {
+  -webkit-animation-name: motion-rule-right;
+          animation-name: motion-rule-right;
+  left: 85%;
+}
+#intake-logo::before {
+  -webkit-animation-name: motion-rule-left;
+          animation-name: motion-rule-left;
+  right: 85%;
 }
 section.gateway {
 /* Fix a bug with cover in Android Chrome
@@ -573,58 +661,47 @@ section.gateway {
 div.pitch {
   position: relative;
   text-transform: uppercase;
+  font-weight: 300;
   font-size: 30px;
-  font-weight: 100;
-  letter-spacing: 5px;
-}
-.gateway .logo {
-  position: absolute;
-  top: -150px;
-  width: 45px;
-  position: absolute;
-  left: calc(50% - 45px / 2);
-  -webkit-transition: top 150ms, left 150ms;
-          transition: top 150ms, left 150ms;
-}
-.gateway .logotype {
-  position: absolute;
-  top: 5%;
-  left: 5%;
-  background-image: url("/images/logotype.svg");
-  background-size: 100px 30px;
-  background-repeat: no-repeat;
-  width: 120px;
-  height: 35px;
-}
-.gateway .share {
-  position: absolute;
-  top: 5%;
-  right: 5%;
-  opacity: 0.3;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  word-spacing: 5px;
 }
 .gateway .explorebtn {
-  width: 123.60939431396785px;
+  width: 92.70704573547589px;
   position: absolute;
-  left: calc(50% - 123.60939431396785px / 2);
+  left: calc(50% - 92.70704573547589px / 2 + 0px);
   bottom: 10%;
 }
 .gateway #continuebtn {
   margin-top: 40px;
 }
-/* parallax layers */
-.intake .neuron {
+.parallax {
+  position: relative;
+  z-index: 1;
+}
+#intake-logo {
+  position: absolute;
+  z-index: 60;
+  -webkit-transform: translateZ(-700px) scale(3.333333333333333);
+          transform: translateZ(-700px) scale(3.333333333333333);
+}
+.neuron-layer {
+  pointer-events: none;
+}
+.neuron-layer .neuron {
   position: absolute;
   background-size: contain;
   background-repeat: no-repeat;
   width: 600px;
   height: 100%;
 }
-.intake .intake-front {
+.neuron-layer.intake-front {
   z-index: 50;
   -webkit-transform: translateZ(150px) scale(0.5);
           transform: translateZ(150px) scale(0.5);
 }
-.intake .intake-front .left {
+.neuron-layer.intake-front .left {
   width: 1547px;
   height: 749.9999999999999px;
   background-image: url("/images/background/front-left.png");
@@ -633,7 +710,7 @@ div.pitch {
   bottom: -474.9999999999999px;
   left: -773.5px;
 }
-.intake .intake-front .right {
+.neuron-layer.intake-front .right {
   width: 1535px;
   height: 500px;
   background-image: url("/images/background/front-right.png");
@@ -642,12 +719,12 @@ div.pitch {
   bottom: -300px;
   right: 0px;
 }
-.intake .intake-middle {
+.neuron-layer.intake-middle {
   z-index: 40;
   -webkit-transform: translateZ(100px) scale(0.666666666666667);
           transform: translateZ(100px) scale(0.666666666666667);
 }
-.intake .intake-middle .left {
+.neuron-layer.intake-middle .left {
   width: 1015px;
   height: 500.00000000000006px;
   background-image: url("/images/background/middle-left-blur.png");
@@ -656,7 +733,7 @@ div.pitch {
   bottom: -300.00000000000006px;
   left: 0px;
 }
-.intake .intake-middle .right {
+.neuron-layer.intake-middle .right {
   width: 1069px;
   height: 500px;
   background-image: url("/images/background/middle-right-blur.png");
@@ -665,12 +742,12 @@ div.pitch {
   bottom: -300px;
   right: 0px;
 }
-.intake .intake-rear {
+.neuron-layer.intake-rear {
   z-index: 30;
   -webkit-transform: translateZ(50px) scale(0.833333333333333);
           transform: translateZ(50px) scale(0.833333333333333);
 }
-.intake .intake-rear .left {
+.neuron-layer.intake-rear .left {
   width: 572px;
   height: 250.00000000000003px;
   background-image: url("/images/background/rear-left-blur.png");
@@ -679,7 +756,7 @@ div.pitch {
   bottom: -50.00000000000003px;
   left: 0px;
 }
-.intake .intake-rear .right {
+.neuron-layer.intake-rear .right {
   width: 1069px;
   height: 500px;
   background-image: url("/images/background/middle-right-blur.png");
@@ -688,12 +765,12 @@ div.pitch {
   bottom: -300px;
   right: 0px;
 }
-.intake .intake-carpet {
+.neuron-layer.intake-carpet {
   z-index: 20;
   -webkit-transform: translateZ(25px) scale(0.916666666666667);
           transform: translateZ(25px) scale(0.916666666666667);
 }
-.intake .intake-carpet .neuron {
+.neuron-layer.intake-carpet .neuron {
   width: 2000px;
   height: 294px;
   background-image: url("/images/background/neural-carpet-blur.png");
@@ -710,55 +787,109 @@ div.pitch {
 .explore {
   height: 100%;
 }
-.parallax {
-  -webkit-perspective: 300px;
-          perspective: 300px;
-  perspective-origin-x: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+@-webkit-keyframes motion-rule-right {
+  0% {
+    width: 0%;
+    left: 85%;
+  }
+  50% {
+    width: 200%;
+    left: 85%;
+  }
+  80% {
+    width: 300%;
+  }
+  100% {
+    width: 300%;
+    left: 800%;
+  }
 }
-.parallax-layer {
-  position: absolute;
+@keyframes motion-rule-right {
+  0% {
+    width: 0%;
+    left: 85%;
+  }
+  50% {
+    width: 200%;
+    left: 85%;
+  }
+  80% {
+    width: 300%;
+  }
+  100% {
+    width: 300%;
+    left: 800%;
+  }
+}
+@-webkit-keyframes motion-rule-left {
+  0% {
+    width: 0%;
+    right: 85%;
+  }
+  50% {
+    width: 200%;
+    right: 85%;
+  }
+  80% {
+    width: 300%;
+  }
+  100% {
+    width: 300%;
+    right: 800%;
+  }
+}
+@keyframes motion-rule-left {
+  0% {
+    width: 0%;
+    right: 85%;
+  }
+  50% {
+    width: 200%;
+    right: 85%;
+  }
+  80% {
+    width: 300%;
+  }
+  100% {
+    width: 300%;
+    right: 800%;
+  }
+}
+header {
+  position: fixed;
   top: 0;
-  right: 0;
-  bottom: 0;
   left: 0;
-  transform-origin-x: 100%;
-}
-.parallax-group {
-  position: relative;
+  width: 100%;
   height: 100%;
-  -webkit-transform-style: preserve-3d;
-          transform-style: preserve-3d;
+  z-index: 100;
+  pointer-events: none;
 }
-.share {
-  width: 30px;
+header .container div {
+  pointer-events: auto;
+  -webkit-transition: opacity 150ms;
+          transition: opacity 150ms;
+}
+header .invisible div {
+  opacity: 0;
+}
+header .logotype {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  background-image: url("/images/logotype.svg");
+  background-size: 100px 30px;
+  background-repeat: no-repeat;
+  width: 120px;
+  height: 35px;
+}
+header .share {
+  position: absolute;
+  top: 5%;
+  right: 5%;
   height: 30px;
-  background-image: url("/images/reg-icons.svg");
-  background-position: 100%;
-  background-size: 173px;
-}
-/* Let's get this party started */
-::-webkit-scrollbar {
-  width: 6px;
-  background: rgba(27,27,27,0.3);
-}
-.autoscrolling {
-  overflow-y: auto !important;
-}
-.autoscrolling::-webkit-scrollbar {
-  width: 0px;
-}
-/* Track */
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-/* Handle */
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: rgba(173,173,173,0.65);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-  background: rgba(173,173,173,0.25);
+  width: 30px;
+  background-image: url("/images/icons/sh.svg");
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+  opacity: 0.3;
 }

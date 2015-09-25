@@ -36,6 +36,8 @@ app.use(serveStatic('build/public'));
 app.use(favicon('build/public/favicon.ico'));
 
 app.get('/', routes.index);
+app.get('/index', routes.index);
+app.get('/index2', routes.index2);
 app.get('/test', function (req, res) {
 	res.render('test');
 })
