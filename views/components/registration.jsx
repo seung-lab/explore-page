@@ -1,4 +1,7 @@
-var Registration = React.createClass({
+var React = require('react/addons'),
+	Conditional = require('../../lib/conditional.js').Conditional;
+
+module.exports = React.createClass({
 	mixins: [ React.addons.LinkedStateMixin ],
 	displayName: "Registration",
 	getInitialState: function () {
@@ -9,19 +12,13 @@ var Registration = React.createClass({
 			email: null,
 			password: null,
 
-			coordinator: new Conditional.Conditional({
+			coordinator: new Conditional({
 				set: { username: true, password: true, email: true },
 				test: function (conds) { return conds.username; },
 				success: function (conds) {
-					$('#username').removeClass('error');
-					$('#usernameerror').slideFadeOut();
 				},
 				failure: function (conds, data) { 
-					$('#username').addClass('error');
-					$('#usernameerror').text(
-						registrationUsernameFixtext(data.username)
-					).slideFadeIn();
-				}
+				},
 			}),
 		};
 	},

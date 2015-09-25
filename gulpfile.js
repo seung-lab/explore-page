@@ -4,6 +4,7 @@ var argv = require('yargs').argv,
 	uglify = require('gulp-uglify'),
 	stylus = require('gulp-stylus'),
 	include = require('gulp-include'),
+	browserify = require('gulp-browserify'),
 	minifyCss = require('gulp-minify-css'),
 	autoprefixer = require('gulp-autoprefixer'),
 	rsync = require('gulp-rsync'),
@@ -82,19 +83,22 @@ gulp.task('clean', function () {
 	]);
 });
 
-gulp.task('js', function () {
+gulp.task('js', [ 'jsx' ], function () {
 	gulp.src([
 		'assets/js/zepto.js',
-		'assets/js/*'
+		'assets/js/*',
+		'build/public/react/components.js'
 	])
-		.pipe(concat('all.js'))
+		.pipe(browserify())
+		.pipe(concat('intake.js'))
 		.pipe(gulp.dest('build/public/js/'));
 });
 
 gulp.task('jsx', function () {
 	gulp.src('views/components/*')
-		.pipe(include())
+		.pipe(include()) // not used anymore
 		.pipe(babel())
+		.pipe(browserify())
 		.pipe(concat('components.js'))
 		.pipe(gulp.dest('build/public/react/')) // for script tag src
 		.pipe(gulp.dest('build/views/react/')); // for direct embedding <% include .... %>
@@ -135,7 +139,8 @@ gulp.task('watch', function () {
 	], [ 'images' ]);
 
 	gulp.watch([
-		'assets/js/*'
+		'assets/js/*',
+		'build/public/assets/react/**'
 	], [ 'js' ]);
 
 	gulp.watch([

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html lang="<%= language %>"> 
+<html lang="{{ language }}"> 
 <head>
-	<title><%= title %></title>
+	<title>{{ title }}</title>
 	<meta charset='UTF-8'>
 
 	<link rel="shortcut icon" sizes="16x16" href="favicon.ico" type="image/x-icon">
@@ -12,14 +12,12 @@
 	<link href="css/all.css" rel="stylesheet" type="text/css">
 	<link href='https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,600,700,800' rel='stylesheet' type='text/css'>
 
-	<script type="text/javascript" src="js/all.js"></script> 
-
-	<script> <% include /react/components.js %> </script>
+	<script type="text/javascript" src="js/intake.js"></script> 
 
 	<script>
 		var GLOBAL = {
 			components: {},
-			mode: '<%= mode %>', // 'login' or 'registration'
+			mode: '{{ mode }}', // 'login' or 'registration'
 			takenusernames: {}, // cache for quick evaluation
 			takenemails: {},
 			registration: {
@@ -29,11 +27,11 @@
 
 		var _intakectrl = new Login.IntakeController();
 
-
 		$(document).ready(function () {
-			_.setTranslation(<%= translation %>);
+			_.setTranslation({{ translation }});
 			//Login.configurePage(GLOBAL.mode);
 
+			Login.bindReact();
 			_intakectrl.playIntro();
 		});
 	</script>
@@ -58,18 +56,18 @@
 				<div class="neuron"></div>
 			</div>
 			<section class="gateway parallax-layer">
-				<script> Login.component('gateway', Gateway, '.gateway') </script>
+				{{{ reactGateway }}}
 			</section> 
 			<section id="registration" class="parallax-layer">
-				<script> Login.component('registration', Registration, '#registration') </script>
+				{{{ reactRegistration }}}
 			</section>
 			<!-- <section class="explore parallax-layer">
-			a
+			a<script> Login.component('registration', Registration, '#registration') </script>
 			</section> -->
 		</div>
 	</section>
 	<header>
-		<script> Login.component('header', FixedHeader, 'header') </script>
+		{{{ reactHeader }}}
 	</header>
 
  </body>

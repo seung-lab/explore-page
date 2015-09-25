@@ -4,17 +4,19 @@
 
 require('node-jsx').install();
 
-var express = require('express');
-var compression = require('compression');
-var favicon = require('serve-favicon');
-var morgan = require('morgan');
-var methodOverride = require('method-override');
-var serveStatic = require('serve-static');
-var bodyParser = require('body-parser');
-var routes = require('./routes');
-var http = require('http');
-var path = require('path');
-var fs = require('fs');
+var express = require('express'),
+	exphbs  = require('express-handlebars'),
+	React = require('react'),
+	compression = require('compression'),
+	favicon = require('serve-favicon'),
+	morgan = require('morgan'),
+	methodOverride = require('method-override'),
+	serveStatic = require('serve-static'),
+	bodyParser = require('body-parser'),
+	routes = require('./routes.jsx'),
+	http = require('http'),
+	path = require('path'),
+	fs = require('fs');
 
 var app = express();
 
@@ -24,14 +26,17 @@ var PORT = process.env.PORT || 3000;
 
 app.set('port', PORT);
 app.set('views', path.join(__dirname, 'build/views/'));
-app.set('view engine', 'ejs');
+
+app.engine('handlebars', exphbs({ }));
+app.set('view engine', 'handlebars');
+
 app.use(compression({ threshold: 512 }));
 //app.use(favicon(__dirname + "/public/images/favicon.ico"));
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride());
-app.use(require('stylus').middleware(path.join(__dirname, 'public')));
+//app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(serveStatic('build/public'));
 app.use(favicon('build/public/favicon.ico'));
 

@@ -1,4 +1,4 @@
-(function ($, undefined) {
+$ = require('zepto');
 
 /* scrollTo
  *

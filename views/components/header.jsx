@@ -1,4 +1,6 @@
-var FixedHeader = React.createClass({
+var React = require('react');
+
+module.exports = React.createClass({
 	displayName: "FixedHeader",
 	getInitialState: function () {
 		return {

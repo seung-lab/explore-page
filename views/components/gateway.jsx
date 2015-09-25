@@ -1,4 +1,6 @@
-var Gateway = React.createClass({
+var React = require('react');
+
+module.exports = React.createClass({
 	displayName: "Gateway",
 	getInitialState: function () {
 		return {};

@@ -1,5 +1,6 @@
+var React = require('react');
 
-var AlphaVideo = React.createClass({
+module.exports = React.createClass({
 	displayName: "AlphaVideo",
 	getInitialState: function () {
 		return {

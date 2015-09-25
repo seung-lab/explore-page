@@ -3,6 +3,18 @@ Login = {};
 (function ($, undefined) {
 	"use strict";
 
+Login.bindReact = function () {
+	var tuples = [
+		[ 'gateway', Gateway ],
+		[ 'registration', Registration ],
+		[ 'header', FixedHeader ],
+	];
+
+	tuples.forEach(function (tuple) {
+		Login.component(tuple[0], tuple[1], '#' + tuple[0])
+	});
+};
+
 Login.component = function (name, klass, selector) {
 	if (klass !== undefined) {
 		GLOBAL.components[name] = React.render(
@@ -34,7 +46,7 @@ Login.IntakeView = function () {
 				easing: Easing.springFactory(.7, 1),
 			})
 			.done(function () {
-				Login.component('header').setState({ visible: true });
+				Login.component('header').setProps({ visible: true });
 			});
 		}, 2500);
 	};

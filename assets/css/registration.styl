@@ -43,12 +43,36 @@
 
 .registration .location-text
 	text-transform uppercase
-	color #3B556A
+	color $TEXT_BLUE
 	font-size 11px
 	font-weight 600
 	letter-spacing 1.5px
-	
 
+.fb-connect
+	position relative
+	
+	padding-left 5%
+	box-sizing border-box
+
+.fb-connect::before
+	content ""
+	height $primary_height
+	width 25%
+
+	background-image url("/images/icons/fb.svg")
+	background-repeat no-repeat
+	background-position 10px 3px
+	background-size 20px
+
+	position absolute
+	left 0px
+	top -1px
+
+	border-right 1px solid $TEXT_BLUE
+	border-top-left-radius 15px
+	border-bottom-left-radius 15px
+
+	box-sizing border-box
 
 
 
