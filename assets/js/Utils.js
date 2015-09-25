@@ -657,7 +657,7 @@ var Utils = Utils || {};
 		return sliced;
 	};
 
-	/* cutoff
+	/* clamp
 	 *
 	 * Bound a value between a minimum and maximum value.
 	 *
@@ -668,7 +668,7 @@ var Utils = Utils || {};
 	 * 
 	 * Returns: value if value in [min,max], min if less, max if more
 	 */
-	Utils.cutoff = function (value, min, max) {
+	Utils.clamp = function (value, min, max) {
 		return Math.max(Math.min(value, max), min);
 	};
 

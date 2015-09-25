@@ -1,0 +1,54 @@
+@require 'mixins.styl'
+@require 'controls.styl'
+@require 'colors.styl'
+@require 'parallax.styl'
+
+#registration 
+	top: 225%
+
+.registration
+	width 500px
+	height 500px
+	
+	center()
+	
+	margin-bottom 100vh
+
+.registration .icon
+	background-repeat no-repeat
+	background-size 15px
+	background-position 10px
+
+
+.registration .username 
+	@extend .registration .icon
+	background-image url("/images/icons/username.svg")
+
+.registration .email 
+	@extend .registration .icon
+	background-image url("/images/icons/email.svg")
+	
+.registration .password
+	@extend .registration .icon
+	background-image url("/images/icons/password.svg")
+
+.registration .logo 
+	width 150px
+	height @width
+
+.registration button,
+.registration input
+	width 150px
+	
+
+.registration .location-text
+	text-transform uppercase
+	color #3B556A
+	font-size 11px
+	font-weight 600
+	letter-spacing 1.5px
+	
+
+
+
+

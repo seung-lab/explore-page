@@ -1,0 +1,7 @@
+test/
+media/
+dist/*
+!dist/*.js
+bower.json
+seethru.json
+.jshintrc

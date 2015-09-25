@@ -1,0 +1,63 @@
+$PHI = 1.618
+
+$IMAGES_DIR = ".."
+
+center-horizontal(offset=0px)
+	position absolute
+	left s("calc(50% - %s / 2 + %s)", @width, offset)
+
+center-vertical(offset=0px)
+	position absolute
+	top s("calc(50% - %s / 2 + %s)", @height, offset)
+	
+center(dx=0px, dy=0px)
+	center-vertical(dx)
+	center-horizontal(dy)
+	
+preserve-aspect-ratio($path)
+	height unit(@width / aspect-ratio($path), 'px')
+
+aspect-ratio($path)
+	dims = image-size(pathjoin($IMAGES_DIR, $path))
+	dims[0] / dims[1]
+
+/* Used for setting the positions of the parallaxing neurons.
+ *
+ * url: URL of image file
+ * side: 'left' or 'right',  the side of the screen to put the neuron relative to
+ * dx: Proportion of image width to move over
+ * dy: Height in pixels to move up relative to bottom of screen
+ */
+parallax-neuron($url, $side, $dx, $dy)
+	width image-size(pathjoin($IMAGES_DIR, $url))[0]
+	
+	// HACK: stylus appearently runs mixins/fns
+	// after evaluating the function body so @height isn't defined yet
+	// if you use preserve-aspect-ratio so I'm inlining it
+	height unit(@width / aspect-ratio($url), 'px') 
+	
+	background-image url($url)
+	background-size contain 
+	background-repeat no-repeat
+	
+	bottom (-@height) + $dy
+	
+	$computation = -@width + (@width * $dx)
+	
+	if $side is 'left'
+		left $computation
+	else if $side is 'right'
+		right $computation
+	else if $side is 'center'
+		left s("calc(50% - %s / 2)", @width)
+		
+
+.column
+	justify-content center
+	text-align center
+	display flex
+	align-items center
+	flex-direction column
+
+
+
