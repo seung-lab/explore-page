@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html lang="<%= language %>">
+<head>
+	<title><%= title %></title>
+	<meta charset='UTF-8'>
+	
+	<link href="css/all.css" rel="stylesheet" type="text/css">
+	<!-- <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,' rel='stylesheet' type='text/css'> -->
+
+	<script type="text/javascript" src="js/all.js"></script>
+
+	<script>
+		var GLOBAL = {
+			mode: '<%= mode %>', // 'login' or 'registration'
+			takenusernames: {}, // cache for quick evaluation
+			takenemails: {},
+			registration: {
+				lastclick: "standard" // for determining the action of the enter key
+			}
+		}; 
+
+		$(document).ready(function () {
+			_.setTranslation(<%= translation %>);
+			Login.configurePage(GLOBAL.mode);
+		});
+	</script>
+</head>
+<body>
+	<div class="container gateway">
+		<div class="eyewire"></div>
+		<div class="share"></div>
+
+	</div>
+
+	<div class="container"></div>
+	<div class="container"></div>
+
+ </body>
+ </html>
