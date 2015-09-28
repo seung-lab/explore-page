@@ -14,63 +14,19 @@
 
 	<script type="text/javascript" src="js/all.js"></script> 
 
-	<script> <% include /react/components.js %> </script>
 
-	<script>
-		var GLOBAL = {
-			components: {},
-			mode: '<%= mode %>', // 'login' or 'registration'
-			takenusernames: {}, // cache for quick evaluation
-			takenemails: {},
-			registration: {
-				lastclick: "standard" // for determining the action of the enter key
-			}
-		}; 
-
-		var _intakectrl = new Login.IntakeController();
-
-
-		$(document).ready(function () {
-			_.setTranslation(<%= translation %>);
-			//Login.configurePage(GLOBAL.mode);
-
-			_intakectrl.playIntro();
-		});
-	</script>
 </head>
 <body>
-	<section id="viewport" class="parallax">
-		<div class="parallax-group">
-			<div id="intake-logo" class="logo parallax-layer"></div>
-			<div class="intake-front parallax-layer neuron-layer">
-				<div class="left neuron"></div>
-				<div class="right neuron"></div>
-			</div>
-			<div class="intake-middle parallax-layer neuron-layer">
-				<div class="left neuron"></div>
-				<div class="right neuron"></div>
+	<div class="parallax">
+		<section class="explore parallax-group">
+			<p>Content Here</p>
+			<div style="text-align:center"> 
+			  <video id="video1" width="420" autoplay>
+			    <source src="animations/explore-intro.mp4" type="video/mp4">
+			    Your browser does not support HTML5 video.
+			  </video>
 			</div> 
-			<div class="intake-rear parallax-layer neuron-layer">
-				<div class="left neuron"></div>
-				<div class="right neuron"></div>
-			</div>
-			<div class="intake-carpet parallax-layer neuron-layer">
-				<div class="neuron"></div>
-			</div>
-			<section class="gateway parallax-layer">
-				<script> Login.component('gateway', Gateway, '.gateway') </script>
-			</section> 
-			<section id="registration" class="parallax-layer">
-				<script> Login.component('registration', Registration, '#registration') </script>
-			</section>
-			<!-- <section class="explore parallax-layer">
-			a
-			</section> -->
-		</div>
-	</section>
-	<header>
-		<script> Login.component('header', FixedHeader, 'header') </script>
-	</header>
-
+		</section>
+	</div>
  </body>
  </html>

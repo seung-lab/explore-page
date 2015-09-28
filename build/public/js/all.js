@@ -3738,6 +3738,12 @@ var Utils = Utils || {};
 	};
 
 })(jQuery);
+(function ($, undefined) {
+	"use strict";
+
+	
+
+})(jQuery);
 Easing = {};
 
 (function (undefined) {
