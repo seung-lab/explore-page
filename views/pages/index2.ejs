@@ -11,22 +11,38 @@
 	
 	<link href="css/all.css" rel="stylesheet" type="text/css">
 	<link href='https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,600,700,800' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:700' rel='stylesheet' type='text/css'>
 
 	<script type="text/javascript" src="js/all.js"></script> 
 
 
 </head>
 <body>
-	<div class="parallax">
-		<section class="explore parallax-group">
-			<p>Content Here</p>
-			<div style="text-align:center"> 
-			  <video id="video1" width="420" autoplay>
-			    <source src="animations/explore-intro.mp4" type="video/mp4">
-			    Your browser does not support HTML5 video.
-			  </video>
-			</div> 
-		</section>
+	<div class="explore">
+		<header>
+			<img class="logo" src="images/logotype.svg" alt="Eyewire Logotype" width="150">
+			<button class="primary cta create-account">
+				Create new account
+			</button>
+		</header>
+		<div class="parallax">
+			<section class="vp parallax-group">
+				<video id="video1" autoplay>
+					<source src="animations/explore-intro.mp4" type="video/mp4">
+				    Your browser does not support HTML5 video.
+				</video>
+				<div class="story-box">
+				  	<h1>Your Brain Makes<br>You Amazing</h1>
+				  	<div class="place-holder">I / X</div>
+			  	</div>
+			</section>
+			<div id="next-arrow">
+				<div class="triangle"></div>
+			</div>
+		</div>
+		<div id="timeline">
+			<div id="t"></div>
+		</div>
 	</div>
  </body>
  </html>

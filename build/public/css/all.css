@@ -507,16 +507,18 @@ button {
 button.primary,
 button.secondary,
 div.tertiary {
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 15px;
   background-color: #fede7d;
   color: #4c4c4c;
-  height: 35px;
-  width: 150px;
+  height: 60px;
+  width: 250px;
   -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
           transition: color 150ms, background-color 150ms, border-color 150ms;
   border: none;
   outline: none;
+  letter-spacing: 0.5px;
+  font-weight: 400;
 }
 button.primary:hover {
   background-color: #f7dd8d;
@@ -525,7 +527,7 @@ button.primary:active {
   background-color: #e8cd7a;
 }
 button.secondary {
-  width: 92.70704573547589px;
+  width: 154.5117428924598px;
   height: 40px;
   color: #dbdbdb;
   background-color: transparent;
@@ -555,8 +557,8 @@ div.tertiary {
 }
 div.tertiary::before {
   content: "";
-  height: 35px;
-  width: 150px;
+  height: 60px;
+  width: 250px;
   border-right: 1px solid #ececec;
 }
 ::-webkit-input-placeholder {
@@ -575,13 +577,13 @@ div.tertiary::before {
 }
 input[type=text],
 input[type=password] {
-  width: 150px;
-  height: 35px;
+  width: 250px;
+  height: 60px;
   box-sizing: border-box;
-  padding: 5px;
+  padding-top: 5px;
+  padding-left: 30px;
   border-radius: 10px;
   margin: 5px;
-  padding-left: 30px;
   font-size: 10px;
   background: transparent;
   border: 1px solid #3b556a;
@@ -589,6 +591,18 @@ input[type=password] {
   outline: none;
   letter-spacing: 0.5px;
   font-weight: 300;
+}
+button.cta {
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 20px;
+  margin: 5px;
+  padding-left: 45px;
+  background: transparent;
+  border: 1px solid #f9f5ec;
+  color: #f9f5ec;
+  outline: none;
+  text-transform: initial;
 }
 .parallax {
   -webkit-perspective: 300px;
@@ -619,9 +633,9 @@ input[type=password] {
   width: 500px;
   height: 500px;
   position: absolute;
-  top: calc(50% - 500px / 2 + 0px);
-  position: absolute;
   left: calc(50% - 500px / 2 + 0px);
+  position: absolute;
+  top: calc(50% - 500px / 2 + 0px);
   margin-bottom: 100vh;
 }
 .registration .icon,
@@ -682,10 +696,133 @@ input[type=password] {
   background: rgba(173,173,173,0.25);
 }
 .explore {
+  width: 100vw;
+  height: 100vh;
+}
+.explore .vp {
   position: relative;
   width: 100%;
   height: 100%;
   background-color: #f9f5ec;
+  text-align: center;
+}
+.explore .icon,
+.explore .create-account {
+  background-repeat: no-repeat;
+  background-size: 25px;
+  background-position: 24px;
+}
+.explore .create-account {
+  fill: #495e72;
+  background-image: url("/images/icons/register-b.svg");
+  position: absolute;
+  top: 35px;
+  border-color: #495e72;
+  right: 35px;
+  color: #495e72;
+}
+.explore .create-account::before {
+  content: "";
+  border-right: 1px solid #495e72;
+  height: 100%;
+  position: absolute;
+  left: 65px;
+  top: 0;
+}
+.explore .logo {
+  position: absolute;
+  margin: 35px;
+}
+.explore video {
+  display: block;
+  width: 400px;
+  height: 300px;
+  position: absolute;
+  left: calc(50% - 400px / 2 + 0px);
+  position: absolute;
+  top: calc(50% - 300px / 2 + -10%);
+}
+.explore #timeline {
+  width: 100%;
+  height: 35px;
+  border-top: 1px solid #495e72;
+  position: absolute;
+  bottom: 0;
+  z-index: 10;
+  -webkit-transition: border-color 100ms ease;
+          transition: border-color 100ms ease;
+}
+.explore #timeline {
+  border-color: #768695;
+}
+.explore #t {
+  position: absolute;
+  left: 0;
+  height: 100%;
+  width: 20%;
+  background-color: #495e72;
+  -webkit-transition: background-color 100ms ease;
+          transition: background-color 100ms ease;
+}
+.explore #t:hover {
+  background-color: #768695;
+  cursor: pointer;
+}
+.explore .triangle {
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 18px solid #495e72;
+  display: inline-block;
+  -webkit-transition: border-top-color 100ms ease;
+          transition: border-top-color 100ms ease;
+}
+.explore .triangle:hover {
+  border-top-color: #768695;
+  cursor: pointer;
+}
+.explore #next-arrow {
+  position: relative;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 125px;
+}
+.explore .story-box {
+  position: absolute;
+  width: 500px;
+  top: 65%;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 500px / 2 + 0px);
+}
+.explore h1::before {
+  content: "";
+  width: 25px;
+  position: absolute;
+  left: calc(50% - 25px / 2 + 0px);
+  border-top: 3px dotted #495e72;
+  margin-top: -15px;
+}
+.explore h1::after {
+  content: "";
+  width: 25px;
+  position: absolute;
+  left: calc(50% - 25px / 2 + 0px);
+  border-top: 3px dotted #495e72;
+  margin-top: 70px;
+}
+.explore .place-holder {
+  margin-top: 35px;
+  width: 50px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fae17b;
+  padding: 5px;
+  border-radius: 20px;
+  font-size: 12px;
 }
 html,
 body {
@@ -697,6 +834,14 @@ body {
 }
 body {
   overflow-y: hidden;
+}
+h1 {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 48px;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  line-height: 1.25em;
+  color: #495e72;
 }
 #viewport {
   width: 100%;
@@ -725,9 +870,9 @@ body {
   width: 200px;
   height: 200px;
   position: absolute;
-  top: calc(50% - 200px / 2 + 0px);
-  position: absolute;
   left: calc(50% - 200px / 2 + 0px);
+  position: absolute;
+  top: calc(50% - 200px / 2 + 0px);
   -webkit-transition: height 2s ease-out, width 2s ease-out;
           transition: height 2s ease-out, width 2s ease-out;
 }
@@ -804,9 +949,9 @@ div.pitch {
   word-spacing: 5px;
 }
 .gateway .explorebtn {
-  width: 92.70704573547589px;
+  width: 154.5117428924598px;
   position: absolute;
-  left: calc(50% - 92.70704573547589px / 2 + 0px);
+  left: calc(50% - 154.5117428924598px / 2 + 0px);
   bottom: 10%;
 }
 .gateway #continuebtn {

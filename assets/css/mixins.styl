@@ -11,8 +11,8 @@ center-vertical(offset=0px)
 	top s("calc(50% - %s / 2 + %s)", @height, offset)
 	
 center(dx=0px, dy=0px)
-	center-vertical(dx)
-	center-horizontal(dy)
+	center-horizontal(dx)
+	center-vertical(dy)
 	
 preserve-aspect-ratio($path)
 	height unit(@width / aspect-ratio($path), 'px')
@@ -28,6 +28,7 @@ aspect-ratio($path)
  * dx: Proportion of image width to move over
  * dy: Height in pixels to move up relative to bottom of screen
  */
+ 
 parallax-neuron($url, $side, $dx, $dy)
 	width image-size(pathjoin($IMAGES_DIR, $url))[0]
 	

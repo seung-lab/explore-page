@@ -1,11 +1,130 @@
 @require 'mixins.styl'
 @require 'controls.styl'
+@require 'colors.styl'
+@require 'parallax.styl'
+@require 'animator.styl'
+
 
 .explore
+	width 100vw
+	height 100vh
+
+.explore .vp
 	position relative
 	width 100%
 	height 100%
-	background-color #F9F5EC
+	background-color $WASHI
+	text-align center
+	
+.explore .icon
+	background-repeat no-repeat
+	background-size 25px
+	background-position 24px
 
+
+.explore .create-account 
+	@extend .explore .icon
+	fill $SLATE
+	background-image url("/images/icons/register-b.svg")
+	position absolute
+	top 35px
+	border-color $SLATE
+	right 35px
+	color $SLATE 
+	
+.explore .create-account::before
+	content ""
+	border-right 1px solid $SLATE
+	height 100%
+	position absolute
+	left 65px
+	top 0
+	
+.explore .logo
+	position absolute
+	margin 35px
+	
+.explore video 
+	display block
+	width 400px
+	height 300px
+	center(0px, -10%)
+	
+.explore #timeline 
+	width 100%
+	height 35px
+	border-top 1px solid $SLATE
+	position absolute
+	bottom 0
+	z-index 10
+	transition border-color $FASTER ease
+
+.explore #timeline
+	border-color $SLATE_LIGHTER
+	
+.explore #t 
+	position absolute
+	left 0
+	height 100%
+	width 20%
+	background-color $SLATE
+	transition background-color $FASTER ease
+	
+.explore #t:hover
+	background-color $SLATE_LIGHTER
+	cursor pointer
+	
+.explore .triangle 
+	width 0
+	height 0
+	border-left 18px solid transparent
+	border-right 18px solid transparent
+	border-top 18px solid $SLATE
+	display inline-block
+	transition border-top-color $FASTER ease
+	
+.explore .triangle:hover 
+	border-top-color $SLATE_LIGHTER
+	cursor pointer
+	
+.explore #next-arrow
+	position relative
+	text-align center
+	margin-left auto
+	margin-right auto
+	bottom 125px
+	
+.explore .story-box
+	position absolute
+	width 500px
+	top 65%
+	text-align center
+	
+	center-horizontal()
+	
+.explore h1::before
+	content ""
+	width 25px
+	center-horizontal()
+	border-top 3px dotted $SLATE
+	margin-top -15px
+	
+.explore h1::after
+	content ""
+	width 25px
+	center-horizontal()
+	border-top 3px dotted $SLATE
+	margin-top 70px
+	
+.explore .place-holder
+	margin-top 35px
+	width 50px
+	position relative
+	margin-left auto
+	margin-right auto
+	background-color $YELLOW
+	padding 5px
+	border-radius 20px
+	font-size 12px	
 
 
