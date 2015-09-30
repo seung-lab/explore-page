@@ -503,6 +503,7 @@ button {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 600;
+  pointer-events: all;
 }
 button.primary,
 button.secondary,
@@ -720,6 +721,14 @@ button.cta {
   border-color: #495e72;
   right: 35px;
   color: #495e72;
+  -webkit-transition: border-color fill color 100ms ease;
+          transition: border-color fill color 100ms ease;
+}
+.explore .create-account:hover {
+  fill: #495e72;
+  border-color: #495e72;
+  color: #495e72;
+  cursor: pointer;
 }
 .explore .create-account::before {
   content: "";
@@ -732,15 +741,19 @@ button.cta {
 .explore .logo {
   position: absolute;
   margin: 35px;
+  pointer-events: all;
+}
+.explore .logo:hover {
+  cursor: pointer;
 }
 .explore video {
   display: block;
-  width: 400px;
-  height: 300px;
+  width: 800px;
+  height: 600px;
   position: absolute;
-  left: calc(50% - 400px / 2 + 0px);
+  left: calc(50% - 800px / 2 + 0px);
   position: absolute;
-  top: calc(50% - 300px / 2 + -10%);
+  top: calc(50% - 600px / 2 + -10%);
 }
 .explore #timeline {
   width: 100%;
@@ -792,25 +805,25 @@ button.cta {
 .explore .story-box {
   position: absolute;
   width: 500px;
-  top: 65%;
+  top: 67.5%;
   text-align: center;
   position: absolute;
   left: calc(50% - 500px / 2 + 0px);
 }
 .explore h1::before {
   content: "";
-  width: 25px;
+  width: 30px;
   position: absolute;
-  left: calc(50% - 25px / 2 + 0px);
-  border-top: 3px dotted #495e72;
+  left: calc(50% - 30px / 2 + 0px);
+  border-top: 3px dotted #768695;
   margin-top: -15px;
 }
 .explore h1::after {
   content: "";
-  width: 25px;
+  width: 30px;
   position: absolute;
-  left: calc(50% - 25px / 2 + 0px);
-  border-top: 3px dotted #495e72;
+  left: calc(50% - 30px / 2 + 0px);
+  border-top: 3px dotted #768695;
   margin-top: 70px;
 }
 .explore .place-holder {

@@ -32,6 +32,14 @@
 	right 35px
 	color $SLATE 
 	
+	transition border-color fill color $FASTER ease
+
+.explore .create-account:hover
+	fill $SLATE
+	border-color $SLATE
+	color $SLATE 
+	cursor pointer
+	
 .explore .create-account::before
 	content ""
 	border-right 1px solid $SLATE
@@ -43,11 +51,16 @@
 .explore .logo
 	position absolute
 	margin 35px
+	pointer-events all
+	
+	
+.explore .logo:hover
+	cursor pointer
 	
 .explore video 
 	display block
-	width 400px
-	height 300px
+	width 800px
+	height 600px
 	center(0px, -10%)
 	
 .explore #timeline 
@@ -97,23 +110,23 @@
 .explore .story-box
 	position absolute
 	width 500px
-	top 65%
+	top 67.5%
 	text-align center
 	
 	center-horizontal()
 	
 .explore h1::before
 	content ""
-	width 25px
+	width 30px
 	center-horizontal()
-	border-top 3px dotted $SLATE
+	border-top 3px dotted $SLATE_LIGHTER
 	margin-top -15px
 	
 .explore h1::after
 	content ""
-	width 25px
+	width 30px
 	center-horizontal()
-	border-top 3px dotted $SLATE
+	border-top 3px dotted $SLATE_LIGHTER
 	margin-top 70px
 	
 .explore .place-holder
