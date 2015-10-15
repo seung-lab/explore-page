@@ -1,4 +1,4 @@
-$ = require('zepto');
+var $ = require('./zepto.js');
 
 /* scrollTo
  *
@@ -83,5 +83,3 @@ $ = require('zepto');
 
  	return deferred;
  };
-
-})(jQuery);

@@ -1,7 +1,9 @@
-Login = {};
+"use strict";
 
-(function ($, undefined) {
-	"use strict";
+var Utils = require('./Utils.js');
+var $ = require('./zepto.js');
+
+Login = {};
 
 Login.bindReact = function () {
 	var tuples = [
@@ -1317,4 +1319,5 @@ function focusOnFirstError (coordinator, mode) {
 	}
 }
 
-})(jQuery);
+window.Login = Login;
+module.exports = Login;

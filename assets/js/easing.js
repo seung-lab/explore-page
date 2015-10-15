@@ -1,3 +1,5 @@
+"use strict";
+
 /* springFactory
  * 
  * Simulate an actual spring.

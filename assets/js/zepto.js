@@ -1825,4 +1825,6 @@ window.$ === undefined && (window.$ = Zepto)
   $.Deferred = Deferred
 })(Zepto)
 
+module.exports = Zepto;
+
 

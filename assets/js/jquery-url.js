@@ -5,12 +5,18 @@
  * Licensed under an MIT-style license. See https://github.com/allmarkedup/jQuery-URL-Parser/blob/master/LICENSE for details.
  */
 
+var jQuery = require('./zepto.js');
+var $ = jQuery;
+
 ;(function(factory) {
     if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
         window.purl = factory();
     }
+
+    module.exports.purl = window.purl;
+
 })(function() {
 
     var tag2attr = {
@@ -243,10 +249,9 @@
             }
 
         };
-
     }
     
-    purl.jQuery = function($){
+    purl.jQuery = function($) {
         if ($ != null) {
             $.fn.url = function( strictMode ) {
                 var url = '';

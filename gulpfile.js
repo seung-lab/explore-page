@@ -87,8 +87,9 @@ gulp.task('js', [ 'jsx' ], function () {
 	gulp.src([
 		'assets/js/zepto.js',
 		'assets/js/*',
-		'build/public/react/components.js'
+		'build/views/react/components.js'
 	])
+		.pipe(gulp.dest('build/public/js/'))
 		.pipe(browserify())
 		.pipe(concat('intake.js'))
 		.pipe(gulp.dest('build/public/js/'));
@@ -96,12 +97,9 @@ gulp.task('js', [ 'jsx' ], function () {
 
 gulp.task('jsx', function () {
 	gulp.src('views/components/*')
-		.pipe(include()) // not used anymore
 		.pipe(babel())
-		.pipe(browserify())
 		.pipe(concat('components.js'))
-		.pipe(gulp.dest('build/public/react/')) // for script tag src
-		.pipe(gulp.dest('build/views/react/')); // for direct embedding <% include .... %>
+		.pipe(gulp.dest('build/views/react/')) // for direct embedding <% include .... %>
 
 	gulp.src('views/pages/*')
 		.pipe(gulp.dest('build/views/'))

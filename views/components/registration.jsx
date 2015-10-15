@@ -1,8 +1,8 @@
 var React = require('react/addons'),
-	Conditional = require('../../lib/conditional.js').Conditional;
+	Conditional = require('../../../lib/conditional.js').Conditional;
 
 module.exports = React.createClass({
-	mixins: [ React.addons.LinkedStateMixin ],
+	//mixins: [ React.addons.LinkedStateMixin ],
 	displayName: "Registration",
 	getInitialState: function () {
 		return {
