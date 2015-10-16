@@ -116,7 +116,7 @@ gulp.task('jsx', function () {
 		.pipe(gulp.dest('dist/views/'))
 });
 
-gulp.task('css', [ 'sprite' ], function () {
+gulp.task('css', [ ], function () {
 	gulp.src([
 		'assets/css/normalize.css',
 		'assets/css/*.css',
@@ -129,9 +129,9 @@ gulp.task('css', [ 'sprite' ], function () {
 		}))
 		.pipe(gulp.dest('dist/public/css/'))
 
-	del([
-		'assets/css/sprites/**'
-	]);
+	// del([
+	// 	'assets/css/sprites/**'
+	// ]);
 });
 
 gulp.task('watch', function () {
