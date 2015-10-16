@@ -1,5 +1,0 @@
-*.sublime-project
-*.sublime-workspace
-npm-debug.log
-node_modules/
-test/non-jquery.html

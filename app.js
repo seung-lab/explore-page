@@ -25,7 +25,7 @@ var app = express();
 var PORT = process.env.PORT || 3000;
 
 app.set('port', PORT);
-app.set('views', path.join(__dirname, 'build/views/'));
+app.set('views', path.join(__dirname, 'dist/views/'));
 
 app.engine('handlebars', exphbs({ }));
 app.set('view engine', 'handlebars');
@@ -37,8 +37,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride());
 //app.use(require('stylus').middleware(path.join(__dirname, 'public')));
-app.use(serveStatic('build/public'));
-app.use(favicon('build/public/favicon.ico'));
+app.use(serveStatic('dist/public'));
+app.use(favicon('dist/public/favicon.ico'));
 
 app.get('/', routes.index);
 app.get('/test', function (req, res) {

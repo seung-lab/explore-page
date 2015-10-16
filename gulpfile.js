@@ -4,7 +4,7 @@ var argv = require('yargs').argv,
 	uglify = require('gulp-uglify'),
 	stylus = require('gulp-stylus'),
 	include = require('gulp-include'),
-	browserify = require('gulp-browserify'),
+	browserify = require('browserify'),
 	minifyCss = require('gulp-minify-css'),
 	autoprefixer = require('gulp-autoprefixer'),
 	rsync = require('gulp-rsync'),
@@ -13,7 +13,11 @@ var argv = require('yargs').argv,
 	babel = require("gulp-babel"),
 	shell = require('gulp-shell'),
 	GulpSSH = require('gulp-ssh'),
-	sprite = require('gulp-node-spritesheet');
+	sprite = require('gulp-node-spritesheet'),
+	source = require('vinyl-source-stream'),
+	buffer = require('vinyl-buffer'),
+	gutil = require('gulp-util'),
+	babelify = require('babelify');
 
 var fs = require('fs');
 var del = require('del');
@@ -64,45 +68,52 @@ gulp.task('sprite', function () {
 gulp.task('images', [ 'sprite' ], function () {
 	gulp
 		.src('assets/images/**')
-		.pipe(gulp.dest('build/public/images/'));
+		.pipe(gulp.dest('dist/public/images/'));
 
 	gulp
 		.src('assets/favicon*')
-		.pipe(gulp.dest('build/public/'));
+		.pipe(gulp.dest('dist/public/'));
 });
 
 gulp.task('animations', function () {
 	gulp
 		.src('assets/animations/**')
-		.pipe(gulp.dest('build/public/animations/'));
+		.pipe(gulp.dest('dist/public/animations/'));
 });
 
 gulp.task('clean', function () {
 	del([
-		'build/**'
+		'build/**',
+		'dist/**'
 	]);
 });
 
 gulp.task('js', [ 'jsx' ], function () {
-	gulp.src([
-		'assets/js/zepto.js',
-		'assets/js/*',
-		'build/views/react/components.js'
-	])
-		.pipe(gulp.dest('build/public/js/'))
-		.pipe(browserify())
-		.pipe(concat('intake.js'))
-		.pipe(gulp.dest('build/public/js/'));
+	var b = browserify({
+		entries: 'clientjs/main.js',
+		//debug: true,
+		// defining transforms here will avoid crashing your stream
+		transform: [ babelify ],
+	});
+
+	return b.bundle()
+		.pipe(source('intake.js'))
+		.pipe(buffer())
+		// .pipe(sourcemaps.init({loadMaps: true}))
+		// 	// Add transformation tasks to the pipeline here.
+		// 	.pipe(uglify())
+		// 	.on('error', gutil.log)
+		// .pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('./dist/public/js/'));
+
 });
 
 gulp.task('jsx', function () {
 	gulp.src('views/components/*')
-		.pipe(babel())
-		.pipe(concat('components.js'))
-		.pipe(gulp.dest('build/views/react/')) // for direct embedding <% include .... %>
+		.pipe(gulp.dest('build/public/js/components/')) // for direct embedding <% include .... %>
 
 	gulp.src('views/pages/*')
-		.pipe(gulp.dest('build/views/'))
+		.pipe(gulp.dest('dist/views/'))
 });
 
 gulp.task('css', [ 'sprite' ], function () {
@@ -116,7 +127,7 @@ gulp.task('css', [ 'sprite' ], function () {
 		.pipe(autoprefixer({
 			browser: "> 1%, last 2 versions, Firefox ESR"
 		}))
-		.pipe(gulp.dest('build/public/css/'))
+		.pipe(gulp.dest('dist/public/css/'))
 
 	del([
 		'assets/css/sprites/**'
@@ -137,11 +148,12 @@ gulp.task('watch', function () {
 	], [ 'images' ]);
 
 	gulp.watch([
-		'assets/js/*',
-		'build/public/assets/react/**'
+		'clientjs/**',
+		'components/**'
 	], [ 'js' ]);
 
 	gulp.watch([
+		'components/**',
 		'views/**'
 	], [ 'jsx' ]);
 });
