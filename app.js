@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-require('node-jsx').install();
+require("babel/register");
 
 var express = require('express'),
 	exphbs  = require('express-handlebars'),

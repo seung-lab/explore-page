@@ -2647,6 +2647,8 @@ module.exports = Utils;
 
 'use strict';
 
+window = window || { document: {} };
+
 var Zepto = (function () {
   var undefined,
       key,
