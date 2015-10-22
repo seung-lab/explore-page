@@ -1,7 +1,7 @@
 var React = require('react'),
 	Gateway = require('./components/gateway.jsx'),
 	Registration = require('./components/registration.jsx'),
-	FixedHeader = require('./components/header.jsx');
+	FixedHeader = require('./components/header.jsx')
 
 exports.index = function (req, res) {
 	res.render('index', { 

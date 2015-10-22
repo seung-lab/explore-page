@@ -1,0 +1,41 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+
+.amazing
+	height 100%
+	width 100%
+	
+	display flex
+	flex-direction column
+	align-items center
+	justify-content center
+
+.amazing .story-text
+	text-transform uppercase
+	color $TEXT_BLUE
+	font-size 30px
+	font-weight 600
+	word-spacing 5px
+	letter-spacing 0.5px
+	
+	width 315px
+
+	position absolute
+	bottom 15%
+
+	center-horizontal()
+	
+
+.story-text:after,
+.story-text:before 
+	content "...."
+	position absolute
+	width 100%
+	font-size 10px
+	left 0px
+
+.story-text:before
+	top -15px
+
+.story-text:after
+	top 70px

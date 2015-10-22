@@ -1,4 +1,5 @@
-var React = require('react');
+var React = require('react/addons'),
+	cx = require('classnames');
 
 module.exports = React.createClass({
 	displayName: "FixedHeader",
@@ -9,8 +10,6 @@ module.exports = React.createClass({
 		};
 	},
 	renderGateway: function () {
-		var cx = React.addons.classSet;
-
 		var classes = cx({
 			container: true,
 			invisible: !this.state.visible,

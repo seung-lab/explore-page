@@ -1,4 +1,4 @@
-var React = require('react'),
+var React = require('react/addons'),
  	Easing = require('../clientjs/easing.js');
 
 module.exports = React.createClass({
@@ -7,13 +7,17 @@ module.exports = React.createClass({
 		return {};
 	},
 	gotoRegistration: function () {
+		$('#explore').hide();
+
 		$('#viewport').scrollTo('#registration', {
 			msec: 4000,
 			easing: Easing.springFactory(.9, 1),
 		});
 	},
 	gotoExplore: function () {
-		$('#viewport').scrollTo('.explore', {
+		$('#registration').hide();
+
+		$('#viewport').scrollTo('#explore', {
 			msec: 2500,
 			easing: Easing.springFactory(.9, 0),
 		});
