@@ -1,13 +1,13 @@
 "use strict";
 
 let React = require('react/addons'),
-	$ = require('./zepto.js'),
+	$ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
 	Gateway = require('../components/gateway.jsx'),
 	FixedHeader = require('../components/header.jsx'),
 	Registration = require('../components/registration.jsx'),
-	TimelineController = require('./controllers/timelinecontroller.jsx');
+	ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
 
 let Login = {};
 
@@ -21,9 +21,6 @@ Login.bindReact = function () {
 	tuples.forEach(function (tuple) {
 		Login.component(tuple[0], tuple[1], '#' + tuple[0])
 	});
-
-	TimelineController.initialize();
-	TimelineController.render();
 };
 
 Login.component = function (name, klass, selector) {

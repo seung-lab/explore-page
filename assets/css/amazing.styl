@@ -17,6 +17,7 @@
 	font-weight 600
 	word-spacing 5px
 	letter-spacing 0.5px
+	text-align center
 	
 	width 315px
 
@@ -25,6 +26,10 @@
 
 	center-horizontal()
 	
+.super-text
+	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
+	font-weight 400
+	color $TEXT_BLUE
 
 .story-text:after,
 .story-text:before 
@@ -39,3 +44,39 @@
 
 .story-text:after
 	top 70px
+
+.counter 
+	display flex
+	justify-content center
+	align-items center
+	
+	background-color $ACCENT_YELLOW
+	color $TEXT_BLUE
+	border-radius 3px
+	
+	box-sizing border-box
+	padding-left 5px
+	
+	width 50px
+	height 10px
+	
+	font-size 6px
+	letter-spacing 5px
+	
+	position absolute
+	bottom -30px
+	center-horizontal()
+
+.amazing .next
+	width 0px
+	height @width
+	
+	$border_width = 7px
+	border $border_width solid transparent
+	border-top $border_width solid $FILL_BLUE
+	
+	center-horizontal(dx=-1 * $border_width)
+	bottom 15px
+
+
+

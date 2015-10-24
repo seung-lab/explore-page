@@ -5,7 +5,7 @@
  * Licensed under an MIT-style license. See https://github.com/allmarkedup/jQuery-URL-Parser/blob/master/LICENSE for details.
  */
 
-var jQuery = require('./zepto.js');
+var jQuery = require('jquery');
 var $ = jQuery;
 
 ;(function(factory) {

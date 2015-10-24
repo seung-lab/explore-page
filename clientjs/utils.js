@@ -14,13 +14,7 @@
  * Date: June-August 2013
  */
 
-var window = window || {};
-
-var $;
-
-if (window.document) {
-	$ = require('./zepto.js');
-}
+let $ = require('jquery');
 
 var Utils = {};	
 

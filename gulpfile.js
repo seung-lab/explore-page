@@ -17,7 +17,8 @@ var argv = require('yargs').argv,
 	source = require('vinyl-source-stream'),
 	buffer = require('vinyl-buffer'),
 	gutil = require('gulp-util'),
-	babelify = require('babelify');
+	babelify = require('babelify'),
+	browserify_shim = require('browserify-shim');
 
 var fs = require('fs');
 var del = require('del');
@@ -93,7 +94,7 @@ gulp.task('js', [ 'jsx' ], function () {
 		entries: 'clientjs/main.js',
 		//debug: true,
 		// defining transforms here will avoid crashing your stream
-		transform: [ babelify ],
+		transform: [ babelify, browserify_shim ],
 	});
 
 	return b.bundle()

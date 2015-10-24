@@ -1,4 +1,6 @@
 var React = require('react/addons'),
+	$ = require('jquery'),
+	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
  	Easing = require('../clientjs/easing.js');
 
 module.exports = React.createClass({
@@ -16,6 +18,10 @@ module.exports = React.createClass({
 	},
 	gotoExplore: function () {
 		$('#registration').hide();
+
+		ModuleCoordinator.initialize();
+		ModuleCoordinator.seek(0);
+		ModuleCoordinator.render();
 
 		$('#viewport').scrollTo('#explore', {
 			msec: 2500,

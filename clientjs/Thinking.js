@@ -46,7 +46,7 @@
  */
 
  var Utils = require('./Utils.js');
- var $ = require('./zepto.js');
+ var $ = require('jquery');
 
 /* thinking
  *

@@ -1,4 +1,4 @@
-var $ = require('./zepto.js');
+var $ = require('jquery');
 
 /* scrollTo
  *

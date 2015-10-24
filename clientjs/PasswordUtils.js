@@ -1,6 +1,6 @@
 "use strict";
 
-var $ = require('./zepto.js');
+var $ = require('jquery');
 
 var PasswordUtils = {};
 
