@@ -663,12 +663,21 @@ input[type=password] {
   background-color: #fafaf0;
   border-top: 1px solid #3b556a;
   width: 100%;
+  cursor: pointer;
+  -webkit-transition: border-top 500ms ease-in-out;
+          transition: border-top 500ms ease-in-out;
 }
 .timeline .progress {
   background-color: #3b556a;
   height: 100%;
-  -webkit-transition: width 500ms ease-in-out;
-          transition: width 500ms ease-in-out;
+  -webkit-transition: width 500ms ease-in-out, background-color 500ms ease-in-out;
+          transition: width 500ms ease-in-out, background-color 500ms ease-in-out;
+}
+.timeline:hover {
+  border-top-color: #c85a5a;
+}
+.timeline:hover .progress {
+  background-color: #c85a5a;
 }
 .bg-light {
   background-color: #fafaf0;

@@ -17,11 +17,21 @@ $timeline_height = 25px
 	border-top 1px solid $FILL_BLUE
 	width 100%
 	
+	cursor pointer
+	
+	transition border-top 500ms ease-in-out
+
 .timeline .progress
 	background-color $FILL_BLUE
 	height 100%
-	transition width 500ms ease-in-out
+	transition width 500ms ease-in-out, background-color 500ms ease-in-out
 	
+.timeline:hover 
+	border-top-color $ACCENT_RED
+
+.timeline:hover .progress
+	background-color $ACCENT_RED
+
 .bg-light 
 	background-color $FILL_WHITE
 

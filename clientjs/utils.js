@@ -991,4 +991,8 @@ Utils.guid = function () {
 	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 };
 
+Utils.ui = require('./utils.ui.js');
+
 module.exports = Utils;
+
+

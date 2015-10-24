@@ -74,12 +74,15 @@ class Amazing {
 	}
 
 	slideAt (t) {
-		let N = this.slides.length - 1;
+		let N = this.slides.length;
 
 		let index = Math.floor(t * N);
 
-		let slide = this.slides[index];
+		index = t < 1 
+			? index 
+			: index - 1;
 
+		let slide = this.slides[index]
 		slide.index = index;
 
 		return slide;

@@ -28,6 +28,7 @@ ModuleCoordinator.initialize = function () {
 	]);
 
 	ModuleCoordinator.timeline = new Timeline({
+		parent: ModuleCoordinator,
 		anchor: anchor,
 	});
 
@@ -136,8 +137,3 @@ function computeNormalization (modules) {
 }
 
 module.exports = ModuleCoordinator;
-
-var window;
-if (window) {
-	window.ModuleCoordinator = ModuleCoordinator;
-}

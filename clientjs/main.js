@@ -12,3 +12,8 @@ $(document).ready(function () {
 	Login.bindReact();
 	_intakectrl.playIntro();
 });
+
+
+// Globals
+
+window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');

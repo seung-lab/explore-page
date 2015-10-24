@@ -4,21 +4,34 @@ let utils = require('../clientjs/utils.js'),
 class Timeline {
 	constructor (args = {}) {
 		this.t = args.t || 0;
+		this.parent = args.parent;
 		this.view = this.generateView();
 		this.anchor = args.anchor;
 		this.visible = false;
 	}
 
 	generateView () {
+		let _this = this;
 		let container = $('<div>').addClass('timeline');
 
 		let progress = $('<div>').addClass('progress');
 		let module = container.append(progress);
 
+		container.on('click', function (evt) {
+			_this.onClick(this, evt);
+		});
+
 		return {
 			module: module,
 			progress: progress,
 		};
+	}
+
+	onClick (elem, evt) {
+		let coords = utils.ui.eventOffset(elem, evt);
+		let fract = coords.x / this.view.module.width();
+
+		this.parent.seek(fract);
 	}
 
 	exit () {
