@@ -62,6 +62,88 @@ module.exports.springFactory = function (zeta, k, pixels, dynamics) {
 	};
 };
 
+module.exports.bounceFactory = function (gravity, elasticity, threshold) {
+	threshold = 0.001;
+
+	function energy_to_height (energy) {
+		return energy / gravity; // assume mass = 1 
+	}
+
+	function height_to_energy (height) {
+		return gravity * height; // assume mass = 1
+	}
+
+	function bounce_time (height) {
+		return 2 * Math.sqrt(2 * height / gravity);
+	}
+
+	function velocity (energy) {
+		return Math.sqrt(2 * energy); // assume mass = 1
+	}
+
+	var height = 1;
+	var potential = height_to_energy(height);
+
+	var bounces = Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
+
+	var critical_points = [{
+		time: - bounce_time(height) / 2,
+		energy: potential,
+	}, 
+	{
+		time: bounce_time(height) / 2,
+		energy: potential * elasticity,
+	}];
+
+	potential *= elasticity;
+	height = energy_to_height(potential);
+
+	var time = critical_points[1].time;
+	for (var i = 1; i < bounces; i++) {
+		time += bounce_time(height);
+		potential *= elasticity;
+
+		critical_points.push({
+			time: time,
+			energy: potential,
+		});
+
+		height = energy_to_height(potential);
+	}
+
+	var duration = time;
+
+	return function (t) {
+		t = Utils.clamp(t, 0, 1);
+
+		var tadj = t * duration;
+
+		if (tadj === 0) {
+			return 0;
+		}
+		else if (tadj >= duration) {
+			return 1;
+		}
+
+		var index;
+		for (index = 0; index < critical_points.length; index++) {
+			if (critical_points[index].time > tadj) {
+				break;
+			}
+		}
+
+		var minpt = critical_points[index - 1];
+
+		tadj -= minpt.time;
+
+		var v0 = velocity(minpt.energy);
+
+		var pos = v0 * tadj + 0.5 * -gravity * tadj * tadj;
+
+		return 1 - pos;
+	};
+};
+
 // Computed as follows:
 //
 // Y = ax^3 + bx^2 + cx + d 
@@ -85,3 +167,5 @@ module.exports.easeInOut = function (t) {
 
 	return t * (t * ((a * t) + b) + c);
 };
+
+module.exports.linear = function (t) { return t };

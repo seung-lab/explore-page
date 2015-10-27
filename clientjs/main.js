@@ -17,3 +17,5 @@ $(document).ready(function () {
 // Globals
 
 window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
+window.Easing = require('./easing.js');
+window.$ = $;
