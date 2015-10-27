@@ -73,8 +73,8 @@ module.exports.bounceFactory = function (gravity, elasticity, threshold) {
 		return gravity * height; // assume mass = 1
 	}
 
-	function half_bounce_time (height) {
-		return Math.sqrt(2 * height / gravity);
+	function bounce_time (height) {
+		return 2 * Math.sqrt(2 * height / gravity);
 	}
 
 	function velocity (energy) {
@@ -86,39 +86,32 @@ module.exports.bounceFactory = function (gravity, elasticity, threshold) {
 
 	var bounces = Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
 
-	console.log("Bounces: " + bounces)
-
 	var critical_points = [{
-		height: height,
-		time: 0,
+		time: - bounce_time(height) / 2,
 		energy: potential,
+	}, 
+	{
+		time: bounce_time(height) / 2,
+		energy: potential * elasticity,
 	}];
 
-	var time = 0;
-	for (var i = 0; i < bounces; i++) {
-		time += half_bounce_time(height);
-		critical_points.push({
-			height: 0,
-			time: time,
-			energy: potential,
-		});
+	potential *= elasticity;
+	height = energy_to_height(potential);
 
+	var time = critical_points[1].time;
+	for (var i = 1; i < bounces; i++) {
+		time += bounce_time(height);
 		potential *= elasticity;
-		height = energy_to_height(potential);
 
-		time += half_bounce_time(height);
 		critical_points.push({
-			height: height,
 			time: time,
 			energy: potential,
 		});
+
+		height = energy_to_height(potential);
 	}
 
-	critical_points.pop(); // remove last jump, b/c guarenteed to be over threshold
-
 	var duration = time;
-
-	console.log(critical_points, duration);
 
 	return function (t) {
 		t = Utils.clamp(t, 0, 1);
@@ -126,32 +119,26 @@ module.exports.bounceFactory = function (gravity, elasticity, threshold) {
 		var tadj = t * duration;
 
 		if (tadj === 0) {
-			return 1;
-		}
-		else if (tadj >= duration) {
 			return 0;
 		}
+		else if (tadj >= duration) {
+			return 1;
+		}
 
-		var greater = 0;
-		for (var index = 0; index < critical_points.length; index++) {
-			greater = index;
+		var index;
+		for (index = 0; index < critical_points.length; index++) {
 			if (critical_points[index].time > tadj) {
 				break;
 			}
 		}
 
-		var minpt = critical_points[greater - 1],
-			maxpt = critical_points[greater];
+		var minpt = critical_points[index - 1];
 
 		tadj -= minpt.time;
 
-		var v0 = maxpt.height > minpt.height
-			? velocity(minpt.energy)
-			: 0;
+		var v0 = velocity(minpt.energy);
 
-		var pos = minpt.height + v0 * tadj + 0.5 * -gravity * tadj * tadj;
-
-		console.log(t, t*duration, tadj, minpt.time, minpt.height, minpt.energy, v0, pos);
+		var pos = v0 * tadj + 0.5 * -gravity * tadj * tadj;
 
 		return 1 - pos;
 	};

@@ -50,8 +50,8 @@ Login.IntakeView = function () {
 			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
 			
 			$('#viewport').scrollTo('.gateway', {
-				msec: 27500,
-				easing: Easing.bounceFactory(.05, 0.85),//Easing.springFactory(.7, 1),
+				msec: 2500,
+				easing: Easing.springFactory(.7, 1),
 			})
 			.done(function () {
 				Login.component('header').setProps({ visible: true });
