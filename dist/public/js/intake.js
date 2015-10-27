@@ -340,10 +340,10 @@ ModuleCoordinator.moduleAt = function (t) {
 	throw new Error('Something got out of sync. t = ' + t + ', tau = ' + tau + ', modules: ' + modules.length);
 };
 
-ModuleCoordinator.sub_t_update = function (module, sub_t) {
+ModuleCoordinator.sub_t_update = function (module_name, sub_t) {
 	var current = ModuleCoordinator.currentModule();
 
-	if (module == current) {
+	if (module_name == current.name) {
 		_t = (current.begin + sub_t * current.duration) / ModuleCoordinator.normalization;
 	}
 
@@ -460,6 +460,98 @@ module.exports.springFactory = function (zeta, k, pixels, dynamics) {
 	return function (t) {
 		t = Utils.clamp(t, 0, 1);
 		return 1 - decayfn(t) * Math.cos(Math.sqrt(1 - zeta * zeta) * omega * t);
+	};
+};
+
+module.exports.bounceFactory = function (gravity, elasticity, threshold) {
+	threshold = 0.001;
+
+	function energy_to_height(energy) {
+		return energy / gravity; // assume mass = 1
+	}
+
+	function height_to_energy(height) {
+		return gravity * height; // assume mass = 1
+	}
+
+	function half_bounce_time(height) {
+		return Math.sqrt(2 * height / gravity);
+	}
+
+	function velocity(energy) {
+		return Math.sqrt(2 * energy); // assume mass = 1
+	}
+
+	var height = 1;
+	var potential = height_to_energy(height);
+
+	var bounces = Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
+
+	console.log("Bounces: " + bounces);
+
+	var critical_points = [{
+		height: height,
+		time: 0,
+		energy: potential
+	}];
+
+	var time = 0;
+	for (var i = 0; i < bounces; i++) {
+		time += half_bounce_time(height);
+		critical_points.push({
+			height: 0,
+			time: time,
+			energy: potential
+		});
+
+		potential *= elasticity;
+		height = energy_to_height(potential);
+
+		time += half_bounce_time(height);
+		critical_points.push({
+			height: height,
+			time: time,
+			energy: potential
+		});
+	}
+
+	critical_points.pop(); // remove last jump, b/c guarenteed to be over threshold
+
+	var duration = time;
+
+	console.log(critical_points, duration);
+
+	return function (t) {
+		t = Utils.clamp(t, 0, 1);
+
+		var tadj = t * duration;
+
+		if (tadj === 0) {
+			return 1;
+		} else if (tadj >= duration) {
+			return 0;
+		}
+
+		var greater = 0;
+		for (var index = 0; index < critical_points.length; index++) {
+			greater = index;
+			if (critical_points[index].time > tadj) {
+				break;
+			}
+		}
+
+		var minpt = critical_points[greater - 1],
+		    maxpt = critical_points[greater];
+
+		tadj -= minpt.time;
+
+		var v0 = maxpt.height > minpt.height ? velocity(minpt.energy) : 0;
+
+		var pos = minpt.height + v0 * tadj + 0.5 * -gravity * tadj * tadj;
+
+		console.log(t, t * duration, tadj, minpt.time, minpt.height, minpt.energy, v0, pos);
+
+		return 1 - pos;
 	};
 };
 
@@ -801,9 +893,9 @@ Login.IntakeView = function () {
 			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
 
 			$('#viewport').scrollTo('.gateway', {
-				msec: 2500,
-				easing: Easing.springFactory(.7, 1)
-			}).done(function () {
+				msec: 27500,
+				easing: Easing.bounceFactory(.05, 0.85) }). //Easing.springFactory(.7, 1),
+			done(function () {
 				Login.component('header').setProps({ visible: true });
 			});
 		}, 2500);
@@ -1984,8 +2076,9 @@ $(document).ready(function () {
 // Globals
 
 window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
+window.easing = require('./easing.js');
 
-},{"./controllers/ModuleCoordinator.js":2,"./jquery-animation.js":4,"./jquery-extra.js":5,"./login.js":6,"jquery":17}],8:[function(require,module,exports){
+},{"./controllers/ModuleCoordinator.js":2,"./easing.js":3,"./jquery-animation.js":4,"./jquery-extra.js":5,"./login.js":6,"jquery":17}],8:[function(require,module,exports){
 "use strict";
 
 /*
@@ -3582,19 +3675,35 @@ var Amazing = (function () {
 		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
 
+		this.mobile = true;
+
 		this.visible = false;
 
+		var path = function path(name) {
+			return "/animations/amazing/" + name;
+		};
+
 		this.slides = [{
-			text: "Your brain makes you amazing!"
+			video: "",
+			text: "Your brain makes you amazing!",
+			gif: path("brain.gif")
 		}, {
-			supertext: "It allows you to:",
-			text: "Learn intricate skills"
+			supertext: "it allows you to:",
+			text: "Learn intricate skills",
+			video: "",
+			gif: path("apple.gif")
 		}, {
-			text: "Dream fantastic dreams"
+			text: "Dream fantastic dreams",
+			video: "",
+			gif: path("narhawk.gif")
 		}, {
-			text: "Even laugh at goofy cat videos"
+			text: "Even laugh at goofy cat videos",
+			video: "",
+			gif: path("cat.gif")
 		}, {
-			text: "But how?"
+			text: "But how?",
+			video: "",
+			gif: ""
 		}];
 
 		this.anchor = args.anchor;
@@ -3604,12 +3713,24 @@ var Amazing = (function () {
 	_createClass(Amazing, [{
 		key: 'generateView',
 		value: function generateView() {
+			var _this = this;
+
+			var slide_one = this.slideAt(0);
+
 			var bg = $('<div>').addClass('amazing bg-light module');
 
-			var video = $('<video>').attr({
-				src: "/animations/out.mp4",
-				controls: true
-			});
+			var video = undefined;
+
+			if (this.mobile) {
+				video = $('<img>').attr({
+					src: slide_one.gif
+				});
+			} else {
+				video = $('<video>').attr({
+					src: slide_one.video,
+					controls: true
+				});
+			}
 
 			var d = function d(classes) {
 				return $('<div>').addClass(classes);
@@ -3620,11 +3741,13 @@ var Amazing = (function () {
 			var text = d('text');
 			var counter = d('counter');
 
-			var next = d('next').ion();
+			var next = d('next').ion('click', function () {
+				_this.next();
+			});
 
-			textcontainer.append(text, counter);
+			textcontainer.append(supertext, text, counter);
 
-			bg.append(video, supertext, textcontainer, next);
+			bg.append(video, textcontainer, next);
 
 			return {
 				module: bg,
@@ -3637,13 +3760,34 @@ var Amazing = (function () {
 			};
 		}
 	}, {
+		key: 'storyPoints',
+		value: function storyPoints() {
+			var counter = -1,
+			    N = this.slides.length - 1;
+
+			return this.slides.map(function () {
+				counter++;
+				return counter / N;
+			});
+		}
+	}, {
+		key: 'next',
+		value: function next() {
+			var N = this.slides.length - 1;
+			var index = Math.floor(this.t * N);
+
+			if (index < N) {
+				index += 1;
+			}
+
+			this.seek(index / N);
+		}
+	}, {
 		key: 'slideAt',
 		value: function slideAt(t) {
-			var N = this.slides.length;
+			var N = this.slides.length - 1;
 
 			var index = Math.floor(t * N);
-
-			index = t < 1 ? index : index - 1;
 
 			var slide = this.slides[index];
 			slide.index = index;
@@ -3690,19 +3834,35 @@ var Amazing = (function () {
 	}, {
 		key: 'render',
 		value: function render(t_prev, t) {
+			var _this = this;
+
 			var slide = this.slideAt(t);
+
+			var splitter = function splitter(txt) {
+				var tokens = txt.split(" ");
+				var html = "";
+				for (var i = 0; i < tokens.length; i++) {
+					html += tokens[i] + " ";
+
+					if (i % 3 === 2) {
+						html += "<br>";
+					}
+				}
+
+				return html;
+			};
 
 			if (!slide.supertext) {
 				this.view.supertext.hide();
-				this.view.textcontainer.addClass('ellipses');
+				this.view.textcontainer.removeClass('visible-supertext');
 			} else {
 				this.view.supertext.text(slide.supertext).show();
-				this.view.textcontainer.removeClass('ellipses');
+				this.view.textcontainer.addClass('visible-supertext');
 			}
 
-			this.view.text.text(slide.text);
+			this.view.video.attr('src', slide.gif);
 
-			// this.view.video.attr('src', wow)
+			this.view.text.html(splitter(slide.text));
 
 			this.view.counter.text(slide.index + 1 + '/' + this.slides.length);
 		}
@@ -3880,6 +4040,12 @@ var Timeline = (function () {
 		value: function onClick(elem, evt) {
 			var coords = utils.ui.eventOffset(elem, evt);
 			var fract = coords.x / this.view.module.width();
+
+			if (fract < 0.01) {
+				fract = 0;
+			} else if (fract > 0.99) {
+				fract = 1;
+			}
 
 			this.parent.seek(fract);
 		}

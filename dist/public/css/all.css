@@ -584,24 +584,39 @@ input[type=password] {
       -ms-flex-pack: center;
           justify-content: center;
 }
+.amazing .animation {
+  height: 100%;
+  z-index: 0;
+}
 .amazing .story-text {
   text-transform: uppercase;
   color: #3b556a;
   font-size: 30px;
   font-weight: 600;
-  word-spacing: 5px;
-  letter-spacing: 0.5px;
+  word-spacing: 0px;
+  letter-spacing: 2px;
   text-align: center;
-  width: 315px;
+  width: 400px;
   position: absolute;
-  bottom: 15%;
+  bottom: 20%;
+  z-index: 1;
   position: absolute;
-  left: calc(50% - 315px / 2 + 0px);
+  left: calc(50% - 400px / 2 + 0px);
 }
 .super-text {
   font-family: 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
   font-weight: 400;
   color: #3b556a;
+  position: absolute;
+  top: -32px;
+  font-style: italic;
+  text-transform: lowercase;
+  letter-spacing: 0px;
+  font-size: 23px;
+  width: 100%;
+  position: absolute;
+  left: calc(50% - 100% / 2 + 0px);
+  z-index: 1;
 }
 .story-text:after,
 .story-text:before {
@@ -610,12 +625,13 @@ input[type=password] {
   width: 100%;
   font-size: 10px;
   left: 0px;
+  z-index: 1;
+}
+.story-text.visible-supertext:before {
+  content: "";
 }
 .story-text:before {
   top: -15px;
-}
-.story-text:after {
-  top: 70px;
 }
 .counter {
   display: -webkit-box;
@@ -636,13 +652,14 @@ input[type=password] {
   box-sizing: border-box;
   padding-left: 5px;
   width: 50px;
-  height: 10px;
+  height: 13px;
   font-size: 6px;
   letter-spacing: 5px;
   position: absolute;
   bottom: -30px;
   position: absolute;
   left: calc(50% - 50px / 2 + 0px);
+  z-index: 1;
 }
 .amazing .next {
   width: 0px;
@@ -651,7 +668,9 @@ input[type=password] {
   border-top: 7px solid #3b556a;
   position: absolute;
   left: calc(50% - 0px / 2 + -7px);
-  bottom: 15px;
+  bottom: 6%;
+  cursor: pointer;
+  z-index: 1;
 }
 #explore {
   top: 225%;
@@ -659,6 +678,7 @@ input[type=password] {
 .timeline {
   position: absolute;
   bottom: 0px;
+  min-width: 1%;
   height: 25px;
   background-color: #fafaf0;
   border-top: 1px solid #3b556a;

@@ -77,10 +77,10 @@ ModuleCoordinator.moduleAt = function (t) {
 	throw new Error(`Something got out of sync. t = ${t}, tau = ${tau}, modules: ${modules.length}`);
 };
 
-ModuleCoordinator.sub_t_update = function (module, sub_t) {
+ModuleCoordinator.sub_t_update = function (module_name, sub_t) {
 	var current = ModuleCoordinator.currentModule();
 
-	if (module == current) {
+	if (module_name == current.name) {
 		_t = (current.begin + (sub_t * current.duration)) / ModuleCoordinator.normalization; 
 	}
 

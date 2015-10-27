@@ -9,24 +9,40 @@ class Amazing {
 		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
 
+		this.mobile = true;
+
 		this.visible = false;
+
+		let path = function (name) {
+			return "/animations/amazing/" + name;
+		};
 
 		this.slides = [
 			{
+				video: "",
 				text: "Your brain makes you amazing!",
+				gif: path("brain.gif"),
 			},
 			{
-				supertext: "It allows you to:",
+				supertext: "it allows you to:",
 				text: "Learn intricate skills",
+				video: "",
+				gif: path("apple.gif"),
 			},
 			{
 				text: "Dream fantastic dreams",
+				video: "",
+				gif: path("narhawk.gif"),
 			},
 			{
 				text: "Even laugh at goofy cat videos",
+				video: "",
+				gif: path("cat.gif"),
 			},
 			{
 				text: "But how?",
+				video: "",
+				gif: "",
 			},
 		];
 
@@ -35,12 +51,25 @@ class Amazing {
 	}
 
 	generateView () {
+		let _this = this;
+
+		let slide_one = this.slideAt(0);
+
 		let bg = $('<div>').addClass('amazing bg-light module');
 
-		let video = $('<video>').attr({
-			src: "/animations/out.mp4",
-			controls: true,
-		});
+		let video;
+
+		if (this.mobile) {
+			video = $('<img>').attr({
+				src: slide_one.gif,
+			});
+		}
+		else {
+			video = $('<video>').attr({
+				src: slide_one.video,
+				controls: true,
+			});
+		}
 
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
@@ -51,13 +80,14 @@ class Amazing {
 		let text = d('text');
 		let counter = d('counter');
 
-		let next = d('next').ion();
+		let next = d('next').ion('click', function () {
+			_this.next();
+		});
 
-		textcontainer.append(text, counter);
+		textcontainer.append(supertext, text, counter);
 
 		bg.append(
 			video,
-			supertext,
 			textcontainer,
 			next
 		);
@@ -73,14 +103,31 @@ class Amazing {
 		};
 	}
 
+	storyPoints () {
+		let counter = -1,
+			N = this.slides.length - 1;
+
+		return this.slides.map(function () {
+			counter++;
+			return counter / N;
+		});
+	}
+
+	next () {
+		let N = this.slides.length - 1;
+		let index = Math.floor(this.t * N);
+
+		if (index < N) {
+			index += 1;
+		}
+
+		this.seek(index / N);
+	}
+
 	slideAt (t) {
-		let N = this.slides.length;
+		let N = this.slides.length - 1;
 
 		let index = Math.floor(t * N);
-
-		index = t < 1 
-			? index 
-			: index - 1;
 
 		let slide = this.slides[index]
 		slide.index = index;
@@ -112,6 +159,8 @@ class Amazing {
 
 		this.visible = true;
 
+		
+
 		return $.Deferred().resolve();
 	}
 
@@ -123,20 +172,38 @@ class Amazing {
 	}
 
 	render (t_prev, t) {
+		let _this = this; 
+
 		let slide = this.slideAt(t);
+
+		let splitter = function (txt) {
+			let tokens = txt.split(" ");
+			let html = "";
+			for (let i = 0; i < tokens.length; i++) {
+				html += tokens[i] + " ";
+
+				if (i % 3 === 2) {
+					html += "<br>";
+				}
+			}
+
+			return html;
+		};
 
 		if (!slide.supertext) {
 			this.view.supertext.hide();
-			this.view.textcontainer.addClass('ellipses');
+			this.view.textcontainer.removeClass('visible-supertext');
 		}
 		else {
 			this.view.supertext.text(slide.supertext).show();
-			this.view.textcontainer.removeClass('ellipses');
+			this.view.textcontainer.addClass('visible-supertext');
 		}
 
-		this.view.text.text(slide.text);
+		this.view.video.attr('src', slide.gif);
 
-		// this.view.video.attr('src', wow)
+		this.view.text.html(
+			splitter(slide.text)
+		);
 
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 	}

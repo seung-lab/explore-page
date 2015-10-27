@@ -31,6 +31,13 @@ class Timeline {
 		let coords = utils.ui.eventOffset(elem, evt);
 		let fract = coords.x / this.view.module.width();
 
+		if (fract < 0.01) {
+			fract = 0;
+		}
+		else if (fract > 0.99) {
+			fract = 1;
+		}
+
 		this.parent.seek(fract);
 	}
 
