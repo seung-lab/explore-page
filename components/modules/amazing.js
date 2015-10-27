@@ -1,5 +1,6 @@
 let $ = require('jquery'),
-	utils = require('../../clientjs/utils.js');
+	utils = require('../../clientjs/utils.js'),
+	Easing = require('../../clientjs/easing.js');
 	
 class Amazing {
 	constructor(args = {}) {
@@ -111,6 +112,12 @@ class Amazing {
 		this.view.module.show();
 
 		this.visible = true;
+
+		this.view.next.drop({
+			msec: 3000,
+			easing: Easing.bounceFactory(0.05, 0.5),
+			displacement: 1,
+		});
 
 		return $.Deferred().resolve();
 	}

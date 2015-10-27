@@ -567,10 +567,15 @@ module.exports.easeInOut = function (t) {
 	return t * (t * (a * t + b) + c);
 };
 
+module.exports.linear = function (t) {
+	return t;
+};
+
 },{"./utils.js":8}],4:[function(require,module,exports){
 'use strict';
 
-var $ = require('jquery');
+var $ = require('jquery'),
+    Easing = require('./easing.js');
 
 /* scrollTo
  *
@@ -651,7 +656,58 @@ $.fn.scrollTo = function (target, options) {
   return deferred;
 };
 
-},{"jquery":17}],5:[function(require,module,exports){
+$.fn.drop = function (args) {
+  args = args || {};
+
+  var _this = $(this);
+
+  var msec = args.msec,
+      easing = args.easing || Easing.linear,
+      displacement = args.displacement; // dimensionless fraction of displacement
+
+  var unit = _this.css('top').replace(/[\d\.]/g, '');
+  var start_pos = parseFloat(this.css('top').replace(unit, ''), 10);
+  var start_time = window.performance.now();
+
+  var displacementpx = _this.height() * displacement;
+
+  _this.css('top', 'calc(' + (start_pos + unit) + ' + ' + displacementpx + 'px)');
+
+  var req;
+
+  var deferred = $.Deferred().done(function () {
+    _this.css(start_pos + unit);
+  }).fail(function () {
+    if (req) {
+      cancelAnimationFrame(req);
+    }
+  });
+
+  var distance_traveled = 0;
+
+  function animate() {
+    var now = window.performance.now();
+    var t = (now - start_time) / msec;
+
+    if (t >= 1) {
+      deferred.resolve();
+      return;
+    }
+
+    var proportion = easing(t);
+
+    distance_traveled = proportion * displacement;
+    _this.css('top', 'calc(' + (start_pos + unit) + ' + ' + (displacementpx - distance_traveled) + 'px)');
+
+    req = requestAnimationFrame(animate);
+  }
+
+  req = requestAnimationFrame(animate);
+
+  return deferred;
+};
+
+},{"./easing.js":3,"jquery":17}],5:[function(require,module,exports){
 /* jquery.extra.js
  *
  * jQuery extensions that are kind of random and don't really
@@ -2064,9 +2120,8 @@ $(document).ready(function () {
 // Globals
 
 window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
-window.easing = require('./easing.js');
 
-},{"./controllers/ModuleCoordinator.js":2,"./easing.js":3,"./jquery-animation.js":4,"./jquery-extra.js":5,"./login.js":6,"jquery":17}],8:[function(require,module,exports){
+},{"./controllers/ModuleCoordinator.js":2,"./jquery-animation.js":4,"./jquery-extra.js":5,"./login.js":6,"jquery":17}],8:[function(require,module,exports){
 "use strict";
 
 /*
@@ -3649,7 +3704,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var $ = require('jquery'),
-    utils = require('../../clientjs/utils.js');
+    utils = require('../../clientjs/utils.js'),
+    Easing = require('../../clientjs/easing.js');
 
 var Amazing = (function () {
 	function Amazing() {
@@ -3758,6 +3814,12 @@ var Amazing = (function () {
 
 			this.visible = true;
 
+			this.view.next.drop({
+				msec: 3000,
+				easing: Easing.bounceFactory(0.05, 0.5),
+				displacement: 1
+			});
+
 			return $.Deferred().resolve();
 		}
 	}, {
@@ -3794,7 +3856,7 @@ var Amazing = (function () {
 
 module.exports = Amazing;
 
-},{"../../clientjs/utils.js":8,"jquery":17}],13:[function(require,module,exports){
+},{"../../clientjs/easing.js":3,"../../clientjs/utils.js":8,"jquery":17}],13:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons'),

@@ -167,3 +167,5 @@ module.exports.easeInOut = function (t) {
 
 	return t * (t * ((a * t) + b) + c);
 };
+
+module.exports.linear = function (t) { return t };

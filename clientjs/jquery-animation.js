@@ -1,4 +1,5 @@
-var $ = require('jquery');
+var $ = require('jquery'),
+	Easing = require('./easing.js');
 
 /* scrollTo
  *
@@ -83,3 +84,58 @@ var $ = require('jquery');
 
  	return deferred;
  };
+
+$.fn.drop = function (args) {
+	args = args || {};
+
+	var _this = $(this);
+
+	var msec = args.msec,
+		easing = args.easing || Easing.linear,
+		displacement = args.displacement; // dimensionless fraction of displacement
+ 	
+ 	var unit = _this.css('top').replace(/[\d\.]/g, '');
+ 	var start_pos = parseFloat(this.css('top').replace(unit, ''), 10); 
+ 	var start_time = window.performance.now();
+
+ 	var displacementpx = _this.height() * displacement;
+
+ 	_this.css('top', `calc(${start_pos + unit} + ${displacementpx}px)`);
+
+ 	var req;
+
+	var deferred = $.Deferred()
+ 		.done(function () {
+ 			_this.css(start_pos + unit);
+ 		})
+ 		.fail(function () {
+ 			if (req) {
+ 				cancelAnimationFrame(req);
+ 			}
+ 		});
+
+ 	var distance_traveled = 0;
+
+ 	function animate () {
+		var now = window.performance.now();
+ 		var t = (now - start_time) / msec;
+
+ 		if (t >= 1) {
+ 			deferred.resolve();
+ 			return;
+ 		}
+ 		
+ 		var proportion = easing(t);
+
+ 		distance_traveled = proportion * displacement;
+ 		_this.css('top', `calc(${start_pos + unit} + ${displacementpx - distance_traveled}px)`);
+
+ 		req = requestAnimationFrame(animate);
+ 	}
+
+ 	req = requestAnimationFrame(animate);
+
+ 	return deferred;
+};
+
+
