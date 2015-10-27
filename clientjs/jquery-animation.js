@@ -92,19 +92,14 @@ $.fn.drop = function (args) {
 
 	var msec = args.msec,
 		easing = args.easing || Easing.linear,
-		displacement = args.displacement, // dimensionless fraction of displacement
+		displacement = args.displacement || 0, // dimensionless fraction of displacement
 		side = args.side || 'top';
-
-	displacement.self = displacement.self || 0;
-	displacement.pixels = displacement.pixels || 0;
  	
  	var unit = _this.css(side).replace(/[\d\.]/g, '');
  	var start_pos = parseFloat(this.css(side).replace(unit, ''), 10); 
  	var start_time = window.performance.now();
 
- 	var displacementpx = _this.height() * displacement.self + displacement.pixels;
-
- 	_this.css(side, `calc(${start_pos + unit} + ${displacementpx}px)`);
+ 	_this.css(side, `calc(${start_pos + unit} + ${displacement}px)`);
 
  	var req;
 
@@ -131,8 +126,8 @@ $.fn.drop = function (args) {
  		
  		var proportion = easing(t);
 
- 		distance_traveled = proportion * displacementpx;
- 		_this.css(side, `calc(${start_pos + unit} + ${displacementpx - distance_traveled}px)`);
+ 		distance_traveled = proportion * displacement;
+ 		_this.css(side, `calc(${start_pos + unit} + ${displacement - distance_traveled}px)`);
 
  		req = requestAnimationFrame(animate);
  	}

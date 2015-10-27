@@ -62,19 +62,31 @@ module.exports.springFactory = function (zeta, k, pixels, dynamics) {
 	};
 };
 
-module.exports.bounceFactory = function (gravity, elasticity, threshold) {
-	threshold = 0.001;
+/* bounceFactory
+ *
+ * Simulate a physical bouncing motion.
+ *
+ * 
+ *
+ *
+ * Required:
+ *   
+ *
+ * Return: 
+ */
+module.exports.bounceFactory = function (elasticity, threshold) {
+	threshold = threshold || 0.001;
 
 	function energy_to_height (energy) {
-		return energy / gravity; // assume mass = 1 
+		return energy; // assume mass = 1 
 	}
 
 	function height_to_energy (height) {
-		return gravity * height; // assume mass = 1
+		return height; // assume mass = 1
 	}
 
 	function bounce_time (height) {
-		return 2 * Math.sqrt(2 * height / gravity);
+		return 2 * Math.sqrt(2 * height);
 	}
 
 	function velocity (energy) {
@@ -84,7 +96,9 @@ module.exports.bounceFactory = function (gravity, elasticity, threshold) {
 	var height = 1;
 	var potential = height_to_energy(height);
 
-	var bounces = Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
+	var bounces = elasticity === 1
+		? 100
+		: Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
 
 	var critical_points = [{
 		time: - bounce_time(height) / 2,
@@ -138,7 +152,7 @@ module.exports.bounceFactory = function (gravity, elasticity, threshold) {
 
 		var v0 = velocity(minpt.energy);
 
-		var pos = v0 * tadj + 0.5 * -gravity * tadj * tadj;
+		var pos = v0 * tadj + -0.5 * tadj * tadj;
 
 		return 1 - pos;
 	};

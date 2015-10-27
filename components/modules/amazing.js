@@ -160,17 +160,12 @@ class Amazing {
 
 		this.visible = true;
 
-		this.view.next.drop({
-			msec: 3000,
-			easing: Easing.bounceFactory(0.05, 0.5),
-			displacement: {
-				self: 1,
-				pixels: 20,
-			},
+		return this.view.next.drop({
+			msec: 5050,
+			easing: Easing.bounceFactory(0.5),
 			side: 'bottom',
+			displacement: 25,
 		});
-
-		return $.Deferred().resolve();
 	}
 
 	seek (t) {

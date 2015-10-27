@@ -5,14 +5,13 @@
 
 #explore 
 	top 225%
+	transform: translateZ(0);
 
 $timeline_height = 25px
 
 .timeline 
-	position absolute
+	position fixed
 	bottom 0px
-	
-	min-width 1%
 
 	height $timeline_height
 	background-color $FILL_WHITE
@@ -24,6 +23,8 @@ $timeline_height = 25px
 	transition border-top 500ms ease-in-out
 
 .timeline .progress
+	min-width 1%
+	
 	background-color $FILL_BLUE
 	height 100%
 	transition width 500ms ease-in-out, background-color 500ms ease-in-out

@@ -50,6 +50,10 @@ ModuleCoordinator.currentModule = function () {
 	return ModuleCoordinator.moduleAt(_t);
 };
 
+ModuleCoordinator.seekToNextModule = function () {
+	
+};
+
 ModuleCoordinator.moduleAt = function (t) {
 	let modules = ModuleCoordinator.modules;
 
