@@ -5,13 +5,34 @@
 
 #explore 
 	top 225%
-	transform: translateZ(0);
+	transform: translateZ(0); // required to allow the timeline to be fixed relative to it
+
+$next_border_width = 7px
+
+.next
+	width 0px
+	height @width
+	
+	border $next_border_width solid transparent
+	border-top $next_border_width solid $FILL_BLUE
+	
+	center-horizontal(dx=-1 * $next_border_width)
+	bottom 6%
+
+	cursor pointer
+	
+	z-index $amazing_z
+	
+.bg-dark .next
+	border-top $next_border_width solid $FILL_WHITE
 
 $timeline_height = 25px
 
 .timeline 
 	position fixed
 	bottom 0px
+	
+	z-index 1
 
 	height $timeline_height
 	background-color $FILL_WHITE

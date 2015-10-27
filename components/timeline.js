@@ -31,10 +31,10 @@ class Timeline {
 		let coords = utils.ui.eventOffset(elem, evt);
 		let fract = coords.x / this.view.module.width();
 
-		if (fract < 0.01) {
+		if (fract < 0.02) {
 			fract = 0;
 		}
-		else if (fract > 0.99) {
+		else if (fract > 0.98) {
 			fract = 1;
 		}
 
@@ -42,25 +42,22 @@ class Timeline {
 	}
 
 	exit () {
-		if (!this.visible) {
-			return;
-		}
-
 		this.view.module.detach();
 		this.view.module.hide();
+
+		this.visible = false;
+
 		return $.Deferred().resolve();
 	}
 
 	enter () {
-		if (this.visible) {
-			return $.Deferred().resolve();
-		}
-
 		this.view.module.detach();
 
 		this.anchor.append(this.view.module);
 
 		this.view.module.show();
+
+		this.visible = true;
 
 		return $.Deferred().resolve();
 	}

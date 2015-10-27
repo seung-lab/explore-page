@@ -21,12 +21,19 @@ module.exports = React.createClass({
 
 		ModuleCoordinator.initialize();
 		ModuleCoordinator.seek(0);
-		ModuleCoordinator.render();
 
-		$('#viewport').scrollTo('#explore', {
-			msec: 2500,
-			easing: Easing.springFactory(.9, 0),
-		});
+		$('#viewport')
+			.scrollTo('#explore', {
+				msec: 2000,
+				easing: Easing.springFactory(.9, 0),
+			})
+			.done(function () {
+				// This trick is done so that the timeline scrolls smoothly into view
+				// but is then fixed to the window rather than the module. The ol' switcharoo
+
+				ModuleCoordinator.timeline.anchor = $('body'); 
+				ModuleCoordinator.timeline.enter();
+			})
 	},
 	render: function () {
 		return (

@@ -8,7 +8,6 @@ let _t = 0;
 
 let ModuleCoordinator = {
 	modules: [],
-	normalization: 1,
 	timeline: null,
 };
 
@@ -20,6 +19,7 @@ ModuleCoordinator.initialize = function () {
 			parent: ModuleCoordinator,
 			anchor: anchor,
 			duration: duration,
+			mobile: true,
 		})
 	}
 
@@ -37,10 +37,12 @@ ModuleCoordinator.initialize = function () {
 
 ModuleCoordinator.setModules = function (modules) {
 	ModuleCoordinator.modules = modules || [];
-	ModuleCoordinator.normalization = computeNormalization(modules);
+	let normalization = computeNormalization(modules);
 
 	let begin = 0;
 	ModuleCoordinator.modules.forEach(function (module) {
+		module.duration /= normalization;
+
 		module.begin = begin;
 		begin += module.duration;
 	});
@@ -50,8 +52,26 @@ ModuleCoordinator.currentModule = function () {
 	return ModuleCoordinator.moduleAt(_t);
 };
 
-ModuleCoordinator.seekToNextModule = function () {
+ModuleCoordinator.moduleComplete = function () {
 	
+
+};
+
+ModuleCoordinator.nextModule = function () {
+	let current_module = ModuleCoordinator.currentModule();
+
+	let modules = ModuleCoordinator.modules;
+
+	let boundary = current_module.begin;
+		boundary += current_module.duration;
+
+	for (let i = 0; i < modules.length; i++) {
+		if (modules[i].begin > boundary) {
+			return modules[i];
+		}
+	}
+
+	return modules[0];
 };
 
 ModuleCoordinator.moduleAt = function (t) {
@@ -71,7 +91,7 @@ ModuleCoordinator.moduleAt = function (t) {
 
 		modules[i].duration = modules[i].duration || 1;
 
-		tau += modules[i].duration / ModuleCoordinator.normalization;
+		tau += modules[i].duration;
 	}
 
 	if (tau >= t) {
@@ -85,7 +105,7 @@ ModuleCoordinator.sub_t_update = function (module_name, sub_t) {
 	var current = ModuleCoordinator.currentModule();
 
 	if (module_name == current.name) {
-		_t = (current.begin + (sub_t * current.duration)) / ModuleCoordinator.normalization; 
+		_t = (current.begin + (sub_t * current.duration)); 
 	}
 
 	ModuleCoordinator.timeline.seek(_t);

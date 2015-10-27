@@ -2,10 +2,10 @@ let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js');
 	
-class Amazing {
+class Galileo {
 	constructor(args = {}) {
 		this.t = 0;
-		this.name = 'Amazing';
+		this.name = 'Galileo';
 		this.begin = null;
 		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
@@ -14,39 +14,6 @@ class Amazing {
 
 		this.visible = false;
 
-		let path = function (name) {
-			return "/animations/amazing/" + name;
-		};
-
-		this.slides = [
-			{
-				video: "",
-				text: "Your brain makes you amazing!",
-				gif: path("brain.gif"),
-			},
-			{
-				supertext: "it allows you to:",
-				text: "Learn intricate skills",
-				video: "",
-				gif: path("apple.gif"),
-			},
-			{
-				text: "Dream fantastic dreams",
-				video: "",
-				gif: path("narhawk.gif"),
-			},
-			{
-				text: "Even laugh at goofy cat videos",
-				video: "",
-				gif: path("cat.gif"),
-			},
-			{
-				text: "But how?",
-				video: "",
-				gif: path("cat.gif"),
-			},
-		];
-
 		this.anchor = args.anchor;
 		this.view = this.generateView();
 	}
@@ -54,52 +21,16 @@ class Amazing {
 	generateView () {
 		let _this = this;
 
-		let slide_one = this.slideAt(0);
-
-		let bg = $('<div>').addClass('amazing bg-light module');
-
-		let video;
-
-		if (this.mobile) {
-			video = $('<img>').attr({
-				src: slide_one.gif,
-			});
-		}
-		else {
-			video = $('<video>').attr({
-				src: slide_one.video,
-				controls: true,
-			});
-		}
-
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
 		};
-
-		let supertext = d('super-text');
-		let textcontainer = d('story-text');
-		let text = d('text');
-		let counter = d('counter');
 
 		let next = d('next').ion('click', function () {
 			_this.next();
 		});
 
-		textcontainer.append(supertext, text, counter);
-
-		bg.append(
-			video,
-			textcontainer,
-			next
-		);
-
 		return {
 			module: bg,
-			video: video,
-			textcontainer: textcontainer,
-			text: text,
-			supertext: supertext,
-			counter: counter,
 			next: next,
 		};
 	}
@@ -115,12 +46,6 @@ class Amazing {
 	}
 
 	next () {
-		if (this.t === 1) {
-			this.parent.moduleComplete();
-			return;
-		}
-
-
 		let N = this.slides.length - 1;
 		let index = Math.floor(this.t * N);
 
@@ -221,7 +146,7 @@ class Amazing {
 }
 
 
-module.exports = Amazing;
+module.exports = Galileo;
 
 
 
