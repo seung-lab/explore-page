@@ -33,6 +33,31 @@ ModuleCoordinator.initialize = function () {
 	});
 
 	ModuleCoordinator.timeline.enter();
+
+	ModuleCoordinator.initHotkeys();
+};
+
+
+ModuleCoordinator.initHotkeys = function () {
+	$(document).ion('keyup', function (evt) {
+		let key = evt.keyCode;
+		if (key === 39 || key === 40) { // right or down key
+			ModuleCoordinator.next();
+		}
+		else if (key === 37 || key == 38) { // left or up key
+			ModuleCoordinator.previous();
+		}
+	});
+};
+
+ModuleCoordinator.previous = function () {
+	let mod = ModuleCoordinator.currentModule();
+	return mod.previous();	
+};
+
+ModuleCoordinator.next = function () {
+	let mod = ModuleCoordinator.currentModule();
+	return mod.next();
 };
 
 ModuleCoordinator.setModules = function (modules) {

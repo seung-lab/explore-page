@@ -131,6 +131,22 @@ class Amazing {
 		this.seek(index / N);
 	}
 
+	previous () {
+		if (this.t === 0) {
+			this.parent.moduleUncomplete();
+			return;
+		}
+
+		let N = this.slides.length - 1;
+		let index = Math.floor(this.t * N);
+
+		if (index > 0) {
+			index -= 1;
+		}
+
+		this.seek(index / N);
+	}
+
 	slideAt (t) {
 		let N = this.slides.length - 1;
 

@@ -25,12 +25,15 @@ class Galileo {
 			return $('<div>').addClass(classes);
 		};
 
+		let bg = d('amazing bg-dark module');
+
 		let next = d('next').ion('click', function () {
 			_this.next();
 		});
 
 		return {
 			module: bg,
+			transition: d('transition'),
 			next: next,
 		};
 	}
