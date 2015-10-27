@@ -43,7 +43,7 @@ class Amazing {
 			{
 				text: "But how?",
 				video: "",
-				gif: "",
+				gif: path("cat.gif"),
 			},
 		];
 
