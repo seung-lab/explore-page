@@ -125,54 +125,20 @@ ModuleCoordinator.moduleComplete = function () {
 	let currentmod = ModuleCoordinator.currentModule();
 	let nextmod = ModuleCoordinator.nextModule();
 
-	if (currentmod === nextmod) {
-		return;
-	}
-
-	let MC = ModuleCoordinator;
-
-	MC.transition.reject();
-
-	MC.transition = nextmod.enter();
-
-	let spacer = $("<div>").addClass('spacer');
-
-	MC.transition.done(function () {
-		MC.container.append(spacer);
-
-		MC.updateTimeline(nextmod.begin);
-
-		_t = nextmod.begin;
-
-		MC.transition.reject();
-
-		MC.transition = MC.container.scrollTo(nextmod.view.module, {
-			msec: 1500,
-			easing: Easing.springFactory(.9, 0),
-		})
-		.done(function () {
-			if (nextmod.begin === _t) {
-				MC.seek(nextmod.begin);
-			}
-
-			currentmod.exit();
-		})
-		.fail(function () {
-			MC.transition.done(function () {
-				nextmod.exit();
-			})
-		})
-		.always(function () {
-			spacer.remove();
-		})
-	})
+	simpleTransition(currentmod, nextmod, nextmod.begin);
 };
 
 ModuleCoordinator.moduleUncomplete = function () {
 	let currentmod = ModuleCoordinator.currentModule();
 	let prevmod = ModuleCoordinator.previousModule();
 
-	if (currentmod === prevmod) {
+	let t = prevmod.begin + prevmod.last() * prevmod.duration;
+
+	simpleTransition(currentmod, prevmod, t);
+};
+
+function simpleTransition (cur, next, t) {
+	if (cur === next) {
 		return;
 	}
 
@@ -180,41 +146,38 @@ ModuleCoordinator.moduleUncomplete = function () {
 
 	MC.transition.reject();
 
-	MC.transition = prevmod.enter();
+	MC.transition = next.enter({ from: cur.name });
 
 	let spacer = $("<div>").addClass('spacer');
 
 	MC.transition.done(function () {
 		MC.container.append(spacer);
 
-		let global_time = prevmod.begin + prevmod.last() * prevmod.duration;
+		MC.updateTimeline(t);
 
-		MC.updateTimeline(global_time);
-
-		_t = global_time;
+		_t = t;
 
 		MC.transition.reject();
 
-		MC.transition = MC.container.scrollTo(prevmod.view.module, {
+		MC.transition = MC.container.scrollTo(next.view.module, {
 			msec: 1500,
 			easing: Easing.springFactory(.9, 0),
 		})
 		.done(function () {
-			if (global_time === _t) {
-				MC.seek(global_time);
+			if (t === _t) {
+				MC.seek(t);
 			}
 
-			currentmod.exit();
+			cur.exit();
 		})
 		.fail(function () {
 			MC.transition.done(function () {
-				prevmod.exit();
+				next.exit();
 			})
 		})
 		.always(function () {
 			spacer.remove();
 		})
-
 	});
 };
 
