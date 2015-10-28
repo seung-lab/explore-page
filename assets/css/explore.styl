@@ -2,6 +2,7 @@
 @require 'controls.styl'
 @require 'colors.styl'
 @require 'amazing.styl'
+@require 'galileo.styl'
 
 #explore 
 	top 225%
@@ -41,15 +42,26 @@ $timeline_height = 25px
 	
 	cursor pointer
 	
-	transition border-top 500ms ease-in-out
+	transition border-top 500ms ease-in-out, background-color 500ms ease-in-out
+
+.timeline.dark
+	background-color $FILL_DARKER_BLUE
+	border-top 1px solid $FILL_LIGHTER_BLUE
 
 .timeline .progress
 	min-width 1%
 	
 	background-color $FILL_BLUE
 	height 100%
-	transition width 500ms ease-in-out, background-color 500ms ease-in-out
 	
+	transition width 500ms ease-in-out, background-color 500ms ease-in-out
+
+.timeline.light .progress
+	background-color $FILL_BLUE
+	
+.timeline.dark .progress
+	background-color $FILL_LIGHTER_BLUE
+
 .timeline:hover 
 	border-top-color $ACCENT_RED
 
@@ -60,10 +72,16 @@ $timeline_height = 25px
 	background-color $FILL_WHITE
 
 .bg-dark 
-	background-color $FILL_BLUE
+	background-color $FILL_DARKER_BLUE
 
 .module
 	position relative
 	width 100%
 	height s("calc(100% - %s)", $timeline_height)
+	
+.spacer 
+	width 100%
+	height $timeline_height
+	
+
 	

@@ -10,6 +10,8 @@ class Amazing {
 		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
 
+		this.allegience = 'light';
+
 		this.mobile = args.mobile;
 
 		this.visible = false;
@@ -106,7 +108,7 @@ class Amazing {
 
 	storyPoints () {
 		let counter = -1,
-			N = this.slides.length - 1;
+			N = this.slides.length;
 
 		return this.slides.map(function () {
 			counter++;
@@ -115,20 +117,17 @@ class Amazing {
 	}
 
 	next () {
-		if (this.t === 1) {
+		let N = this.slides.length;
+
+		if (this.last() - this.t < 0.0001) {
 			this.parent.moduleComplete();
 			return;
 		}
 
+		let slide = this.slideAt(this.t);
+		let index = utils.clamp(slide.index + 1, 0, this.slides.length - 1);
 
-		let N = this.slides.length - 1;
-		let index = Math.floor(this.t * N);
-
-		if (index < N) {
-			index += 1;
-		}
-
-		this.seek(index / N);
+		this.seek(index / this.slides.length);
 	}
 
 	previous () {
@@ -137,18 +136,19 @@ class Amazing {
 			return;
 		}
 
-		let N = this.slides.length - 1;
-		let index = Math.floor(this.t * N);
+		let slide = this.slideAt(this.t);
+		let index = utils.clamp(slide.index - 1, 0, this.slides.length - 1);
 
-		if (index > 0) {
-			index -= 1;
-		}
+		this.seek(index / this.slides.length);
+	}
 
-		this.seek(index / N);
+	last () {
+		let N = this.slides.length;
+		return (N - 1) / N;
 	}
 
 	slideAt (t) {
-		let N = this.slides.length - 1;
+		let N = this.slides.length;
 
 		let index = Math.floor(t * N);
 
@@ -177,17 +177,19 @@ class Amazing {
 		}
 
 		this.view.module.detach();
-		this.anchor.prepend(this.view.module);
+		this.anchor.append(this.view.module);
 		this.view.module.show();
 
 		this.visible = true;
 
-		return this.view.next.drop({
+		this.view.next.drop({
 			msec: 5050,
 			easing: Easing.bounceFactory(0.5),
 			side: 'bottom',
 			displacement: 25,
 		});
+
+		return $.Deferred().resolve();
 	}
 
 	seek (t) {

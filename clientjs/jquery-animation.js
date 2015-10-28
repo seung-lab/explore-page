@@ -32,6 +32,10 @@ var $ = require('jquery'),
  	
  	var position_offset = target.position().top - this.scrollTop();
 
+ 	if (position_offset === 0) {
+ 		return $.Deferred().resolve();
+ 	}
+
  	window.performance.now = window.performance.now || Date.now;
 
  	var distance_traveled = 0;
@@ -53,14 +57,12 @@ var $ = require('jquery'),
  	var deferred = $.Deferred()
  		.done(function () {
  			_this.scrollTop(start_pos + position_offset);
+ 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
  		})
  		.fail(function () {
  			if (req) {
  				cancelAnimationFrame(req);
  			}
- 		})
- 		.always(function () {
- 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
  		});
 
  	function animate () {

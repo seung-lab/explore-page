@@ -10,6 +10,8 @@ class Galileo {
 		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
 
+		this.allegience = 'dark';
+
 		this.mobile = args.mobile;
 
 		this.visible = false;
@@ -25,7 +27,7 @@ class Galileo {
 			return $('<div>').addClass(classes);
 		};
 
-		let bg = d('amazing bg-dark module');
+		let bg = d('galileo bg-dark module');
 
 		let next = d('next').ion('click', function () {
 			_this.next();
@@ -46,6 +48,13 @@ class Galileo {
 			counter++;
 			return counter / N;
 		});
+	}
+
+	previous () {
+		if (this.t === 0) {
+			this.parent.moduleUncomplete();
+			return;
+		}
 	}
 
 	next () {
@@ -89,17 +98,19 @@ class Galileo {
 		}
 
 		this.view.module.detach();
-		this.anchor.prepend(this.view.module);
+		this.anchor.append(this.view.module);
 		this.view.module.show();
 
 		this.visible = true;
 
-		return this.view.next.drop({
-			msec: 5050,
-			easing: Easing.bounceFactory(0.5),
-			side: 'bottom',
-			displacement: 25,
-		});
+		return $.Deferred().resolve();
+
+		// this.view.next.drop({
+		// 	msec: 5050,
+		// 	easing: Easing.bounceFactory(0.5),
+		// 	side: 'bottom',
+		// 	displacement: 25,
+		// });
 	}
 
 	seek (t) {
@@ -112,38 +123,6 @@ class Galileo {
 	render (t_prev, t) {
 		let _this = this; 
 
-		let slide = this.slideAt(t);
-
-		let splitter = function (txt) {
-			let tokens = txt.split(" ");
-			let html = "";
-			for (let i = 0; i < tokens.length; i++) {
-				html += tokens[i] + " ";
-
-				if (i % 3 === 2) {
-					html += "<br>";
-				}
-			}
-
-			return html;
-		};
-
-		if (!slide.supertext) {
-			this.view.supertext.hide();
-			this.view.textcontainer.removeClass('visible-supertext');
-		}
-		else {
-			this.view.supertext.text(slide.supertext).show();
-			this.view.textcontainer.addClass('visible-supertext');
-		}
-
-		this.view.video.attr('src', slide.gif);
-
-		this.view.text.html(
-			splitter(slide.text)
-		);
-
-		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 	}
 
 }
