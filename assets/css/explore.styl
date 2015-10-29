@@ -1,6 +1,88 @@
-@import 'mixins.styl'
-@import 'buttons.styl'
+@require 'mixins.styl'
+@require 'controls.styl'
+@require 'colors.styl'
+@require 'amazing.styl'
+@require 'galileo.styl'
+@require 'wonderers.styl'
 
+#explore 
+	top 225%
+	transform: translateZ(0); // required to allow the timeline to be fixed relative to it
 
+$next_border_width = 7px
 
+.next
+	width 0px
+	height @width
+	
+	border $next_border_width solid transparent
+	border-top $next_border_width solid $FILL_BLUE
+	
+	center-horizontal(dx=-1 * $next_border_width)
+	bottom 6%
 
+	cursor pointer
+	
+	z-index $amazing_z
+	
+.bg-dark .next
+	border-top $next_border_width solid $FILL_LIGHTER_BLUE
+
+$timeline_height = 25px
+
+.timeline 
+	position fixed
+	bottom 0px
+	
+	z-index 1
+
+	height $timeline_height
+	background-color $FILL_WHITE
+	border-top 1px solid $FILL_BLUE
+	width 100%
+	
+	cursor pointer
+	
+	transition border-top 500ms ease-in-out, background-color 500ms ease-in-out
+
+.timeline.dark
+	background-color $FILL_DARKER_BLUE
+	border-top 1px solid $FILL_LIGHTER_BLUE
+
+.timeline .progress
+	min-width 1%
+	
+	background-color $FILL_BLUE
+	height 100%
+	
+	transition width 500ms ease-in-out, background-color 500ms ease-in-out
+
+.timeline.light .progress
+	background-color $FILL_BLUE
+	
+.timeline.dark .progress
+	background-color $FILL_LIGHTER_BLUE
+
+.timeline:hover 
+	border-top-color $ACCENT_RED
+
+.timeline:hover .progress
+	background-color $ACCENT_RED
+
+.bg-light 
+	background-color $FILL_WHITE
+
+.bg-dark 
+	background-color $FILL_DARKER_BLUE
+
+.module
+	position relative
+	width 100%
+	height s("calc(100% - %s)", $timeline_height)
+	
+.spacer 
+	width 100%
+	height $timeline_height
+	
+
+	

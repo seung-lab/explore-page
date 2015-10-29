@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<script src="/js/intake.js"></script>
+		<script>
+			$(document).ready(function () {
+
+				var canvas = $('#wow')[0];
+				var video = $('<video>')
+					.css('display', 'none')
+					.attr('src', '/animations/alpha.mp4');
+
+				video = video[0];
+
+				var output = canvas.getContext('2d');
+
+				function processFrame() {
+					output.drawImage(video, 0, 0);
+
+					var data = output.getImageData(0,0, canvas.width, canvas.height);
+					var uint8arr = data.data;
+
+					var hasalpha = false;
+					for (var i = 3; i < uint8arr.length; i += 4) {
+						hasalpha = hasalpha || (uint8arr[i] < 255);
+
+						if (hasalpha) {
+							break;
+						}
+					}
+					
+					console.log(hasalpha);
+				}
+
+				video.addEventListener('playing', function() {
+					processFrame();
+					video.pause();
+					video.src="";
+				}, false);
+
+				video.play();
+			});
+		</script>
+	</head>
+	<body>
+		<canvas id="wow" width="1800" height="1000"></canvas>
+
+	<!-- 	<video controls autoplay="true" width="1000">
+			<source src="/animations/alpha.webm" type="video/webm">
+			<source src="/animations/alpha.webm" type="video/webm">
+		</video> -->
+	</body>
+</html>

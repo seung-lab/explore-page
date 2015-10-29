@@ -1,0 +1,95 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+
+.amazing
+	height 100%
+	width 100%
+	
+	display flex
+	flex-direction column
+	align-items center
+	justify-content center
+	
+.amazing .animation
+	height 100%
+	z-index 0
+
+$amazing_z = 1
+
+.amazing .story-text
+	text-transform uppercase
+	color $TEXT_BLUE
+	font-size 30px
+	font-weight 600
+	word-spacing 0px
+	letter-spacing 2px
+	text-align center
+	
+	width 400px
+
+	position absolute
+	bottom 20%
+	
+	z-index $amazing_z
+
+	center-horizontal()
+	
+.super-text
+	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
+	font-weight 400
+	color $TEXT_BLUE
+	
+	position absolute
+	top -32px
+	font-style italic
+	text-transform lowercase
+	letter-spacing 0px
+	font-size 23px
+	
+	width 100%
+	center-horizontal()
+
+	z-index $amazing_z
+
+.story-text:after,
+.story-text:before 
+	content "...."
+	position absolute
+	width 100%
+	font-size 10px
+	left 0px
+	
+	z-index $amazing_z
+
+.story-text.visible-supertext:before
+	content ""
+
+
+.story-text:before
+	top -15px
+
+.counter 
+	display flex
+	justify-content center
+	align-items center
+	flex-direction column
+	
+	background-color $ACCENT_YELLOW
+	color $TEXT_BLUE
+	border-radius 3px
+	
+	box-sizing border-box
+	padding-left 5px
+	
+	width 50px
+	height 13px
+	
+	font-size 6px
+	letter-spacing 5px
+	
+	position absolute
+	bottom -30px
+	center-horizontal()
+	
+	z-index $amazing_z
+

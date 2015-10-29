@@ -1,32 +1,38 @@
-@import 'mixins.styl'
-@import 'buttons.styl'
-@import 'colors.styl'
-@import 'parallax.styl'
+@require 'mixins.styl'
+@require 'controls.styl'
+@require 'colors.styl'
+@require 'parallax.styl'
+@require 'registration.styl'
+@require 'scrollbar.styl'
 
 html, body
-    font-family Roboto, 'Lucida Grande', sans-serif
+    font-family 'Roboto Condensed', 'Lucida Grande', sans-serif
     font-weight 400
 
     -moz-box-sizing border-box
     box-sizing border-box
     
     width 100%
-    height 100%
+    height 100%   
     
-    overflow hidden
+body
+	overflow-y hidden
 
-
-.intake
+#viewport
 	width 100%
 	height 100%
 	overflow-x hidden
 	overflow-y hidden
-		
-	background rgb(1, 19, 34) url("/images/intake-background.png")
-	background-size cover
+	
+	background linear-gradient(to top, #0B1929, #172E4B)
+	
+	transition background 1s ease-in-out
+	
+	position relative
+	
 
-.intake .parallax > div,
-.intake .parallax > section
+.parallax-group > div,
+.parallax-group > section
 	position absolute
 	overflow-y visible
 	
@@ -34,14 +40,14 @@ html, body
 	height 100%
 	width 100%
 	
-	margin-bottom 100% // extra oscillation space
+	// margin-bottom 100% // extra oscillation space
 
 $logo_width = 200px
 
-.intake .parallax .logo
+#intake-logo
 	position fixed
 	
-	background-image url("/images/loader.gif")
+	background-image url("/images/loading.gif")
 	background-repeat no-repeat
 	background-size contain
 
@@ -52,18 +58,18 @@ $logo_width = 200px
 
 	transition height 2s ease-out, width 2s ease-out
 
-.intake .parallax .logo.fixed
+#intake-logo.shrink
 	width ($logo_width * 0.75)
 	height ($logo_width * 0.75)
 
-.logo::before,
-.logo::after
+#intake-logo::before,
+#intake-logo::after
 	content " "
 	display block
 	width 0px
 	height 1px
 	
-	background-color $BLUE
+	background-color $LOGO_BLUE
 	border none
 	outline none
 	position absolute
@@ -76,11 +82,11 @@ $logo_width = 200px
 
 $logo_rule_start_pos = 85%
 
-.logo::after
+#intake-logo::after
 	animation-name motion-rule-right
 	left $logo_rule_start_pos
 	
-.logo::before
+#intake-logo::before
 	animation-name motion-rule-left
 	right $logo_rule_start_pos
 
@@ -143,45 +149,11 @@ div.pitch
 	position relative
 	text-transform uppercase
 	
+	font-weight 300
 	font-size 30px
-	font-weight 100
-	letter-spacing 5px
-
-header
-	position fixed
-	top 0
-	left 0
-	
-	width 100%
-	height 100%
-
-$corner_offset = 5%
-
-header .logotype
-	position absolute
-	top $corner_offset
-	left $corner_offset
-	
-	background-image url('/images/logotype.svg') 
-	background-size 100px 30px
-	background-repeat no-repeat
-	width 120px
-	height 35px
-	
-	transition opacity 150ms
-	
-header .logotype.invisible
-	opacity 0
-	
-header .share 
-	position absolute
-	top $corner_offset
-	right $corner_offset
-	
-	opacity 0.3
-	
-header .share.invisible
-	opacity 0
+	text-transform uppercase
+	letter-spacing 2px
+	word-spacing 5px
 
 .gateway .explorebtn
 	width ($primary_width / $PHI)
@@ -191,18 +163,25 @@ header .share.invisible
 .gateway #continuebtn
 	margin-top 40px
 	
+	display flex
+	justify-content center
+	align-items center
+	
 /* parallax layers */
 
-.intake .parallax
+.parallax
 	position relative
 	z-index 1
 
-.intake .logo
+#intake-logo
 	position absolute
 	z-index 60
 	parallax(-700px)
 
-.intake .neuron
+.neuron-layer
+	pointer-events none
+
+.neuron-layer .neuron
 	position absolute
 	background-size contain
 	background-repeat no-repeat
@@ -210,18 +189,18 @@ header .share.invisible
 	width 600px
 	height 100%
 	
-	
-.intake .left
+
+.neuron-layer .left
 	1 // no-op
 	
-.intake .right 
+.neuron-layer .right 
 	1 // no-op
 
-.intake .intake-front
+.neuron-layer.intake-front
 	z-index 50
 	parallax(150px)
 	
-.intake .intake-front .left
+.neuron-layer.intake-front .left
 	parallax-neuron(
 		$url: '/images/background/front-left.png', 
 		$side: 'left', 
@@ -230,7 +209,7 @@ header .share.invisible
 	)
 	
 	
-.intake .intake-front .right
+.neuron-layer.intake-front .right
 	parallax-neuron(
 		$url: '/images/background/front-right.png', 
 		$side: 'right', 
@@ -238,11 +217,11 @@ header .share.invisible
 		$dy: 200px
 	)
 	
-.intake .intake-middle
+.neuron-layer.intake-middle
 	z-index 40
 	parallax(100px)
 	
-.intake .intake-middle .left
+.neuron-layer.intake-middle .left
 	parallax-neuron(
 		$width: 1547px,
 		$url: '/images/background/middle-left-blur.png', 
@@ -251,7 +230,7 @@ header .share.invisible
 		$dy: 200px
 	)
 	
-.intake .intake-middle .right
+.neuron-layer.intake-middle .right
 	parallax-neuron(
 		$url: '/images/background/middle-right-blur.png', 
 		$side: 'right', 
@@ -259,11 +238,11 @@ header .share.invisible
 		$dy: 200px
 	)
 	
-.intake .intake-rear
+.neuron-layer.intake-rear
 	z-index 30
 	parallax(50px)
 	
-.intake .intake-rear .left
+.neuron-layer.intake-rear .left
 	parallax-neuron(
 		$url: '/images/background/rear-left-blur.png', 
 		$side: 'left', 
@@ -271,7 +250,7 @@ header .share.invisible
 		$dy: 200px
 	)
 	
-.intake .intake-rear .right
+.neuron-layer.intake-rear .right
 	parallax-neuron(
 		$url: '/images/background/middle-right-blur.png', 
 		$side: 'right', 
@@ -279,12 +258,12 @@ header .share.invisible
 		$dy: 200px
 	)
 	
-.intake .intake-carpet
+.neuron-layer.intake-carpet
 	z-index 20
 	parallax(25px)
 	
 
-.intake .intake-carpet .neuron
+.neuron-layer.intake-carpet .neuron
 	$url = '/images/background/neural-carpet-blur.png'
 	parallax-neuron(
 		$url: $url,

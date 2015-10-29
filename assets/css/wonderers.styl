@@ -1,0 +1,16 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+@require 'amazing.styl'
+
+.wonderers img
+	height 400px
+	width @height * 1.333 // aspect ratio of this image
+	
+	center($dy=-25px)
+	
+.wonderers .story-text
+	@extend .amazing .story-text
+	
+.wonderers .story-text:before
+	display none
+	
