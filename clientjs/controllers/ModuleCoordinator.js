@@ -52,10 +52,14 @@ ModuleCoordinator.initialize = function () {
 
 
 ModuleCoordinator.initHotkeys = function () {
-	$(document).ion('keyup', function (evt) {
+	$(document).ion('keydown', function (evt) {
 		let key = evt.keyCode;
-		if (key === 39 || key === 40) { // right or down key
+
+		// right or down key or spacebar or enter
+		if (key === 39 || key === 40 || key === 32 || key === 13) { 
+			evt.preventDefault();
 			ModuleCoordinator.next();
+			return false;
 		}
 		else if (key === 37 || key == 38) { // left or up key
 			ModuleCoordinator.previous();
