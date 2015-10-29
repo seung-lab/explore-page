@@ -97,17 +97,25 @@ $.fn.drop = function (args) {
 		displacement = args.displacement || 0, // dimensionless fraction of displacement
 		side = args.side || 'top';
  	
- 	var unit = _this.css(side).replace(/[\d\.]/g, '');
- 	var start_pos = parseFloat(this.css(side).replace(unit, ''), 10); 
+	var css = _this.css(side);
+
+	var start_pos;
+	if (css.match(/calc/)) {
+		start_pos = css.replace(/calc\(/, '').replace(/\)$/, '');
+	}
+	else {
+		start_pos = css;
+	}
+
  	var start_time = window.performance.now();
 
- 	_this.css(side, `calc(${start_pos + unit} + ${displacement}px)`);
+ 	_this.css(side, `calc(${start_pos} + ${displacement}px)`);
 
  	var req;
 
 	var deferred = $.Deferred()
  		.done(function () {
- 			_this.css(start_pos + unit);
+ 			_this.css(start_pos);
  		})
  		.fail(function () {
  			if (req) {
@@ -129,7 +137,7 @@ $.fn.drop = function (args) {
  		var proportion = easing(t);
 
  		distance_traveled = proportion * displacement;
- 		_this.css(side, `calc(${start_pos + unit} + ${displacement - distance_traveled}px)`);
+ 		_this.css(side, `calc(${start_pos} + ${displacement - distance_traveled}px)`);
 
  		req = requestAnimationFrame(animate);
  	}
