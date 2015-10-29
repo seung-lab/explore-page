@@ -192,6 +192,10 @@ ModuleCoordinator.moduleAt = function (t) {
 		throw new Error("No modules were defined for this timeline.");
 	}
 
+	if (t === 1) {
+		return modules[modules.length - 1];
+	}
+
 	for (let i = 0; i < modules.length; i++) {
 		let current = modules[i];
 		if (t >= current.begin && t < current.begin + current.duration) {
@@ -221,7 +225,7 @@ ModuleCoordinator.t = function (tee) {
 };
 
 ModuleCoordinator.seek = function (t) {
-let prev_t = _t;
+	let prev_t = _t;
 	_t = t;
 	return ModuleCoordinator.render(prev_t, t);
 };
