@@ -71,7 +71,7 @@ ModuleCoordinator.next = function () {
 
 ModuleCoordinator.setModules = function (modules) {
 	ModuleCoordinator.modules = modules || [];
-	let normalization = computeNormalization(modules);
+	let normalization = computeNormalization(modules) - 1;
 
 	let begin = 0;
 	ModuleCoordinator.modules.forEach(function (module) {
