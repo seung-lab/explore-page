@@ -12,11 +12,13 @@ let ModuleCoordinator = {
 	modules: [],
 	timeline: null,
 	container: null,
-	transition: $.Deferred(),
+	transition: null,
 };
 
 ModuleCoordinator.initialize = function () {
 	let anchor = $('#explore');
+
+	ModuleCoordinator.transition = $.Deferred();
 
 	function moduleFactory(module, duration) {
 		return new module({
