@@ -4,7 +4,8 @@ let utils = require('../utils.js'),
 	Easing = require('../easing.js'),
 	Timeline = require('../../components/timeline.js'),
 	Amazing = require('../../components/modules/amazing.js'),
-	Galileo = require('../../components/modules/galileo.js');
+	Galileo = require('../../components/modules/galileo.js'),
+	Wonderers = require('../../components/modules/wonderers.js');
 
 let _t = 0;
 
@@ -31,7 +32,8 @@ ModuleCoordinator.initialize = function () {
 
 	ModuleCoordinator.setModules([
 		moduleFactory(Amazing),
-		moduleFactory(Galileo)
+		moduleFactory(Galileo),
+		moduleFactory(Wonderers)
 	]);
 
 	ModuleCoordinator.timeline = new Timeline({
@@ -44,6 +46,8 @@ ModuleCoordinator.initialize = function () {
 	ModuleCoordinator.timeline.enter();
 
 	ModuleCoordinator.initHotkeys();
+
+	ModuleCoordinator.resizeEvents();
 };
 
 
@@ -56,6 +60,17 @@ ModuleCoordinator.initHotkeys = function () {
 		else if (key === 37 || key == 38) { // left or up key
 			ModuleCoordinator.previous();
 		}
+	});
+};
+
+ModuleCoordinator.resizeEvents = function () {
+	$(window).ion('resize', function (evt) {
+		let mod = ModuleCoordinator.currentModule();
+
+		$('#viewport').scrollTo(ModuleCoordinator.container, {
+			msec: 0,
+			easing: Easing.linear,
+		});
 	});
 };
 
@@ -160,6 +175,8 @@ function simpleTransition (cur, next, t) {
 
 	MC.transition.reject();
 
+	next.seek(ModuleCoordinator.toModuleT(next, t));
+
 	MC.transition = MC.container.scrollTo(next.view.module, {
 		msec: 1500,
 		easing: Easing.springFactory(.9, 0),
@@ -230,6 +247,10 @@ ModuleCoordinator.seek = function (t) {
 	return ModuleCoordinator.render(prev_t, t);
 };
 
+ModuleCoordinator.toModuleT = function (module, t) {
+	return (t - module.begin) / module.duration;
+}
+
 ModuleCoordinator.render = function (prev_t, t) {
 	prev_t = utils.nvl(prev_t, _t);
 	t = utils.nvl(t, _t);
@@ -248,7 +269,7 @@ ModuleCoordinator.render = function (prev_t, t) {
 		current_mod.enter();
 	}
 
-	let t_mod = (t - current_mod.begin) / current_mod.duration;
+	let t_mod = ModuleCoordinator.toModuleT(current_mod, t);
 
 	current_mod.seek(t_mod);
 
