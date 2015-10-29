@@ -7,7 +7,6 @@ class Amazing {
 		this.t = 0;
 		this.name = 'Amazing';
 		this.begin = null;
-		this.duration = utils.nvl(args.duration, 1);
 		this.parent = args.parent;
 
 		this.allegience = 'light';
@@ -48,6 +47,8 @@ class Amazing {
 				gif: path("cat.gif"),
 			},
 		];
+
+		this.duration = utils.nvl(args.duration, this.slides.length);
 
 		this.anchor = args.anchor;
 		this.view = this.generateView();
@@ -158,20 +159,7 @@ class Amazing {
 		return slide;
 	}
 
-	exit () {
-		if (!this.visible) {
-			return $.Deferred().resolve();
-		}
-
-		this.view.module.hide();
-		this.view.module.detach();
-
-		this.visible = false;
-
-		return $.Deferred().resolve();
-	}
-
-	enter () {
+	enter (from) {
 		if (this.visible) {
 			return $.Deferred().resolve();
 		}
@@ -188,6 +176,19 @@ class Amazing {
 			side: 'bottom',
 			displacement: 25,
 		});
+
+		return $.Deferred().resolve();
+	}
+
+	exit (from) {
+		if (!this.visible) {
+			return $.Deferred().resolve();
+		}
+
+		this.view.module.hide();
+		this.view.module.detach();
+
+		this.visible = false;
 
 		return $.Deferred().resolve();
 	}

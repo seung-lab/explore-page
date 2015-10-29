@@ -1,11 +1,104 @@
 @require 'colors.styl'
 @require 'mixins.styl'
+@require 'amazing.styl'
 
 .galileo
 	height 100%
 	width 100%
 	
+
+.galileo .transition
+	$height_factor = 5;
+
+	width 100%
+	height $height_factor * 100%
+	background-image linear-gradient($FILL_WHITE (100% / $height_factor), $FILL_DARKER_BLUE);
+	
+.galileo .action
+	position relative
+	
+	width 100%
+	height 100%
+	
+	background-color $FILL_DARKER_BLUE
+
+.galileo .story-text
+	@extend .amazing .story-text
+	
+	color $TEXT_BLUE_LIGHT
+	width 500px
+	height 75px
+	center()
+	
+// .galileo .story-text .text.caps
+	
+.galileo .story-text .text.italics
+	font-style italic
+	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
+	font-weight 400
+	font-size 24px
+	text-transform none
+	letter-spacing 0px
+
+.galileo .story-text-big
+	@extend .amazing .story-text
+
+	width 700px
+	height 400px
+
+	color $TEXT_BLUE_LIGHT
+	center()
+	
+.big-number.hundred:first-letter
+	letter-spacing -35px
+
+.galileo .story-text-big .inner
 	display flex
-	flex-direction column
 	align-items center
 	justify-content center
+	flex-direction column
+	
+	z-index 1
+	
+	width 100%
+	height 200px
+	center-vertical()
+	
+.galileo .inner:after
+	content "...."
+	font-size 10px
+	letter-spacing 1px
+	
+.galileo .story-text-big .counter
+	bottom 0px
+	
+.galileo .story-text-big .high-text
+	@extend .galileo .story-text .text.italics
+	text-transform lowercase
+	
+.galileo .story-text-big .medium-text
+	font-size 70px
+	letter-spacing 10px
+	line-height 70px
+	
+.galileo .story-text-big .low-text
+	letter-spacing 15px
+	
+.galileo .big-number
+	position absolute
+	top -25px
+	
+	z-index 0
+	font-size 400px
+	font-weight 400
+
+	color $BIG_NUMBER_BLUE
+	
+	width 100%
+	height 100%
+	text-align center
+
+.neural-network
+	height 100%
+	width 100%
+	

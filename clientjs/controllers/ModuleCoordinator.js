@@ -99,7 +99,7 @@ ModuleCoordinator.nextModule = function () {
 		}
 	}
 
-	return modules[0];
+	return current_module; // we're at the end
 };
 
 ModuleCoordinator.previousModule = function () {
@@ -144,41 +144,43 @@ function simpleTransition (cur, next, t) {
 
 	let MC = ModuleCoordinator;
 
-	MC.transition.reject();
-
-	MC.transition = next.enter({ from: cur.name });
-
 	let spacer = $("<div>").addClass('spacer');
 
-	MC.transition.done(function () {
-		MC.container.append(spacer);
+	let scrolled = $.Deferred();
 
-		MC.updateTimeline(t);
+	next.enter(scrolled, cur.name);
+	
+	MC.container.append(spacer);
 
-		_t = t;
+	MC.updateTimeline(t);
 
-		MC.transition.reject();
+	_t = t;
 
-		MC.transition = MC.container.scrollTo(next.view.module, {
-			msec: 1500,
-			easing: Easing.springFactory(.9, 0),
-		})
-		.done(function () {
-			if (t === _t) {
-				MC.seek(t);
-			}
+	MC.transition.reject();
 
-			cur.exit();
-		})
-		.fail(function () {
-			MC.transition.done(function () {
-				next.exit();
-			})
-		})
-		.always(function () {
-			spacer.remove();
-		})
-	});
+	MC.transition = MC.container.scrollTo(next.view.module, {
+		msec: 1500,
+		easing: Easing.springFactory(.9, 0),
+	})
+	.done(function () {
+		scrolled.resolve();
+
+		if (t === _t) {
+			MC.seek(t);
+		}
+
+		cur.exit(cur.name);
+	})
+	.fail(function () {
+		scrolled.reject();
+
+		// MC.transition.done(function () {
+		// 	next.exit(cur.name);
+		// })
+	})
+	.always(function () {
+		spacer.remove();
+	})
 };
 
 ModuleCoordinator.moduleAt = function (t) {
