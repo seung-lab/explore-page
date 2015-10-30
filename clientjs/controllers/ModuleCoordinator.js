@@ -197,9 +197,9 @@ function simpleTransition (cur, next, t) {
 	.fail(function () {
 		scrolled.reject();
 
-		// MC.transition.done(function () {
-		// 	next.exit(cur.name);
-		// })
+		MC.transition.always(function () {
+			MC.exitNonDisplayed();
+		})
 	})
 	.always(function () {
 		spacer.remove();
