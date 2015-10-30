@@ -11,6 +11,8 @@ var _intakectrl = new Login.IntakeController();
 $(document).ready(function () {
 	Login.bindReact();
 	_intakectrl.playIntro();
+
+	Login.bindResizeEvents('gateway');
 });
 
 

@@ -23,6 +23,33 @@ Login.bindReact = function () {
 	});
 };
 
+Login.bindResizeEvents = function (stage) {
+	if (stage === 'gateway') {
+		$(window).ion('resize', function () {
+			$('#viewport').scrollTo('#gateway', {
+				msec: 0,
+			})
+		});
+	}
+	else if (stage === 'registration') {
+		$(window).ion('resize', function () {
+			$('#viewport').scrollTo('#registration', {
+				msec: 0,
+			})
+		});
+	}
+	else if (stage === 'explore') {
+		$(window).ion('resize', function (evt) {
+			$('#viewport').scrollTo('#explore', {
+				msec: 0,
+			});
+		});
+	}
+	else {
+		throw new Error(`A valid stage was not provided: ${stage}`);
+	}
+};
+
 Login.component = function (name, klass, selector) {
 	if (klass !== undefined) {
 		GLOBAL.components[name] = React.render(

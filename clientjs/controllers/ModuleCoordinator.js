@@ -46,8 +46,6 @@ ModuleCoordinator.initialize = function () {
 	ModuleCoordinator.timeline.enter();
 
 	ModuleCoordinator.initHotkeys();
-
-	ModuleCoordinator.resizeEvents();
 };
 
 
@@ -64,17 +62,6 @@ ModuleCoordinator.initHotkeys = function () {
 		else if (key === 37 || key == 38) { // left or up key
 			ModuleCoordinator.previous();
 		}
-	});
-};
-
-ModuleCoordinator.resizeEvents = function () {
-	$(window).ion('resize', function (evt) {
-		let mod = ModuleCoordinator.currentModule();
-
-		$('#viewport').scrollTo(ModuleCoordinator.container, {
-			msec: 0,
-			easing: Easing.linear,
-		});
 	});
 };
 

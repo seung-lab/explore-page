@@ -1,7 +1,8 @@
-var React = require('react/addons'),
-	$ = require('jquery'),
+let React = require('react/addons'),
+	$ = require('jquery'), 
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
- 	Easing = require('../clientjs/easing.js');
+ 	Easing = require('../clientjs/easing.js'),
+ 	Login = require('../clientjs/login.js');
 
 module.exports = React.createClass({
 	displayName: "Gateway",
@@ -11,6 +12,12 @@ module.exports = React.createClass({
 	gotoRegistration: function () {
 		$('#explore').hide();
 
+		$(window).ion('resize', function () {
+			$('#viewport').scrollTo('#registration', {
+				msec: 0,
+			})
+		});
+
 		$('#viewport').scrollTo('#registration', {
 			msec: 4000,
 			easing: Easing.springFactory(.9, 1),
@@ -18,6 +25,12 @@ module.exports = React.createClass({
 	},
 	gotoExplore: function () {
 		$('#registration').hide();
+
+		$(window).ion('resize', function (evt) {
+			$('#viewport').scrollTo('#explore', {
+				msec: 0,
+			});
+		});
 
 		ModuleCoordinator.initialize();
 		ModuleCoordinator.seek(0);
