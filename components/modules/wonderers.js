@@ -22,7 +22,7 @@ class Wonderers {
 		this.slides = [
 			{
 				supertext: "gamers * students * teachers * scientists",
-				text: "We are Wonderers."
+				text: "We are Wonderers"
 			},
 		];
 

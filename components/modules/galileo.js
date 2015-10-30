@@ -242,6 +242,9 @@ class Galileo {
 				.always(function () {
 					_this.view.transition.detach();
 				})
+			})
+			.fail(function () {
+				_this.view.transition.detach();
 			});
 		}
 		else {

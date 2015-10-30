@@ -273,12 +273,28 @@ ModuleCoordinator.render = function (prev_t, t) {
 		current_mod.enter();
 	}
 
+	ModuleCoordinator.exitNonDisplayed(t);
+
 	let t_mod = ModuleCoordinator.toModuleT(current_mod, t);
 
 	current_mod.seek(t_mod);
 
 	ModuleCoordinator.updateTimeline(t);
 }
+
+ModuleCoordinator.exitNonDisplayed = function (t) {
+	t = utils.nvl(t, _t);
+
+	let current_mod = ModuleCoordinator.moduleAt(t);
+
+	let mods = ModuleCoordinator.modules.filter(function (mod) {
+		return mod !== current_mod;
+	});
+
+	mods.forEach(function (mod) {
+		mod.exit();
+	});
+};
 
 ModuleCoordinator.updateTimeline = function (t) {
 	ModuleCoordinator.timeline.seek(t);
