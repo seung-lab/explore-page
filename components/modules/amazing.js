@@ -52,6 +52,10 @@ class Amazing {
 
 		this.anchor = args.anchor;
 		this.view = this.generateView();
+
+		this.animations = {
+			text: $.Deferred().resolve(),
+		};
 	}
 
 	generateView () {
@@ -188,6 +192,8 @@ class Amazing {
 		this.view.module.hide();
 		this.view.module.detach();
 
+		this.view.text.text("");
+
 		this.visible = false;
 
 		return $.Deferred().resolve();
@@ -204,20 +210,7 @@ class Amazing {
 		let _this = this; 
 
 		let slide = this.slideAt(t);
-
-		let splitter = function (txt) {
-			let tokens = txt.split(" ");
-			let html = "";
-			for (let i = 0; i < tokens.length; i++) {
-				html += tokens[i] + " ";
-
-				if (i % 3 === 2) {
-					html += "<br>";
-				}
-			}
-
-			return html;
-		};
+		let last_slide = this.slideAt(t_prev);
 
 		if (!slide.supertext) {
 			this.view.supertext.hide();
@@ -230,13 +223,51 @@ class Amazing {
 
 		this.view.video.attr('src', slide.gif);
 
-		this.view.text.html(
-			splitter(slide.text)
-		);
+		this.animations.text.reject();
+
+		if (_this.view.text.text()) {
+			this.animations.text = _this.view.text.scrambleText({
+				begin: _this.view.text.html(),
+				end: slide.text,
+				msec: 2000,
+				tick: 50,
+				update: function (txt) {
+					_this.view.text.html(splitter(txt))
+				}
+			});
+		}
+		else {
+			_this.view.text.html(splitter(slide.text));
+		}
 
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 	}
+}
 
+function splitter (txt) {
+	let tokens = txt.split(" ");
+	let html = "";
+
+	let midpt = txt.length / 2;
+	let len = 0;
+
+	let broken = false;
+
+	for (let i = 0; i < tokens.length; i++) {
+		html += tokens[i];
+		len += tokens[i].length;
+
+		if (!broken && len > midpt) {
+			html += '<br>';
+			broken = true;
+		}
+		else {
+			html += " ";
+			len++;
+		}
+	}
+
+	return html;
 }
 
 

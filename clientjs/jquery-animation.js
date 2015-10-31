@@ -1,4 +1,5 @@
 var $ = require('jquery'),
+	Utils = require('./utils.js'),
 	Easing = require('./easing.js');
 
 /* scrollTo
@@ -143,6 +144,111 @@ $.fn.drop = function (args) {
  	}
 
  	req = requestAnimationFrame(animate);
+
+ 	return deferred;
+};
+
+$.fn.scrambleText = function (args = {}) {
+	let begin = args.start || this.html(),
+		end = args.end,
+		msec = args.msec || 2000,
+		tick = args.tick || 50,
+		updatefn = args.update || function (txt) {
+			_this.text(txt);
+		};
+
+	begin = begin.replace(/<br>/g, ' ');
+
+	if (begin.replace(/ /g, '') === end.replace(/ /g, '')) {
+		return $.Deferred().resolve();
+	}
+
+	let _this = this;
+
+	let size = Math.max(begin.length, end.length);
+
+	function sizedVector (txt) {
+		let vector = "";
+
+		for (let i = 0; i < size; i++) {
+			vector += " ";
+		}
+
+		let centering = Math.floor((size - txt.length) / 2);
+
+		for (let i = 0; i < txt.length; i++) {
+			vector = Utils.replaceAt(vector, txt[i], i + centering);
+		}	
+
+		return vector;
+	}
+
+	let vector = sizedVector(begin),
+		end_vector = sizedVector(end);
+
+	function genAlphabet (start_letter, num) {
+		let alphabet = [];
+		for (let code = start_letter.charCodeAt(0), i = 0; i < num; i++, code++) {
+			alphabet.push(String.fromCharCode(code));
+		}
+		return alphabet;
+	}
+
+	let alphabet = [' ']
+		.concat(genAlphabet('a', 26))
+		.concat(genAlphabet('A', 26))
+		.concat(genAlphabet('0', 10));
+
+ 	let req;
+
+	let deferred = $.Deferred()
+ 		.done(function () {
+ 			updatefn(end_vector.trim());
+ 		})
+ 		.always(function () {
+ 			clearInterval(req);
+ 		});
+
+ 	let start_time = window.performance.now();
+
+ 	updatefn(vector);
+
+ 	let probability = 0.15;
+
+ 	req = setInterval(function () {
+ 		let now = window.performance.now();
+
+ 		if (now - start_time > msec) {
+ 			deferred.resolve();
+ 			return;
+ 		}
+
+ 		let all_solved = true;
+ 		for (let i = 0; i < vector.length; i++) {
+ 			if (vector[i] === end_vector[i]) {
+ 				continue;
+ 			}
+
+ 			if (end_vector[i] === ' ') {
+ 				vector = Utils.replaceAt(vector, end_vector[i], i);
+ 			}
+ 			else if (probability >= Math.random()) {
+ 				vector = Utils.replaceAt(vector, end_vector[i], i);
+ 			}
+ 			else {
+ 				vector = Utils.replaceAt(vector, Utils.random_choice(alphabet), i);
+ 				all_solved = false;
+ 			}
+ 		}
+
+ 		if (all_solved) {
+ 			deferred.resolve();
+ 		}
+ 		else {
+ 			updatefn(vector);
+ 		}
+
+ 	}, tick);
 
  	return deferred;
 };

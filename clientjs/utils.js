@@ -991,6 +991,10 @@ Utils.guid = function () {
 	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 };
 
+Utils.replaceAt = function (str, chr, index) {
+	return str.slice(0, index) + chr + str.slice(index + chr.length);
+}
+
 Utils.ui = require('./utils.ui.js');
 
 module.exports = Utils;
