@@ -194,7 +194,7 @@ $.fn.scrambleText = function (args = {}) {
 		return alphabet;
 	}
 
-	let alphabet = [' ']
+	let alphabet = []
 		.concat(genAlphabet('a', 26))
 		.concat(genAlphabet('A', 26))
 		.concat(genAlphabet('0', 10));

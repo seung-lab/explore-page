@@ -995,6 +995,16 @@ Utils.replaceAt = function (str, chr, index) {
 	return str.slice(0, index) + chr + str.slice(index + chr.length);
 }
 
+Utils.sreverse = function (str) {
+	var new_string = "";
+
+	for (var i = str.length - 1; i >= 0; i--) {
+		new_string += str[i];
+	}
+
+	return new_string;
+}
+
 Utils.ui = require('./utils.ui.js');
 
 module.exports = Utils;
