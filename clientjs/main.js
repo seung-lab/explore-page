@@ -1,7 +1,7 @@
 
 
 var $ = require('jquery');
-var login = require('./login.js');
+var Login = require('./login.js');
 
 require('./jquery-extra.js');
 require('./jquery-animation.js');
