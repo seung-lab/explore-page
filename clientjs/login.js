@@ -1352,5 +1352,4 @@ function focusOnFirstError (coordinator, mode) {
 	}
 }
 
-window.Login = Login;
 module.exports = Login;

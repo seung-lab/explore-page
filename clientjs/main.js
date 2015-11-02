@@ -18,6 +18,7 @@ $(document).ready(function () {
 
 // Globals
 
+window.Login = Login;
 window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
 window.Easing = require('./easing.js');
 window.$ = $;
