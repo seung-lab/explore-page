@@ -1,7 +1,6 @@
-var React = require('react'),
-	Gateway = require('./components/gateway.jsx'),
-	Registration = require('./components/registration.jsx'),
-	FixedHeader = require('./components/header.jsx')
+// var React = require('react'),
+// 	Gateway = require('./components/gateway.jsx'),
+// 	Registration = require('./components/registration.jsx');
 
 exports.index = function (req, res) {
 	res.render('index', { 
@@ -10,8 +9,7 @@ exports.index = function (req, res) {
 		mode: "login",
 		translation: " ",
 
-		reactGateway: React.renderToString(<Gateway />),
-		reactRegistration: React.renderToString(<Registration />),
-		reactHeader: React.renderToString(<FixedHeader />),
+		// reactGateway: React.renderToString(<Gateway />),
+		// reactRegistration: React.renderToString(<Registration />),
 	});
 };

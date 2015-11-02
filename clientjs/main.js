@@ -9,7 +9,8 @@ require('./jquery-animation.js');
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
-	Login.bindReact();
+	Login.initialize();
+	
 	_intakectrl.playIntro();
 
 	Login.bindResizeEvents('gateway');

@@ -1,4 +1,4 @@
-header
+.header
 	position fixed
 	top 0
 	left 0
@@ -9,16 +9,16 @@ header
 	z-index 100
 	pointer-events none
 	
-header .container div
+.header div
 	pointer-events auto
 	transition opacity 150ms
 	
-header .invisible div
+.header.invisible div
 	opacity 0
 
 $corner_offset = 5%
 
-header .logotype
+.header .logotype
 	position absolute
 	top $corner_offset
 	left $corner_offset
@@ -29,7 +29,7 @@ header .logotype
 	width 120px
 	height 35px
 	
-header .share
+.header .share
 	position absolute
 	top $corner_offset
 	right $corner_offset

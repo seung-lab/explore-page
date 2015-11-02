@@ -1,22 +1,14 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
-	Easing = require('../../clientjs/easing.js');
+	Easing = require('../../clientjs/easing.js'),
+	ExploreModule = require('../explore.js');
 	
-class Galileo {
+class Galileo extends ExploreModule {
 	constructor(args = {}) {
-		this.t = 0;
+		super(args);
+
 		this.name = 'Galileo';
-		this.begin = null;
-		this.duration = utils.nvl(args.duration, 1);
-		this.parent = args.parent;
-
 		this.allegience = 'dark';
-
-		this.mobile = args.mobile;
-
-		this.visible = false;
-
-		this.anchor = args.anchor;
 		this.view = this.generateView();
 
 		this.slides = [
@@ -150,71 +142,9 @@ class Galileo {
 		};
 	}
 
-	storyPoints () {
-		let counter = -1,
-			N = this.slides.length;
-
-		return this.slides.map(function () {
-			counter++;
-			return counter / N;
-		});
-	}
-
-	next () {
-		let N = this.slides.length;
-
-		if (this.last() - this.t < 0.0001) {
-			this.parent.moduleComplete();
-			return;
-		}
-
-		let slide = this.slideAt(this.t);
-		let index = utils.clamp(slide.index + 1, 0, this.slides.length - 1);
-
-		this.seek(index / this.slides.length);
-	}
-
-	previous () {
-		if (this.t === 0) {
-			this.parent.moduleUncomplete();
-			return;
-		}
-
-		let slide = this.slideAt(this.t);
-		let index = utils.clamp(slide.index - 1, 0, this.slides.length - 1);
-
-		this.seek(index / this.slides.length);
-	}
-
-	last () {
-		let N = this.slides.length;
-		return (N - 1) / N;
-	}
-
-	slideAt (t) {
-		let N = this.slides.length;
-
-		let index = Math.floor(t * N);
-
-		let slide = this.slides[index]
-		slide.index = index;
-
-		return slide;
-	}
-
-	enter (transition, frm) {
-		if (this.visible) {
-			return $.Deferred().resolve();
-		}
-
+	afterEnter (transition, frm) {
 		let _this = this;
-
-		this.view.module.detach();
-		this.anchor.append(this.view.module);
-		this.view.module.show();
-
-		this.visible = true;
-
+		
 		_this.view.next.hide();
 
 		let dropfn = function () {
@@ -250,28 +180,6 @@ class Galileo {
 		else {
 			dropfn();
 		}
-
-		return $.Deferred().resolve();
-	}
-
-	exit (transition, frm) {
-		if (!this.visible) {
-			return $.Deferred().resolve();
-		}
-
-		this.view.module.hide();
-		this.view.module.detach();
-
-		this.visible = false;
-
-		return $.Deferred().resolve();
-	}
-
-	seek (t) {
-		let t_prev = this.t;
-		this.t = t;
-		this.parent.sub_t_update(this.name, t);
-		return this.render(t_prev, t);
 	}
 
 	render (t_prev, t) {
@@ -311,11 +219,8 @@ class Galileo {
 		else {
 			throw new Error("slide did not specify text or big.");
 		}
-
 	}
-
 }
-
 
 module.exports = Galileo;
 

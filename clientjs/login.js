@@ -4,23 +4,25 @@ let React = require('react/addons'),
 	$ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
-	Gateway = require('../components/gateway.jsx'),
-	FixedHeader = require('../components/header.jsx'),
-	Registration = require('../components/registration.jsx'),
-	ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
+	Gateway = require('../components/gateway.js'),
+	Header = require('../components/header.js');
+	// Registration = require('../components/registration.jsx'),
+	// ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
 
 let Login = {};
 
-Login.bindReact = function () {
-	var tuples = [
-		[ 'gateway', Gateway ],
-		[ 'registration', Registration ],
-		[ 'header', FixedHeader ],
-	];
+let _components = {};
 
-	tuples.forEach(function (tuple) {
-		Login.component(tuple[0], tuple[1], '#' + tuple[0])
+Login.initialize = function () {
+	_components.header = new Header({ 
+		anchor: '#header',
+		name: "Header",
 	});
+
+	_components.header.enter();
+
+	_components.gateway = new Gateway({ anchor: '#gateway' });
+	_components.gateway.enter();
 };
 
 Login.bindResizeEvents = function (stage) {
@@ -50,20 +52,6 @@ Login.bindResizeEvents = function (stage) {
 	}
 };
 
-Login.component = function (name, klass, selector) {
-	if (klass !== undefined) {
-		GLOBAL.components[name] = React.render(
-			React.createElement(klass, null), $(selector)[0]
-		);
-	}
-	
-	return GLOBAL.components[name];
-};
-
-Login.progressController = function () {
-	// this will control global t
-};
-
 Login.IntakeView = function () {
 	var _this = this;
 
@@ -80,9 +68,6 @@ Login.IntakeView = function () {
 				msec: 2500,
 				easing: Easing.springFactory(.7, 1),
 			})
-			.done(function () {
-				Login.component('header').setProps({ visible: true });
-			});
 		}, 2500);
 	};
 };
