@@ -14,11 +14,13 @@
 	
 	margin-bottom 100vh
 
-.registration .field
+.registration .field,
+.registration .password-meter
 	transition height 100ms, margin 100ms, padding 100ms, border 100ms, opacity 100ms
 
 .registration.one .email,
-.registration.one .password
+.registration.one .password,
+.registration.one .password-meter
 	opacity 0
 	height 0
 	margin 0
@@ -114,6 +116,33 @@
 	right -3px
 	
 
+.registration .password-meter
+	height 20px
+	width 135px
+	
+	margin 5px
+	box-sizing border-box
+	
+.registration .password-meter .bar
+	width 100%
+	height 1px
+	
+	background-color rgb(50, 75, 94)
+
+.registration .password-meter .strength
+	height 1px
+	width 0%
+	display block
+	background-color rgb(82, 105, 124)
+
+	transition width 200ms ease-in-out
+	
+.registration .password-meter .label
+	font-size 10px
+	text-align left
+	margin-top 2px
+	
+	color $TEXT_BLUE
 	
 
 

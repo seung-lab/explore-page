@@ -502,13 +502,13 @@ function createLoginCoordinator () {
 				{
 					elem: $('#username'),
 					errorelem: $('#usernameerror'),
-					fixtextfn: loginUsernameFixtext,
+					fixtextfn: Login.loginUsernameFixtext,
 					condition: 'username'
 				},
 				{
 					elem: $('#loginpassword'),
 					errorelem: $('#loginpassworderror'),
-					fixtextfn: loginPasswordFixtext,
+					fixtextfn: Login.loginPasswordFixtext,
 					condition: 'password',
 					onalert: function (msgelem) { 
 						$(msgelem).fadeIn(300); 
@@ -612,7 +612,7 @@ function configureForgotPassword () {
  *
  * Returns: fixtext string
  */
-function loginForgotPasswordFixtext (reason) {
+Login.loginForgotPasswordFixtext = function (reason) {
 	if (reason === 'success') {
 		return _("An email has been sent.");
 	}
@@ -694,7 +694,7 @@ function loginValidateUsernameNoLength(usernamefield, coordinator) {
  *
  * Returns: fixtext string
  */
-function loginUsernameFixtext (reason) {
+Login.loginUsernameFixtext = function (reason) {
 	if (reason === 'minimum-length') {
 		return _("Please enter your username or email.");
 	}
@@ -718,7 +718,7 @@ function loginUsernameFixtext (reason) {
  *
  * Returns: fixtext string
  */
-function loginPasswordFixtext (reason) {
+Login.loginPasswordFixtext = function (reason) {
 	if (reason === 'minimum-length') {
 		return _("Please enter your password.");
 	}
@@ -727,99 +727,88 @@ function loginPasswordFixtext (reason) {
 	}
 
 	return _("Please contact support and describe what you were doing.");
-}
-
-/* configureRegistrationPage
- *
- * Required: none
- *
- * Returns: void
- */
-Login.configureRegistrationPage = function () {
-	$('#togglemode')
-		.attr('href', '/login')
-		.text(_('LOGIN'));
-
-	$('#signintype').first().text(_('SIGN UP'));
-
-	$('#pitch').show();
-
-	$('#username')
-		.addClass('bottom-rounded')
-		.attr('placeholder', _('Username'))
-		.focus();
-
-	$('.register.step1').show();
-
-	var playcoordinator = new Coordinator.Coordinator({
-		set: { username: true, password: true, email: true },
-		test: function (conds) { return conds.username; },
-		success: function (conds) {
-			$('#username').removeClass('error');
-			$('#usernameerror').slideFadeOut();
-		},
-		failure: function (conds, data) { 
-			$('#username').addClass('error');
-			$('#usernameerror').text(
-				registrationUsernameFixtext(data.username)
-			).slideFadeIn();
-		}
-	});
-
-	PasswordUtils.configurePasswordMeter($('.register .password-strength'));
-	Login.bindRegistrationAvailabilityHandlers(playcoordinator);
-
-	var playnowclickhandler = function () {
-		Login.validateUsername(playcoordinator, function (data) {
-			Login.playNowContinueHandler(playcoordinator);
-		});
-
-		if (!playcoordinator.execute()) {
-			$('#username').focus();
-		}
-	};
-
-	$('.playnow')
-		.text(_('SIGN UP'))
-		.on('click.Register', playnowclickhandler);
-
-	$(document).on('keyup.Register', function (evt) {
-		if (evt.keyCode === Keycodes.codes.enter) {
-
-			if (GLOBAL.registration.lastclick === 'facebook') {
-				registrationFacebookSelectionHandler(playcoordinator);	
-			}
-			else {
-				playnowclickhandler();	
-			}
-		}
-	});
-
-	$('#centerpiece').maybeAlwaysCenterIn(window, { top: -50 });
-
-	$('#fb-register').on('click', function () {
-		GLOBAL.registration.lastclick = 'facebook';
-		registrationFacebookSelectionHandler(playcoordinator);
-	});
-
-	if (!isWebGLEnabled()) {
-		$('#webGLlink').show();
-	}
 };
 
-function isWebGLEnabled () {
-	var canvas = $('<canvas />')[0];
+// /* configureRegistrationPage
+//  *
+//  * Required: none
+//  *
+//  * Returns: void
+//  */
+// Login.configureRegistrationPage = function () {
+// 	$('#togglemode')
+// 		.attr('href', '/login')
+// 		.text(_('LOGIN'));
 
-	var gl = null;
-	try {
-		gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-	} catch(e) {}
+// 	$('#signintype').first().text(_('SIGN UP'));
 
-	return gl;
-}
+// 	$('#pitch').show();
+
+// 	$('#username')
+// 		.addClass('bottom-rounded')
+// 		.attr('placeholder', _('Username'))
+// 		.focus();
+
+// 	$('.register.step1').show();
+
+// 	var playcoordinator = new Coordinator.Coordinator({
+// 		set: { username: true, password: true, email: true },
+// 		test: function (conds) { return conds.username; },
+// 		success: function (conds) {
+// 			$('#username').removeClass('error');
+// 			$('#usernameerror').slideFadeOut();
+// 		},
+// 		failure: function (conds, data) { 
+// 			$('#username').addClass('error');
+// 			$('#usernameerror').text(
+// 				registrationUsernameFixtext(data.username)
+// 			).slideFadeIn();
+// 		}
+// 	});
+
+// 	PasswordUtils.configurePasswordMeter($('.register .password-strength'));
+// 	Login.bindRegistrationAvailabilityHandlers(playcoordinator);
+
+// 	var playnowclickhandler = function () {
+// 		Login.validateUsername(playcoordinator, function (data) {
+// 			Login.playNowContinueHandler(playcoordinator);
+// 		});
+
+// 		if (!playcoordinator.execute()) {
+// 			$('#username').focus();
+// 		}
+// 	};
+
+// 	$('.playnow')
+// 		.text(_('SIGN UP'))
+// 		.on('click.Register', playnowclickhandler);
+
+// 	$(document).on('keyup.Register', function (evt) {
+// 		if (evt.keyCode === Keycodes.codes.enter) {
+
+// 			if (GLOBAL.registration.lastclick === 'facebook') {
+// 				registrationFacebookSelectionHandler(playcoordinator);	
+// 			}
+// 			else {
+// 				playnowclickhandler();	
+// 			}
+// 		}
+// 	});
+
+// 	$('#centerpiece').maybeAlwaysCenterIn(window, { top: -50 });
+
+// 	$('#fb-register').on('click', function () {
+// 		GLOBAL.registration.lastclick = 'facebook';
+// 		registrationFacebookSelectionHandler(playcoordinator);
+// 	});
+
+// 	if (!isWebGLEnabled()) {
+// 		$('#webGLlink').show();
+// 	}
+// };
 
 Login.registrationFacebookSelectionHandler = function (username, coordinator) {
-	Login.validateUsername(coordinator)
+	Login.validateUsername(username, coordinator)
 		.done(function () {
 			if (!coordinator.execute()) {
 				return;
@@ -848,15 +837,6 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 				}
 			});
 		});
-}
-
-Login.quickValidate = function (field, coordinator) {
-	if (field === 'username') {
-		Login.quickValidateUsernameNoLength(coordinator);
-	}
-	else if (field === 'password') {
-
-	}
 }
 
 /* quickValidateUsernameNoLength
@@ -943,31 +923,31 @@ Login.validateUsernameNoLength = function (username, coordinator) {
  */
 Login.registrationUsernameFixtext = function (reason) {
 	if (reason === 'taken') {
-		return "This name is taken.";
+		return _("This name is taken.");
 	}
 	else if (reason === 'hyperlink') {
-		return "Your name shouldn't look like a link.";
+		return _("Your name shouldn't look like a link.");
 	}
 	else if (reason === 'reserved') {
-		return "Your name may not contain official titles.";
+		return _("Your name may not contain official titles.");
 	}
 	else if (reason === 'PENIS') {
-		return "Hint: We're not laughing with you.";
+		return _("Hint: We're not laughing with you.");
 	}
 	else if (reason === 'zero-length') {
-		return "Please choose a name.";
+		return _("Please choose a name.");
 	}
 	else if (reason === 'minimum-length') {
-		return "Please choose a longer name.";
+		return _("Please choose a longer name.");
 	}
 	else if (reason === 'maximum-length') {
-		return "Please choose a name up to twenty characters long.";
+		return _("Please choose a name up to twenty characters long.");
 	}
 	else if (reason === 'format') {
-		return "Please use only letters, numbers, and underscores.";
+		return _("Please use only letters, numbers, and underscores.");
 	}
 
-	return "Please contact support if you really want this name.";
+	return _("Please contact support if you really want this name.");
 };
 
 /* registrationPasswordFixtext

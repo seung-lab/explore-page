@@ -35,8 +35,7 @@ class Registration extends Synapse {
 				return !!conds.username;
 			})
 			.done(function (conds) {
-				_this.view.username.removeClass('error');
-				_this.view.error.username.removeClass('error');
+				_this.clearErrors();
 			})
 			.fail(function (conds, data) { 
 				let fixtext = Login.registrationUsernameFixtext(data.username);
@@ -48,8 +47,41 @@ class Registration extends Synapse {
 	}
 
 	stageTwoCoordinator () {
+		return Coordinator(this.coordinator.conds, this.coordinator.data)
+			.done(function () {
+				_this.clearErrors();
+			})
+			.fail(function (conds, data) {
+				var stack = [
+					{
+						fixtextfn: Login.registrationUsernameFixtext,
+						condition: 'username'
+					},
+					{
+						fixtextfn: Login.registrationPasswordFixtext,
+						condition: 'password'
+					},
+					{
+						fixtextfn: Login.registrationEmailFixtext,
+						condition: 'email'
+					}
+				];
 
+				coordinationFailure(stack, conds, data);
+			})
 	}
+
+	clearErrors () {
+		_this.view.username.removeClass('error');
+		_this.view.password.removeClass('error');
+		_this.view.email.removeClass('error');
+		_this.view.fb.removeClass('error');
+		
+		Object.keys(_this.view.error).forEach(function (field) {
+			_this.view.error[field].removeClass('error');
+		});
+	}
+
 
 	attachEventListeners () {
 		let _this = this;
@@ -60,10 +92,16 @@ class Registration extends Synapse {
 		_this.attachEmailEvents();
 		_this.attachPasswordEvents();
 
+		_this.view.fb.ion('click', function () {
+			GLOBAL.registration.lastclick = 'facebook';
+			Login.registrationFacebookSelectionHandler(_this.state.username, _this.coordinator);
+		});
+
 		let okfn = function () {
-			Login.validateUsername(_this.state.username, _this.coordinator)
+			// HACK: Login.validateUsername(_this.state.username, _this.coordinator)
+			$.Deferred().resolve()
 				.done(function () {
-					if (!playcoordinator.execute()) {
+					if (!_this.coordinator.execute()) {
 						_this.view.username.focus();
 					}
 					else {
@@ -110,20 +148,15 @@ class Registration extends Synapse {
 					_this.coordinator.execute();
 				}
 			})
-			.ion('keydown.state', function () {
+			.ion('keydown.state change.state input.state', function (evt) {
 				_this.state.password = pval();
+				_this.adjustPasswordMeter();
 			})
 			.ion('blur.validation', function () {
 				PasswordUtils.quickValidatePasswordNoLength(pval(), uval(), _this.coordinator);
 				_this.coordinator.execute();
 			})
 			.ion('keyup.validation keypress.validation', function () {
-				PasswordUtils.adjustPasswordMeter({
-					meter: _this.view.password_meter,
-					password: pval(),
-					username: uval(), 
-					coordinator: _this.coordinator,
-				});
 				var valid = PasswordUtils.quickValidatePassword(pval(), uval(), _this.coordinator);
 
 				if (valid) {
@@ -174,8 +207,9 @@ class Registration extends Synapse {
 			.ithinking({ idle: 750 }, function () {
 				Login.validateUsernameNoLength(val(), _this.coordinator);
 			})
-			.ion('keydown.state', function () {
-				_this.state.username = _this.view.username.val();
+			.ion('keydown.state input.state', function () {
+				_this.state.username = val();
+				_this.adjustPasswordMeter();
 			})
 			.ion('keyup.validation keypress.validation', function () {
 				Login.quickValidateUsernameNoLength(val(), _this.coordinator);
@@ -184,6 +218,17 @@ class Registration extends Synapse {
 			.ion('blur.validation', Utils.UI.trim(function () {
 				Login.validateUsernameNoLength(val(), _this.coordinator);
 			}));
+	}
+
+	adjustPasswordMeter () {
+		let ratio = PasswordUtils.qualifyPassword(
+			this.state.password,
+			this.state.username, 
+			this.coordinator
+		);
+
+		ratio = Utils.clamp(ratio * 100, 0, 100);
+		this.view.password_meter.find('.strength').css('width',  `${ratio}%`);
 	}
 
 	generateView () {
@@ -210,10 +255,10 @@ class Registration extends Synapse {
 			.addClass('primary')
 			.text("OK");
 
-		let fieldfn = function (name) {
+		let fieldfn = function (name, type) {
 			return $('<input>').attr({
 				placeholder: name,
-				type: "text",
+				type: type || "text",
 			})
 			.addClass('field ' + name.toLowerCase());
 		};
@@ -229,10 +274,18 @@ class Registration extends Synapse {
 			emailerror = errormsg();
 
 
-		let password = fieldfn('Password'),
+		let password = fieldfn('Password', 'password'),
 			passworderror = errormsg();
 
-		let pwmeter = $('<div>').addClass('password-strength');
+		let pwmeter = $('<div>')
+			.addClass('password-meter')
+			.append(
+				$('<div>').addClass('bar').append(
+					$('<div>').addClass('strength')
+				),
+				$('<div>').addClass('label').text("Strength")
+			)
+
 
 		let fb = $('<div>')
 			.addClass('fb-connect tertiary')
@@ -268,6 +321,7 @@ class Registration extends Synapse {
 			location: location,
 			progress: progress,
 			ok: okbtn,
+			fb: fb,
 			error: {
 				username: usernameerror,
 				email: emailerror,

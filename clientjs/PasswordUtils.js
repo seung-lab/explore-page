@@ -4,42 +4,6 @@ var $ = require('jquery');
 
 var PasswordUtils = {};
 
-/* adjustPasswordMeter
- *
- * Given a password sets the meter to one of four 
- * levels depending on the password quality:
- * 
- * Gray: No password entered
- * Red: The system will not accept it
- * Orange: Acceptable
- * Green: Very strong
- *
- * Required:
- *    meter
- *    password
- *    username
- *    coordinator
- *
- * Returns: void
- */
-PasswordUtils.adjustPasswordMeter = function (args) {
-	args = args || {};
-
-	var meter = args.meter;
-	var password = args.password;
-	var username = args.username;
-	var coordinator = args.coordinator;
-
-	meter.removeClass('terrible poor acceptable good strong');
-
-	if (!password) {
-		return;	
-	}
-
-	var quality = PasswordUtils.qualifyPassword(password, username, coordinator);
-	meter.addClass(quality);
-};
-
 /* quickValidatePassword
  *
  * Evaluates the password along dimensions that do not
@@ -126,7 +90,7 @@ PasswordUtils.qualifyPassword = function (password, username, coordinator) {
 	var valid = PasswordUtils.quickValidatePasswordNoLength(password, username, coordinator);
 	
 	if (!valid) {
-		return 'terrible';
+		return 0;
 	}
 	
 	var score = scorePassword(password);
@@ -136,20 +100,7 @@ PasswordUtils.qualifyPassword = function (password, username, coordinator) {
 	var good = 8 * Math.log(10 + 26 + 26 + 30); // 8 characters, three classes
 	var strong = 10 * Math.log(10 + 26 + 26 + 30); // 10 characters, 4 classes
 
-	if (score >= strong) {
-		return 'strong';
-	}
-	else if (score >= good) {
-		return 'good';
-	}
-	else if (score >= acceptable) {
-		return 'acceptable';
-	}
-	else if (score >= poor) {
-		return 'poor';
-	}
-	
-	return "terrible";
+	return score / strong;
 };
 
 /* scorePassword
@@ -188,6 +139,10 @@ PasswordUtils.qualifyPassword = function (password, username, coordinator) {
  */
 function scorePassword (password) {
 	password = password || "";
+
+	if (!password.length) {
+		return 0;
+	}
 
 	var classes = [
 		[ /[a-z]/, 26 ],
