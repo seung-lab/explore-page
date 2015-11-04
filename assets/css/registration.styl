@@ -3,22 +3,32 @@
 @require 'colors.styl'
 @require 'parallax.styl'
 
-#registration 
+#intake
 	top: 225%
 
 .registration
-	width 500px
-	height 500px
+	width 100%
+	height 100%
 	
 	center()
 	
 	margin-bottom 100vh
 
+.registration .field
+	transition height 100ms, margin 100ms, padding 100ms, border 100ms, opacity 100ms
+
+.registration.one .email,
+.registration.one .password
+	opacity 0
+	height 0
+	margin 0
+	padding 0
+	border 0
+
 .registration .icon
 	background-repeat no-repeat
 	background-size 15px
 	background-position 10px
-
 
 .registration .username 
 	@extend .registration .icon
@@ -74,5 +84,36 @@
 
 	box-sizing border-box
 
+
+.registration .progress-indicator
+	width 15px
+	overflow visible
+	height 1px
+	border-top 1px solid white
+	position relative
+	
+.registration .progress-indicator:before,
+.registration .progress-indicator:after
+	display block
+	content " "
+	
+	height 10px
+	width @height
+	
+	border-radius 100%
+	position absolute
+	
+	background white
+	
+.registration .progress-indicator:before
+	top -5px
+	left -3px
+	
+.registration .progress-indicator:after
+	top -5px
+	right -3px
+	
+
+	
 
 

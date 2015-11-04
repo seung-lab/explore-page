@@ -1,5 +1,3 @@
-"use strict";
-
 /* Thinking.js
  *
  * An idle timer designed to integrate well with 
@@ -45,8 +43,8 @@
  * You can find jquery.idle.js at https://github.com/kidh0/jquery.idle as of this writing. (Aug. 2013)
  */
 
- var Utils = require('./Utils.js');
- var $ = require('jquery');
+let $ = require('jquery'),
+	Utils = require('./utils.js');
 
 /* thinking
  *
@@ -152,6 +150,14 @@ $.fn.thinking = function () {
 	}
 
 	return selector;
+};
+
+$.fn.ithinking = function () {
+	if (this.data('thinking')) {
+		return this;
+	}
+
+	return this.thinking.apply(this, arguments);
 };
 
 /* defaults */

@@ -1,10 +1,12 @@
 
 
 var $ = require('jquery');
-var Login = require('./login.js');
 
 require('./jquery-extra.js');
 require('./jquery-animation.js');
+require('./thinking.js');
+
+var Login = require('./login.js');
 
 var _intakectrl = new Login.IntakeController();
 

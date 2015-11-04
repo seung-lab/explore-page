@@ -1,13 +1,16 @@
 let $ = require('jquery'), 
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
  	Easing = require('../clientjs/easing.js'),
- 	Login = require('../clientjs/login.js'),
  	Synapse = require('./synapse.js');
+
+let Login; // avoid circular reference
 
  class Gateway extends Synapse {
  	constructor (args = {}) {
  		args.name = args.name || "Gateway";
  		super(args);
+
+ 		Login = args.login;
 
  		this.view = this.generateView();
  	}
@@ -49,13 +52,9 @@ let $ = require('jquery'),
  		this.view.startbtn.ion('click', function () {
  			$('#explore').hide();
 
-			$(window).ion('resize', function () {
-				$('#viewport').scrollTo('#registration', {
-					msec: 0,
-				})
-			});
+ 			Login.initRegistration();
 
-			$('#viewport').scrollTo('#registration', {
+			$('#viewport').scrollTo('#intake', {
 				msec: 4000,
 				easing: Easing.springFactory(.9, 1),
 			});
@@ -64,11 +63,7 @@ let $ = require('jquery'),
  		this.view.explorebtn.ion('click', function () {
  			$('#registration').hide();
 
-			$(window).ion('resize', function (evt) {
-				$('#viewport').scrollTo('#explore', {
-					msec: 0,
-				});
-			});
+ 			Login.bindResizeEvents('explore');
 
 			ModuleCoordinator.initialize();
 			ModuleCoordinator.seek(0);

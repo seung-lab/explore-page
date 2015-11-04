@@ -89,7 +89,7 @@ gulp.task('clean', function () {
 	]);
 });
 
-gulp.task('js', [ 'jsx' ], function () {
+gulp.task('js', function () {
 	var b = browserify({
 		entries: 'clientjs/main.js',
 		//debug: true,
@@ -107,14 +107,6 @@ gulp.task('js', [ 'jsx' ], function () {
 		// .pipe(sourcemaps.write('./'))
 		.pipe(gulp.dest('./dist/public/js/'));
 
-});
-
-gulp.task('jsx', function () {
-	gulp.src('views/components/*')
-		.pipe(gulp.dest('build/public/js/components/')) // for direct embedding <% include .... %>
-
-	gulp.src('views/pages/*')
-		.pipe(gulp.dest('dist/views/'))
 });
 
 gulp.task('css', [ ], function () {
@@ -152,9 +144,4 @@ gulp.task('watch', function () {
 		'clientjs/**',
 		'components/**'
 	], [ 'js' ]);
-
-	gulp.watch([
-		'components/**',
-		'views/**'
-	], [ 'jsx' ]);
 });

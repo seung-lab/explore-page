@@ -1006,6 +1006,7 @@ Utils.sreverse = function (str) {
 }
 
 Utils.ui = require('./utils.ui.js');
+Utils.UI = Utils.ui;
 
 module.exports = Utils;
 

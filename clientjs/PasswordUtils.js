@@ -16,8 +16,8 @@ var PasswordUtils = {};
  *
  * Required:
  *    meter
- *    passwordfield
- *    usernamefield
+ *    password
+ *    username
  *    coordinator
  *
  * Returns: void
@@ -26,37 +26,18 @@ PasswordUtils.adjustPasswordMeter = function (args) {
 	args = args || {};
 
 	var meter = args.meter;
-	var passwordfield = args.passwordfield;
-	var usernamefield = args.usernamefield;
+	var password = args.password;
+	var username = args.username;
 	var coordinator = args.coordinator;
 
-
 	meter.removeClass('terrible poor acceptable good strong');
-
-	var password = $(passwordfield).val();
 
 	if (!password) {
 		return;	
 	}
 
-	var quality = PasswordUtils.qualifyPassword(passwordfield, usernamefield, coordinator);
+	var quality = PasswordUtils.qualifyPassword(password, username, coordinator);
 	meter.addClass(quality);
-};
-
-
-/* configurePasswordMeter
- *
- * Configures the password meter.
- *
- * Required:
- *   [0] meter
- *
- * Returns: void
- */
-PasswordUtils.configurePasswordMeter = function (meter) {
-	for (var i = 0; i < 5; i++) {
-		$(meter).append($('<div>'));
-	}
 };
 
 /* quickValidatePassword
@@ -65,14 +46,12 @@ PasswordUtils.configurePasswordMeter = function (meter) {
  * require the server.
  *
  * Required:
- *    [0] passwordfield
+ *    [0] password
  *    [1] playcoordinator
  *
  * Returns: boolean
  */
-PasswordUtils.quickValidatePassword = function (passwordfield, usernamefield, coordinator) {
-	var password = $(passwordfield).val();
-
+PasswordUtils.quickValidatePassword = function (password, username, coordinator) {
 	if (!password) {
 		coordinator.lazySet('password', false, 'zero-length');
 		return false;
@@ -82,13 +61,10 @@ PasswordUtils.quickValidatePassword = function (passwordfield, usernamefield, co
 		return false;
 	}
 
-	return PasswordUtils.quickValidatePasswordNoLength(passwordfield, usernamefield, coordinator);
+	return PasswordUtils.quickValidatePasswordNoLength(password, username, coordinator);
 };
 
-PasswordUtils.quickValidatePasswordNoLength = function (passwordfield, usernamefield, coordinator) {
-	var password = $(passwordfield).val();
-	var username = $.trim($(usernamefield).val());
-
+PasswordUtils.quickValidatePasswordNoLength = function (password, username, coordinator) {
 	if (!password || password.length <= 4) {
 		coordinator.lazySet('password', true);
 		return true;
@@ -140,20 +116,19 @@ PasswordUtils.quickValidatePasswordNoLength = function (passwordfield, usernamef
  * strength of another type of password.
  *
  * Required:
- *    [0] passwordfield
- *    [1] usernamefield
+ *    [0] password
+ *    [1] username
  *    [2] coordinator
  *
  * Returns one of: "terrible", "poor", "acceptable", "good", "strong"
  */
-PasswordUtils.qualifyPassword = function (passwordfield, usernamefield, coordinator) {
-	var valid = PasswordUtils.quickValidatePasswordNoLength(passwordfield, usernamefield, coordinator);
+PasswordUtils.qualifyPassword = function (password, username, coordinator) {
+	var valid = PasswordUtils.quickValidatePasswordNoLength(password, username, coordinator);
 	
 	if (!valid) {
 		return 'terrible';
 	}
-
-	var password = passwordfield.val();
+	
 	var score = scorePassword(password);
 
 	var poor = 6 * Math.log(10); // 6 characters, lowest classes

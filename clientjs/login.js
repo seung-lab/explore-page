@@ -1,12 +1,12 @@
 "use strict";
 
-let React = require('react/addons'),
-	$ = require('jquery'),
+let $ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
 	Gateway = require('../components/gateway.js'),
-	Header = require('../components/header.js');
-	// Registration = require('../components/registration.jsx'),
+	Header = require('../components/header.js'),
+	Registration = require('../components/registration.js'),
+	_ = require('./localeplanet-translate.js');
 	// ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
 
 let Login = {};
@@ -21,9 +21,21 @@ Login.initialize = function () {
 
 	_components.header.enter();
 
-	_components.gateway = new Gateway({ anchor: '#gateway' });
+	_components.gateway = new Gateway({ 
+		anchor: '#gateway',
+		login: Login,
+	});
 	_components.gateway.enter();
+
+	_components.registration = new Registration({ 
+		anchor: '#intake',
+		login: Login,
+	});
 };
+
+Login.initRegistration = function () {
+	_components.registration.enter();
+}
 
 Login.bindResizeEvents = function (stage) {
 	if (stage === 'gateway') {
@@ -33,9 +45,9 @@ Login.bindResizeEvents = function (stage) {
 			})
 		});
 	}
-	else if (stage === 'registration') {
+	else if (stage === 'intake') {
 		$(window).ion('resize', function () {
-			$('#viewport').scrollTo('#registration', {
+			$('#viewport').scrollTo('#intake', {
 				msec: 0,
 			})
 		});
@@ -58,8 +70,6 @@ Login.IntakeView = function () {
 
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
-
-		var pixels = $('.gateway').position().top;
 
 		setTimeout(function () {
 			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
@@ -283,7 +293,7 @@ Login.facebookRegistration = function (args) {
 
 	var coordinator = args.coordinator;
 
-	validateUsername(coordinator);
+	Login.validateUsername(coordinator);
 
 	if (!coordinator.execute()) {
 		focusOnFirstError(coordinator, 'register');
@@ -481,12 +491,12 @@ Login.configureLoginPage = function () {
  *
  * Refactoring of configureLoginPage
  *
- * Returns: Conditional.Conditional coordinator object
+ * Returns: Coordinator.Coordinator coordinator object
  */
 function createLoginCoordinator () {
- 	return new Conditional.Conditional({
+ 	return new Coordinator.Coordinator({
 		set: { username: true, password: true },
-		test: Conditional.and,
+		test: Coordinator.and,
 		failure: function (conds, data) {
 			var stack = [
 				{
@@ -539,7 +549,7 @@ function createLoginCoordinator () {
 function configureForgotPassword () {
 	var throttledpost = Utils.UI.throttle(2500, $.post);
 
-	var forgotcoordinator = new Conditional.Conditional({
+	var forgotcoordinator = new Coordinator.Coordinator({
 		set: { sent: false },
 		success: function (conds, data) {
 			$('#loginpassworderror').text(
@@ -741,7 +751,7 @@ Login.configureRegistrationPage = function () {
 
 	$('.register.step1').show();
 
-	var playcoordinator = new Conditional.Conditional({
+	var playcoordinator = new Coordinator.Coordinator({
 		set: { username: true, password: true, email: true },
 		test: function (conds) { return conds.username; },
 		success: function (conds) {
@@ -760,7 +770,7 @@ Login.configureRegistrationPage = function () {
 	Login.bindRegistrationAvailabilityHandlers(playcoordinator);
 
 	var playnowclickhandler = function () {
-		validateUsername(playcoordinator, function (data) {
+		Login.validateUsername(playcoordinator, function (data) {
 			Login.playNowContinueHandler(playcoordinator);
 		});
 
@@ -808,91 +818,59 @@ function isWebGLEnabled () {
 	return gl;
 }
 
-function registrationFacebookSelectionHandler (coordinator) {
-	validateUsername(coordinator);
+Login.registrationFacebookSelectionHandler = function (username, coordinator) {
+	Login.validateUsername(coordinator)
+		.done(function () {
+			if (!coordinator.execute()) {
+				return;
+			}
 
-	if (!coordinator.execute()) {
-		return;
-	}
-
-	FB.getLoginStatus(function (response) {
-		if (response.status === 'connected') {
-			Login.facebookRegistration({
-				username: $('#username').val(),
-				access_token: response.authResponse.accessToken,
-				coordinator: coordinator
-			});
-		}
-		else {
-			FB.login(function (loginresponse) {
-				 if (loginresponse.authResponse) {
-				 	Login.facebookRegistration({
-				 		username: $('#username').val(),
-						access_token: loginresponse.authResponse.accessToken,
-						coordinator: coordinator
+			FB.getLoginStatus(function (response) {
+				if (response.status === 'connected') {
+					Login.facebookRegistration({
+						username: username,
+						access_token: response.authResponse.accessToken,
+						coordinator: coordinator,
 					});
-				 }
-			}, {
-				scope: "email"
+				}
+				else {
+					FB.login(function (loginresponse) {
+						 if (loginresponse.authResponse) {
+						 	Login.facebookRegistration({
+						 		username: username,
+								access_token: loginresponse.authResponse.accessToken,
+								coordinator: coordinator,
+							});
+						 }
+					}, {
+						scope: "email"
+					});
+				}
 			});
-		}
-	});
+		});
 }
 
-/* registrationUsernameFixtext
- *
- * Provides fixtext for various reasons that the server may
- * reject a username.
- *
- * Required:
- *   [0] reason
- *
- * Returns: fixtext string
- */
-function registrationUsernameFixtext (reason) {
-	if (reason === 'taken') {
-		return _("This name is taken.");
+Login.quickValidate = function (field, coordinator) {
+	if (field === 'username') {
+		Login.quickValidateUsernameNoLength(coordinator);
 	}
-	else if (reason === 'hyperlink') {
-		return _("Your name shouldn't look like a link.");
-	}
-	else if (reason === 'reserved') {
-		return _("Your name may not contain official titles.");
-	}
-	else if (reason === 'PENIS') {
-		return _("Hint: We're not laughing with you.");
-	}
-	else if (reason === 'zero-length') {
-		return _("Please choose a name.");
-	}
-	else if (reason === 'minimum-length') {
-		return _("Please choose a longer name.");
-	}
-	else if (reason === 'maximum-length') {
-		return _("Please choose a name up to twenty characters long.");
-	}
-	else if (reason === 'format') {
-		return _("Please use only letters, numbers, and underscores.");
-	}
+	else if (field === 'password') {
 
-	return _("Please contact support if you really want this name.");
+	}
 }
 
-/* quickValidateUsername
+/* quickValidateUsernameNoLength
  *
  * In the interests of streamlining, we can evaluate
  * the username, along dimensions that do not require a
  * database check, in real time.
  *
  * Required:
- *    [0] playcoordinator: A Conditional.js object
+ *    [0] playcoordinator: A Coordinator.js object
  *
  * Returns: boolean
  */
-function quickValidateUsernameNoLength (coordinator) {
-	var username = $('#username').val();
-	username = $.trim(username);
-
+Login.quickValidateUsernameNoLength = function (username, coordinator) {
 	if (username.length > 20) {
 		coordinator.set('username', false, 'maximum-length');
 		return false;
@@ -917,25 +895,20 @@ function quickValidateUsernameNoLength (coordinator) {
  * of the username.
  *
  * Required:
- *    [0] coordinator: A Conditional.js object
- * Optional:
- *    [1] callback
+ *    [0] coordinator: A Coordinator.js object
  *
- * Returns: void (because the AJAX call will necessitate delay)
+ * Returns: deferred object
  */
-function validateUsername (coordinator, callback) {
-	var username = $('#username').val();
-	username = $.trim(username);
-
-	if (!quickValidateUsernameNoLength(coordinator)) {
-		return;
+Login.validateUsername = function (username, coordinator) {
+	if (!Login.quickValidateUsernameNoLength(username, coordinator)) {
+		return $.Deferred().reject();
 	}
 	else if (username.length === 0) {
 		coordinator.set('username', false, 'zero-length');
 	}
 
 	var url = '/1.0/internal/account/available/username/' + encodeURIComponent(username);
-	$.getJSON(url, function (data) {
+	return $.getJSON(url, function (data) {
 		if (data.available) {
 			coordinator.set('username', true);
 			GLOBAL.takenusernames[username] = null;
@@ -944,24 +917,58 @@ function validateUsername (coordinator, callback) {
 			GLOBAL.takenusernames[username] = data.reason || 'taken';
 			coordinator.set('username', false, data.reason);
 		}
-
-		if (callback) {
-			callback(data);
-		}
 	});
 }
 
-function validateUsernameNoLength (coordinator, callback) {
-	var username = $('#username').val();
-	username = $.trim(username);
-
+Login.validateUsernameNoLength = function (username, coordinator) {
 	if (username.length === 0) {
 		coordinator.set('username', true);
+		return $.Deferred().resolve();
 	}
 	else {
-		validateUsername(coordinator, callback);
+		return Login.validateUsername(username, coordinator);
 	}
 }
+
+
+/* registrationUsernameFixtext
+ *
+ * Provides fixtext for various reasons that the server may
+ * reject a username.
+ *
+ * Required:
+ *   [0] reason
+ *
+ * Returns: fixtext string
+ */
+Login.registrationUsernameFixtext = function (reason) {
+	if (reason === 'taken') {
+		return "This name is taken.";
+	}
+	else if (reason === 'hyperlink') {
+		return "Your name shouldn't look like a link.";
+	}
+	else if (reason === 'reserved') {
+		return "Your name may not contain official titles.";
+	}
+	else if (reason === 'PENIS') {
+		return "Hint: We're not laughing with you.";
+	}
+	else if (reason === 'zero-length') {
+		return "Please choose a name.";
+	}
+	else if (reason === 'minimum-length') {
+		return "Please choose a longer name.";
+	}
+	else if (reason === 'maximum-length') {
+		return "Please choose a name up to twenty characters long.";
+	}
+	else if (reason === 'format') {
+		return "Please use only letters, numbers, and underscores.";
+	}
+
+	return "Please contact support if you really want this name.";
+};
 
 /* registrationPasswordFixtext
  *
@@ -1004,46 +1011,51 @@ Login.registrationPasswordFixtext = function (reason) {
  *    [0] emailfield
  *    [1] coordinator
  *
- * Returns: boolean
+ * Returns: deferred
  */
-function validateEmailNoLength (emailfield, coordinator) {
-	var email = $(emailfield).val() || "";
-	email = $.trim(email);
+Login.validateEmailNoLength = function (email, coordinator) {
+	email = email.trim();
 
 	if (email.length === 0) {
 		coordinator.lazySet('email', true);
-		return true;
+		return $.Deferred().resolve();
 	}
 
-	return validateEmail(emailfield, coordinator);
+	return Login.validateEmail(email, coordinator);
 }
 
-function validateEmail (emailfield, coordinator) {
-	var email = $(emailfield).val() || "";
+Login.validateEmail = function (email, coordinator) {
+	email = email.trim();
 
 	if (email.length === 0) {
 		coordinator.lazySet('email', false, 'zero-length');
-		return true;
+		return $.Deferred().reject('zero-length');
 	}
 	else if (!email.match(/^.+@.+\.[a-z]{2,4}$/i)) {
 		coordinator.lazySet('email', false, 'format');
-		return false;
+		return $.Deferred().reject('format');
 	}
 	else if (GLOBAL.takenemails[email]) {
 		coordinator.lazySet('email', false, GLOBAL.takenemails[email]);
-		return false;
+		return $.Deferred().reject(GLOBAL.takenemails[email]);
 	}
+
+	var deferred = $.Deferred();
 
 	var url = '/1.0/internal/account/available/email/' + encodeURIComponent(email);
 	$.getJSON(url, function (data) {
 		if (data.available) {
 			coordinator.set('email', true);
+			deferred.resolve();
 		}
 		else {
 			GLOBAL.takenemails[email] = data.reason;
 			coordinator.set('email', false, data.reason);
+			deferred.reject(data.reason);
 		}
 	});
+
+	return deferred;
 }
 
 /* registrationEmailFixtext
@@ -1055,7 +1067,7 @@ function validateEmail (emailfield, coordinator) {
  *
  * Returns: English text 
  */
-function registrationEmailFixtext (reason) {
+Login.registrationEmailFixtext = function (reason) {
 	if (reason === 'zero-length') {
 		return _("Please enter an email.");
 	}
@@ -1067,75 +1079,6 @@ function registrationEmailFixtext (reason) {
 	}
 
 	return _("Please contact support if you really want to use this email.");
-}
-
-/* bindRegistrationAvailabilityHandlers
- *
- * Attaches various validation handlers to the username/password/email fields.
- *
- * Required:
- *    [0] playcoordinator: A Conditional.js object
- *
- * Returns: void
- */
-Login.bindRegistrationAvailabilityHandlers = function (playcoordinator) {
-	$('#username')
-		.thinking({ idle: 750 }, function () {
-			validateUsernameNoLength(playcoordinator);
-		})
-		.on('keyup', function () {
-			quickValidateUsernameNoLength(playcoordinator);
-		})
-		.on('focus', Utils.UI.trim())
-		.on('blur', Utils.UI.trim(function () {
-			validateUsernameNoLength(playcoordinator);
-		}));
-
-	$('#registrationpassword')
-		.on('focus', function () {
-			var valid = PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
-			if (valid) {
-				playcoordinator.execute();
-			}
-		})
-		.on('blur', function () {
-			PasswordUtils.quickValidatePasswordNoLength($('#registrationpassword'), $('#username'), playcoordinator);
-			playcoordinator.execute();
-		})
-		.on('keyup keypress', function () {
-			PasswordUtils.adjustPasswordMeter({
-				meter: $('.register .password-strength'),
-				passwordfield: $('#registrationpassword'), 
-				usernamefield: $('#username'), 
-				coordinator: playcoordinator
-			});
-			var valid = PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
-
-			if (valid) {
-				playcoordinator.execute();
-			}
-		})
-		.thinking({ idle: 1500 }, function () {
-			PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
-			playcoordinator.execute();
-		});
-
-	$('#email')
-		.thinking({ idle: 2000 }, function () {
-			validateEmail(this, playcoordinator);
-			playcoordinator.execute();
-		})
-		.on('focus keyup keypress', function () {
-			var valid = validateEmailNoLength(this, playcoordinator);
-
-			if (valid) {
-				playcoordinator.execute();
-			}
-		})
-		.on('blur', Utils.UI.trim(function () {
-			validateEmailNoLength(this, playcoordinator);
-			playcoordinator.execute();
-		}));
 };
 
 /* playNowContinueHandler
@@ -1144,7 +1087,7 @@ Login.bindRegistrationAvailabilityHandlers = function (playcoordinator) {
  * the normal (non-social) sign up button.
  *
  * Required:
- *    [0] playcoordinator: A Conditional.js object
+ *    [0] playcoordinator: A Coordinator.js object
  *
  * Returns: void
  */
@@ -1154,13 +1097,13 @@ Login.playNowContinueHandler = function (playcoordinator) {
 		return;
 	}
 
-	playcoordinator.test = Conditional.and;
+	playcoordinator.test = Coordinator.and;
 	playcoordinator.failure = function (conds, data) {
 		var stack = [
 			{
 				elem: $('#username'),
 				errorelem: $('#usernameerror'),
-				fixtextfn: registrationUsernameFixtext,
+				fixtextfn: Login.registrationUsernameFixtext,
 				condition: 'username'
 			},
 			{
@@ -1172,7 +1115,7 @@ Login.playNowContinueHandler = function (playcoordinator) {
 			{
 				elem: $('#email'),
 				errorelem: $('#emailerror'),
-				fixtextfn: registrationEmailFixtext,
+				fixtextfn: Login.registrationEmailFixtext,
 				condition: 'email'
 			}
 		];
@@ -1301,7 +1244,7 @@ function coordinationFailure(stack, conds, data) {
  * workflow.
  *
  * Required:
- *   [0] coordinator: a Conditional.js object
+ *   [0] coordinator: a Coordinator.js object
  *
  * Returns: void
  */

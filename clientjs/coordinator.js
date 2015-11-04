@@ -1,6 +1,6 @@
 "use strict";
 
-/* Conditional.js
+/* Coordinator.js
  *
  * This is essentially an if/else block with
  * conditions that can be updated dynamically
@@ -26,49 +26,72 @@
  *
  * Author: William Silversmith
  * Affiliation: Seung Lab, Brain and Cognitive Sciences Dept., MIT
- * Date: August 2013, adapted for browserify Sept. 2015
+ * Date: August 2013, adapted for browserify Sept. 2015, Nov. 2015
  */
 
-/* Conditional
+/* Coordinator
  *
- * Creates a new conditional object.
+ * Creates a new Coordinator object.
  *
+ * Required:
+ *   [0] set { name1: true, name2: false, etc }, a way of initializing some conditions
+ * 
  * Optional:
- *   set: { name1: true, name2: false, etc }, a way of initializing some conditions
- *   data: { name2: something, name2: something, etc } link some data to conditions
- *	 success: callback when test returns true. 
- *   failure: callback when test returns false. 
- *   test: callback that returns a boolean based on status of registered conditions
+ *   [1] data: { name2: something, name2: something, etc } link some data to conditions
+ *   [2] test: callback that returns a boolean based on status of registered conditions
  *      defaults to ANDing all of them.
-*
- *   All callbacks are of the following form:
  *
- *   function (conditions, data) { ... }
- *   
- *   Where:
- *		conditions: { name1: bool, name2: bool, etc }
- *      data: { name1: somedata, name2: somedata, etc }
- *
- * Returns: Conditional object (use new)
+ * Returns: Coordinator object (use new)
  */
-var Conditional = function (args) {
-	args = args || {};
-
-	var noop = function (conds, data) {};
-
+var Coordinator = function (set = {}, data = {}, test = module.exports.and) {
 	var _this = this;
+
+	if (typeof data === 'function') {
+		test = data;
+		data = {};
+	}
 
 	this.conds = {};
 	this.data = {};
 
-	Object.keys(args.set).forEach(function (cond) {
-		_this.lazySet(cond, args.set[cond]);
+	Object.keys(set).forEach(function (cond) {
+		_this.lazySet(cond, set[cond]);
 	});
 
-	this.failure = args.failure || noop;
-	this.success = args.success || noop;
-	this.test = args.test || Conditional.and;
-	this.data = args.data || {};
+	this.failure = [];
+	this.success = [];
+	this.test = test;
+	this.data = data;
+};
+
+/*  All callbacks provided to done and fail are of the following form:
+ *
+ *  function (conditions, data) { ... }
+ *   
+ *  Where:
+ *	  conditions: { name1: bool, name2: bool, etc }
+ *     data: { name1: somedata, name2: somedata, etc }
+ */
+Coordinator.prototype.done = function (fn) {
+	this.success.push(fn);
+	return this;
+};
+
+Coordinator.prototype.fail = function (fn) {
+	this.failure.push(fn);
+	return this;
+};
+
+Coordinator.prototype.always = function (fn) {
+	this.success.push(fn);
+	this.failure.push(fn);
+	return this;
+};
+
+Coordinator.prototype.clearCallbacks = function () {
+	this.success = [];
+	this.failure = [];
+	return this;
 };
 
 /* assess
@@ -79,7 +102,7 @@ var Conditional = function (args) {
 *    
 * Returns: boolean result of test
 */
-Conditional.prototype.assess = function () {
+Coordinator.prototype.assess = function () {
 	return this.test(this.conds, this.data);
 };
 
@@ -91,15 +114,24 @@ Conditional.prototype.assess = function () {
 *
 * Returns: boolean result of test
 */
-Conditional.prototype.execute = function () {
-	if (this.test(this.conds, this.data)) {
-		this.success(this.conds, this.data);
+Coordinator.prototype.execute = function () {
+	let _this = this; 
+
+	if (_this.test(_this.conds, _this.data)) {
+		_this.success.forEach(function (fn) {
+			fn(_this.conds, _this.data);
+		});
+
 		return true;
 	}
 	else {
-		this.failure(this.conds, this.data);
+		_this.failure.forEach(function (fn) {
+			fn(_this.conds, _this.data);
+		});
 		return false;
 	}
+
+	return _this;
 };
 
 /* set
@@ -116,9 +148,11 @@ Conditional.prototype.execute = function () {
 *
 * Returns: void
 */
-Conditional.prototype.set = function (name, value, data) {
+Coordinator.prototype.set = function (name, value, data) {
 	this.lazySet(name, value, data);
 	this.execute();
+
+	return this;
 };
 
 /* lazySet
@@ -129,7 +163,7 @@ Conditional.prototype.set = function (name, value, data) {
 *
 * Returns: void
 */
-Conditional.prototype.lazySet = function (name, value, data) {
+Coordinator.prototype.lazySet = function (name, value, data) {
 	value = value || false;
 
 	if (typeof value !== 'function') {
@@ -144,6 +178,8 @@ Conditional.prototype.lazySet = function (name, value, data) {
 	else {
 		this.data[name] = null;
 	}
+
+	return this;
 };
 
 /* remove
@@ -155,9 +191,11 @@ Conditional.prototype.lazySet = function (name, value, data) {
 *
 * Returns: void
 */
-Conditional.prototype.remove = function (name) {
+Coordinator.prototype.remove = function (name) {
 	this.lazyRemove(name);
 	this.execute();
+
+	return this;
 };
 
 /* lazyRemove
@@ -168,20 +206,24 @@ Conditional.prototype.remove = function (name) {
 *   [0] name: The name of the condition
 * Returns: void
 */
-Conditional.prototype.lazyRemove = function (name) {
+Coordinator.prototype.lazyRemove = function (name) {
 	delete this.conds[name];
 	delete this.data[name];
+
+	return this;
 };
 
-/* The following functions are not part of the Conditional object,
+/* The following functions are not part of the Coordinator object,
 * however, they may be useful in constructing test functions.
 */
 
-module.exports.Conditional = Conditional;
+module.exports.Coordinator = function (set, data, test) {
+	return new Coordinator(set, data, test);
+};
 
 /* and
 *
-* Simply ANDs every conditional together.
+* Simply ANDs every Coordinator together.
 *
 * Required:
 *   [0] conds
@@ -196,19 +238,19 @@ module.exports.and = function (conds, data) {
 
  /* nand
 *
-* Simply nots the conjuntion of every conditional.
+* Simply nots the conjuntion of every Coordinator.
 *
 * Required: same as and
 *
 * Returns: boolean
 */
 module.exports.nand = function () {
-	return !Conditional.and.apply(this, arguments);
+	return !module.exports.and.apply(this, arguments);
 };
 
 /* or
 *
-* Simply ORs every conditional together.
+* Simply ORs every Coordinator together.
 *
 * Required:
 *   [0] conds
@@ -230,12 +272,12 @@ module.exports.or = function (conds, data) {
 * Returns: boolean
 */
 module.exports.nor = function () {
-	return !Conditional.or.apply(this, arguments);
+	return !module.exports.or.apply(this, arguments);
 };
 
 /* xor
 *
-* Simply XORs every conditional together.
+* Simply XORs every Coordinator together.
 *
 * Required:
 *   [0] conds
