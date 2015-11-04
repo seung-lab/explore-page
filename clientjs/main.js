@@ -3,25 +3,53 @@
 var $ = require('jquery');
 
 require('./jquery-extra.js');
+require('./jquery-url.js');
 require('./jquery-animation.js');
 require('./thinking.js');
 
-var Login = require('./login.js');
+let Login = require('./login.js'),
+	ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
 
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
-	Login.initialize();
-	
-	_intakectrl.playIntro();
 
-	Login.bindResizeEvents('gateway');
+	Login.initialize();
+
+	let t = $.url(window.location.href).param('t');
+
+	if (t === undefined) {
+		_intakectrl.playIntro();
+		Login.bindResizeEvents('gateway');
+	}
+	else {
+		ModuleCoordinator.initialize();
+		ModuleCoordinator.seek(t / 100);
+
+		let curtain = $('<div>').addClass('curtain');
+		$('body').append(curtain);
+
+		Login.takeMeTo('explore');
+
+		setTimeout(function () {
+			curtain.cssAnimation('fall')
+				.always(function () {
+					curtain.remove();
+				});
+
+			// This trick is done so that the timeline scrolls smoothly into view
+			// but is then fixed to the window rather than the module. The ol' switcharoo
+
+			ModuleCoordinator.timeline.anchor = $('body'); 
+			ModuleCoordinator.timeline.enter();
+		}, 100);
+	}
 });
 
 
 // Globals
 
 window.Login = Login;
-window.ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
+window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
 window.$ = $;

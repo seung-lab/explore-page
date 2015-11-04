@@ -3,7 +3,7 @@ let $ = require('jquery'),
 	Easing = require('../../clientjs/easing.js'),
 	ExploreModule = require('../explore.js');
 	
-class Amazing extends ExploreModule{
+class Amazing extends ExploreModule {
 	constructor(args = {}) {
 		super(args);
 

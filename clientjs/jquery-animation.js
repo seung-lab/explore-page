@@ -253,4 +253,69 @@ $.fn.scrambleText = function (args = {}) {
  	return deferred;
 };
 
+/* cssAnimation
+ *
+ * Execute a css animation by attaching an animation
+ * class and removing it once complete.
+ *
+ * Required: 
+ *   [0] animation_class: (string) CSS class that contains a
+ *		   complete description of the animation.
+ *
+ * Optional:
+ *   [1] final_state_class: (string) CSS class that represents the 
+ *     static terminal state of the animation.
+ *   [2] callback
+ * 
+ * Returns: this
+ */
+$.fn.cssAnimation = function (animation_class, final_state_class) {
+	let deferred = $.Deferred();
+	let _this = this;
+
+	deferred.always(function () {
+		$(_this)
+			.addClass(final_state_class)
+			.removeClass(animation_class);
+	})
+
+	$(this)
+		.addClass(animation_class)
+		.motionend(function () {
+			deferred.resolve();
+		});
+
+	return deferred;
+};
+
+
+/* animationend
+ *
+ * Shorthand for all the browser prefixes
+ * for a one off animation end event.
+ *
+ * Required: 
+ *   [0] fn
+ * 
+ * Returns: this 
+ */
+$.fn.animationend = function (fn) {
+	return $(this).one('animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd', fn);
+};
+
+$.fn.transitionoff = function () {
+	return $(this).off('animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd');
+};
+
+$.fn.transitionend = function (fn) {
+	return $(this).one('transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd', fn);
+};
+
+$.fn.transitionoff = function () {
+	return $(this).off('transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd');
+};
+
+$.fn.motionend = function (fn) {
+	return $(this).one('animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd', fn);
+};
 

@@ -265,7 +265,7 @@ var $ = jQuery;
         }
     };
 
-    purl.jQuery(window.jQuery);
+    purl.jQuery(jQuery);
 
     return purl;
 

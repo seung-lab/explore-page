@@ -38,30 +38,23 @@ Login.initRegistration = function () {
 }
 
 Login.bindResizeEvents = function (stage) {
-	if (stage === 'gateway') {
+	if (stage === 'gateway'
+		|| stage === 'intake'
+		|| stage === 'explore') {
+
 		$(window).ion('resize', function () {
-			$('#viewport').scrollTo('#gateway', {
-				msec: 0,
-			})
-		});
-	}
-	else if (stage === 'intake') {
-		$(window).ion('resize', function () {
-			$('#viewport').scrollTo('#intake', {
-				msec: 0,
-			})
-		});
-	}
-	else if (stage === 'explore') {
-		$(window).ion('resize', function (evt) {
-			$('#viewport').scrollTo('#explore', {
-				msec: 0,
-			});
+			Login.takeMeTo(stage);
 		});
 	}
 	else {
 		throw new Error(`A valid stage was not provided: ${stage}`);
 	}
+};
+
+Login.takeMeTo = function (stage) {
+	$('#viewport').scrollTo(`#${stage}`, {
+		msec: 0,
+	});
 };
 
 Login.IntakeView = function () {
