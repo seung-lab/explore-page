@@ -55,6 +55,8 @@ Login.takeMeTo = function (stage) {
 	$('#viewport').scrollTo(`#${stage}`, {
 		msec: 0,
 	});
+
+	Login.bindResizeEvents(stage);
 };
 
 Login.IntakeView = function () {
