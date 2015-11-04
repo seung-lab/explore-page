@@ -27,7 +27,7 @@ var extend = require('node.extend');
 
 gulp.task('default', ['make']);
 
-gulp.task('make', ['images', 'animations', 'js', 'css', 'jsx' ]);
+gulp.task('make', ['images', 'animations', 'js', 'css' ]);
 
 // gulp.task('sprite', function () {
 // 	gulp.src("assets/images/sprite")
