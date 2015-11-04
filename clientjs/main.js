@@ -24,7 +24,15 @@ $(document).ready(function () {
 	}
 	else {
 		ModuleCoordinator.initialize();
-		ModuleCoordinator.seek(t / 100);
+
+		if (t.match(/^\d+$/)) {
+			t = parseInt(t, 10) / 100;
+		}
+		else {
+			t = ModuleCoordinator.tForName(t);
+		}
+
+		ModuleCoordinator.seek(t);
 
 		let curtain = $('<div>').addClass('curtain');
 		$('body').append(curtain);

@@ -48,6 +48,22 @@ ModuleCoordinator.initialize = function () {
 	ModuleCoordinator.initHotkeys();
 };
 
+ModuleCoordinator.tForName = function (name) {
+	if (typeof name === 'number') {
+		return utils.clamp(name, 0, 1);
+	}
+
+	let mods = ModuleCoordinator.modules;
+
+	for (let i = 0; i < mods.length; i++) {
+		if (mods[i].name.toLowerCase() === name.toLowerCase()) {
+			return mods[i].begin;
+		}
+	}
+
+	return 0;
+};
+
 
 ModuleCoordinator.initHotkeys = function () {
 	$(document).ion('keydown', function (evt) {
