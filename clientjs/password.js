@@ -2,7 +2,7 @@
 
 var $ = require('jquery');
 
-var PasswordUtils = {};
+var Password = {};
 
 /* quickValidatePassword
  *
@@ -15,7 +15,7 @@ var PasswordUtils = {};
  *
  * Returns: boolean
  */
-PasswordUtils.quickValidatePassword = function (password, username, coordinator) {
+Password.quickValidatePassword = function (password, username, coordinator) {
 	if (!password) {
 		coordinator.lazySet('password', false, 'zero-length');
 		return false;
@@ -25,10 +25,10 @@ PasswordUtils.quickValidatePassword = function (password, username, coordinator)
 		return false;
 	}
 
-	return PasswordUtils.quickValidatePasswordNoLength(password, username, coordinator);
+	return Password.quickValidatePasswordNoLength(password, username, coordinator);
 };
 
-PasswordUtils.quickValidatePasswordNoLength = function (password, username, coordinator) {
+Password.quickValidatePasswordNoLength = function (password, username, coordinator) {
 	if (!password || password.length <= 4) {
 		coordinator.lazySet('password', true);
 		return true;
@@ -86,8 +86,8 @@ PasswordUtils.quickValidatePasswordNoLength = function (password, username, coor
  *
  * Returns one of: "terrible", "poor", "acceptable", "good", "strong"
  */
-PasswordUtils.qualifyPassword = function (password, username, coordinator) {
-	var valid = PasswordUtils.quickValidatePasswordNoLength(password, username, coordinator);
+Password.qualifyPassword = function (password, username, coordinator) {
+	var valid = Password.quickValidatePasswordNoLength(password, username, coordinator);
 	
 	if (!valid) {
 		return 0;
@@ -225,4 +225,4 @@ function passwordStreakCheck (password) {
 	return Math.max.apply(undefined, chars);
 }
 
-module.exports = PasswordUtils;
+module.exports = Password;

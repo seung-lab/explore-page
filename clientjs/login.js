@@ -3,6 +3,7 @@
 let $ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
+	Validate = require('./validate.js'),
 	Gateway = require('../components/gateway.js'),
 	Header = require('../components/header.js'),
 	Registration = require('../components/registration.js'),
@@ -219,17 +220,6 @@ Login.facebookLogin = function (args) {
 	});	
 };
 
-function loginFacebookAccountFixtext (reason) {
-	if (reason === 'not-registered') {
-		return _("Please sign up to use this Facebook account.");
-	}
-	else if (reason === 'not-connected') {
-		return _("Sign out of Facebook and try again.");
-	}
-
-	return _("Unknown Facebook error. Please contact support.");
-}
-
 /* standardRegistration
  *
  * Attempt to register and sign in using standard
@@ -283,24 +273,43 @@ Login.standardRegistration = function (args) {
 	return deferred;
 };
 
+
+/* facebookRegistration
+ *
+ * 
+ *
+ * Required:
+ *   username
+ *   access_token
+ *   coordinator
+ *
+ * Return: 
+ */
 Login.facebookRegistration = function (args) {
 	args = args || {};
 
-	var coordinator = args.coordinator;
+	let deferred = $.Deferred();
 
-	Login.validateUsername(coordinator);
+	var coordinator = args.coordinator;
+	var username = args.username || "";
+
+	Validate.Registration.username(username, coordinator);
 
 	if (!coordinator.execute()) {
 		focusOnFirstError(coordinator, 'register');
-		return;
+		return deferred.reject({
+			invalid_parameters: true,
+		}).promise();
 	}
 
 	if (!args.username || !args.access_token) {
-		return;
+		return deferred.reject({
+			missing: true,
+		}).promise();
 	}
 
 	var postdata = {
-		username: args.username,
+		username: username,
 		access_token: args.access_token
 	};
 
@@ -309,8 +318,11 @@ Login.facebookRegistration = function (args) {
 		
 		if (response.success) {
 			continueOn();
+			deferred.resolve();
 		}
 		else {
+			deferred.reject(response.reasons);
+
 			if (response.reasons.username) {
 				coordinator.set('username', false, response.reasons.username);
 			}
@@ -326,25 +338,8 @@ Login.facebookRegistration = function (args) {
 			}
 		}
 	});
-}
 
-function registrationFacebookAccountFixtext (reason) {
-	if (reason === 'taken') {
-		return _("Your Facebook account is already registered.");
-	}
-
-	return _("Please contact support.");
-}
-
-function registrationAccessTokenFixtext (reason) {
-	if (reason === 'missing') {
-		return _("Try signing in to Facebook again.");
-	}
-	else if (reason === 'invalid') {
-		return _("Sign out of Facebook and try again.");
-	}
-
-	return _("Unknown Facebook authorization error. Please contact support.");
+	return deferred.promise();
 }
 
 /* configurePage
@@ -497,7 +492,7 @@ function createLoginCoordinator () {
 				{
 					elem: $('#username'),
 					errorelem: $('#usernameerror'),
-					fixtextfn: Login.loginUsernameFixtext,
+					fixtextfn: Validate.Login.usernameFixtext,
 					condition: 'username'
 				},
 				{
@@ -596,133 +591,6 @@ function configureForgotPassword () {
 			.show();
 	}
 }
-
-/* loginForgotPasswordFixtext
- *
- * Provides fixtext for various reasons that the server may
- * accept or reject a reset password request.
- *
- * Required:
- *   [0] reason
- *
- * Returns: fixtext string
- */
-Login.loginForgotPasswordFixtext = function (reason) {
-	if (reason === 'success') {
-		return _("An email has been sent.");
-	}
-
-	if (reason === 'no-identifier') {
-		return _("Please enter your username or email.");
-	}
-	else if (reason === 'user-not-found') {
-		return _("This username or email was not registered.");
-	}
-	else if (reason === 'failed' || reason === 'email-failed') {
-		return _("Unable to process. Please contact support.");
-	}
-	else if (reason === 'limit-exceeded') {
-		return _("Too many attempts. Please try back later.");
-	}
-
-	return _("Unknown error. Please contact support.");
-}
-
-/* loginValidateUsername
- *
- * Validates the username field checking for emails
- * and accounts names.
- *
- * Required:
- *   [0] usernamefield
- *   [1] coordinator
- *
- * Returns: void
- */
-function loginValidateUsername(usernamefield, coordinator) {
-	var username = $(usernamefield).val();
-	username = $.trim(username);
-
-	if (!username.length) {
-		coordinator.set('username', false, 'minimum-length');
-	}
-	else if (username.match(/[,\[\]\s]/i)) {
-		coordinator.set('username', false, 'available-username');
-	}
-	else {
-		var type = 'username';
-		if (username.match(/@/)) {
-			type = 'email';
-		}
-
-		var url = '/1.0/internal/account/available/' + type + '/' + encodeURIComponent(username);
-		$.getJSON(url, function (data) {
-			if (data.available) {
-				coordinator.set('username', false, 'available-' + type);
-			}
-			else {
-				coordinator.set('username', true);
-			}
-		});
-	}
-}
-
-function loginValidateUsernameNoLength(usernamefield, coordinator) {
-	var username = $(usernamefield).val();
-	username = $.trim(username);
-
-	if (!username) {
-		coordinator.set('username', true);
-	}
-	else {
-		loginValidateUsername(usernamefield, coordinator);
-	}
-}
-
-/* loginUsernameFixtext
- *
- * Provides fixtext for various reasons that the server may
- * reject a username.
- *
- * Required:
- *   [0] reason
- *
- * Returns: fixtext string
- */
-Login.loginUsernameFixtext = function (reason) {
-	if (reason === 'minimum-length') {
-		return _("Please enter your username or email.");
-	}
-	else if (reason === 'available-username') {
-		return _("This name is not registered. Did you misspell it?");
-	}
-	else if (reason === 'available-email') {
-		return _("This email is not registered. Did you misspell it?");
-	}
-
-	return _("Please contact support and describe what you were doing.");
-}
-
-/* loginPasswordFixtext
- *
- * Provides fixtext for various reasons that the server may
- * reject a password.
- *
- * Required:
- *   [0] reason
- *
- * Returns: fixtext string
- */
-Login.loginPasswordFixtext = function (reason) {
-	if (reason === 'minimum-length') {
-		return _("Please enter your password.");
-	}
-	else if (reason === 'invalid') {
-		return _("Please double-check your password.");
-	}
-
-	return _("Please contact support and describe what you were doing.");
-};
 
 // /* configureRegistrationPage
 //  *
@@ -833,228 +701,6 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 			});
 		});
 }
-
-/* quickValidateUsernameNoLength
- *
- * In the interests of streamlining, we can evaluate
- * the username, along dimensions that do not require a
- * database check, in real time.
- *
- * Required:
- *    [0] playcoordinator: A Coordinator.js object
- *
- * Returns: boolean
- */
-Login.quickValidateUsernameNoLength = function (username, coordinator) {
-	if (username.length > 20) {
-		coordinator.set('username', false, 'maximum-length');
-		return false;
-	}
-	else if (!username.match(/^[a-z0-9_\.]*$/i)) {
-		coordinator.set('username', false, 'format');
-		return false;
-	}
-	else if (GLOBAL.takenusernames[username]) {
-		coordinator.set('username', false, GLOBAL.takenusernames[username]);
-		return false;
-	}
-	else {
-		coordinator.set('username', true);
-		return true;
-	}
-}
-
-/* validateUsername
- *
- * Performs full validation (including DB checks)
- * of the username.
- *
- * Required:
- *    [0] coordinator: A Coordinator.js object
- *
- * Returns: deferred object
- */
-Login.validateUsername = function (username, coordinator) {
-	if (!Login.quickValidateUsernameNoLength(username, coordinator)) {
-		return $.Deferred().reject();
-	}
-	else if (username.length === 0) {
-		coordinator.set('username', false, 'zero-length');
-	}
-
-	var url = '/1.0/internal/account/available/username/' + encodeURIComponent(username);
-	return $.getJSON(url, function (data) {
-		if (data.available) {
-			coordinator.set('username', true);
-			GLOBAL.takenusernames[username] = null;
-		}
-		else {
-			GLOBAL.takenusernames[username] = data.reason || 'taken';
-			coordinator.set('username', false, data.reason);
-		}
-	});
-}
-
-Login.validateUsernameNoLength = function (username, coordinator) {
-	if (username.length === 0) {
-		coordinator.set('username', true);
-		return $.Deferred().resolve();
-	}
-	else {
-		return Login.validateUsername(username, coordinator);
-	}
-}
-
-
-/* registrationUsernameFixtext
- *
- * Provides fixtext for various reasons that the server may
- * reject a username.
- *
- * Required:
- *   [0] reason
- *
- * Returns: fixtext string
- */
-Login.registrationUsernameFixtext = function (reason) {
-	if (reason === 'taken') {
-		return _("This name is taken.");
-	}
-	else if (reason === 'hyperlink') {
-		return _("Your name shouldn't look like a link.");
-	}
-	else if (reason === 'reserved') {
-		return _("Your name may not contain official titles.");
-	}
-	else if (reason === 'PENIS') {
-		return _("Hint: We're not laughing with you.");
-	}
-	else if (reason === 'zero-length') {
-		return _("Please choose a name.");
-	}
-	else if (reason === 'minimum-length') {
-		return _("Please choose a longer name.");
-	}
-	else if (reason === 'maximum-length') {
-		return _("Please choose a name up to twenty characters long.");
-	}
-	else if (reason === 'format') {
-		return _("Please use only letters, numbers, and underscores.");
-	}
-
-	return _("Please contact support if you really want this name.");
-};
-
-/* registrationPasswordFixtext
- *
- * Translates validation problems into fixtext.
- *
- * Required:
- *   [0] reason: A string representing a canonicalization of the issue
- *
- * Returns: English text 
- */
-Login.registrationPasswordFixtext = function (reason) {
-	if (reason === 'zero-length') {
-		return _("Please enter a password.");
-	}
-	else if (reason === 'minimum-length') {
-		return _("Please enter at least six characters.");
-	}
-	else if (reason === 'username') {
-		return _("Including your username is not a good idea.");
-	}
-	else if (reason === 'character-classes') {
-		return _("Please use a mixture of lower case, upper case, digits, and symbols.");
-	}
-	else if (reason === 'streak' || reason == 'ratio') {
-		return _("Please use more variation in your password.");
-	}
-	else if (reason === 'simplicity') {
-		return _("Please make your password stronger.");
-	}
-
-	return _("Please contact support if you really want this password.");
-}
-
-/* quickValidateEmail
- *
- * Evaluates the email along dimensions that do not
- * require the server.
- *
- * Required:
- *    [0] emailfield
- *    [1] coordinator
- *
- * Returns: deferred
- */
-Login.validateEmailNoLength = function (email, coordinator) {
-	email = email.trim();
-
-	if (email.length === 0) {
-		coordinator.lazySet('email', true);
-		return $.Deferred().resolve();
-	}
-
-	return Login.validateEmail(email, coordinator);
-}
-
-Login.validateEmail = function (email, coordinator) {
-	email = email.trim();
-
-	if (email.length === 0) {
-		coordinator.lazySet('email', false, 'zero-length');
-		return $.Deferred().reject('zero-length');
-	}
-	else if (!email.match(/^.+@.+\.[a-z]{2,4}$/i)) {
-		coordinator.lazySet('email', false, 'format');
-		return $.Deferred().reject('format');
-	}
-	else if (GLOBAL.takenemails[email]) {
-		coordinator.lazySet('email', false, GLOBAL.takenemails[email]);
-		return $.Deferred().reject(GLOBAL.takenemails[email]);
-	}
-
-	var deferred = $.Deferred();
-
-	var url = '/1.0/internal/account/available/email/' + encodeURIComponent(email);
-	$.getJSON(url, function (data) {
-		if (data.available) {
-			coordinator.set('email', true);
-			deferred.resolve();
-		}
-		else {
-			GLOBAL.takenemails[email] = data.reason;
-			coordinator.set('email', false, data.reason);
-			deferred.reject(data.reason);
-		}
-	});
-
-	return deferred;
-}
-
-/* registrationEmailFixtext
- *
- * Translates validation problems into fixtext.
- *
- * Required:
- *   [0] reason: A string representing a canonicalization of the issue
- *
- * Returns: English text 
- */
-Login.registrationEmailFixtext = function (reason) {
-	if (reason === 'zero-length') {
-		return _("Please enter an email.");
-	}
-	else if (reason === 'taken') {
-		return _("Please choose another email; this one is taken.");
-	}
-	else if (reason === 'format') {
-		return _("Email may not be correctly formatted.");
-	}
-
-	return _("Please contact support if you really want to use this email.");
-};
 
 /* playNowContinueHandler
  *
@@ -1213,46 +859,46 @@ function coordinationFailure(stack, conds, data) {
 	}
 }
 
-/* focusOnFirstError
- *
- * Moves the focus to the first error in the registration
- * workflow.
- *
- * Required:
- *   [0] coordinator: a Coordinator.js object
- *
- * Returns: void
- */
-function focusOnFirstError (coordinator, mode) {
-	var order; 
-	var translation;
+// /* focusOnFirstError
+//  *
+//  * Moves the focus to the first error in the registration
+//  * workflow.
+//  *
+//  * Required:
+//  *   [0] coordinator: a Coordinator.js object
+//  *
+//  * Returns: void
+//  */
+// function focusOnFirstError (coordinator, mode) {
+// 	var order; 
+// 	var translation;
 
-	if (mode == 'login') {
-		order = ['username', 'password'];
-		translation = {
-			username: $("#username"),
-			password: $("#loginpassword")
-		};
-	}
-	else {
-		order = ['username', 'password', 'email'];
-		translation = {
-			username: $("#username"),
-			password: $("#registrationpassword"),
-			email: $("#email")
-		};
-	}
+// 	if (mode == 'login') {
+// 		order = ['username', 'password'];
+// 		translation = {
+// 			username: $("#username"),
+// 			password: $("#loginpassword")
+// 		};
+// 	}
+// 	else {
+// 		order = ['username', 'password', 'email'];
+// 		translation = {
+// 			username: $("#username"),
+// 			password: $("#registrationpassword"),
+// 			email: $("#email")
+// 		};
+// 	}
 
-	for (var i = 0; i < order.length; i++) {
-		var key = order[i];
-		if (!coordinator.conds[key]) {
-			translation[key].one('focus', function (evt) {
-				evt.stopImmediatePropagation();
-			}).focus();
-			translation[key].thinking('cancel');
-			return;
-		}
-	}
-}
+// 	for (var i = 0; i < order.length; i++) {
+// 		var key = order[i];
+// 		if (!coordinator.conds[key]) {
+// 			translation[key].one('focus', function (evt) {
+// 				evt.stopImmediatePropagation();
+// 			}).focus();
+// 			translation[key].thinking('cancel');
+// 			return;
+// 		}
+// 	}
+// }
 
 module.exports = Login;

@@ -1,7 +1,8 @@
 var Coordinator = require('../clientjs/coordinator.js').Coordinator,
 	Utils = require('../clientjs/utils.js'),
 	Synapse = require('./synapse.js'),
-	PasswordUtils = require('../clientjs/PasswordUtils.js'),
+	Validate = require('../clientjs/validate.js'),
+	Password = require('../clientjs/password.js'),
 	GLOBAL = require('../clientjs/GLOBAL.js');
 
 let Login; // avoid circular reference
@@ -38,40 +39,32 @@ class Registration extends Synapse {
 				_this.clearErrors();
 			})
 			.fail(function (conds, data) { 
-				let fixtext = Login.registrationUsernameFixtext(data.username);
+				let fixtext = Validate.Registration.usernameFixtext(data.username);
 				_this.view.username.addClass('error');
 				_this.view.error.username
 					.addClass('error')
 					.text(fixtext);
+
+				_this.focusOnFirstError();
 			})
 	}
 
 	stageTwoCoordinator () {
+		let _this = this; 
+
 		return Coordinator(this.coordinator.conds, this.coordinator.data)
 			.done(function () {
 				_this.clearErrors();
 			})
 			.fail(function (conds, data) {
-				var stack = [
-					{
-						fixtextfn: Login.registrationUsernameFixtext,
-						condition: 'username'
-					},
-					{
-						fixtextfn: Login.registrationPasswordFixtext,
-						condition: 'password'
-					},
-					{
-						fixtextfn: Login.registrationEmailFixtext,
-						condition: 'email'
-					}
-				];
-
-				coordinationFailure(stack, conds, data);
+				_this.assignErrorMessages();
+				_this.focusOnFirstError();
 			})
 	}
 
 	clearErrors () {
+		let _this = this; 
+
 		_this.view.username.removeClass('error');
 		_this.view.password.removeClass('error');
 		_this.view.email.removeClass('error');
@@ -81,7 +74,6 @@ class Registration extends Synapse {
 			_this.view.error[field].removeClass('error');
 		});
 	}
-
 
 	attachEventListeners () {
 		let _this = this;
@@ -106,6 +98,7 @@ class Registration extends Synapse {
 					}
 					else {
 						_this.state.stage = 2;
+						_this.coordinator = _this.stageTwoCoordinator();
 						_this.render();
 					}
 				})
@@ -143,7 +136,7 @@ class Registration extends Synapse {
 
 		_this.view.password
 			.ion('focus.validation', function () {
-				var valid = PasswordUtils.quickValidatePassword(pval(), uval(), _this.coordinator);
+				var valid = Password.quickValidatePassword(pval(), uval(), _this.coordinator);
 				if (valid) {
 					_this.coordinator.execute();
 				}
@@ -153,18 +146,18 @@ class Registration extends Synapse {
 				_this.adjustPasswordMeter();
 			})
 			.ion('blur.validation', function () {
-				PasswordUtils.quickValidatePasswordNoLength(pval(), uval(), _this.coordinator);
+				Password.quickValidatePasswordNoLength(pval(), uval(), _this.coordinator);
 				_this.coordinator.execute();
 			})
 			.ion('keyup.validation keypress.validation', function () {
-				var valid = PasswordUtils.quickValidatePassword(pval(), uval(), _this.coordinator);
+				var valid = Password.quickValidatePassword(pval(), uval(), _this.coordinator);
 
 				if (valid) {
 					_this.coordinator.execute();
 				}
 			})
 			.ithinking({ idle: 1500 }, function () {
-				PasswordUtils.quickValidatePassword(pval(), uval(), _this.coordinator);
+				Password.quickValidatePassword(pval(), uval(), _this.coordinator);
 				_this.coordinator.execute();
 			});
 	}
@@ -178,20 +171,20 @@ class Registration extends Synapse {
 
 		_this.view.email
 			.ithinking({ idle: 2000 }, function () {
-				Login.validateEmail(val(), _this.coordinator);
+				Validate.Registration.email(val(), _this.coordinator);
 				_this.coordinator.execute();
 			})
 			.ion('keydown.state', function () {
 				_this.state.email = val().trim();
 			})
 			.ion('focus.validation keyup.validation keypress.validation', function () {
-				Login.validateEmailNoLength(val(), _this.coordinator)
+				Validate.Registration.emailNoLength(val(), _this.coordinator)
 					.done(function () {
 						_this.coordinator.execute();	
 					});
 			})
 			.ion('blur.validation', Utils.UI.trim(function () {
-				Login.validateEmailNoLength(val(), _this.coordinator);
+				Validate.Registration.emailNoLength(val(), _this.coordinator);
 				_this.coordinator.execute();
 			}));
 	}
@@ -205,23 +198,23 @@ class Registration extends Synapse {
 
 		_this.view.username
 			.ithinking({ idle: 750 }, function () {
-				Login.validateUsernameNoLength(val(), _this.coordinator);
+				Validate.Registration.usernameNoLength(val(), _this.coordinator);
 			})
 			.ion('keydown.state input.state', function () {
 				_this.state.username = val();
 				_this.adjustPasswordMeter();
 			})
 			.ion('keyup.validation keypress.validation', function () {
-				Login.quickValidateUsernameNoLength(val(), _this.coordinator);
+				Validate.Registration.usernameNoLengthInstant(val(), _this.coordinator);
 			})
 			.ion('focus.adjust', Utils.UI.trim())
 			.ion('blur.validation', Utils.UI.trim(function () {
-				Login.validateUsernameNoLength(val(), _this.coordinator);
+				Validate.Registration.usernameNoLength(val(), _this.coordinator);
 			}));
 	}
 
 	adjustPasswordMeter () {
-		let ratio = PasswordUtils.qualifyPassword(
+		let ratio = Password.qualifyPassword(
 			this.state.password,
 			this.state.username, 
 			this.coordinator
@@ -229,6 +222,93 @@ class Registration extends Synapse {
 
 		ratio = Utils.clamp(ratio * 100, 0, 100);
 		this.view.password_meter.find('.strength').css('width',  `${ratio}%`);
+	}
+
+	assignErrorMessages () {
+		let _this = this;
+
+		let stack = [
+			{
+				fixtextfn: Validate.Registration.usernameFixtext,
+				condition: 'username',
+			},
+			{
+				fixtextfn: Validate.Registration.passwordFixtext,
+				condition: 'password',
+			},
+			{
+				fixtextfn: Validate.Registration.emailFixtext,
+				condition: 'email',
+			}
+		];
+
+		let first = true;
+
+		for (let i = 0; i < stack.length; i++) {
+			let condition = stack[i].condition;
+			let fixtextfn = stack[i].fixtextfn;
+
+
+			let field = _this.view[condition],
+				msg = _this.view.error[condition];
+
+			if (!_this.coordinator.conds[condition]) {
+				field.addClass('error');
+				
+				if (first) {
+					msg
+						.addClass('error')
+						.text(
+							fixtextfn(_this.coordinator.data[condition])
+						);
+					
+					first = false;
+				}
+				else {
+					msg.removeClass('error');
+				}
+			}
+			else {
+				if (_this.state[condition] === '') {
+					first = false; // prevents flickering cascades
+				}
+
+				field.removeClass('error');
+				msg.removeClass('error').text("");
+			}
+		}
+	}
+
+	/* focusOnFirstError
+	 *
+	 * Moves the focus to the first error in the registration
+	 * workflow.
+	 *
+	 * Returns: void
+	 */
+	focusOnFirstError () {
+		let _this = this;
+
+		let order = ['username', 'email', 'password' ];
+
+		for (let i = 0; i < order.length; i++) {
+			let key = order[i];
+
+			let elem = _this.view[key];
+
+			if (_this.coordinator.conds[key]) {
+				continue;
+			}
+
+			return elem
+					.one('focus', function (evt) {
+						evt.stopImmediatePropagation();
+					})	
+					.focus()
+					.thinking('cancel');
+		}
+
+		return null;
 	}
 
 	generateView () {

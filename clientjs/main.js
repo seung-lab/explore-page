@@ -11,7 +11,7 @@ let Login = require('./login.js'),
 	ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
 
 var _intakectrl = new Login.IntakeController();
-
+		
 $(document).ready(function () {
 
 	Login.initialize();
