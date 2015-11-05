@@ -1,9 +1,9 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js'),
-	ExploreModule = require('../explore.js');
+	TeaTime = require('../teatime.js');
 	
-class Amazing extends ExploreModule {
+class Amazing extends TeaTime {
 	constructor(args = {}) {
 		super(args);
 

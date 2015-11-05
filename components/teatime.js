@@ -2,7 +2,7 @@ let $ = require('jquery'),
 	utils = require('../clientjs/utils.js'),
 	Synapse =require('./synapse.js');
 	
-class ExploreModule extends Synapse {
+class TeaTime extends Synapse {
 	constructor(args = {}) {
 		super(args);
 
@@ -77,7 +77,7 @@ class ExploreModule extends Synapse {
 }
 
 
-module.exports = ExploreModule;
+module.exports = TeaTime;
 
 
 
