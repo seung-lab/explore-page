@@ -15,7 +15,8 @@
 	margin-bottom 100vh
 
 .registration .field,
-.registration .password-meter
+.registration .password-meter,
+.registration .errormsg
 	transition height 100ms, margin 100ms, padding 100ms, border 100ms, opacity 100ms
 
 .registration.one .email,
@@ -144,5 +145,16 @@
 	
 	color $TEXT_BLUE
 	
-
+.registration .errormsg
+	color #FFF
+	font-size 10px
+	text-align left
+	
+	height 0px
+	width 130px
+	
+.registration .errormsg.error
+	height auto
+	
+	
 

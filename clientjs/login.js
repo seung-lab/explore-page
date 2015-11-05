@@ -20,7 +20,7 @@ Login.initialize = function () {
 		name: "Header",
 	});
 
-	_components.header.enter();
+	_components.header.enter().render();
 
 	_components.gateway = new Gateway({ 
 		anchor: '#gateway',
@@ -229,15 +229,22 @@ Login.facebookLogin = function (args) {
  *   username
  *   password
  *   email
- *   coordinator
  *
  * Returns: void
  */
 Login.standardRegistration = function (args) {
 	args = args || {};
 
+	let zl = (str) => str.length ? false : 'zero-length';
+
 	if (!args.username || !args.password || !args.email) {
-		return $.Deferred().reject();
+		return $.Deferred().reject({
+			reasons: {
+				username: zl(args.username),
+				password: zl(args.password),
+				email: zl(args.email),
+			},
+		});
 	}
 
 	var postdata = {
@@ -246,29 +253,29 @@ Login.standardRegistration = function (args) {
 		email: args.email
 	};
 
-	var coordinator = args.coordinator;
-
 	var deferred = $.Deferred();
 
-	$.post("/1.0/internal/account/register/standard/", postdata, function (response) {
-		if (!response) {
-			deferred.reject();
-			return;
-		}
-		
-		response = $.parseJSON(response);
-		
-		if (response.success) {
-			deferred.resolve();
-		}
-		else {
-			deferred.reject(response);
-			//focusOnFirstError(coordinator, 'register');
-		}
-	})
-	.fail(function () {
-		deferred.reject();
-	});
+	$.post("/1.0/internal/account/register/standard/", postdata)
+		.done(function (response) {
+			if (!response) {
+				deferred.reject();
+				return;
+			}
+			
+			response = $.parseJSON(response);
+			
+			if (response.success) {
+				deferred.resolve();
+			}
+			else {
+				deferred.reject(response);
+			}
+		})
+		.fail(function () {
+			deferred.reject({
+				reasons: { 'network-failure': true },
+			});
+		});
 
 	return deferred;
 };

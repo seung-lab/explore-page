@@ -64,6 +64,10 @@ var Coordinator = function (set = {}, data = {}, test = module.exports.and) {
 	this.data = data;
 };
 
+Coordinator.prototype.ok = function (condition) {
+	return this.conds[condition]();
+};
+
 /*  All callbacks provided to done and fail are of the following form:
  *
  *  function (conditions, data) { ... }
@@ -128,10 +132,9 @@ Coordinator.prototype.execute = function () {
 		_this.failure.forEach(function (fn) {
 			fn(_this.conds, _this.data);
 		});
+		
 		return false;
 	}
-
-	return _this;
 };
 
 /* set

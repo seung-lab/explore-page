@@ -20,7 +20,7 @@ class Synapse {
 		transition = transition || $.Deferred().resolve();
 
 		if (this.visible) {
-			return $.Deferred().resolve();
+			return this;
 		}
 
 		this.beforeEnter(transition);
@@ -33,7 +33,7 @@ class Synapse {
 
 		this.afterEnter(transition);
 
-		return $.Deferred().resolve();
+		return this;
 	}
 
 	beforeEnter () {}
@@ -41,9 +41,9 @@ class Synapse {
 
 	exit (transition) {
 		transition = transition || $.Deferred().resolve();
-		
+
 		if (!this.visible) {
-			return $.Deferred().resolve();
+			return this;
 		}
 
 		this.beforeExit(transition);
@@ -55,14 +55,14 @@ class Synapse {
 
 		this.afterExit(transition);
 
-		return $.Deferred().resolve();
+		return this;
 	}
 
 	beforeExit () {}
 	afterExit () {}
 
 	render () {
-	
+		return this;
 	}
 }
 

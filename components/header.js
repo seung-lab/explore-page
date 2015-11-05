@@ -8,6 +8,8 @@ class Header extends Synapse {
 		super(args);
 
 		this.view = this.generateView();
+
+		this.mode = args.mode || 'share';
 	}
 
 	generateView () {
@@ -15,12 +17,16 @@ class Header extends Synapse {
 		let logo = $('<div>').addClass('logotype');
 
 		let share = $('<div>').addClass('icon share');
+		let login = $('<div>').addClass('icon login');
+		let register = $('<div>').addClass('icon register');
 
-		container.append(logo, share);
+		container.append(logo, share, login, register);
 
 		return {
 			module: container,
 			logo: logo,
+			login: login,
+			register: register,
 			share: share,
 		};
 	}
@@ -33,7 +39,13 @@ class Header extends Synapse {
 	}
 
 	render () {
-		
+		let _this = this;
+
+		[ 'login', 'register', 'share' ].forEach(function (icon) {
+			_this.view[icon].removeClass('visible');
+		});
+
+		_this.view[_this.mode].addClass('visible');		
 	}
 }
 

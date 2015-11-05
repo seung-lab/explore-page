@@ -44,8 +44,6 @@ class Registration extends Synapse {
 				_this.view.error.username
 					.addClass('error')
 					.text(fixtext);
-
-				_this.focusOnFirstError();
 			})
 	}
 
@@ -58,7 +56,6 @@ class Registration extends Synapse {
 			})
 			.fail(function (conds, data) {
 				_this.assignErrorMessages();
-				_this.focusOnFirstError();
 			})
 	}
 
@@ -248,11 +245,10 @@ class Registration extends Synapse {
 			let condition = stack[i].condition;
 			let fixtextfn = stack[i].fixtextfn;
 
-
 			let field = _this.view[condition],
 				msg = _this.view.error[condition];
 
-			if (!_this.coordinator.conds[condition]) {
+			if (!_this.coordinator.ok(condition)) {
 				field.addClass('error');
 				
 				if (first) {
@@ -296,7 +292,7 @@ class Registration extends Synapse {
 
 			let elem = _this.view[key];
 
-			if (_this.coordinator.conds[key]) {
+			if (_this.coordinator.ok(key)) {
 				continue;
 			}
 
@@ -412,6 +408,8 @@ class Registration extends Synapse {
 	}
 
 	register () {
+		let _this = this;
+
 		Login.standardRegistration({
 			username: this.state.username,
 			email: this.state.email,
@@ -421,17 +419,15 @@ class Registration extends Synapse {
 			Login.continueOn();
 		})
 		.fail(function (response) {
-			if (!response) {
-				return;
-			}
-
 			['username', 'password', 'email'].forEach(function (key) {
 				if (response.reasons[key]) {
-					this.state.coordinator.lazySet(key, false, response.reasons[key]);
+					_this.coordinator.lazySet(key, false, response.reasons[key]);
 				}
 			});
 			
-			this.state.coordinator.execute();
+			_this.coordinator.execute();
+
+			_this.focusOnFirstError();
 		})
 	}
 

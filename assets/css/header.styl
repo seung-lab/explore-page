@@ -29,7 +29,9 @@ $corner_offset = 5%
 	width 120px
 	height 35px
 	
-.header .share
+.header .share,
+.header .login,
+.header .register
 	position absolute
 	top $corner_offset
 	right $corner_offset
@@ -41,6 +43,9 @@ $corner_offset = 5%
 	background-size @height @height
 	background-repeat no-repeat
 	
+	opacity 0
+
+.header .visible
 	opacity .3
 
 
