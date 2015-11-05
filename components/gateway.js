@@ -65,21 +65,14 @@ let Login; // avoid circular reference
 
  			Login.bindResizeEvents('explore');
 
-			ModuleCoordinator.initialize();
-			ModuleCoordinator.seek(0);
-
-			$('#viewport')
+			let transition = $('#viewport')
 				.scrollTo('#explore', {
 					msec: 2000,
 					easing: Easing.springFactory(.9, 0),
-				})
-				.done(function () {
-					// This trick is done so that the timeline scrolls smoothly into view
-					// but is then fixed to the window rather than the module. The ol' switcharoo
+				});
 
-					ModuleCoordinator.timeline.anchor = $('body'); 
-					ModuleCoordinator.timeline.enter();
-				})
+			ModuleCoordinator.initialize(transition);
+			ModuleCoordinator.seek(0);
  		})
  	}
  }

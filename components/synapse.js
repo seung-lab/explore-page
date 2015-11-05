@@ -16,12 +16,14 @@ class Synapse {
 		};
 	}
 
-	enter () {
+	enter (transition) {
+		transition = transition || $.Deferred().resolve();
+
 		if (this.visible) {
 			return $.Deferred().resolve();
 		}
 
-		this.beforeEnter(...arguments);
+		this.beforeEnter(transition);
 
 		this.view.module.detach();
 		this.anchor.append(this.view.module);
@@ -29,7 +31,7 @@ class Synapse {
 
 		this.visible = true;
 
-		this.afterEnter(...arguments);
+		this.afterEnter(transition);
 
 		return $.Deferred().resolve();
 	}
@@ -37,19 +39,21 @@ class Synapse {
 	beforeEnter () {}
 	afterEnter () {}
 
-	exit () {
+	exit (transition) {
+		transition = transition || $.Deferred().resolve();
+		
 		if (!this.visible) {
 			return $.Deferred().resolve();
 		}
 
-		this.beforeExit(...arguments);
+		this.beforeExit(transition);
 
 		this.view.module.hide();
 		this.view.module.detach();
 
 		this.visible = false;
 
-		this.afterExit(...arguments);
+		this.afterExit(transition);
 
 		return $.Deferred().resolve();
 	}

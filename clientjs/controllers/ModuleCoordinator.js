@@ -16,7 +16,7 @@ let ModuleCoordinator = {
 	transition: null,
 };
 
-ModuleCoordinator.initialize = function () {
+ModuleCoordinator.initialize = function (animation) {
 	let anchor = $('#explore');
 
 	ModuleCoordinator.transition = $.Deferred();
@@ -43,7 +43,7 @@ ModuleCoordinator.initialize = function () {
 
 	ModuleCoordinator.container = anchor;
 
-	ModuleCoordinator.timeline.enter();
+	ModuleCoordinator.timeline.enter(animation);
 
 	ModuleCoordinator.initHotkeys();
 };

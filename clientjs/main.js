@@ -23,8 +23,6 @@ $(document).ready(function () {
 		Login.bindResizeEvents('gateway');
 	}
 	else {
-		ModuleCoordinator.initialize();
-
 		if (t.match(/^\d+$/)) {
 			t = parseInt(t, 10) / 100;
 		}
@@ -32,27 +30,30 @@ $(document).ready(function () {
 			t = ModuleCoordinator.tForName(t);
 		}
 
-		ModuleCoordinator.seek(t);
-
-		let curtain = $('<div>').addClass('curtain');
-		$('body').append(curtain);
-
-		Login.takeMeTo('explore');
-
-		setTimeout(function () {
-			curtain.cssAnimation('fall')
-				.always(function () {
-					curtain.remove();
-				});
-
-			// This trick is done so that the timeline scrolls smoothly into view
-			// but is then fixed to the window rather than the module. The ol' switcharoo
-
-			ModuleCoordinator.timeline.anchor = $('body'); 
-			ModuleCoordinator.timeline.enter();
-		}, 100);
+		jumpToExplore(t);
 	}
 });
+
+function jumpToExplore (t) {
+	let curtain = $('<div>').addClass('curtain');
+	$('body').append(curtain);
+
+	Login.takeMeTo('explore');
+
+	let transition = $.Deferred();
+
+	setTimeout(function () {
+		curtain.cssAnimation('fall')
+			.always(function () {
+				curtain.remove();
+			});
+
+		transition.resolve();
+	}, 100);
+
+	ModuleCoordinator.initialize(transition);
+	ModuleCoordinator.seek(t);
+}
 
 
 // Globals

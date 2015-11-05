@@ -1,8 +1,11 @@
 let utils = require('../clientjs/utils.js'),
+	Synapse = require('./synapse.js'),
 	$ = require('jquery');
 
-class Timeline {
+class Timeline extends Synapse {
 	constructor (args = {}) {
+		super(args);
+
 		this.t = args.t || 0;
 		this.parent = args.parent;
 		this.view = this.generateView();
@@ -41,25 +44,20 @@ class Timeline {
 		this.parent.seek(fract);
 	}
 
-	exit () {
-		this.view.module.detach();
-		this.view.module.hide();
+	afterEnter (transition) {
+		let _this = this;
 
-		this.visible = false;
-
-		return $.Deferred().resolve();
+		transition.done(function () { 
+			_this.view.module.detach();
+			$('body').append(_this.view.module);
+		})
 	}
 
-	enter () {
-		this.view.module.detach();
+	beforeExit (transition) {
+		let _this = this;
 
-		this.anchor.append(this.view.module);
-
-		this.view.module.show();
-
-		this.visible = true;
-
-		return $.Deferred().resolve();
+		_this.view.module.detach();
+		_this.anchor.append(_this.view.module);
 	}
 
 	seek (t) {
