@@ -23,6 +23,9 @@ $(document).ready(function () {
 		Login.bindResizeEvents('gateway');
 	}
 	else {
+		let transition = $.Deferred();
+		ModuleCoordinator.initialize(transition);
+
 		if (t.match(/^\d+$/)) {
 			t = parseInt(t, 10) / 100;
 		}
@@ -30,17 +33,15 @@ $(document).ready(function () {
 			t = ModuleCoordinator.tForName(t);
 		}
 
-		jumpToExplore(t);
+		jumpToExplore(t, transition);
 	}
 });
 
-function jumpToExplore (t) {
+function jumpToExplore (t, transition) {
 	let curtain = $('<div>').addClass('curtain');
 	$('body').append(curtain);
 
 	Login.takeMeTo('explore');
-
-	let transition = $.Deferred();
 
 	setTimeout(function () {
 		curtain.cssAnimation('fall')
@@ -51,7 +52,6 @@ function jumpToExplore (t) {
 		transition.resolve();
 	}, 100);
 
-	ModuleCoordinator.initialize(transition);
 	ModuleCoordinator.seek(t);
 }
 

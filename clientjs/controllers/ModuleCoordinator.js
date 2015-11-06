@@ -265,12 +265,9 @@ ModuleCoordinator.render = function (prev_t, t) {
 	let prev_mod = ModuleCoordinator.moduleAt(prev_t);
 	let current_mod = ModuleCoordinator.moduleAt(t);
 
-	let entry_promise = $.Deferred().resolve();
-
 	if (prev_mod !== current_mod) {
-		entry_promise = prev_mod.exit().done(function () {
-			current_mod.enter();
-		})
+		prev_mod.exit();
+		current_mod.enter();
 	}
 	else if (!current_mod.visible) {
 		current_mod.enter();

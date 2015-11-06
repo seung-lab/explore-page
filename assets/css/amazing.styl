@@ -1,12 +1,15 @@
 @require 'colors.styl'
 @require 'mixins.styl'
 
+.module-font 
+	font-family 'Roboto Condensed', 'Lucidia Grande', sans-serif
+	font-weight 700
+
 .amazing
 	height 100%
 	width 100%
 	
-	font-family 'Roboto Condensed', 'Lucidia Grande', sans-serif
-	font-weight 700
+	@extend .module-font
 	
 	display flex
 	flex-direction column
