@@ -5,7 +5,7 @@ let $ = require('jquery'),
 
 let Login; // avoid circular reference
 
- class Gateway extends Synapse {
+class Gateway extends Synapse { // You can only build within a pylon field
  	constructor (args = {}) {
  		args.name = args.name || "Gateway";
  		super(args);

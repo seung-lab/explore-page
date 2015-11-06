@@ -140,7 +140,7 @@ Login.standardAuthenticate = function (args) {
 
 	var coordinator = args.coordinator;
 
-	loginValidateUsername(args.username, coordinator);
+	Validate.Login.username(args.username, coordinator);
 
 	if (!args.password) {
 		coordinator.lazySet('password', false, 'minimum-length');
@@ -678,7 +678,7 @@ function configureForgotPassword () {
 // };
 
 Login.registrationFacebookSelectionHandler = function (username, coordinator) {
-	Login.validateUsername(username, coordinator)
+	Validate.Registration.username(username, coordinator)
 		.done(function () {
 			if (!coordinator.execute()) {
 				return;
