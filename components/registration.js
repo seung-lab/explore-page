@@ -230,12 +230,12 @@ class Registration extends Synapse {
 				condition: 'username',
 			},
 			{
-				fixtextfn: Validate.Registration.passwordFixtext,
-				condition: 'password',
-			},
-			{
 				fixtextfn: Validate.Registration.emailFixtext,
 				condition: 'email',
+			},
+			{
+				fixtextfn: Validate.Registration.passwordFixtext,
+				condition: 'password',
 			}
 		];
 

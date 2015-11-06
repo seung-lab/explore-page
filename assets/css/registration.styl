@@ -4,7 +4,7 @@
 @require 'parallax.styl'
 
 #intake
-	top: 225%
+	top 225%
 
 .registration
 	width 100%
@@ -58,13 +58,15 @@
 	text-transform uppercase
 	color $TEXT_BLUE
 	font-size 11px
-	font-weight 600
+	font-weight 700
 	letter-spacing 1.5px
+	
+	margin-bottom 10px
 
 .fb-connect
 	position relative
 	
-	padding-left 5%
+	padding-left 2%
 	box-sizing border-box
 
 .fb-connect::before
@@ -106,7 +108,7 @@
 	border-radius 100%
 	position absolute
 	
-	background white
+	background $FILL_BLUE
 	
 .registration .progress-indicator:before
 	top -5px
@@ -146,7 +148,7 @@
 	color $TEXT_BLUE
 	
 .registration .errormsg
-	color #FFF
+	color $ACCENT_YELLOW
 	font-size 10px
 	text-align left
 	
@@ -156,7 +158,9 @@
 	opacity 0
 	
 .registration .errormsg.error
-	height 15px
+	line-height 15px
+	height auto
+	min-height 15px
 	opacity 1
 	
 	
