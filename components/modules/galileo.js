@@ -231,7 +231,9 @@ class Galileo extends TeaTime {
 					_this.animateTextScamble(slide);
 				}
 				else {
-					_this.view.story.text.text(slide.text);
+					_this.view.story.text.html(
+						utils.invertedPyramidLineBreak(slide.text)
+					);
 				}
 
 			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);

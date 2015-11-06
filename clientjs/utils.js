@@ -1018,7 +1018,7 @@ Utils.invertedPyramidLineBreak = function (txt) {
 		html += tokens[i];
 		len += tokens[i].length;
 
-		if (!broken && len > midpt) {
+		if (!broken && len >= midpt) {
 			html += '<br>';
 			broken = true;
 		}
@@ -1044,7 +1044,7 @@ Utils.pyramidLineBreak = function (txt) {
 		html += Utils.sreverse(tokens[i]);
 		len += tokens[i].length;
 
-		if (!broken && len > midpt) {
+		if (!broken && len >= midpt) {
 			html += Utils.sreverse('<br>');
 			broken = true;
 		}

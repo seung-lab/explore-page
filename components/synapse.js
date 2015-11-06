@@ -31,6 +31,8 @@ class Synapse {
 
 		this.visible = true;
 
+		console.log("Enter: ", arguments)
+
 		this.afterEnter(...arguments);
 
 		return this;

@@ -431,8 +431,20 @@ class Registration extends Synapse {
 		})
 	}
 
-	afterEnter () {
+	focusOnField (field) {
+		this.view[field].one('focus', function () {
+			evt.stopImmediatePropagation();
+		})
+		.focus()
+	}
+
+	afterEnter (transition) {
+		let _this = this;
 		this.render();
+
+		transition.done(function () {
+			_this.focusOnField();
+		})
 	}
 
 	render () {
