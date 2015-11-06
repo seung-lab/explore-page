@@ -34,8 +34,8 @@ Login.initialize = function () {
 	});
 };
 
-Login.initRegistration = function () {
-	_components.registration.enter();
+Login.initRegistration = function (transition) {
+	_components.registration.enter(transition);
 }
 
 Login.bindResizeEvents = function (stage) {

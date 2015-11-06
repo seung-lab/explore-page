@@ -19,6 +19,7 @@ class Registration extends Synapse {
 
 		this.state = {
 			stage: 1,
+			showing_password: false,
 			username: "",
 			email: "",
 			password: "",
@@ -87,8 +88,7 @@ class Registration extends Synapse {
 		});
 
 		let okfn = function () {
-			// HACK: Login.validateUsername(_this.state.username, _this.coordinator)
-			$.Deferred().resolve()
+			Login.validateUsername(_this.state.username, _this.coordinator)
 				.done(function () {
 					if (!_this.coordinator.execute()) {
 						_this.view.username.focus();
@@ -157,6 +157,20 @@ class Registration extends Synapse {
 				Password.quickValidatePassword(pval(), uval(), _this.coordinator);
 				_this.coordinator.execute();
 			});
+
+		_this.view.password_show.ion('click', function () {
+			
+			if (_this.state.showing_password) {
+				_this.view.password.attr('type', 'password');
+				_this.view.password_show.removeClass('showing');
+			}
+			else {
+				_this.view.password.attr('type', 'text');
+				_this.view.password_show.addClass('showing');
+			}
+
+			_this.state.showing_password = !_this.state.showing_password;
+		});
 	}
 
 	attachEmailEvents () {
@@ -353,15 +367,17 @@ class Registration extends Synapse {
 		let password = fieldfn('Password', 'password'),
 			passworderror = errormsg();
 
+		let pwshow = $('<div>').addClass('rlabel').text("Show");
+
 		let pwmeter = $('<div>')
 			.addClass('password-meter')
 			.append(
 				$('<div>').addClass('bar').append(
 					$('<div>').addClass('strength')
 				),
-				$('<div>').addClass('label').text("Strength")
-			)
-
+				$('<div>').addClass('label').text("Strength"),
+				pwshow
+			);
 
 		let fb = $('<div>')
 			.addClass('fb-connect tertiary')
@@ -394,6 +410,7 @@ class Registration extends Synapse {
 			email: email,
 			password: password,
 			password_meter: pwmeter,
+			password_show: pwshow,
 			location: location,
 			progress: progress,
 			ok: okbtn,
@@ -432,7 +449,7 @@ class Registration extends Synapse {
 	}
 
 	focusOnField (field) {
-		this.view[field].one('focus', function () {
+		this.view[field].one('focus', function (evt) {
 			evt.stopImmediatePropagation();
 		})
 		.focus()
@@ -443,7 +460,7 @@ class Registration extends Synapse {
 		this.render();
 
 		transition.done(function () {
-			_this.focusOnField();
+			_this.focusOnField('username');
 		})
 	}
 

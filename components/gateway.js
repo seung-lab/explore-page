@@ -52,12 +52,12 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.startbtn.ion('click', function () {
  			$('#explore').hide();
 
- 			Login.initRegistration();
-
-			$('#viewport').scrollTo('#intake', {
+			let transition = $('#viewport').scrollTo('#intake', {
 				msec: 4000,
 				easing: Easing.springFactory(.9, 1),
 			});
+
+			Login.initRegistration(transition);
  		});
 
  		this.view.explorebtn.ion('click', function () {

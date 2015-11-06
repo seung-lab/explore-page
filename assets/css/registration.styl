@@ -91,10 +91,10 @@
 
 
 .registration .progress-indicator
-	width 15px
+	width 10px
 	overflow visible
 	height 1px
-	border-top 1px solid white
+	border-top 1px solid $FILL_BLUE
 	position relative
 	
 .registration .progress-indicator:before,
@@ -102,21 +102,27 @@
 	display block
 	content " "
 	
-	height 10px
+	height 5px
 	width @height
 	
 	border-radius 100%
 	position absolute
 	
 	background $FILL_BLUE
+	border 1px solid $FILL_BLUE
+	
+	transition background 1s ease-in-out
+	
+.registration.one .progress-indicator:after
+	background transparent
 	
 .registration .progress-indicator:before
-	top -5px
-	left -3px
+	top -4px
+	left -6px
 	
 .registration .progress-indicator:after
-	top -5px
-	right -3px
+	top -4px
+	right -6px
 	
 
 .registration .password-meter
@@ -125,6 +131,7 @@
 	
 	margin 5px
 	box-sizing border-box
+	user-select none
 	
 .registration .password-meter .bar
 	width 100%
@@ -140,12 +147,24 @@
 
 	transition width 200ms ease-in-out
 	
-.registration .password-meter .label
+.registration .password-meter .label,
+.registration .password-meter .rlabel
 	font-size 10px
 	text-align left
 	margin-top 2px
+	float left
 	
 	color $TEXT_BLUE
+	
+.registration .password-meter .rlabel
+	float right
+	text-align right
+	cursor pointer
+	
+	transition color 100ms ease-in-out
+	
+.registration .password-meter .rlabel.showing
+	color white
 	
 .registration .errormsg
 	color $ACCENT_YELLOW
