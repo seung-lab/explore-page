@@ -1005,6 +1005,58 @@ Utils.sreverse = function (str) {
 	return new_string;
 }
 
+Utils.invertedPyramidLineBreak = function (txt) {
+	let tokens = txt.split(" ");
+	let html = "";
+
+	let midpt = txt.length / 2;
+	let len = 0;
+
+	let broken = false;
+
+	for (let i = 0; i < tokens.length; i++) {
+		html += tokens[i];
+		len += tokens[i].length;
+
+		if (!broken && len > midpt) {
+			html += '<br>';
+			broken = true;
+		}
+		else {
+			html += " ";
+			len++;
+		}
+	}
+
+	return html;
+};
+
+Utils.pyramidLineBreak = function (txt) {
+	let tokens = txt.split(" ");
+	let html = "";
+
+	let midpt = txt.length / 2;
+	let len = 0;
+
+	let broken = false;
+
+	for (let i = tokens.length - 1; i >= 0; i--) {
+		html += Utils.sreverse(tokens[i]);
+		len += tokens[i].length;
+
+		if (!broken && len > midpt) {
+			html += Utils.sreverse('<br>');
+			broken = true;
+		}
+		else {
+			html += " ";
+			len++;
+		}
+	}
+
+	return Utils.sreverse(html);
+};
+
 Utils.ui = require('./utils.ui.js');
 Utils.UI = Utils.ui;
 

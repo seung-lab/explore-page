@@ -62,6 +62,10 @@ class Galileo extends TeaTime {
 
 		this.view.story.container.hide();
 		this.view.bignumber.container.hide();
+
+		this.animations = {
+			text: $.Deferred().resolve(),
+		};
 	}
 
 	generateView () {
@@ -182,6 +186,32 @@ class Galileo extends TeaTime {
 		}
 	}
 
+	animateTextScamble (slide) {
+		let _this = this;
+		let elem = _this.view.story.text;
+
+		this.animations.text.reject();
+
+		if (elem.text()) {
+			this.animations.text = elem.scrambleText({
+				begin: elem.html(),
+				end: slide.text,
+				msec: 2000,
+				tick: 50,
+				update: function (txt) {
+					elem.html(
+						utils.invertedPyramidLineBreak(txt)
+					)
+				}
+			});
+		}
+		else {
+			elem.html(
+				utils.invertedPyramidLineBreak(slide.text)
+			);
+		}
+	}
+
 	render (t_prev, t) {
 		let _this = this; 
 
@@ -194,12 +224,17 @@ class Galileo extends TeaTime {
 			_this.view.story.container.show();
 
 			_this.view.story.text
-				.text(slide.text)
 				.removeClass('caps italics')
 				.addClass(slide.format);
 
-			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
+				if (slide.format === 'italics') {
+					_this.animateTextScamble(slide);
+				}
+				else {
+					_this.view.story.text.text(slide.text);
+				}
 
+			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
 		}
 		else if (slide.big) {
 			_this.view.bignumber.container.show();

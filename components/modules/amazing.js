@@ -68,13 +68,15 @@ class Amazing extends TeaTime {
 		if (this.mobile) {
 			video = $('<img>').attr({
 				src: slide_one.gif,
-			});
+			})
+			.addClass('gif')
 		}
 		else {
 			video = $('<video>').attr({
 				src: slide_one.video,
 				controls: true,
-			});
+			})
+			.addClass('video')
 		}
 
 		let d = function (classes) { 
@@ -161,71 +163,18 @@ class Amazing extends TeaTime {
 }
 
 function splitter (txt, inverted) {
-	let tokens = txt.split(" ").filter(function (str) { return str !== "" });
+	let tokens = txt.split(" ").filter((str) => { return str !== "" });
 
 	if (tokens.length < 4) {
 		return txt;
 	}
 
 	if (inverted) {
-		return ipyramid_splitter(txt);
+		return utils.invertedPyramidLineBreak(txt);
 	}
 
-	return pyramid_splitter(txt);
+	return utils.pyramidLineBreak(txt);
 }
-
-function ipyramid_splitter (txt) {
-	let tokens = txt.split(" ");
-	let html = "";
-
-	let midpt = txt.length / 2;
-	let len = 0;
-
-	let broken = false;
-
-	for (let i = 0; i < tokens.length; i++) {
-		html += tokens[i];
-		len += tokens[i].length;
-
-		if (!broken && len > midpt) {
-			html += '<br>';
-			broken = true;
-		}
-		else {
-			html += " ";
-			len++;
-		}
-	}
-
-	return html;
-}
-
-function pyramid_splitter (txt) {
-	let tokens = txt.split(" ");
-	let html = "";
-
-	let midpt = txt.length / 2;
-	let len = 0;
-
-	let broken = false;
-
-	for (let i = tokens.length - 1; i >= 0; i--) {
-		html += utils.sreverse(tokens[i]);
-		len += tokens[i].length;
-
-		if (!broken && len > midpt) {
-			html += utils.sreverse('<br>');
-			broken = true;
-		}
-		else {
-			html += " ";
-			len++;
-		}
-	}
-
-	return utils.sreverse(html);
-}
-
 
 module.exports = Amazing;
 
