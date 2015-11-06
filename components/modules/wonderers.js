@@ -32,7 +32,7 @@ class Wonderers extends TeaTime {
 		let bg = d('wonderers bg-light module');
 
 		let image = $('<img>').attr({
-			src: '/images/Wonderers.png',
+			src: '/images/wonderers.png',
 		});
 
 		let supertext = d('super-text');
