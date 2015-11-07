@@ -176,29 +176,23 @@ module.exports.bounceFactory = function (elasticity, threshold) {
 	};
 };
 
-// Computed as follows:
-//
-// Y = ax^3 + bx^2 + cx + d 
-//
-// 4 pts chosen: (0,0), (.5,.5), (1,1) and the control point (0.25, .2)
-//
-//  b/c (0,0) is one of the points, d = 0, solve for a,b,c
-//
-//  A = [ 1 1 1; 1/8 1/4 1/2; 1/64 1/16 1/4 ]
-//  Y = [ 1; .5; .2 ]
-//
-//  AX = Y
-//  X = inv(A) * Y
-// 
-module.exports.easeInOut = function (t) {
-	t = Utils.clamp(t, 0, 1);
-
-	var a = -1.067,
-		b = 1.6,
-		c = 0.467;
-
-	return t * (t * ((a * t) + b) + c);
+/* sigmoidFactory
+ * 
+ * Note: Values of alpha below 9 start to show artifacts
+ *
+ * Optional:
+ *	 [0] alpha: (default 12) controls steepness of easing
+ *
+ * Return: f(t), t in 0..1
+ */
+module.exports.sigmoidFactory = function (alpha) {
+	return function (t) {
+		t = Utils.clamp(t, 0, 1);
+		return 1 / (1 + Math.exp(-alpha * (t - 0.5)));
+	};
 };
+
+module.exports.easeInOut = module.exports.sigmoidFactory(12); // a cool default
 
 module.exports.linear = function (t) { return t };
 
