@@ -182,13 +182,24 @@ module.exports.bounceFactory = function (elasticity, threshold) {
  *
  * Optional:
  *	 [0] alpha: (default 12) controls steepness of easing
+ *   [1] offset: Subtract this amount from the centerpoint (default 0, useful range -.5 to .5);
  *
  * Return: f(t), t in 0..1
  */
-module.exports.sigmoidFactory = function (alpha) {
+module.exports.sigmoidFactory = function (alpha, offset) {
+	offset = offset || 0;
+
 	return function (t) {
 		t = Utils.clamp(t, 0, 1);
-		return 1 / (1 + Math.exp(-alpha * (t - 0.5)));
+
+		if (t <= 0) {
+			return 1;
+		}
+		else if (t >= 1) {
+			return 0;
+		}
+
+		return 1 / (1 + Math.exp(-alpha * (t - 0.5 - offset)));
 	};
 };
 
