@@ -42,89 +42,18 @@ body
 	
 	// margin-bottom 100% // extra oscillation space
 
-$logo_width = 200px
-
 #intake-logo
-	position fixed
-	
-	background-image url("/images/loading.gif")
-	background-repeat no-repeat
-	background-size contain
+	position absolute
 
-	width $logo_width
-	height @width
+	width 100%
+	height 100%
 	
-	center()
+	top 0px
 
 	transition height 2s ease-out, width 2s ease-out
 
 #intake-logo.shrink
-	width ($logo_width * 0.75)
-	height ($logo_width * 0.75)
-
-#intake-logo::before,
-#intake-logo::after
-	content " "
-	display block
-	width 0px
-	height 1px
-	
-	background-color $LOGO_BLUE
-	border none
-	outline none
-	position absolute
-	top 50%
-	
-	animation-iteration-count 1
-	animation-timing-function linear
-	animation-delay 1.45s
-	animation-duration 1.5s
-
-$logo_rule_start_pos = 85%
-
-#intake-logo::after
-	animation-name motion-rule-right
-	left $logo_rule_start_pos
-	
-#intake-logo::before
-	animation-name motion-rule-left
-	right $logo_rule_start_pos
-
-@keyframes motion-rule-right {
-	0% {
-		width 0%
-		left $logo_rule_start_pos
-	}
-	50% {
-		width 200%
-		left $logo_rule_start_pos
-	}
-	80% {
-		width 300%
-	}
-	100% {
-		width 300%
-		left 800%
-	}
-}	
-
-@keyframes motion-rule-left {
-	0% {
-		width 0%
-		right $logo_rule_start_pos
-	}
-	50% {
-		width 200%
-		right $logo_rule_start_pos
-	}
-	80% {
-		width 300%
-	}
-	100% {
-		width 300%
-		right 800%
-	}
-}
+	transform scale(.33)
 
 
 section.gateway

@@ -6,7 +6,7 @@ var Easing = require('./easing.js'),
 // http://eyewire.org
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
-var bump = function (p) {
+var bump = function (anchor, p) {
 // Global Variables
 
 	var E, E2;
@@ -25,8 +25,7 @@ var bump = function (p) {
 
 	var t_cl; 	// Global Time Controller
 
-
-	p.preload = function() {
+	p.preload = function () {
 		// Load image assets
 		E = p.loadImage("/images/bumper/E.png");
 		E2 = p.loadImage("/images/bumper/E2.png");
@@ -34,8 +33,11 @@ var bump = function (p) {
 		dot2 = p.loadImage("/images/bumper/dot.png");
 	}
 
-	p.setup = function() {
-		p.createCanvas(window.innerWidth, window.innerHeight);
+	p.setup = function () {
+		var canvas = p.createCanvas(window.innerWidth, window.innerHeight);
+
+		canvas.parent(anchor);
+
 		p.frameRate(60);
 
 		t_cl = 1;			// Default to 1
@@ -124,7 +126,7 @@ var bump = function (p) {
 
 	// Consider this Update
 	p.draw = function () {
-		p.background(27,39,49);
+		p.clear();
 		
 		// Draw Grid
 		// debug();
@@ -142,17 +144,13 @@ var bump = function (p) {
 	function step () {
 
 		// Kick off animation
-		if(!global_animator.started) {
+		if (!global_animator.started) {
 			global_animator.animate();
-			console.log("global");
 		}
 
 		// Animate the Es to Scale
 		if (global_animator.value >= (a_e_s.ratio * a_e_s.order) && !a_e_s.started) {
-			console.log(global_animator.value);
 			// a_e_s.msec = global_animator.msec * a_e_s.ratio;
-			// console.log("Es scale");
-			// console.log(a_e_s.delta);
 			a_e_s.animate();
 		}
 
@@ -268,9 +266,9 @@ var bump = function (p) {
 
 				// Polar Coordinates
 				var r = a_d_d.value;				// Origin Offset  	{start: 300, end: 265}
-				angle = p.radians(a_d_r.value);		// Angle Offset		{start: 0, end: 77}
-				x = p.cos(angle) * r;				// Multiply r * -1 for other Dot
-				y = p.sin(angle) * r;
+				var angle = p.radians(a_d_r.value);		// Angle Offset		{start: 0, end: 77}
+				var x = p.cos(angle) * r;				// Multiply r * -1 for other Dot
+				var y = p.sin(angle) * r;
 
 				// Top Dot
 				pushMatrix(function () {
@@ -370,10 +368,17 @@ var bump = function (p) {
 			requestAnimationFrame(frame); // you can use setInterval, but this will give a smoother animation --> Call it the first time and it loops forever until return
 		}
 	}
+
+	p.windowResized = function () {
+		p.resizeCanvas(window.innerWidth, window.innerHeight);
+	};
 }
 
-// Instantiate the entire P5 sketch
-new p5(bump);
+module.exports.play = function (anchor) {
+	var bmp = bump.bind(this, anchor);
 
+	// Instantiate the entire P5 sketch
+	return new p5(bmp);
+};
 
 

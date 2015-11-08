@@ -3,6 +3,7 @@
 let $ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
+	Bumper = require('./bumper.js'),
 	Validate = require('./validate.js'),
 	Gateway = require('../components/gateway.js'),
 	Header = require('../components/header.js'),
@@ -67,6 +68,8 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
+		Bumper.play($('#intake-logo')[0]);
+
 		setTimeout(function () {
 			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
 			
@@ -74,7 +77,7 @@ Login.IntakeView = function () {
 				msec: 2500,
 				easing: Easing.springFactory(.7, 1),
 			})
-		}, 2500);
+		}, 2000);
 	};
 };
 
