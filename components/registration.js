@@ -88,16 +88,26 @@ class Registration extends Synapse {
 		});
 
 		let okfn = function () {
-			Login.validateUsername(_this.state.username, _this.coordinator)
+			let stage2 = function () {
+				_this.state.stage = 2;
+				_this.coordinator = _this.stageTwoCoordinator();
+				_this.render();
+			};
+
+			Validate.Registration.username(_this.state.username, _this.coordinator)
 				.done(function () {
 					if (!_this.coordinator.execute()) {
 						_this.view.username.focus();
 					}
 					else {
-						_this.state.stage = 2;
-						_this.coordinator = _this.stageTwoCoordinator();
-						_this.render();
+						stage2();	
 					}
+				})
+				.fail(function (reason) {
+					// debugging
+					// if (reason === 'network-failure') {
+					// 	stage2();
+					// }
 				})
 		};
 

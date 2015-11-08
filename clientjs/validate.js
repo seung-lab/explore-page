@@ -26,7 +26,7 @@ Validate.Registration.username = function (username, coordinator) {
 	}
 	else if (username.length === 0) {
 		coordinator.set('username', false, 'zero-length');
-		return $.Deferred().reject();
+		return $.Deferred().reject('zero-length');
 	}
 
 	var url = '/1.0/internal/account/available/username/' + encodeURIComponent(username);
@@ -41,12 +41,12 @@ Validate.Registration.username = function (username, coordinator) {
 			GLOBAL.takenusernames[username] = data.reason || 'taken';
 			coordinator.set('username', false, data.reason);
 
-			deferred.reject();
+			deferred.reject(data.reason);
 		}
 	})
 	.fail(function () {
 		coordinator.set('username', true, 'network-failure');
-		deferred.reject();
+		deferred.reject('network-failure');
 	})
 
 	return deferred.promise();
