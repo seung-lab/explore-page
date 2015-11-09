@@ -67,7 +67,7 @@ class TeaTime extends Synapse {
 	slideAt (t) {
 		let N = this.slides.length;
 
-		let index = Math.floor(t * N);
+		let index = Math.floor(utils.round(t * N, 5));
 
 		let slide = this.slides[index]
 		slide.index = index;

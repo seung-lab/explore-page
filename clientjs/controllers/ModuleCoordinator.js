@@ -7,6 +7,8 @@ let utils = require('../utils.js'),
 	Galileo = require('../../components/modules/galileo.js'),
 	Wonderers = require('../../components/modules/wonderers.js'),
 	Superheros = require('../../components/modules/superheros.js');
+	Melt = require('../../components/modules/melt.js'),
+	MeltMobile = require('../../components/modules/melt-mobile.js');
 
 let _t = 0;
 
@@ -31,11 +33,15 @@ ModuleCoordinator.initialize = function (animation) {
 		})
 	}
 
+	var isMobile = true;
+
 	ModuleCoordinator.setModules([
 		moduleFactory(Amazing),
 		moduleFactory(Galileo),
 		moduleFactory(Wonderers),
 		moduleFactory(Superheros)
+		moduleFactory(isMobile ? MeltMobile : Melt),
+		moduleFactory(Wonderers),
 	]);
 
 	ModuleCoordinator.timeline = new Timeline({
@@ -48,6 +54,15 @@ ModuleCoordinator.initialize = function (animation) {
 	ModuleCoordinator.timeline.enter(animation);
 
 	ModuleCoordinator.initHotkeys();
+
+
+	$(window).ion('scrollStart', function (e, down) {
+		if (down) {
+			ModuleCoordinator.next();
+		} else {
+			ModuleCoordinator.previous();
+		}
+	});
 };
 
 ModuleCoordinator.tForName = function (name) {
@@ -95,7 +110,7 @@ ModuleCoordinator.next = function () {
 
 ModuleCoordinator.setModules = function (modules) {
 	ModuleCoordinator.modules = modules || [];
-	let normalization = computeNormalization(modules) - 1;
+	let normalization = computeNormalization(modules);
 
 	let begin = 0;
 	ModuleCoordinator.modules.forEach(function (module) {
@@ -236,7 +251,7 @@ ModuleCoordinator.sub_t_update = function (module_name, sub_t) {
 	var current = ModuleCoordinator.currentModule();
 
 	if (module_name == current.name) {
-		_t = (current.begin + (sub_t * current.duration)); 
+		_t = (current.begin + (sub_t * current.duration));
 	}
 
 	ModuleCoordinator.timeline.seek(_t);

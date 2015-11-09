@@ -7,6 +7,7 @@ require('./jquery-extra.js');
 require('./jquery-url.js');
 require('./jquery-animation.js');
 require('./thinking.js');
+require('./jquery-scrollstart.js');
 
 let Login = require('./login.js'),
 	Utils = require('./utils.js'),
@@ -56,4 +57,8 @@ window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
 window.$ = $;
 
+// Polyfills
 
+window.performance = window.performance || {
+	now: Date.now
+};
