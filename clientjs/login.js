@@ -68,9 +68,11 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
-		Bumper.play($('#intake-logo')[0]);
+		let p5 = Bumper.play($('#intake-logo')[0]);
 
 		setTimeout(function () {
+			p5.noLoop();
+
 			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
 			
 			$('#viewport').scrollTo('.gateway', {
