@@ -63,27 +63,32 @@
 	
 	margin-bottom 10px
 
-.fb-connect
-	position relative
+div.fb-connect
+	@extend div.tertiary
+	width 125px
 	
-	padding-left 2%
+	position relative
+	left 15px
+	
+	border-top-left-radius 0px
+	border-bottom-left-radius 0px
 	box-sizing border-box
+	
 
-.fb-connect::before
-	content ""
-	height $primary_height
-	width 25%
-
+div.fb-connect::before
+	@extend div.tertiary:before
+	
 	background-image url("/images/icons/fb.svg")
 	background-repeat no-repeat
-	background-position 10px 3px
+	background-position 6px 2px
 	background-size 20px
 
+	height 34.5px
 	position absolute
-	left 0px
-	top -1px
-
-	border-right 1px solid $TEXT_BLUE
+	top -0.5px
+	left -30px
+	
+	border 1px solid #3b556a
 	border-top-left-radius 15px
 	border-bottom-left-radius 15px
 

@@ -7,7 +7,7 @@ var Coordinator = require('../clientjs/coordinator.js').Coordinator,
 
 let Login; // avoid circular reference
 
-class Registration extends Synapse {
+class Authentication extends Synapse {
 	constructor (args = {}) {
 		super(args);
 
@@ -18,10 +18,8 @@ class Registration extends Synapse {
 		this.coordinator = this.createCoordinator();
 
 		this.state = {
-			stage: 1,
 			showing_password: false,
 			username: "",
-			email: "",
 			password: "",
 		};
 	}
@@ -29,35 +27,66 @@ class Registration extends Synapse {
 	createCoordinator () {
 		let _this = this;
 
-		return Coordinator({ 
+		return Coordinator({
 				username: true, 
-				password: true, 
-				email: true,
-			}, function (conds) { 
-				return !!conds.username;
+				password: true,
 			})
-			.done(function (conds) {
-				_this.clearErrors();
-			})
-			.fail(function (conds, data) { 
-				let fixtext = Validate.Registration.usernameFixtext(data.username);
-				_this.view.username.addClass('error');
-				_this.view.error.username
-					.addClass('error')
-					.text(fixtext);
-			})
-	}
-
-	stageTwoCoordinator () {
-		let _this = this; 
-
-		return Coordinator(this.coordinator.conds, this.coordinator.data)
 			.done(function () {
 				_this.clearErrors();
 			})
 			.fail(function (conds, data) {
 				_this.assignErrorMessages();
-			})
+			});
+	}
+
+	assignErrorMessages () {
+		let _this = this;
+
+		let stack = [
+			{
+				fixtextfn: Validate.Login.usernameFixtext,
+				condition: 'username',
+			},
+			{
+				fixtextfn: Validate.Login.passwordFixtext,
+				condition: 'password',
+			}
+		];
+
+		let first = true;
+
+		for (let i = 0; i < stack.length; i++) {
+			let condition = stack[i].condition;
+			let fixtextfn = stack[i].fixtextfn;
+
+			let field = _this.view[condition],
+				msg = _this.view.error[condition];
+
+			if (!_this.coordinator.ok(condition)) {
+				field.addClass('error');
+				
+				if (first) {
+					msg
+						.addClass('error')
+						.text(
+							fixtextfn(_this.coordinator.data[condition])
+						);
+					
+					first = false;
+				}
+				else {
+					msg.removeClass('error');
+				}
+			}
+			else {
+				if (_this.state[condition] === '') {
+					first = false; // prevents flickering cascades
+				}
+
+				field.removeClass('error');
+				msg.removeClass('error').text("");
+			}
+		}
 	}
 
 	clearErrors () {
@@ -75,59 +104,32 @@ class Registration extends Synapse {
 		Login.bindResizeEvents('intake');
 
 		_this.attachUsernameEvents();
-		_this.attachEmailEvents();
 		_this.attachPasswordEvents();
-
-		_this.view.fb.ion('click', function () {
-			GLOBAL.lastclick = 'facebook';
-			Login.registrationFacebookSelectionHandler(_this.state.username, _this.coordinator);
-		});
+		_this.attachFacebookEvents();
 
 		let okfn = function () {
-			let stage2 = function () {
-				_this.state.stage = 2;
-				_this.coordinator = _this.stageTwoCoordinator();
-				_this.render();
-			};
-
-			_this.view.loading.addClass('onscreen').removeClass('error');
-			Validate.Registration.username(_this.state.username, _this.coordinator)
-				.done(function () {
-					if (!_this.coordinator.execute()) {
-						_this.view.username.focus();
-					}
-					else {
-						stage2();	
-					}
-				})
-				.fail(function (reason) {
-					_this.view.loading.addClass('error');
-					// debugging
-					// if (reason === 'network-failure') {
-					// 	stage2();
-					// }
-				})
-				.always(function () {
-					_this.view.loading.removeClass('onscreen');
-				});
+			_this.authenticate();
 		};
-
-		if (this.state.stage === 2) {
-			okfn = function () {
-				_this.register();
-			};
-		}
 		
 		_this.view.ok.ion('click', okfn);
-		_this.view.module.ion('keydown.registration', function (evt) {
+		_this.view.module.ion('keydown.login', function (evt) {
 			if (evt.keyCode === 13) {
 				if (GLOBAL.lastclick === 'facebook') {
-					Login.registrationFacebookSelectionHandler(_this.state.username, _this.coordinator);	
+					Login.loginFacebookSelectionHandler(_this.state.username, _this.coordinator);	
 				}
 				else {
 					okfn();	
 				}
 			}
+		});
+	}
+
+	attachFacebookEvents () {
+		let _this = this;
+
+		_this.view.fb.ion('click', function () {
+			GLOBAL.lastclick = 'facebook';
+			Login.loginFacebookSelectionHandler(_this.state.username, _this.coordinator);
 		});
 	}
 
@@ -151,7 +153,6 @@ class Registration extends Synapse {
 			})
 			.ion('keydown.state change.state input.state', function (evt) {
 				_this.state.password = pval();
-				_this.adjustPasswordMeter();
 			})
 			.ion('blur.validation', function () {
 				Password.quickValidatePasswordNoLength(pval(), uval(), _this.coordinator);
@@ -184,33 +185,6 @@ class Registration extends Synapse {
 		});
 	}
 
-	attachEmailEvents () {
-		let _this = this;
-
-		let val = function () {
-			return _this.view.email.val().trim();
-		};
-
-		_this.view.email
-			.ithinking({ idle: 2000 }, function () {
-				Validate.Registration.email(val(), _this.coordinator);
-				_this.coordinator.execute();
-			})
-			.ion('keydown.state', function () {
-				_this.state.email = val().trim();
-			})
-			.ion('focus.validation keyup.validation keypress.validation', function () {
-				Validate.Registration.emailNoLength(val(), _this.coordinator)
-					.done(function () {
-						_this.coordinator.execute();	
-					});
-			})
-			.ion('blur.validation', Utils.UI.trim(function () {
-				Validate.Registration.emailNoLength(val(), _this.coordinator);
-				_this.coordinator.execute();
-			}));
-	}
-
 	attachUsernameEvents () {
 		let _this = this; 
 
@@ -220,30 +194,19 @@ class Registration extends Synapse {
 
 		_this.view.username
 			.ithinking({ idle: 750 }, function () {
-				Validate.Registration.usernameNoLength(val(), _this.coordinator);
+				Validate.Login.usernameNoLength(val(), _this.coordinator);
 			})
 			.ion('keydown.state input.state', function () {
 				_this.state.username = val();
 				_this.adjustPasswordMeter();
 			})
 			.ion('keyup.validation keypress.validation', function () {
-				Validate.Registration.usernameNoLengthInstant(val(), _this.coordinator);
+				Validate.Login.usernameNoLengthInstant(val(), _this.coordinator);
 			})
 			.ion('focus.adjust', Utils.UI.trim())
 			.ion('blur.validation', Utils.UI.trim(function () {
-				Validate.Registration.usernameNoLength(val(), _this.coordinator);
+				Validate.Login.usernameNoLength(val(), _this.coordinator);
 			}));
-	}
-
-	adjustPasswordMeter () {
-		let ratio = Password.qualifyPassword(
-			this.state.password,
-			this.state.username, 
-			this.coordinator
-		);
-
-		ratio = Utils.clamp(ratio * 100, 0, 100);
-		this.view.password_meter.find('.strength').css('width',  `${ratio}%`);
 	}
 
 	assignErrorMessages () {
@@ -251,15 +214,11 @@ class Registration extends Synapse {
 
 		let stack = [
 			{
-				fixtextfn: Validate.Registration.usernameFixtext,
+				fixtextfn: Validate.Login.usernameFixtext,
 				condition: 'username',
 			},
 			{
-				fixtextfn: Validate.Registration.emailFixtext,
-				condition: 'email',
-			},
-			{
-				fixtextfn: Validate.Registration.passwordFixtext,
+				fixtextfn: Validate.Login.passwordFixtext,
 				condition: 'password',
 			}
 		];
@@ -335,7 +294,7 @@ class Registration extends Synapse {
 	generateView () {
 		let _this = this;
 
-		let container = $("<div>").addClass('registration column');		
+		let container = $("<div>").addClass('authentication column');		
 
 		let logo = $('<img>')
 			.addClass('logo')
@@ -347,72 +306,50 @@ class Registration extends Synapse {
 		let location = $('<div>')
 			.addClass('location-text');
 
-		let progress = $('<div>')
-			.addClass('progress-indicator');
-
 		let col = $('<div>').addClass('column');
 
 		let okbtn = $('<button>')
 			.addClass('primary')
-			.text("OK");
+			.text("PLAY");
 
-		let fieldfn = function (name, type) {
+		let fieldfn = function (placeholder, klass, type) {
 			return $('<input>').attr({
-				placeholder: name,
+				placeholder: placeholder,
 				type: type || "text",
 			})
-			.addClass('field ' + name.toLowerCase());
+			.addClass('field ' + klass);
 		};
 
 		let errormsg = function () {
 			return $('<div>').addClass('errormsg');
 		};
 
-		let username = fieldfn('Username'),
+		let username = fieldfn('Username or Email', 'username'),
 			usernameerror = errormsg();
 
-		let email = fieldfn('Email'),
-			emailerror = errormsg();
-
-
-		let password = fieldfn('Password', 'password'),
+		let password = fieldfn('Password', 'password', 'password'),
 			passworderror = errormsg();
+
+		let forgot = $('<div>').addClass('rlabel').text("Forgot?");
 
 		let pwshow = $('<div>').addClass('rlabel').text("Show");
 
-		let pwmeter = $('<div>')
-			.addClass('password-meter')
-			.append(
-				$('<div>').addClass('bar').append(
-					$('<div>').addClass('strength')
-				),
-				$('<div>').addClass('label').text("Strength"),
-				pwshow
-			);
-
 		let fb = $('<div>')
-			.addClass('fb-connect')
+			.addClass('fb-connect tertiary')
 			.text("Facebook Connect");
 		let fberror = errormsg();
-
-		let loading = $('<div>').addClass('spinny');
 
 		col.append(
 			username,
 			usernameerror,
-			email,
-			emailerror,
 			password,
 			passworderror,
-			pwmeter,
-			okbtn,
-			loading
+			okbtn
 		);
 
 		container.append(
 			logo,
 			location,
-			progress,
 			col,
 			fb,
 			fberror
@@ -421,25 +358,19 @@ class Registration extends Synapse {
 		return {
 			module: container,
 			username: username,
-			email: email,
 			password: password,
-			password_meter: pwmeter,
-			password_show: pwshow,
 			location: location,
-			progress: progress,
 			ok: okbtn,
 			fb: fb,
-			loading: loading,
 			error: {
 				username: usernameerror,
-				email: emailerror,
 				password: passworderror,
 				fb: fberror,
 			},
 		};
 	}
 
-	register () {
+	authenticate () {
 		let _this = this;
 
 		_this.view.loading
@@ -492,27 +423,9 @@ class Registration extends Synapse {
 
 	render () {
 		let _this = this;
-
-		let stage = this.state.stage === 1
-			? 'one'
-			: 'two';
-
-		_this.view.module
-			.removeClass('one two')
-			.addClass(stage);
-
-		this.attachEventListeners();
-
-		if (_this.state.stage === 1) {
-			_this.view.location.text("Select Username");
-		}
-		else {
-			_this.view.location.text("Complete Registration");
-		}
-
 	}
 }
 
-module.exports = Registration;
+module.exports = Authentication;
 
 

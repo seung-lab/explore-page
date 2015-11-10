@@ -57,7 +57,12 @@ class Gateway extends Synapse { // You can only build within a pylon field
 				easing: Easing.springFactory(.9, 1),
 			});
 
-			Login.initRegistration(transition);
+			if ($.cookie('visited')) {
+				Login.initLogin(transition);
+			}
+			else {
+				Login.initRegistration(transition);
+			}
  		});
 
  		this.view.explorebtn.ion('click', function () {

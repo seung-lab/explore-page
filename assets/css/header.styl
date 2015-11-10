@@ -1,3 +1,5 @@
+@require 'colors.styl'
+
 .header
 	position fixed
 	top 0
@@ -11,9 +13,10 @@
 	
 .header div
 	pointer-events auto
-	transition opacity 150ms
+	transition opacity 300ms
 	
-.header.invisible div
+.header.invisible div,
+.header.invisible div.visible
 	opacity 0
 
 $corner_offset = 5%
@@ -36,18 +39,39 @@ $corner_offset = 5%
 	top $corner_offset
 	right $corner_offset
 	
+	opacity 0
+
+.header .share
 	height 30px
 	width @height
 	
 	background-image url('/images/icons/sh.svg') // ad-blocks sometimes block share.svg
 	background-size @height @height
 	background-repeat no-repeat
-	
-	opacity 0
 
-.header .visible
+.header .login,
+.header .register
+	height 30px
+	width 150px
+	
+	color $TEXT_BLUE_LIGHT
+	border-top-left-radius 0px
+	border-bottom-left-radius 0px
+	
+.header .login.visible,
+.header .register.visible 
+	opacity 1
+	
+.header .login.visible:before,
+.header .register.visible:before
+	opacity 1
+
+.header .share.visible
 	opacity .3
 
-
-
-
+.header .tertiary:before
+	background url("/images/icons/enter.svg")
+	background-size 65%
+	background-repeat no-repeat
+	background-position 5px 6px
+	
