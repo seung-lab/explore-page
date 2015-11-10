@@ -1,4 +1,5 @@
 var Easing = require('./easing.js'),
+	Kruskal = require('../components/neurons/kruskal.js');
 	p5 = require('p5');
 
 // Eyewire Bumper Animation

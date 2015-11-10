@@ -1057,6 +1057,33 @@ Utils.pyramidLineBreak = function (txt) {
 	return Utils.sreverse(html);
 };
 
+// Method to abstract call-once variable logic
+Utils.cacheify = function (f) {
+	var cache = null;
+	var first = true;
+
+	return function() {
+		if (first) {
+			first = false;
+			cache = f.apply(this, arguments);
+		}
+
+		return cache;
+	}
+};
+	
+// Method to abstract call-once logic
+Utils.onceify = function(f) {
+    var called = false;
+    
+    return function() {
+        if (!called) {
+            called = true;
+            return f.apply(this, arguments);
+        }
+    }
+};
+
 Utils.ui = require('./utils.ui.js');
 Utils.UI = Utils.ui;
 
