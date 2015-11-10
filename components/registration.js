@@ -429,6 +429,7 @@ class Registration extends Synapse {
 			progress: progress,
 			ok: okbtn,
 			fb: fb,
+			loading: loading,
 			error: {
 				username: usernameerror,
 				email: emailerror,
