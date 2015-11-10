@@ -64,6 +64,21 @@ div.tertiary
 	align-items center
 	justify-content center
 
+div.tertiary:before
+	content ""
+	display block
+
+	width 30px
+	height 30px
+	position absolute
+	top -1px
+	left -32px
+	
+	border 1px solid $TEXT_BLUE
+	border-top-left-radius 10px
+	border-bottom-left-radius 10px
+	
+
 /* Placeholder defaults */
 
 ::-webkit-input-placeholder  /* WebKit, Blink, Edge */
@@ -107,6 +122,48 @@ input[type=password]:focus
 	border 1px solid rgba(255, 255, 255, 0.05)
 
 
+
+/* For loading indicators */
+
+.spinny {
+	width: 1px;
+  	height: 10px;
+  	background-color: rgb(199, 199, 199);
+  	opacity: 0;
+
+	transition: opacity 0.5s 0.5s ease-in-out;
+
+	-webkit-animation: spin 1.5s 0.5s 0;
+	-moz-animation: spin 1.5s 0.5s 0;
+	animation: spin 1.5s 0.5s 0;
+}
+
+.spinny.onscreen {
+	opacity: 1;
+
+	/* This optimization is for power efficiency. 
+	   Otherwise blinkies take up about 10% idle cpu
+	   in a Chrome Helper */
+	-webkit-animation-iteration-count: infinite; 
+	-moz-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+}
+
+.spinny.error {
+	width: 7px;
+  	height: 7px;
+  	border-radius: 100%;
+	background-color: rgb(213, 81, 50);
+	opacity: 1;
+
+	-webkit-animation: none;
+	animation: none;
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
 		
 
 

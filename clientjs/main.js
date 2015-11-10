@@ -2,6 +2,7 @@
 
 var $ = require('jquery');
 
+require('jquery.cookie');
 require('./jquery-extra.js');
 require('./jquery-url.js');
 require('./jquery-animation.js');
@@ -55,10 +56,11 @@ function jumpToExplore (t, transition) {
 	ModuleCoordinator.seek(t);
 }
 
-
 // Globals
 
 window.Login = Login;
 window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
 window.$ = $;
+
+

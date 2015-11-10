@@ -17,8 +17,13 @@ class Header extends Synapse {
 		let logo = $('<div>').addClass('logotype');
 
 		let share = $('<div>').addClass('icon share');
-		let login = $('<div>').addClass('icon login');
-		let register = $('<div>').addClass('icon register');
+		let login = $('<div>')
+			.addClass('tertiary login')
+			.text("Player Login");
+
+		let register = $('<div>')
+			.addClass('tertiary register')
+			.text("Create New Account");
 
 		container.append(logo, share, login, register);
 
@@ -29,6 +34,14 @@ class Header extends Synapse {
 			register: register,
 			share: share,
 		};
+	}
+
+	attachEventListeners () {
+		let _this = this;
+
+		_this.view.login.ion('click', function () {
+
+		});
 	}
 
 	afterEnter () {
@@ -45,7 +58,15 @@ class Header extends Synapse {
 			_this.view[icon].removeClass('visible');
 		});
 
-		_this.view[_this.mode].addClass('visible');		
+		if (_this.mode === 'login') {
+			_this.view.register.addClass('visible');
+		}
+		else if (_this.mode === 'register') {
+			_this.view.login.addClass('visible');	
+		}
+		else {
+			_this.view.share.addClass('visible');		
+		}		
 	}
 }
 

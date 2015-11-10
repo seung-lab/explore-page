@@ -8,6 +8,7 @@ let $ = require('jquery'),
 	Gateway = require('../components/gateway.js'),
 	Header = require('../components/header.js'),
 	Registration = require('../components/registration.js'),
+	Authentication = require('../components/authentication.js'),
 	_ = require('./localeplanet-translate.js');
 	// ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
 
@@ -33,11 +34,23 @@ Login.initialize = function () {
 		anchor: '#intake',
 		login: Login,
 	});
+
+	_components.authentication = new Authentication({
+		anchor: '#intake',
+		login: Login,
+	})
 };
 
 Login.initRegistration = function (transition) {
 	_components.registration.enter(transition);
+
+	_components.header.mode = 'register';
+	_components.header.render();
 }
+
+Login.initLogin = function (transition) {
+	_components.authentication.enter(transition);
+};
 
 Login.bindResizeEvents = function (stage) {
 	if (stage === 'gateway'
@@ -147,6 +160,8 @@ Login.standardAuthenticate = function (args) {
 
 	Validate.Login.username(args.username, coordinator);
 
+	var deferred = $.Deferred();
+
 	if (!args.password) {
 		coordinator.lazySet('password', false, 'minimum-length');
 	}
@@ -160,10 +175,8 @@ Login.standardAuthenticate = function (args) {
 		username: args.username,
 		password: args.password
 	};
-
-	var loginbtn = $('.login button.playnow').addClass('loading');
+	
 	$.post("/1.0/internal/account/authenticate/standard/", postdata, function (response) {
-		loginbtn.removeClass('loading');
 		if (!response) {
 			// error handling
 		}
@@ -329,7 +342,7 @@ Login.facebookRegistration = function (args) {
 		response = $.parseJSON(response);
 		
 		if (response.success) {
-			continueOn();
+			Login.continueOn();
 			deferred.resolve();
 		}
 		else {
@@ -410,136 +423,6 @@ Login.keepQueryOnToggle = function () {
 	$('#togglemode').attr('href', linkPath + query);
 };
 
-/* configureLoginPage
- *
- * Required: none
- *
- * Returns: void
- */
-Login.configureLoginPage = function () {
-	var logincoordinator = createLoginCoordinator();
-
-	$('.login').show();
-	$('.playnow').on('click', function (evt) {
-		Login.standardAuthenticate({
-			username: $('#username').val(),
-			password: $('#loginpassword').val(),
-			coordinator: logincoordinator
-		});
-	});
-
-	$('.login .passwordvisibilitytoggle').centerIn('#loginpassword', { 
-		direction: 'vertical',
-		top: -2
-	});
-
-	$('#username')
-		.attr('maxlength', 40)
-		.thinking({ idle: 1000 }, function () {
-			loginValidateUsernameNoLength(this, logincoordinator);
-		})
-		.on('focus', Utils.UI.trim())
-		.on('blur', Utils.UI.trim(function () {
-			loginValidateUsernameNoLength(this, logincoordinator);
-		}))
-		.on('keyup', function () {
-			logincoordinator.set('username', true);
-		});
-
-	$('#loginpassword')
-		.on('keyup', function () {
-			logincoordinator.set('password', true);
-		});
-
-	$('#fb-login').on('click', function () {
-		FB.getLoginStatus(function (response) {
-			if (response.status === 'connected') {
-				Login.facebookLogin({
-					access_token: response.authResponse.accessToken,
-					coordinator: logincoordinator
-				});
-			}
-			else {
-				FB.login(function (loginresponse) {
-					 if (loginresponse.authResponse) {
-					 	Login.facebookLogin({
-							access_token: loginresponse.authResponse.accessToken,
-							coordinator: logincoordinator
-						});
-					 }
-				});
-			}
-		});
-	});
-
-	$(document).keyup(function (evt) {
-		if (evt.keyCode === Keycodes.codes.enter) {
-			Login.standardAuthenticate({
-				username: $('#username').val(),
-				password: $('#loginpassword').val(),
-				coordinator: logincoordinator
-			});
-		}
-	});
-
-	$('#centerpiece').maybeAlwaysCenterIn(window);
-
-	$('#username').focus();
-	configureForgotPassword();
-};
-
-
-/* createLoginCoordinator 
- *
- * Refactoring of configureLoginPage
- *
- * Returns: Coordinator.Coordinator coordinator object
- */
-function createLoginCoordinator () {
- 	return new Coordinator.Coordinator({
-		set: { username: true, password: true },
-		test: Coordinator.and,
-		failure: function (conds, data) {
-			var stack = [
-				{
-					elem: $('#username'),
-					errorelem: $('#usernameerror'),
-					fixtextfn: Validate.Login.usernameFixtext,
-					condition: 'username'
-				},
-				{
-					elem: $('#loginpassword'),
-					errorelem: $('#loginpassworderror'),
-					fixtextfn: Login.loginPasswordFixtext,
-					condition: 'password',
-					onalert: function (msgelem) { 
-						$(msgelem).fadeIn(300); 
-					},
-					onresolved: function (msgelem) { 
-						$(msgelem).fadeOut(300); 
-					}
-				}
-			];
-
-			coordinationFailure(stack, conds, data);
-		},
-		success: function (conds) {
-			$('input').removeClass('error');
-			$('.errormsg').each(function (index, element) {
-				element = $(element);
-
-				if (element.attr('id') === 'loginpassworderror') {
-					element.fadeOut(300);
-				}
-				else {
-					element.slideFadeOut();
-				}
-			});
-		},
-	});	
-}
-
-
 /* configureForgotPassword
  *
  * Configures the behavior of the forgot? link.
@@ -604,88 +487,44 @@ function configureForgotPassword () {
 	}
 }
 
-// /* configureRegistrationPage
-//  *
-//  * Required: none
-//  *
-//  * Returns: void
-//  */
-// Login.configureRegistrationPage = function () {
-// 	$('#togglemode')
-// 		.attr('href', '/login')
-// 		.text(_('LOGIN'));
+Login.loginFacebookSelectionHandler = function (username, coordinator) {
+	var deferred = $.Deferred();
 
-// 	$('#signintype').first().text(_('SIGN UP'));
+	var FB = window.FB;
 
-// 	$('#pitch').show();
+	FB.getLoginStatus(function (response) {
+		if (response.status === 'connected') {
+			Login.facebookLogin({
+				access_token: response.authResponse.accessToken,
+				coordinator: coordinator,
+			})
+			.then(deferred.resolve, deferred.reject);
+		}
+		else {
+			FB.login(function (loginresponse) {
+				 if (loginresponse.authResponse) {
+				 	Login.facebookLogin({
+						access_token: loginresponse.authResponse.accessToken,
+						coordinator: coordinator,
+					})
+					.then(deferred.resolve, deferred.reject);
+				 }
+			});
+		}
+	});
 
-// 	$('#username')
-// 		.addClass('bottom-rounded')
-// 		.attr('placeholder', _('Username'))
-// 		.focus();
-
-// 	$('.register.step1').show();
-
-// 	var playcoordinator = new Coordinator.Coordinator({
-// 		set: { username: true, password: true, email: true },
-// 		test: function (conds) { return conds.username; },
-// 		success: function (conds) {
-// 			$('#username').removeClass('error');
-// 			$('#usernameerror').slideFadeOut();
-// 		},
-// 		failure: function (conds, data) { 
-// 			$('#username').addClass('error');
-// 			$('#usernameerror').text(
-// 				registrationUsernameFixtext(data.username)
-// 			).slideFadeIn();
-// 		}
-// 	});
-
-// 	PasswordUtils.configurePasswordMeter($('.register .password-strength'));
-// 	Login.bindRegistrationAvailabilityHandlers(playcoordinator);
-
-// 	var playnowclickhandler = function () {
-// 		Login.validateUsername(playcoordinator, function (data) {
-// 			Login.playNowContinueHandler(playcoordinator);
-// 		});
-
-// 		if (!playcoordinator.execute()) {
-// 			$('#username').focus();
-// 		}
-// 	};
-
-// 	$('.playnow')
-// 		.text(_('SIGN UP'))
-// 		.on('click.Register', playnowclickhandler);
-
-// 	$(document).on('keyup.Register', function (evt) {
-// 		if (evt.keyCode === Keycodes.codes.enter) {
-
-// 			if (GLOBAL.registration.lastclick === 'facebook') {
-// 				registrationFacebookSelectionHandler(playcoordinator);	
-// 			}
-// 			else {
-// 				playnowclickhandler();	
-// 			}
-// 		}
-// 	});
-
-// 	$('#centerpiece').maybeAlwaysCenterIn(window, { top: -50 });
-
-// 	$('#fb-register').on('click', function () {
-// 		GLOBAL.registration.lastclick = 'facebook';
-// 		registrationFacebookSelectionHandler(playcoordinator);
-// 	});
-
-// 	if (!isWebGLEnabled()) {
-// 		$('#webGLlink').show();
-// 	}
-// };
+	return deferred;
+};
 
 Login.registrationFacebookSelectionHandler = function (username, coordinator) {
+	var deferred = $.Deferred();
+
+	var FB = window.FB;
+
 	Validate.Registration.username(username, coordinator)
 		.done(function () {
 			if (!coordinator.execute()) {
+				deferred.reject('username');
 				return;
 			}
 
@@ -695,7 +534,8 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 						username: username,
 						access_token: response.authResponse.accessToken,
 						coordinator: coordinator,
-					});
+					})
+					.then(deferred.resolve, deferred.reject);
 				}
 				else {
 					FB.login(function (loginresponse) {
@@ -704,7 +544,8 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 						 		username: username,
 								access_token: loginresponse.authResponse.accessToken,
 								coordinator: coordinator,
-							});
+							})
+							.then(deferred.resolve, deferred.reject);
 						 }
 					}, {
 						scope: "email"
@@ -712,205 +553,8 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 				}
 			});
 		});
+
+	return deferred;
 }
-
-/* playNowContinueHandler
- *
- * Reconfigures the dialog when the player clicks on 
- * the normal (non-social) sign up button.
- *
- * Required:
- *    [0] playcoordinator: A Coordinator.js object
- *
- * Returns: void
- */
-Login.playNowContinueHandler = function (playcoordinator) {
-	if (!playcoordinator.execute()) {
-		$('#username').focus();
-		return;
-	}
-
-	playcoordinator.test = Coordinator.and;
-	playcoordinator.failure = function (conds, data) {
-		var stack = [
-			{
-				elem: $('#username'),
-				errorelem: $('#usernameerror'),
-				fixtextfn: Login.registrationUsernameFixtext,
-				condition: 'username'
-			},
-			{
-				elem: $('#registrationpassword'),
-				errorelem: $('#registrationpassworderror'),
-				fixtextfn: Login.registrationPasswordFixtext,
-				condition: 'password'
-			},
-			{
-				elem: $('#email'),
-				errorelem: $('#emailerror'),
-				fixtextfn: Login.registrationEmailFixtext,
-				condition: 'email'
-			}
-		];
-
-		coordinationFailure(stack, conds, data);
-	};
-	playcoordinator.success = function (conds, data) {
-		$('.errormsg').slideFadeOut();
-		$('input').removeClass('error');
-	};
-
-	var register = Utils.UI.throttle(1000, function () {
-		validateUsername(playcoordinator);
-		PasswordUtils.quickValidatePassword($('#registrationpassword'), $('#username'), playcoordinator);
-		validateEmail($('#email'), playcoordinator);
-
-		if (!playcoordinator.execute()) {
-			focusOnFirstError(playcoordinator, 'register');
-			return false;
-		}
-
-		Login.standardRegistration({
-			username: $('#username').val(),
-			password: $('#registrationpassword').val(),
-			email: $('#email').val(),
-			coordinator: playcoordinator
-		});
-
-		return true;
-	});
-
-	$(document).ion('keyup.Register', function (evt) {
-		if (evt.keyCode === Keycodes.codes.enter) {
-			register();
-		}
-	});
-
-	$(window).ion('resize', function () {
-		$('#centerpiece').centerIn(window);
-	});
-
-	$('#username')
-		.thinking('done')
-		.off('blur');
-
-	$('.playnow')
-		.text(_("PLAY NOW"))
-		.addClass('fullwidth')
-		.ion('click.Register', register);
-
-	setTimeout(function () { 
-		$('#registrationpassword').focus();
-		$('#username').on('blur', function () {
-			validateUsername(playcoordinator);
-		});
-	}, 0);
-
-	$('#registersocialerror').hide();
-	$('.register.step2').slideFadeIn();
-	$('.register.step1 button').hide();
-	$('#standard-register').css('width', '100%').show();
-};
-
-/* coordinationFailure
- *
- * Provides common error prioritizing for
- * both login and registration coordinators.
- *
- * Required:
- *  [0] stack: [ { elem, condition, errorelem, fixtextfn, onalert, onresolved }, ... ]
- *  [1] conds: from the coordinator's failure callback
- *  [2] data: from the coordinator's failure callback
- *
- * Returns: void
- */
-function coordinationFailure(stack, conds, data) {
-	var first = true;
-	for (var i = 0; i < stack.length; i++) {
-		var field = stack[i];
-		var msgelem = field.errorelem;
-
-		if (!conds[field.condition]) {
-			field.elem.addClass('error');
-			if (first) {
-				msgelem.text(
-					field.fixtextfn(data[field.condition])
-				);
-
-				if (!field.onalert) {
-					msgelem.slideFadeIn();
-				}
-				else {
-					field.onalert(msgelem);
-				}
-				
-				first = false;
-			}
-			else {
-				if (!field.onresolved) {
-					msgelem.slideFadeOut();
-				}
-				else {
-					field.onresolved(msgelem);
-				}
-			}
-		}
-		else {
-			if ($.trim($(field.elem).val()) === '') {
-				first = false; // prevents flickering cascades
-			}
-
-			field.elem.removeClass('error');
-			if (!field.onresolved) {
-				msgelem.slideFadeOut();
-			}
-			else {
-				field.onresolved(msgelem);
-			}
-		}
-	}
-}
-
-// /* focusOnFirstError
-//  *
-//  * Moves the focus to the first error in the registration
-//  * workflow.
-//  *
-//  * Required:
-//  *   [0] coordinator: a Coordinator.js object
-//  *
-//  * Returns: void
-//  */
-// function focusOnFirstError (coordinator, mode) {
-// 	var order; 
-// 	var translation;
-
-// 	if (mode == 'login') {
-// 		order = ['username', 'password'];
-// 		translation = {
-// 			username: $("#username"),
-// 			password: $("#loginpassword")
-// 		};
-// 	}
-// 	else {
-// 		order = ['username', 'password', 'email'];
-// 		translation = {
-// 			username: $("#username"),
-// 			password: $("#registrationpassword"),
-// 			email: $("#email")
-// 		};
-// 	}
-
-// 	for (var i = 0; i < order.length; i++) {
-// 		var key = order[i];
-// 		if (!coordinator.conds[key]) {
-// 			translation[key].one('focus', function (evt) {
-// 				evt.stopImmediatePropagation();
-// 			}).focus();
-// 			translation[key].thinking('cancel');
-// 			return;
-// 		}
-// 	}
-// }
 
 module.exports = Login;
