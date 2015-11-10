@@ -137,6 +137,11 @@ var bump = function (anchor, p) {
 		// Render Graphics
 		render();
 
+		// No Loop
+		if (global_animator.value >= 1) {
+			p.noLoop();
+		}
+
 	}
 
 	// Global Animator Controls

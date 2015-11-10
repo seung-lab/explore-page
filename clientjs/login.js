@@ -70,16 +70,16 @@ Login.IntakeView = function () {
 
 		let p5 = Bumper.play($('#intake-logo')[0]);
 
-		setTimeout(function () {
-			p5.noLoop();
+		// setTimeout(function () {
+		// 	// p5.noLoop();	
 
-			$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
+		// 	$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
 			
-			$('#viewport').scrollTo('.gateway', {
-				msec: 2500,
-				easing: Easing.springFactory(.7, 1),
-			})
-		}, 2000);
+		// 	$('#viewport').scrollTo('.gateway', {
+		// 		msec: 2500,
+		// 		easing: Easing.springFactory(.7, 1),
+		// 	})
+		// }, 2000);
 	};
 };
 
