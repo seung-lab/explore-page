@@ -32,9 +32,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  			.addClass('primary play-now')
  			.text('Play Now');
 
- 		let explorebtn = $('<button>')
- 			.addClass('explorebtn secondary')
- 			.text('Explore');
+ 		let explorebtn = $('<div>').addClass('explorebtn');
 
  		container.append(
  			opening,
@@ -50,6 +48,20 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	}
 
  	afterEnter () {
+ 		let _this = this;
+
+ 		this.view.explorebtn.hide();
+
+ 		setTimeout(function () {
+ 			_this.view.explorebtn.drop({
+				msec: 2000,
+				easing: Easing.bounceFactory(0.5),
+				side: 'bottom',
+				displacement: 25,
+			});
+			_this.view.explorebtn.show();
+ 		}, 6000);
+
  		this.view.startbtn.ion('click', function () {
  			$('#explore').hide();
 

@@ -41,9 +41,16 @@ div.opening
 	margin-top 35px
 
 .gateway .explorebtn
-	width ($primary_width / $PHI)
+	//width ($primary_width / $PHI)
 	center-horizontal()
-	bottom 10%
+	
+	width 0px
+	height 0px
+	border 10px solid rgba(0, 0, 0, 0)
+	border-top 10px solid rgba(255, 255, 255, 0.85)
+	position absolute
+	left calc(50% - 0px / 2 + -10px)
+	bottom 15%
 
 .gateway #continuebtn
 	margin-top 40px
