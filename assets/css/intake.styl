@@ -3,6 +3,7 @@
 @require 'colors.styl'
 @require 'parallax.styl'
 @require 'gateway.styl'
+@require 'neurons.styl'
 @require 'registration.styl'
 @require 'scrollbar.styl'
 
@@ -66,104 +67,6 @@ body
 	position absolute
 	z-index 60
 	parallax(-700px)
-
-.neuron-layer
-	pointer-events none
-
-.neuron-layer .neuron
-	position absolute
-	background-size contain
-	background-repeat no-repeat
-	
-	width 600px
-	height 100%
-	
-
-.neuron-layer .left
-	1 // no-op
-	
-.neuron-layer .right 
-	1 // no-op
-
-.neuron-layer.intake-front
-	z-index 50
-	parallax(150px)
-	
-.neuron-layer.intake-front .left
-	parallax-neuron(
-		$url: '/images/background/front-left.png', 
-		$side: 'left', 
-		$dx: 0.5, 
-		$dy: 275px
-	)
-	
-	
-.neuron-layer.intake-front .right
-	parallax-neuron(
-		$url: '/images/background/front-right.png', 
-		$side: 'right', 
-		$dx: 1, 
-		$dy: 200px
-	)
-	
-.neuron-layer.intake-middle
-	z-index 40
-	parallax(100px)
-	
-.neuron-layer.intake-middle .left
-	parallax-neuron(
-		$width: 1547px,
-		$url: '/images/background/middle-left-blur.png', 
-		$side: 'left', 
-		$dx: 1, 
-		$dy: 200px
-	)
-	
-.neuron-layer.intake-middle .right
-	parallax-neuron(
-		$url: '/images/background/middle-right-blur.png', 
-		$side: 'right', 
-		$dx: 1, 
-		$dy: 200px
-	)
-	
-.neuron-layer.intake-rear
-	z-index 30
-	parallax(50px)
-	
-.neuron-layer.intake-rear .left
-	parallax-neuron(
-		$url: '/images/background/rear-left-blur.png', 
-		$side: 'left', 
-		$dx: 1, 
-		$dy: 200px
-	)
-	
-.neuron-layer.intake-rear .right
-	parallax-neuron(
-		$url: '/images/background/middle-right-blur.png', 
-		$side: 'right', 
-		$dx: 1, 
-		$dy: 200px
-	)
-	
-.neuron-layer.intake-carpet
-	z-index 20
-	parallax(25px)
-	
-
-.neuron-layer.intake-carpet .neuron
-	$url = '/images/background/neural-carpet-blur.png'
-	parallax-neuron(
-		$url: $url,
-		$side: 'center', 
-		$dx: 1, 
-		$dy: 100px
-	)
-	
-.gateway
-	z-index 60
-	parallax(1px)
 
 .curtain
 	opacity 1
