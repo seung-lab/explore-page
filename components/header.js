@@ -41,7 +41,9 @@ class Header extends Synapse {
 			.addClass('register')
 			.append(
 				$("<div>").addClass("icon"),
-				$("<div>").text("Create New Account")
+				$("<div>")
+					.text("Create new account")
+					.addClass("content")
 			);
 
 		container.append(logo, share, login, register);
