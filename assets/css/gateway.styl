@@ -1,0 +1,49 @@
+@require 'mixins.styl'
+@require 'controls.styl'
+@require 'colors.styl'
+@require 'parallax.styl'
+@require 'scrollbar.styl'
+
+section.gateway
+	/* Fix a bug with cover in Android Chrome
+	   where it appearently doesn't work on html/body
+	   but works in other situations. */
+	
+	height 100vh
+	margin 0
+	overflow-x hidden
+	overflow-y auto
+	padding 0
+	width 100%
+
+	display flex
+	color white
+	align-items center
+	justify-content center
+	flex-direction column
+
+div.opening
+	text-transform uppercase
+
+	font-weight 400
+	font-size 36px
+	letter-spacing 12px
+	color rgba(255, 255, 255, 0.85)
+	
+.gateway .play-now
+	position relative
+	margin-left auto
+	margin-right auto
+	margin-top 35px
+
+.gateway .explorebtn
+	width ($primary_width / $PHI)
+	center-horizontal()
+	bottom 10%
+
+.gateway #continuebtn
+	margin-top 40px
+	
+	display flex
+	justify-content center
+	align-items center

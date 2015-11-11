@@ -38,8 +38,11 @@ class Header extends Synapse {
 			.text("Player Login");
 
 		let register = $('<div>')
-			.addClass('tertiary register')
-			.text("Create New Account");
+			.addClass('register')
+			.append(
+				$("<div>").addClass("icon"),
+				$("<div>").text("Create New Account")
+			);
 
 		container.append(logo, share, login, register);
 

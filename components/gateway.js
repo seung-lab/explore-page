@@ -29,8 +29,8 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		opening.append(logintxt);
  		
  		let startplayingbtn = $('<button>')
- 			.addClass('primary')
- 			.text('Start Playing');
+ 			.addClass('primary play-now')
+ 			.text('Play Now');
 
  		let explorebtn = $('<button>')
  			.addClass('explorebtn secondary')

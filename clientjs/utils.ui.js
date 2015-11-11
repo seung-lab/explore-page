@@ -525,9 +525,7 @@ Utils.UI.curtainFall = function (fn) {
 	let curtain = $('<div>').addClass('curtain fall');
 	$('body').append(curtain);
 
-	setTimeout(function () {
-		curtain.removeClass('fall').transitionend(fn);
-	}, 1000);
+	curtain.removeClass('fall').transitionend(fn);
 };
 
 
