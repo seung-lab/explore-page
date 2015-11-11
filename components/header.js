@@ -1,22 +1,38 @@
 let $ = require('jquery'),
 	utils = require('../clientjs/utils.js'),
 	Easing = require('../clientjs/easing.js'),
-	Synapse = require('./synapse.js');
+	Synapse = require('./synapse.js'),
+	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js');
+
+let Login = null;
 
 class Header extends Synapse {
 	constructor(args = {}) {
 		super(args);
 
+		Login = args.login;
+
 		this.view = this.generateView();
 
 		this.mode = args.mode || 'share';
+
+		this.state = {
+			share_activated: false,
+			exploring: false,
+		};
 	}
 
 	generateView () {
-		let container = $('<div>').addClass('header invisible');
+		let container = $('<div>').addClass('header');
 		let logo = $('<div>').addClass('logotype');
 
 		let share = $('<div>').addClass('icon share');
+		let before = $('<div>').addClass('before');
+		let permalink = $("<div>").addClass('permalink');
+		let at_moment = $("<input>").attr('type', 'checkbox');
+
+		share.append(before, permalink);//, at_moment)
+
 		let login = $('<div>')
 			.addClass('tertiary login')
 			.text("Player Login");
@@ -32,41 +48,81 @@ class Header extends Synapse {
 			logo: logo,
 			login: login,
 			register: register,
-			share: share,
+			share: {
+				container: share,
+				icon: before,
+				permalink: permalink,
+				at_moment: at_moment,
+			},
 		};
 	}
 
 	attachEventListeners () {
 		let _this = this;
 
-		_this.view.login.ion('click', function () {
+		_this.view.share.icon.ion('click', function () {
+			_this.state.share_activated = !_this.state.share_activated;
+			_this.render();
+		});
 
+		_this.view.share.at_moment.ion('click', function () {
+			_this.render();
+		});
+
+		_this.view.register.ion('click', function () {
+			Login.curtainFall(function () {
+				document.location.href = 'https://eyewire.org/signup';
+			})
 		});
 	}
 
-	afterEnter () {
+	afterEnter (transition) {
 		let _this = this;
-		setTimeout(function () {
+		
+		transition.done(function () {
 			_this.view.module.removeClass('invisible');
-		}, 5000);
+		});
+	}
+
+	renderShare () {
+		let _this = this;
+
+		_this.view.share.container.addClass('visible');
+
+		let share_url = `${document.location.href}`;
+		if (_this.view.share.at_moment.is(":checked")) {
+			let t = Math.floor(ModuleCoordinator.timeline.t * 100);
+			share_url = `${document.location.href}?t=${t}`; 
+		}
+
+		_this.view.share.permalink.text(share_url);
+
+		_this.view.share.container.removeClass('activated');
+		if (_this.state.share_activated) {
+			_this.view.share.container.addClass('activated');
+		}
 	}
 
 	render () {
 		let _this = this;
 
-		[ 'login', 'register', 'share' ].forEach(function (icon) {
+		[ 'login', 'register' ].forEach(function (icon) {
 			_this.view[icon].removeClass('visible');
 		});
 
+		_this.view.share.container.removeClass('visible');
+
 		if (_this.mode === 'login') {
-			_this.view.register.addClass('visible');
+			_this.view.login.addClass('visible');
 		}
 		else if (_this.mode === 'register') {
-			_this.view.login.addClass('visible');	
+			_this.view.register.addClass('visible');	
 		}
 		else {
-			_this.view.share.addClass('visible');		
-		}		
+			_this.renderShare();
+		}
+
+		this.attachEventListeners();
 	}
 }
 

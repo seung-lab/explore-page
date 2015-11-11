@@ -8,9 +8,7 @@
 // the last branches
 
 // Contructor: P5.Vector, P5.p
-function Synapse(args) {
-	args = args || {};
-
+function Synapse (args = {}) {
 	// Private arguments from constructor
 	var p = args.p;
 

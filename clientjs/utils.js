@@ -975,6 +975,21 @@ Utils.xor = function (p,q) {
 	return !(p && q) && (p || q);
 }
 
+/* modulo
+ *
+ * Correctly deal with both positive and negative numbers in 
+ * modulo arithmetic.
+ *
+ * Required:
+ *   [0] a
+ *   [1] b
+ *
+ * Return: a % b even when the number is negative 
+ */
+Utils.modulo = function (a, b) {
+	return ((a % b) + b) % b;
+};
+
 /* guid
  *
  * Generate a globally unique id.

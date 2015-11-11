@@ -6,20 +6,20 @@
 	left 0
 	
 	width 100%
-	height 100%
+	height 1px
 	
 	z-index 100
 	pointer-events none
 	
 .header div
 	pointer-events auto
-	transition opacity 300ms
+	transition opacity 2s
 	
 .header.invisible div,
 .header.invisible div.visible
 	opacity 0
 
-$corner_offset = 5%
+$corner_offset = 35px
 
 .header .logotype
 	position absolute
@@ -40,12 +40,46 @@ $corner_offset = 5%
 	right $corner_offset
 	
 	opacity 0
+	pointer-events none
+	cursor pointer
+	
+.header div.visible
+	pointer-events all
 
 .header .share
 	height 30px
+	width 300px
+	
+	right (-@width + $corner_offset + @height)
+	
+	transition right 1s ease-in-out
+	
+.header .share.activated
+	right 0px
+	
+.header .share .permalink
+	display inline-block
+	color $TEXT_BLUE
+	opacity 0
+	
+	float left
+	margin-top 5px
+	margin-left 10px
+	font-size 16px
+	
+	cursor text
+
+.header .share.activated .permalink
+	opacity 1
+
+.header .share .before
+	display block
+	height 30px
 	width @height
 	
-	background-image url('/images/icons/sh.svg') // ad-blocks sometimes block share.svg
+	float left
+	
+	background-image url('/images/icons/sh-dark.svg') // ad-blocks sometimes block share.svg
 	background-size @height @height
 	background-repeat no-repeat
 
@@ -67,11 +101,24 @@ $corner_offset = 5%
 	opacity 1
 
 .header .share.visible
-	opacity .3
+	opacity 1
+
+.header .tertiary
+	color $TEXT_BLUE
 
 .header .tertiary:before
 	background url("/images/icons/enter.svg")
 	background-size 65%
 	background-repeat no-repeat
 	background-position 5px 6px
+	
+	top: -0.5px;
+	left: -31px;
+	
+.header .tertiary.register:before
+	background url("/images/icons/create-account-dark.svg")
+	background-size 65%
+	background-repeat no-repeat
+	background-position 5px 6px
+	
 	

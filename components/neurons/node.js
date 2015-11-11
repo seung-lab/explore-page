@@ -13,6 +13,10 @@
 		// 	Integer:  	max_depth
 		//  P5, 	p --> instance
 	// 
+
+let Utils = require('../../clientjs/utils.js'),
+	p5 = require('p5');
+
 function Node (args) {
 	args = args || {};
 
@@ -58,12 +62,12 @@ function Node (args) {
 
 	// Private variables
 	var radius = 0;
-	var wandertheta = 0;
-	var wan_const = 0;
-	var maxspeed = 1.5;       // Default 2
-	var maxforce = p.random(0.8,1);    // Default 0.05
-	var damping = 0.85;
-	var pow = 1000; // Huge starting multipliers!
+		wandertheta = 0,
+		wan_const = 0,
+		maxspeed = 1.5, // Default 2
+		maxforce = p.random(0.8,1), // Default 0.05
+		damping = 0.85,
+		pow = 1000; // Huge starting multipliers!
 
 	// Increment for each instantiation at a branch event
 	this.depth++;
@@ -75,20 +79,20 @@ function Node (args) {
 	};
 
 	// var n :: Node()
-	this.addChild = function(n) {
+	this.addChild = function (n) {
 		var _this = this;
 		n.parent = _this;
 		_this.children.push(n);
-	} 
+	}; 
 
 	// var n :: Node()
-	this.addParent = function(n) {
+	this.addParent = function (n) {
 		var _this = this;
 		n.addChild(_this);
-	}
+	};
 
-	// Set curve points
-	this.pt_0 = function() {
+	// Set curve points for Catmull–Rom spline
+	this.pt_0 = function () {
 		var _this = this;
 		var p_0 = p.createVector();
 		if (_this.depth == 1 || _this.depth == 2) {
@@ -98,9 +102,9 @@ function Node (args) {
 		else {
 			return p_0.set(_this.parent.parent.position.x,_this.parent.parent.position.y);
 		}
-	}
+	};
 
-	this.pt_1 = function() {
+	this.pt_1 = function () {
 		var _this = this;
 		var p_1 = p.createVector();
 		var isAlone =  _this.parent instanceof Node;
@@ -111,13 +115,13 @@ function Node (args) {
 		else {
 			return p_1.set(_this.parent.position.x,_this.parent.position.y);
 		}
-	}
+	};
 
-	this.pt_2 = function() {
+	this.pt_2 = function () {
 		var _this = this;
 		var p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
-	}
+	};
 
 	this.pt_3 = function() {
 		var _this = this;
@@ -200,10 +204,12 @@ function Node (args) {
 		_target.normalize();
 
 		if (_this.distribute) {
+			// HACK: Fourth power is suspicious
+			
 			// Calculate distance from center
 			var center = p.createVector(p.width/2, p.height/2);
 			var cd = p.abs(p5.Vector.dist(_this.position, center));
-			target.div(cd*cd*cd*cd*cd); // Weight by distance
+			target.div(cd*cd*cd*cd*cd); // Weight by distance 
 		}
 
 		_target.mult(maxspeed);
@@ -726,7 +732,7 @@ function Node (args) {
 			return null;
 		}
 
-	    depthx = depthx === undefined ? 0 : depthx;
+	    depthx = Utils.nvl(depthx, 0);
 
 	    var parentsC = this.parent.children;
 	    var parentIdx = null;
@@ -742,7 +748,8 @@ function Node (args) {
 	    // left most = 0
 
 	    if (parentIdx > 0 || this.parent.parent === undefined) {
-	        return parentsC[(parentIdx - 1).mod(parentsC.length)].rightMost(depthx);
+	    	let index = Utils.modulo((parentIdx - 1), parentsC.length);
+	        return parentsC[index].rightMost(depthx);
 	    } else {
 	        return this.parent.leftNode(depthx + 1);
 	    }
@@ -754,11 +761,11 @@ function Node (args) {
 	    }
 
 	    return this.children[this.children.length - 1].rightMost(depthx - 1);
-	}
+	};
 
 	// Method to be called on window resize to keep nodes in tension
 	// MousePos for debugging 
-	this.repel = function() {
+	this.repel = function () {
 		var _this = this;
 		if(p.mouseIsPressed) {
 			var mousePos = p.createVector(p.mouseX, p.mouseY);
@@ -780,7 +787,7 @@ function Node (args) {
 	// Method to shift nodes around
 	// Only to be called once growing has completed!
 	// Only to be called once springify has completed!
-	this.relax = function() {
+	this.relax = function () {
 		var _this = this;
 		_this.repel();
 		_this.update();
@@ -791,7 +798,7 @@ function Node (args) {
 
 	// Create a new dendrite at the current position, but change direction by a given angle
 	// Returns a new Node object
-	this.branch = function(angle, id) {
+	this.branch = function (angle, id) {
 		var _this = this;
 		// What is my current heading
 		var theta = _this.velocity.heading();
@@ -826,7 +833,3 @@ function Node (args) {
 	}
 }
 
-
-Number.prototype.mod = function(n) {
-    return ((this%n)+n)%n;
-};

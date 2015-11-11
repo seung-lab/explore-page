@@ -6,26 +6,26 @@
 
 // A class for controlling the interactions across the enire network
 
-function Nnn(args) {
-	args = args || {};
+// Nortons Neural Network (NNN)
+function NNN (args = {}) {
 
 	// Private arguments from constructor
 	var p = args.p;
 
 	// Public arguments from constructor
 	this.num_neurons = args.num_neurons || 1;
-	this.complexity = args.complexity  || 13;
+	this.complexity = args.complexity || 13;
 
 	// Generic public array variable : not an argument though
 	this.neurons = [];
 
-	this.max_depth;
-	this.num_branches;
+	this.max_depth = null;
+	this.num_branches = null;
 
 	// Array of all somas included in the NNN
 	var somas = [];
 
-	this.initialize = function() {
+	this.initialize = function () {
 		var _this = this;
 
 		// Initialize Neuron
@@ -36,12 +36,11 @@ function Nnn(args) {
 			// Find soma for each neuron
 			somas.push(neuron.nodes[0]);
 		});
-
-	}
+	};
 	
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
-	this.run = function() {
+	this.run = function () {
 		var _this = this;
 		_this.neurons.forEach(function(neuron) {
 
@@ -62,9 +61,9 @@ function Nnn(args) {
 			}
 
 		});
-	}
+	};
 
-	this.done = function() {
+	this.done = function () {
 		var _this = this;
 
 		var n;
@@ -76,11 +75,10 @@ function Nnn(args) {
 		}
 
 		return true;
-
-	}
+	};
 
 	// Add neuron to the network --> Accepts P5.Vector for Arg
-	this.add_neuron = function(count) {
+	this.add_neuron = function (count) {
 		var _this = this;
 		var x, y;
 
@@ -128,10 +126,10 @@ function Nnn(args) {
 			_this.neurons[_this.neurons.length - 1].network_setup();
 
 		}
-	}
+	};
 
 	// Remove neuron to the network
-	this.remove_neuron = function(count) {
+	this.remove_neuron = function (count) {
 		var _this = this;
 		var j;
 		// splice() is a javascript method to working on arrays
@@ -139,18 +137,18 @@ function Nnn(args) {
 			j = p.floor(p.random(_this.neurons.length));
 			_this.neurons.splice(j, 1);
 		}
-	}
+	};
 
 	// Calculate initial separation forces for NNN
-	this.spread = function() {
+	this.spread = function () {
 		var _this = this;
 
 		somas.forEach(function(soma) {
 			// Find soma for each neuron
 			soma.separate(somas);
-			soma
 		});
-	}
-
+	};
 }
+
+module.exports = NNN;
 

@@ -10,7 +10,6 @@ let $ = require('jquery'),
 	Registration = require('../components/registration.js'),
 	Authentication = require('../components/authentication.js'),
 	_ = require('./localeplanet-translate.js');
-	// ModuleCoordinator = require('./controllers/ModuleCoordinator.js')
 
 let Login = {};
 
@@ -20,6 +19,7 @@ Login.initialize = function () {
 	_components.header = new Header({ 
 		anchor: '#header',
 		name: "Header",
+		login: Login,
 	});
 
 	_components.header.enter().render();
@@ -52,6 +52,13 @@ Login.initLogin = function (transition) {
 	_components.authentication.enter(transition);
 };
 
+Login.initExploring = function () {
+	_components.header.mode = 'register';
+	_components.header.render();
+
+	Login.bindResizeEvents('explore');
+};
+
 Login.bindResizeEvents = function (stage) {
 	if (stage === 'gateway'
 		|| stage === 'intake'
@@ -71,7 +78,12 @@ Login.takeMeTo = function (stage) {
 		msec: 0,
 	});
 
-	Login.bindResizeEvents(stage);
+	if (stage === 'explore') {
+		Login.initExploring();
+	}
+	else {
+		Login.bindResizeEvents(stage);
+	}
 };
 
 Login.IntakeView = function () {
@@ -81,18 +93,20 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
-		let p5 = Bumper.play($('#intake-logo')[0]);
+		setTimeout(function () {
 
-		// setTimeout(function () {
-		// 	// p5.noLoop();	
+		Bumper.play($('#intake-logo')[0]);
 
-		// 	$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
-			
-		// 	$('#viewport').scrollTo('.gateway', {
-		// 		msec: 2500,
-		// 		easing: Easing.springFactory(.7, 1),
-		// 	})
-		// }, 2000);
+			setTimeout(function () {
+				$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
+				
+				$('#viewport').scrollTo('.gateway', {
+					msec: 2500,
+					easing: Easing.springFactory(.7, 1),
+				});
+			}, 2000);
+
+		}, 500);
 	};
 };
 
@@ -556,5 +570,30 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 
 	return deferred;
 }
+
+Login.curtainRise = function (fn) {
+	let curtain = $('<div>').addClass('curtain');
+	$('body').append(curtain);
+
+	setTimeout(function () {
+		curtain.cssAnimation('fall')
+			.always(function () {
+				curtain.remove();
+			});
+
+		fn();
+	}, 100);
+};
+
+Login.curtainFall = function (fn) {
+	let curtain = $('<div>').addClass('curtain fall');
+	$('body').append(curtain);
+
+	setTimeout(function () {
+		curtain.removeClass('fall').transitionend(fn);
+	}, 1000);
+};
+
+
 
 module.exports = Login;

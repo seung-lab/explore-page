@@ -39,19 +39,11 @@ $(document).ready(function () {
 });
 
 function jumpToExplore (t, transition) {
-	let curtain = $('<div>').addClass('curtain');
-	$('body').append(curtain);
-
 	Login.takeMeTo('explore');
 
-	setTimeout(function () {
-		curtain.cssAnimation('fall')
-			.always(function () {
-				curtain.remove();
-			});
-
+	Login.curtainRise(function () {
 		transition.resolve();
-	}, 100);
+	});
 
 	ModuleCoordinator.seek(t);
 }

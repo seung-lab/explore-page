@@ -52,23 +52,32 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.startbtn.ion('click', function () {
  			$('#explore').hide();
 
-			let transition = $('#viewport').scrollTo('#intake', {
-				msec: 4000,
-				easing: Easing.springFactory(.9, 1),
-			});
+			// let transition = $('#viewport').scrollTo('#intake', {
+			// 	msec: 4000,
+			// 	easing: Easing.springFactory(.9, 1),
+			// });
 
-			if ($.cookie('visited')) {
-				Login.initLogin(transition);
-			}
-			else {
-				Login.initRegistration(transition);
-			}
+			// if ($.cookie('visited')) {
+			// 	Login.initLogin(transition);
+			// }
+			// else {
+			// 	Login.initRegistration(transition);
+			// }
+
+			Login.curtainFall(function () {
+				if ($.cookie('visited')) {
+					document.location.href = 'https://eyewire.org/login';
+				}
+				else {
+					document.location.href = 'https://eyewire.org/signup';
+				}
+			});
  		});
 
  		this.view.explorebtn.ion('click', function () {
  			$('#registration').hide();
 
- 			Login.bindResizeEvents('explore');
+ 			Login.initExploring();
 
 			let transition = $('#viewport')
 				.scrollTo('#explore', {

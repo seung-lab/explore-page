@@ -1,5 +1,4 @@
 var Easing = require('./easing.js'),
-	Kruskal = require('../components/neurons/kruskal.js');
 	p5 = require('p5');
 
 // Eyewire Bumper Animation
@@ -127,6 +126,12 @@ var bump = function (anchor, p) {
 
 	// Consider this Update
 	p.draw = function () {
+		// No Loop
+		if (global_animator.value >= 1) {
+			p.noLoop();
+			return;
+		}
+		
 		p.clear();
 		
 		// Draw Grid
@@ -137,12 +142,6 @@ var bump = function (anchor, p) {
 
 		// Render Graphics
 		render();
-
-		// No Loop
-		if (global_animator.value >= 1) {
-			p.noLoop();
-		}
-
 	}
 
 	// Global Animator Controls
