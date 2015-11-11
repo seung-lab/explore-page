@@ -3,6 +3,8 @@ let $ = require('jquery'),
 	TeaTime = require('../teatime.js');
 
 
+var EPS = 0.01;
+
 class Melt extends TeaTime {
 	constructor(args = {}) {
 		super(args);
@@ -16,7 +18,21 @@ class Melt extends TeaTime {
 
 		this.duration = 10; // seconds
 
+		this.text = [
+			splitter("EyeWire is the first of its kind", true),
+			splitter("It's a 3D puzzle game", true)
+		];
+
 		this.view = this.generateView();
+
+		this.slideIndex = 0;
+
+		var _this = this;
+
+		window.onresize = function () {
+			_this.resize();
+		};
+		_this.resize();
 	}
 
 	generateView () {
@@ -33,36 +49,126 @@ class Melt extends TeaTime {
 		container.append(vidContainer);
 
 		let textcontainer = d('story-text');
-		let text = d('text caps').html(splitter("EyeWire is the first of it's kind", true));
-		let counter = d('counter');
-		textcontainer.append(text, counter);
+		{
+			let text = d('text caps').html(this.text[0]);
+			let counter = d('counter');
+
+			textcontainer.append(text, counter);
+		}
+		vidContainer.append(textcontainer);
+
+
+		let textcontainer3 = d('story-text bottom');
+		{
+			let text3 = d('text caps').html(this.text[1]);
+			let counter3 = d('counter');
+			textcontainer3.append(text3, counter3);
+		}
+		container.append(textcontainer3);
+
+		let whitePart = d('whitePart');
+
+		container.append(whitePart);
+
 		// TODO, fade out before cube goes underneath
 
-		vidContainer.append(textcontainer);
+
+		let supertext = d('super-text').html("as you solve puzzles");
+		let textcontainer2 = d('story-text visible-supertext on-white bottom');
+		let text2 = d('text caps').html(splitter("You're mapping the brain", true));
+		let counter2 = d('counter');
+		textcontainer2.append(supertext, text2, counter2);
+
+		container.append(textcontainer2);
 
 		return {
 			module: container,
-			vidContainer: vidContainer
+			vidContainer: vidContainer,
+			texts: [
+				textcontainer,
+				textcontainer3,
+				textcontainer2
+			],
+			white: whitePart
 		};
 	}
 
-	afterEnter (from) {
-		var _this = this;
-		window.addEventListener('resize', function () {
-			resizeVideo(_this.currentVideo);
-		});
+	resize() {
+		var aspect = window.innerWidth / window.innerHeight;
+		if (aspect > (16 / 10) && aspect < 2) {
+			this.view.module.addClass('wide');
+		} else {
+			this.view.module.removeClass('wide');
+		}
 	}
 
 	next () { // next slide
-		SequenceManager.scrollHandler(true);
+		console.log('next', SequenceManager.tTime(), this.t);
+		if (SequenceManager.tTime() > 1 - EPS) {
+			this.parent.moduleComplete();
+		} else {
+			SequenceManager.scrollHandler(true)
+		}
 	}
 
 	previous () { // previous slide
-		SequenceManager.scrollHandler(false);
+		console.log('previous', SequenceManager.tTime(), this.t);
+		if (SequenceManager.tTime() < EPS) {
+			this.parent.moduleUncomplete();
+		} else {
+			SequenceManager.scrollHandler(false)
+		}
 	}
 
 	last () {
-		return 0.9;
+		return 0.999;
+	}
+
+	timeUpdate (t) {
+		console.log('timeUpdate', t);
+		this.t = t;
+		this.parent.sub_t_update(this.name, t);
+
+		var i = 0;
+
+		if (t < 0.01) {
+			this.view.texts[i].css('opacity', '1');
+			this.view.texts[i].css('transition', 'opacity 0s');
+		} else {
+			this.view.texts[i].css('transition', 'opacity 0.5s');
+			this.view.texts[i].css('opacity', '0');
+		}
+
+		i++;
+
+		if (t > 0.16 && t < 0.37) {
+			this.view.texts[i].css('opacity', '1');
+		} else {
+			this.view.texts[i].css('opacity', '0');
+		}
+
+		i++;
+
+		if (t > 0.89 && t < 1) {
+			this.view.texts[i].css('opacity', '1');
+		} else {
+			this.view.texts[i].css('opacity', '0');
+		}
+
+		var whiteTStart = 0.87;
+
+		if (t > whiteTStart) {
+			var p = (t - whiteTStart) / (1 - whiteTStart);
+
+			var heightStart = 27;
+			var heightEnd = 37;
+
+
+			this.view.white.css('opacity', p); 
+			this.view.white.css('height', (p * heightEnd + (1-p) * heightStart) + '%');
+		} else {
+			this.view.white.css('opacity', 0);
+		}
 	}
 
 	render (t_prev, t) {
@@ -71,8 +177,6 @@ class Melt extends TeaTime {
 		var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
 
 		var targetFrame = t * totalFrames;
-
-		console.log(targetFrame)
 
 		for (var i = 0; i < SEQUENCE_LENGTHS.length; i++) {
 			let length = SEQUENCE_LENGTHS[i];
@@ -95,8 +199,7 @@ class Melt extends TeaTime {
 	seek (t) {
 		console.log('seek', t);
 		let t_prev = this.t;
-		this.t = t;
-		this.parent.sub_t_update(this.name, t);
+		this.timeUpdate(t);
 
 
 		if (SequenceManager.active) {
@@ -107,6 +210,7 @@ class Melt extends TeaTime {
 	}
 
 	loadVideo(forward, sequence, start, autoplay) {
+		console.log('loadVideo', forward, sequence, start, autoplay);
 		start = start || 0;
 		var cacheResult = videoCache[forward][sequence];
 
@@ -125,6 +229,8 @@ class Melt extends TeaTime {
 
 		seqEl.myautoplay = autoplay;
 
+		seqEl.forward = forward;
+
 		var src = document.createElement('source');
 		src.src = "./animations/Melt_Sequence/small2/melt_" + fString + "_" + sequence + ".mp4";
 
@@ -134,8 +240,6 @@ class Melt extends TeaTime {
 		seqEl.style.display = 'none';
 
 		this.view.vidContainer.append(seqEl);
-
-		resizeVideo(seqEl);
 
 		seqEl.seqNum = sequence;
 
@@ -155,7 +259,6 @@ class Melt extends TeaTime {
 
 			seqEl.setupAndReadyToGo = true;
 			seqEl.style.display = 'inherit';
-			resizeVideo(seqEl);
 
 			setTimeout(function () {
 				var videos = videoCache[true].concat(videoCache[false]);
@@ -175,6 +278,13 @@ class Melt extends TeaTime {
 				if (seqEl.myautoplay) {
 					seqEl.play();
 					seqEl.started = true;
+				} else if (sequence === 0 && forward) {
+					setTimeout(function () {
+						if (!seqEl.started) {
+							seqEl.play();
+							seqEl.started = true;
+						}
+					}, 3000);
 				}
 			}, 10); // TODO, maybe increase this? there is still a slight glitch in safari after second playthrough
 				// TODO with safari, try to change the z-index before switching them
@@ -183,61 +293,33 @@ class Melt extends TeaTime {
 
 		var ended = false;
 
-		function tTime() {
-			var currentFrame = seqEl.currentTime * 30;
-
-			var currentLength = SEQUENCE_LENGTHS[seqEl.seqNum];
-
-			var frameTime = Math.min(currentFrame, currentLength);//forward ? currentFrame : currentLength - currentFrame;
-
-			// var realSeqNum = forward ? seqEl.seqNum : SEQUENCE_COUNT - seqEl.seqNum - 1;
-
-			// console.log('realSeqNum', realSeqNum, currentFrame);
-
-			if (forward) {
-				for (var i = 0; i < seqEl.seqNum; i++) {
-					frameTime += SEQUENCE_LENGTHS[i];
-				};
-			} else {
-				for (var i = seqEl.seqNum + 1; i < SEQUENCE_COUNT; i++) {
-					frameTime += SEQUENCE_LENGTHS[i];
-				};
-			}
-
-			var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
-
-			var teaTime = frameTime / totalFrames;
-
-			console.log('tTime', forward, seqEl.seqNum, teaTime);
-
-			// return 0.5;
-
-			if (!forward) {
-				return 1 - teaTime;
-			}
-
-			return teaTime;
-		}
-
 		seqEl.addEventListener('pause', function () {
 			if (seqEl.currentTime === seqEl.duration) {
-				console.log('sequence ended', forward, sequence);
+				console.log('sequence ended', forward, sequence, SequenceManager.tTime());
 				ended = true;
 			}
 		});
 
 		setInterval(function () {
 			if (SequenceManager.active === seqEl) {
-				_this.parent.sub_t_update(_this.name, tTime());
+				_this.timeUpdate(SequenceManager.tTime());
 			}
 		}, 15);
 
 
 		seqEl.scrollHandler = function (down) {
-			if (!seqEl.started && down === forward) {
-				seqEl.play();
-				seqEl.started = true;
-				return;
+			if (!seqEl.started) {
+				console.log('not started', sequence);
+				if (down === forward) {
+					console.log('starting', sequence);
+					seqEl.play();
+					seqEl.started = true;
+
+					return true;
+				} else {
+					// return true;
+					// return false; // TODO, this may be a mistake if we start at the end
+				}
 			}
 
 			if (!ended) {
@@ -245,7 +327,7 @@ class Melt extends TeaTime {
 				if (down === forward) {
 					console.log('double playback', forward, sequence);
 					seqEl.playbackRate = 2;
-					return;
+					return true;
 				} else {
 					console.log('pausing', forward, sequence);
 					// pleaseEnd = true;
@@ -287,7 +369,10 @@ class Melt extends TeaTime {
 				// }
 			} else {
 				console.log('ignoring');
+				// return false;
 			}
+
+			// return true;
 		};
 
 		return seqEl;
@@ -299,12 +384,6 @@ var videoCache = {
 	false: []
 };
 
-function resizeVideo(video) {
-	video.height = window.innerHeight;
-	var videoWidth = 4000 / 2260 * window.innerHeight;
-	video.style.left = `${-(videoWidth - window.innerWidth) / 2}px`;
-}
-
 var SEQUENCE_COUNT = 4;
 
 var SEQUENCE_LENGTHS = [
@@ -315,8 +394,46 @@ var SequenceManager = {
 	active: null,
 	scrollHandler: function (down) {
 		if (SequenceManager.active) {
-			SequenceManager.active.scrollHandler(down);
+			return SequenceManager.active.scrollHandler(down);
 		}
+	},
+	tTime: function () {
+		var video = SequenceManager.active;
+
+
+		var currentFrame = video.currentTime * 30;
+
+		var currentLength = SEQUENCE_LENGTHS[video.seqNum];
+
+		var frameTime = Math.min(currentFrame, currentLength);//forward ? currentFrame : currentLength - currentFrame;
+
+		// var realSeqNum = forward ? seqEl.seqNum : SEQUENCE_COUNT - seqEl.seqNum - 1;
+
+		// console.log('realSeqNum', realSeqNum, currentFrame);
+
+		if (video.forward) {
+			for (var i = 0; i < video.seqNum; i++) {
+				frameTime += SEQUENCE_LENGTHS[i];
+			};
+		} else {
+			for (var i = video.seqNum + 1; i < SEQUENCE_COUNT; i++) {
+				frameTime += SEQUENCE_LENGTHS[i];
+			};
+		}
+
+		var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
+
+		var teaTime = frameTime / totalFrames;
+
+		// console.log('tTime', forward, seqEl.seqNum, teaTime);
+
+		// return 0.5;
+
+		if (!video.forward) {
+			return Math.min(1 - teaTime, 0.999);
+		}
+
+		return Math.min(teaTime, 0.999);
 	}
 };
 
@@ -328,62 +445,10 @@ function splitter (txt, inverted) {
 	}
 
 	if (inverted) {
-		return ipyramid_splitter(txt);
+		return utils.invertedPyramidLineBreak(txt);
 	}
 
-	return pyramid_splitter(txt);
-}
-
-function ipyramid_splitter (txt) {
-	let tokens = txt.split(" ");
-	let html = "";
-
-	let midpt = txt.length / 2;
-	let len = 0;
-
-	let broken = false;
-
-	for (let i = 0; i < tokens.length; i++) {
-		html += tokens[i];
-		len += tokens[i].length;
-
-		if (!broken && len > midpt) {
-			html += '<br>';
-			broken = true;
-		}
-		else {
-			html += " ";
-			len++;
-		}
-	}
-
-	return html;
-}
-
-function pyramid_splitter (txt) {
-	let tokens = txt.split(" ");
-	let html = "";
-
-	let midpt = txt.length / 2;
-	let len = 0;
-
-	let broken = false;
-
-	for (let i = tokens.length - 1; i >= 0; i--) {
-		html += utils.sreverse(tokens[i]);
-		len += tokens[i].length;
-
-		if (!broken && len > midpt) {
-			html += utils.sreverse('<br>');
-			broken = true;
-		}
-		else {
-			html += " ";
-			len++;
-		}
-	}
-
-	return utils.sreverse(html);
+	return utils.pyramidLineBreak(txt);
 }
 
 module.exports = Melt;

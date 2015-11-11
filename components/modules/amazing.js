@@ -14,37 +14,40 @@ class Amazing extends TeaTime {
 			return "/animations/amazing/" + name;
 		};
 
+		this.frameRateMsec = 83;
+
 		this.slides = [
 			{
 				video: "",
 				text: "Your brain makes you amazing!",
 				ipyramid: true,
-				gif: path("brain.gif"),
+				lastFrame: 15,
+				lastRepeatFrame: 19,
 			},
 			{
 				supertext: "it allows you to:",
 				text: "Learn intricate skills",
 				ipyramid: true,
-				video: "",
-				gif: path("apple.gif"),
+				lastFrame: 47,
+				lastRepeatFrame: 63,
 			},
 			{
 				text: "Dream fantastic dreams",
 				ipyramid: true,
-				video: "",
-				gif: path("narhawk.gif"),
+				lastFrame: 88,
+				lastRepeatFrame: 95,
 			},
 			{
 				text: "Even laugh at goofy cat videos",
 				ipyramid: false,
-				video: "",
-				gif: path("cat.gif"),
+				lastFrame: 113,
+				lastRepeatFrame: 117,
 			},
 			{
 				text: "But how?",
 				ipyramid: true,
-				video: "",
-				gif: path("cat.gif"),
+				lastFrame: 145,
+				lastRepeatFrame: 149,
 			},
 		];
 
@@ -63,21 +66,33 @@ class Amazing extends TeaTime {
 
 		let bg = $('<div>').addClass('amazing bg-light module');
 
-		let video;
+		let videoContainer = $('<div>');
 
-		if (this.mobile) {
-			video = $('<img>').attr({
-				src: slide_one.gif,
-			})
-			.addClass('gif')
-		}
-		else {
-			video = $('<video>').attr({
-				src: slide_one.video,
-				controls: true,
-			})
-			.addClass('video')
-		}
+		var count = 0;
+		var frame = 1;
+
+		var thisisnew = 1;
+
+		for (let i = 0; i < this.slides.length; i++) {
+			let slide = this.slides[i];
+
+			let slideFrameContainer = $('<div>', { id: `slide${count}`});
+
+			while (frame <= slide.lastRepeatFrame) {
+				var img = $('<img>', {
+					src: `./animations/amazing/opt/opt-f${frame}.jpg`,
+					class: 'frame',
+					id: 'frame' + frame,
+				});
+				slideFrameContainer.append(img);
+
+				frame++;
+			};
+
+			videoContainer.append(slideFrameContainer);
+
+			count++;
+		};
 
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
@@ -95,14 +110,14 @@ class Amazing extends TeaTime {
 		textcontainer.append(supertext, text, counter);
 
 		bg.append(
-			video,
+			videoContainer,
 			textcontainer,
 			next
 		);
 
 		return {
 			module: bg,
-			video: video,
+			videoContainer: videoContainer,
 			textcontainer: textcontainer,
 			text: text,
 			supertext: supertext,
@@ -122,13 +137,53 @@ class Amazing extends TeaTime {
 
 	afterExit () {
 		this.view.text.text("");
+
+		this.clearAsync();
+	}
+
+	blink () {
+		var frames = [146, 147, 148, 149];
+
+		var index = 0;
+		var delta = 1;
+
+		$('#frame' + frames[index]).css('visibility', 'visible');
+
+		let interval = setInterval(function () {
+			if (index === 0 && delta < 0) {
+				def.resolve();
+				return;
+			}
+
+			if (index === frames.length -1) {
+				delta *= -1;
+			}
+
+			console.log('hiding', frames[index]);
+			$('#frame' + frames[index]).css('visibility', 'hidden');
+			index += delta;
+			console.log('showing', frames[index]);
+			$('#frame' + frames[index]).css('visibility', 'visible');
+
+		}, this.frameRateMsec);
+
+		var def = $.Deferred().always(function () {
+			clearInterval(interval);
+		});
+
+		return def;
+	}
+
+	clearAsync () {
+		if (this.animationPromise !== undefined) {
+			this.animationPromise.reject();
+		}
 	}
 
 	render (t_prev, t) {
 		let _this = this; 
 
 		let slide = this.slideAt(t);
-		let last_slide = this.slideAt(t_prev);
 
 		if (!slide.supertext) {
 			this.view.supertext.hide();
@@ -138,8 +193,6 @@ class Amazing extends TeaTime {
 			this.view.supertext.text(slide.supertext).show();
 			this.view.textcontainer.addClass('visible-supertext');
 		}
-
-		this.view.video.attr('src', slide.gif);
 
 		this.animations.text.reject();
 
@@ -159,6 +212,85 @@ class Amazing extends TeaTime {
 		}
 
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
+
+
+		// play video
+		// ensure all frames are hidden
+		$('.amazing .frame').css('visibility', 'hidden');
+
+		var beforeSlide = this.slides[slide.index - 1];
+		var frame = beforeSlide ? beforeSlide.lastRepeatFrame : 0;
+
+		$('#frame' + frame).css('visibility', 'visible');
+		_this.clearAsync();
+
+		if (slide.index === 4) {
+
+			let interval = setInterval(function () {
+				$('#frame' + frame).css('visibility', 'hidden');
+				frame++;
+				$('#frame' + frame).css('visibility', 'visible');
+
+				if (frame === slide.lastFrame + 1) {
+					_this.animationPromise.resolve();
+
+					var min = 200;
+					var max = 4000;
+
+					let timeout = null;
+
+					let randomInterval = $.Deferred().fail(function () {
+						if (timeout !== null) {
+							clearTimeout(timeout);
+						}
+					});
+
+					function loop() {
+						var wait = Math.random() * (max - min) + min;
+						console.log('wait', wait);
+
+
+
+						timeout = setTimeout(function () {
+							_this.animationPromise = _this.blink().done(loop);
+						}, wait);
+
+						_this.animationPromise = randomInterval;
+					}
+
+					loop();
+				}
+
+			}, this.frameRateMsec);
+
+			_this.animationPromise = $.Deferred().always(function () {
+				clearInterval(interval);
+			});
+		} else {
+			let interval = setInterval(function () {
+				$('#frame' + frame).css('visibility', 'hidden');
+				frame++;
+				if (frame === slide.lastRepeatFrame + 1) {
+					frame = slide.lastFrame + 1;
+				}
+				$('#frame' + frame).css('visibility', 'visible');
+			}, this.frameRateMsec);
+
+			_this.animationPromise = $.Deferred().fail(function () {
+				console.log('rejecting interval');
+				clearInterval(interval);
+			});
+		}
+	}
+}
+
+function setIntervalRandom(f, min, max) {
+	return {
+		clear: clearTimeout(this.timeout),
+		timeout: function loop () {
+			var num = Math.random() * (max - min) + min;
+			setTimeout(f, num);
+		}
 	}
 }
 
