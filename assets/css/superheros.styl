@@ -1,0 +1,36 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+@require 'amazing.styl'
+
+.superheros
+	@extend .module-font
+
+.superheros .play-now
+	height 300px
+	width @height
+	
+	border-radius 100%
+	background $ACCENT_YELLOW
+	
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	center()
+	
+	cursor pointer
+
+.superheros img
+	height 400px
+	width @height * 1.333 // aspect ratio of this image
+	
+	center($dy=-25px)
+	
+.superheros .story-text
+	@extend .amazing .story-text
+	
+	white-space normal
+	
+.superheros .story-text:before
+	display none
+	

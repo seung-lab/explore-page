@@ -1,4 +1,5 @@
 let $ = require('jquery'), 
+	Utils = require('../clientjs/utils.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
  	Easing = require('../clientjs/easing.js'),
  	Synapse = require('./synapse.js');
@@ -64,7 +65,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			// 	Login.initRegistration(transition);
 			// }
 
-			Login.curtainFall(function () {
+			Utils.UI.curtainFall(function () {
 				if ($.cookie('visited')) {
 					document.location.href = 'https://eyewire.org/login';
 				}

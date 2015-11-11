@@ -1,5 +1,5 @@
 let $ = require('jquery'),
-	utils = require('../clientjs/utils.js'),
+	Utils = require('../clientjs/utils.js'),
 	Easing = require('../clientjs/easing.js'),
 	Synapse = require('./synapse.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js');
@@ -70,7 +70,7 @@ class Header extends Synapse {
 		});
 
 		_this.view.register.ion('click', function () {
-			Login.curtainFall(function () {
+			Utils.UI.curtainFall(function () {
 				document.location.href = 'https://eyewire.org/signup';
 			})
 		});

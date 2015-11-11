@@ -571,29 +571,4 @@ Login.registrationFacebookSelectionHandler = function (username, coordinator) {
 	return deferred;
 }
 
-Login.curtainRise = function (fn) {
-	let curtain = $('<div>').addClass('curtain');
-	$('body').append(curtain);
-
-	setTimeout(function () {
-		curtain.cssAnimation('fall')
-			.always(function () {
-				curtain.remove();
-			});
-
-		fn();
-	}, 100);
-};
-
-Login.curtainFall = function (fn) {
-	let curtain = $('<div>').addClass('curtain fall');
-	$('body').append(curtain);
-
-	setTimeout(function () {
-		curtain.removeClass('fall').transitionend(fn);
-	}, 1000);
-};
-
-
-
 module.exports = Login;

@@ -506,4 +506,29 @@ Utils.UI.checkbox = function (state, input) {
 	return outerbody;
 };
 
+
+Utils.UI.curtainRise = function (fn) {
+	let curtain = $('<div>').addClass('curtain');
+	$('body').append(curtain);
+
+	setTimeout(function () {
+		curtain.cssAnimation('fall')
+			.always(function () {
+				curtain.remove();
+			});
+
+		fn();
+	}, 100);
+};
+
+Utils.UI.curtainFall = function (fn) {
+	let curtain = $('<div>').addClass('curtain fall');
+	$('body').append(curtain);
+
+	setTimeout(function () {
+		curtain.removeClass('fall').transitionend(fn);
+	}, 1000);
+};
+
+
 module.exports = Utils.UI;

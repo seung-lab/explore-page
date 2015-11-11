@@ -9,6 +9,7 @@ require('./jquery-animation.js');
 require('./thinking.js');
 
 let Login = require('./login.js'),
+	Utils = require('./utils.js'),
 	ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
 
 var _intakectrl = new Login.IntakeController();
@@ -41,7 +42,7 @@ $(document).ready(function () {
 function jumpToExplore (t, transition) {
 	Login.takeMeTo('explore');
 
-	Login.curtainRise(function () {
+	Utils.UI.curtainRise(function () {
 		transition.resolve();
 	});
 

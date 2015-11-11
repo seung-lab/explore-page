@@ -5,7 +5,8 @@ let utils = require('../utils.js'),
 	Timeline = require('../../components/timeline.js'),
 	Amazing = require('../../components/modules/amazing.js'),
 	Galileo = require('../../components/modules/galileo.js'),
-	Wonderers = require('../../components/modules/wonderers.js');
+	Wonderers = require('../../components/modules/wonderers.js'),
+	Superheros = require('../../components/modules/superheros.js');
 
 let _t = 0;
 
@@ -33,7 +34,8 @@ ModuleCoordinator.initialize = function (animation) {
 	ModuleCoordinator.setModules([
 		moduleFactory(Amazing),
 		moduleFactory(Galileo),
-		moduleFactory(Wonderers)
+		moduleFactory(Wonderers),
+		moduleFactory(Superheros)
 	]);
 
 	ModuleCoordinator.timeline = new Timeline({
