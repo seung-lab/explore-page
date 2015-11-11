@@ -1,0 +1,174 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+@require 'galileo.styl'
+
+
+.melt-mobile .meltSlide img
+	height 100%
+	left: 0
+	right: 0
+	margin: auto
+	position: absolute
+	top: 0
+	bottom: 0
+
+#slideContainer div:nth-child(n+40):nth-child(-n+50)
+	background: blue
+
+.melt-mobile #meltMobileBg
+	opacity 0
+	height 100%
+	position absolute
+	left 50%
+	transform translateX(-50%)
+
+.melt-mobile .meltSlide
+	opacity 0
+
+.melt-mobile .meltSlide.enter
+	opacity 1
+
+
+.melt-mobile .story-text
+	@extend .galileo .story-text
+	font-family 'Roboto Condensed'
+
+	
+.melt-mobile #meltMobileWhitePart .story-text
+	color: $TEXT_BLUE
+
+// slide 0
+.melt-mobile #meltMobile0.meltSlide
+	opacity 0
+
+.melt-mobile #meltMobile0.meltSlide.enter
+	opacity 1
+
+.melt-mobile #meltMobile0.meltSlide.exit.forward
+	transition opacity 1s
+	transition-delay 0.5s
+
+.melt-mobile #meltMobile0.meltSlide.enter.reverse
+	transition opacity 1s
+	transition-delay 1.5s
+
+
+// slide 1
+
+.melt-mobile #meltMobile1 img
+	animation-timing-function linear
+	animation-fill-mode forwards
+	animation-duration 1.5s
+
+.melt-mobile #meltMobile1.enter.forward img
+	animation-name enterFromBottom
+
+.melt-mobile #meltMobile1.exit.reverse img
+	animation-name exitToBottom
+
+.melt-mobile #meltMobile1.exit.forward img
+	animation-name exitToTop
+
+.melt-mobile #meltMobile1.enter.reverse img
+	animation-name enterFromTop
+
+#meltMobile1.enter, #meltMobile1.exit
+	opacity 1
+
+
+#meltMobile1 .story-text
+	opacity 0
+	top auto
+	bottom 20%
+	transition opacity 2s
+
+#meltMobile1.enter .story-text
+	opacity 1
+	
+#meltMobile1.enter.forward .story-text
+	// transition opacity 2s
+	transition-delay 1.5s
+
+#meltMobile1.exit.forward .story-text
+	// transition opacity 2s
+
+
+#meltMobile1.enter.reverse .story-text
+	transition-delay 2s
+
+
+@keyframes enterFromTop {
+  from {
+    transform: translateY(-54%);
+  }
+
+  to {
+   	transform: translateY(0%);
+  }
+}
+
+@keyframes enterFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+   	transform: translateY(0%);
+  }
+}
+
+@keyframes exitToTop {
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+   	transform: translateY(-100%);
+  }
+}
+
+@keyframes exitToBottom {
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+   	transform: translateY(100%);
+  }
+}
+
+
+
+// slide 2
+.melt-mobile #meltMobile2.exit.reverse
+	opacity 1
+	
+
+
+// end sequence
+
+
+// #meltMobile49 .story-text
+// 	opacity 0
+// 	top auto
+// 	bottom 20%
+// 	transition opacity 2s
+
+// #meltMobile49.enter .story-text
+// 	opacity 1
+
+
+.melt-mobile #meltMobileWhitePart
+	width: 100%
+	height: 30%
+	background-color: $FILL_WHITE
+	position: absolute
+	bottom: 0px
+	z-index: 1
+	opacity: 0
+	transition: all 160ms
+	
+// .melt-mobile #meltMobileWhitePart
+// 	height: 49%
+// 	opacity: 1
+

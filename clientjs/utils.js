@@ -1099,6 +1099,24 @@ Utils.onceify = function(f) {
     }
 };
 
+/* range
+ *
+ * Returns a range of numbers similar to python range.
+ *
+ * Required:
+ *   [0] end: e.g. 3
+ *
+ * Return: e.g. [ 0, 1, 2 ]
+ */
+Utils.range = function (end) {
+	var rng = [];
+	for (var i = 0; i < end; i++) {
+		rng.push(i);
+	}
+
+	return rng;
+};
+
 Utils.ui = require('./utils.ui.js');
 Utils.UI = Utils.ui;
 

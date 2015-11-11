@@ -37,8 +37,6 @@ var $ = require('jquery'),
  		return $.Deferred().resolve();
  	}
 
- 	window.performance.now = window.performance.now || Date.now;
-
  	var distance_traveled = 0;
  	var start_time = window.performance.now();
  	var start_pos = this.scrollTop();

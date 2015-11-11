@@ -1,0 +1,40 @@
+@require 'colors.styl'
+@require 'mixins.styl'
+
+.melt.module
+	background-color rgb(18, 29, 38)
+
+.melt .story-text
+	@extend .galileo .story-text
+	font-family 'Roboto Condensed'
+	transition opacity 0.5s
+	z-index 2
+
+.melt .story-text.on-white
+	color $TEXT_BLUE
+
+.melt .story-text.bottom
+	bottom 15%
+	top auto
+
+.melt video
+	margin auto
+	height 100%
+	top -9999px
+	bottom -9999px
+	left -9999px
+	right -9999px
+	z-index 1
+
+.melt.wide video
+	height auto
+	width 100%
+
+.melt .whitePart
+	height 50%
+	background-color $FILL_WHITE
+	width 100%
+	bottom 0%
+	position absolute
+	opacity 0
+	
