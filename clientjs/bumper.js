@@ -125,13 +125,7 @@ var bump = function (anchor, p) {
 	}
 
 	// Consider this Update
-	p.draw = function () {
-		// No Loop
-		if (global_animator.value >= 1) {
-			p.noLoop();
-			return;
-		}
-		
+	p.draw = function () {	
 		p.clear();
 		
 		// Draw Grid
@@ -239,11 +233,11 @@ var bump = function (anchor, p) {
 			p.translate(p.width/2, p.height/2);		// Translate to center
 
 			// Set strokeweight to decrease proportionally to the stretch factor
-			var base_stroke_weight = 3;
+			var base_stroke_weight = 2;
 			var stroke_weight = base_stroke_weight - (a_l_de.value * base_stroke_weight);
 			p.strokeWeight(stroke_weight);
 
-			var spacing = 75;						// Set space around Es
+			var spacing = 60;						// Set space around Es
 			// Mult by -1 for left line
 			var displacement_start = a_l_ds.value * (p.width / 2) + spacing;
 			var displacement_end = a_l_de.value * (p.width / 2) + spacing;
@@ -261,7 +255,7 @@ var bump = function (anchor, p) {
 			
 			p.translate(p.width / 2, p.height / 2);
 			p.rotate(p.radians(a_ed_r.value));		// All rotations must occur here!!!
-			p.scale(1,1);
+			p.scale(0.75, 0.75);
 
 			// For Dots
 			pushMatrix(function () {
@@ -319,6 +313,10 @@ var bump = function (anchor, p) {
 			p.noStroke();
 			p.translate(p.width/2, p.height/2);
 		});
+
+		if (global_animator.value >= 1) {
+			p.noLoop();
+		}
 	}
 
 	// OOP --> Generic animation function
@@ -376,6 +374,7 @@ var bump = function (anchor, p) {
 
 	p.windowResized = function () {
 		p.resizeCanvas(window.innerWidth, window.innerHeight);
+		p.redraw();
 	};
 }
 

@@ -3,13 +3,9 @@ let $ = require('jquery'),
 	Easing = require('../../clientjs/easing.js'),
 	TeaTime = require('../teatime.js');
 
-let Login;
-
 class Superheros extends TeaTime {
 	constructor(args = {}) {
 		super(args);
-
-		Login = args.login;
 
 		this.name = 'Superheros';
 		this.allegience = 'light';
