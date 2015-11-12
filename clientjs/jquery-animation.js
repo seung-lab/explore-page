@@ -12,6 +12,7 @@ var $ = require('jquery'),
  * Optional:
  *     msec: defaults to 250 msec
  *     easing: defaults to ease-in-out-cubic
+ *	   offset: extra offset in pixels
  *
  * Return: void
  */
@@ -28,10 +29,11 @@ var $ = require('jquery'),
 
  	var msec = options.msec || 250;
  	var easing = options.easing || Easing.easeInOut;
+ 	var offset = options.offset || 0;
 
  	target = $(target).first();
  	
- 	var position_offset = target.position().top - this.scrollTop();
+ 	var position_offset = target.position().top - this.scrollTop() + offset;
 
  	if (position_offset === 0) {
  		return $.Deferred().resolve();

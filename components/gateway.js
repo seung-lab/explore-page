@@ -14,6 +14,10 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		Login = args.login;
 
  		this.view = this.generateView();
+
+ 		this.animations = {
+ 			dip: $.Deferred().resolve(),
+ 		};
  	}
 
  	generateView () {
@@ -68,7 +72,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		}, 6000);
 
  		this.view.startbtn.ion('click', function () {
- 			$('#explore').hide();
+ 			// $('#explore').hide();
 
 			// let transition = $('#viewport').scrollTo('#intake', {
 			// 	msec: 4000,
@@ -93,6 +97,9 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		});
 
  		this.view.explorebtn.ion('click', function () {
+ 			_this.animations.dip.reject();
+ 			_this.view.explorebtn.off('mouseenter mouseleave');
+
  			$('#registration').hide();
 
  			Login.initExploring();
@@ -106,6 +113,26 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			ModuleCoordinator.initialize(transition);
 			ModuleCoordinator.seek(0, transition);
  		})
+
+ 		this.view.explorebtn.ion('mouseenter', function () {
+ 			_this.dipReveal(25);
+ 		});
+
+ 		this.view.explorebtn.ion('mouseleave', function () {
+ 			_this.dipReveal(0);
+ 		});
+ 	}
+
+ 	dipReveal (offset) {
+ 		let _this = this;
+ 		
+ 		_this.animations.dip.reject();
+
+		_this.animations.dip = $('#viewport').scrollTo(_this.view.module.parent(), {
+			msec: 750,
+			easing: Easing.sigmoidFactory(7),
+			offset: offset,
+		});
  	}
  }
 
