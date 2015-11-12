@@ -21,42 +21,45 @@ class Amazing extends TeaTime {
 				video: "",
 				text: "Your brain makes you amazing!",
 				ipyramid: true,
-				lastFrame: 15,
-				lastRepeatFrame: 19,
+				lastFrame: 14,
+				lastRepeatFrame: 18,
 			},
 			{
 				supertext: "it allows you to:",
 				text: "Learn intricate skills",
 				ipyramid: true,
-				lastFrame: 47,
-				lastRepeatFrame: 63,
+				lastFrame: 46,
+				lastRepeatFrame: 62,
 			},
 			{
 				text: "Dream fantastic dreams",
 				ipyramid: true,
-				lastFrame: 88,
-				lastRepeatFrame: 95,
+				lastFrame: 87,
+				lastRepeatFrame: 94,
 			},
 			{
 				text: "Even laugh at goofy cat videos",
 				ipyramid: false,
-				lastFrame: 113,
-				lastRepeatFrame: 117,
+				lastFrame: 112,
+				lastRepeatFrame: 116,
 			},
 			{
 				text: "But how?",
 				ipyramid: true,
-				lastFrame: 145,
-				lastRepeatFrame: 149,
+				lastFrame: 144,
+				lastRepeatFrame: 148,
 			},
 		];
 
 		this.duration = utils.nvl(args.duration, this.slides.length);
-		this.view = this.generateView();
 
 		this.animations = {
 			text: $.Deferred().resolve(),
+			video: $.Deferred().resolve(),
+			load: null,
 		};
+
+		this.view = this.generateView();
 	}
 
 	generateView () {
@@ -68,23 +71,26 @@ class Amazing extends TeaTime {
 
 		let videoContainer = $('<div>');
 
-		$.getJSON('./animations/amazing/opt/concat.json', function (json) {
-			var frame = 1;
+		let frames = [];
+
+		// opt = optimal, came from these bash commands:
+		// for i in *.jpg; do convert $i pnm:- | mozcjpeg -quality 70 > opt-$i; done
+		// for i in $(seq 1 49); do base64 -in f$i.png | xargs printf "\"%s\"," >> concat.json; done 
+		_this.animations.load = $.getJSON('/animations/amazing/sequence.json', function (json) {
+			var frame = 0;
 
 			for (let i = 0; i < _this.slides.length; i++) {
 				let slide = _this.slides[i];
 
 				let slideFrameContainer = $('<div>', { id: `slide${i}`});
 
-				while (frame <= slide.lastRepeatFrame) {
+				for (; frame <= slide.lastRepeatFrame; frame++) {
 					var img = $('<img>', {
-						src: 'data:image/jpeg;base64,' + json[frame - 1],
-						class: 'frame',
-						id: 'frame' + frame,
-					});
-					slideFrameContainer.append(img);
+						src: 'data:image/jpeg;base64,' + json[frame],
+					}).addClass('frame');
 
-					frame++;
+					slideFrameContainer.append(img);
+					frames.push(img);
 				};
 
 				videoContainer.append(slideFrameContainer);
@@ -120,6 +126,7 @@ class Amazing extends TeaTime {
 			supertext: supertext,
 			counter: counter,
 			next: next,
+			frames: frames,
 		};
 	}
 
@@ -136,22 +143,35 @@ class Amazing extends TeaTime {
 				displacement: 25,
 			});
 			_this.view.next.show();
+
+			_this.playVideo();
 		});
 	}
 
 	afterExit () {
 		this.view.text.text("");
-
-		this.clearAsync();
+		this.animations.video.reject();
 	}
 
+	// Makes the cat blink seemingly naturally
 	blink () {
-		var frames = [146, 147, 148, 149];
+		let _this = this;
+
+		if (!_this.view.frames.length) {
+			_this.animations.load.done(function () {
+				_this.blink();
+			});
+			return;
+		}
+
+		var blink_frames = Utils.range(145, 149);
 
 		var index = 0;
 		var delta = 1;
 
-		$('#frame' + frames[index]).css('visibility', 'visible');
+		_this.view.frames[
+			blink_frames[0]
+		].css('visibility', 'visible');
 
 		let interval = setInterval(function () {
 			if (index === 0 && delta < 0) {
@@ -163,9 +183,9 @@ class Amazing extends TeaTime {
 				delta *= -1;
 			}
 
-			$('#frame' + frames[index]).css('visibility', 'hidden');
+			_this.view.frames[blink_frames[index]].css('visibility', 'hidden');
 			index += delta;
-			$('#frame' + frames[index]).css('visibility', 'visible');
+			_this.view.frames[blink_frames[index]].css('visibility', 'visible');
 
 		}, this.frameRateMsec);
 
@@ -176,9 +196,103 @@ class Amazing extends TeaTime {
 		return def;
 	}
 
-	clearAsync () {
-		if (this.animationPromise !== undefined) {
-			this.animationPromise.reject();
+	playCatBlinking () {
+		let _this = this;
+
+		if (!_this.view.frames.length) {
+			_this.animations.load.done(function () {
+				_this.playCatBlinking();
+			});
+			return;
+		}
+
+		let slide = this.slideAt(this.t);
+
+		let beforeSlide = this.slides[slide.index - 1];
+		let frame = beforeSlide 
+			? beforeSlide.lastRepeatFrame 
+			: 0;
+
+		let interval = setInterval(function () {
+			_this.view.frames[frame].css('visibility', 'hidden');
+			frame++;
+			_this.view.frames[frame].css('visibility', 'visible');
+
+			if (frame === slide.lastFrame + 1) {
+				_this.animations.video.resolve();
+
+				let min = 200;
+				let max = 3000;
+
+				let timeout = null;
+
+				let randomDeferred = $.Deferred().fail(function () {
+					if (timeout !== null) {
+						clearTimeout(timeout);
+					}
+				});
+
+				(function randomBlinkWait () {
+					var wait = Math.random() * (max - min) + min;
+
+					timeout = setTimeout(function () {
+						_this.animations.video = _this.blink().done(randomBlinkWait);
+					}, wait);
+
+					_this.animations.video = randomDeferred;
+				})();
+			}
+
+		}, this.frameRateMsec);
+
+		_this.animations.video = $.Deferred().always(function () {
+			clearInterval(interval);
+		});
+	}
+
+	playVideo () {
+		let _this = this;
+
+		if (!_this.view.frames.length) {
+			_this.animations.load.done(function () {
+				_this.playVideo();
+			});
+			return;
+		}
+
+		let slide = this.slideAt(this.t);
+
+		// play video
+		// ensure all frames are hidden
+		$('.amazing .frame').css('visibility', 'hidden');
+
+		var beforeSlide = this.slides[slide.index - 1];
+		var frame = beforeSlide 
+			? beforeSlide.lastRepeatFrame 
+			: 0;
+
+		_this.view.frames[frame].css('visibility', 'visible');
+
+		_this.animations.video.reject();
+
+		if (slide.index === 4) {
+			_this.playCatBlinking();
+		} 
+		else {
+			let interval = setInterval(function () {
+				_this.view.frames[frame].css('visibility', 'hidden');
+
+				frame++;
+				if (frame === slide.lastRepeatFrame + 1) {
+					frame = slide.lastFrame + 1;
+				}
+
+				_this.view.frames[frame].css('visibility', 'visible');
+			}, this.frameRateMsec);
+
+			_this.animations.video = $.Deferred().fail(function () {
+				clearInterval(interval);
+			});
 		}
 	}
 
@@ -215,79 +329,8 @@ class Amazing extends TeaTime {
 
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 
-
-		// play video
-		// ensure all frames are hidden
-		$('.amazing .frame').css('visibility', 'hidden');
-
-		var beforeSlide = this.slides[slide.index - 1];
-		var frame = beforeSlide ? beforeSlide.lastRepeatFrame : 0;
-
-		$('#frame' + frame).css('visibility', 'visible');
-		_this.clearAsync();
-
-		if (slide.index === 4) {
-
-			let interval = setInterval(function () {
-				$('#frame' + frame).css('visibility', 'hidden');
-				frame++;
-				$('#frame' + frame).css('visibility', 'visible');
-
-				if (frame === slide.lastFrame + 1) {
-					_this.animationPromise.resolve();
-
-					var min = 200;
-					var max = 4000;
-
-					let timeout = null;
-
-					let randomInterval = $.Deferred().fail(function () {
-						if (timeout !== null) {
-							clearTimeout(timeout);
-						}
-					});
-
-					function loop() {
-						var wait = Math.random() * (max - min) + min;
-
-						timeout = setTimeout(function () {
-							_this.animationPromise = _this.blink().done(loop);
-						}, wait);
-
-						_this.animationPromise = randomInterval;
-					}
-
-					loop();
-				}
-
-			}, this.frameRateMsec);
-
-			_this.animationPromise = $.Deferred().always(function () {
-				clearInterval(interval);
-			});
-		} else {
-			let interval = setInterval(function () {
-				$('#frame' + frame).css('visibility', 'hidden');
-				frame++;
-				if (frame === slide.lastRepeatFrame + 1) {
-					frame = slide.lastFrame + 1;
-				}
-				$('#frame' + frame).css('visibility', 'visible');
-			}, this.frameRateMsec);
-
-			_this.animationPromise = $.Deferred().fail(function () {
-				clearInterval(interval);
-			});
-		}
-	}
-}
-
-function setIntervalRandom(f, min, max) {
-	return {
-		clear: clearTimeout(this.timeout),
-		timeout: function loop () {
-			var num = Math.random() * (max - min) + min;
-			setTimeout(f, num);
+		if (this.entered) {
+			this.playVideo();
 		}
 	}
 }

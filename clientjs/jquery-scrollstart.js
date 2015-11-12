@@ -1,6 +1,6 @@
 var $ = require('jquery');
 
-(function () {
+$(document).ready(function () {
 	var GAP = 200;
 	var last = 0;
 	var lastDelta = null;
@@ -11,8 +11,6 @@ var $ = require('jquery');
 		var now = performance.now();
 
 		var currentDelta = Math.abs(e.deltaY);
-
-		// console.log('currentDelta', currentDelta);
 
 		// yay magic numbers
 		if (currentDelta > 0 &&
@@ -27,4 +25,4 @@ var $ = require('jquery');
 		lastDelta = currentDelta;
 		last = now;
 	});
-})();
+});

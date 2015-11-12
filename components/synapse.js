@@ -6,6 +6,7 @@ class Synapse {
 		this.mobile = args.mobile;
 
 		this.visible = false;
+		this.entered = false;
 
 		this.anchor = args.anchor ? $(args.anchor) : null;
 	}
@@ -17,6 +18,8 @@ class Synapse {
 	}
 
 	enter (transition, frm) { 
+		let _this = this;
+
 		transition = transition || $.Deferred().resolve();
 
 		if (this.visible) {
@@ -33,6 +36,10 @@ class Synapse {
 
 		this.afterEnter(transition, frm);
 
+		transition.done(function () {
+			_this.entered = true;
+		});
+
 		return this;
 	}
 
@@ -40,6 +47,8 @@ class Synapse {
 	afterEnter () {}
 
 	exit (transition, frm) {
+		let _this = this;
+		
 		transition = transition || $.Deferred().resolve();
 
 		if (!this.visible) {
@@ -54,6 +63,10 @@ class Synapse {
 		this.visible = false;
 
 		this.afterExit(transition, frm);
+
+		transition.done(function () {
+			_this.entered = false;
+		})
 
 		return this;
 	}
