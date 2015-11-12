@@ -1135,6 +1135,17 @@ Utils.isMobile = function () {
 Utils.ui = require('./utils.ui.js');
 Utils.UI = Utils.ui;
 
+// returns a deferred equivalent of setTimeout
+Utils.timeoutDeferred = function (ms) {
+	var d = $.Deferred();
+
+	setTimeout(function () {
+		d.resolve();
+	}, ms);
+
+	return d;
+}
+
 module.exports = Utils;
 
 
