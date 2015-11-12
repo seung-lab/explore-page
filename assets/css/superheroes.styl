@@ -14,7 +14,7 @@ $circleRadius = 90px
 	width @height
 	
 	border-radius 100%
-	background $ACCENT_YELLOW
+	background rgb(254, 231, 156)
 	
 	display: flex;
 	align-items: center;
@@ -138,24 +138,41 @@ position-superhero(name, offx, offy, px, py, center = false)
 	transform rotate(-2deg)
 
 #SUPERalex
-	width 500px
+	width 450px
 	z-index 15
-	position-superhero('alex', 0.5, 0.5, -230px, 130px, true)
+	position-superhero('alex', 0.5, 0.5, -215px, 130px, true)
 
-// #SUPERscout_girl
-// 	width 500px
-// 	z-index 3
-// 	position-superhero('scout_girl', 0.65, 0.65, 90%, 55%, true)
-// 	transform scaleX(-1) rotate(-16deg)
+#SUPERscout_girl
+	width 450px
+	z-index 59
+	position-superhero('scout_girl', 0.5, 0.5, 240px, 100px, true)
+	transform scaleX(-1) rotate(-16deg)
 	
-// #SUPERscout_guy
-// 	width 300px
-// 	z-index 5
-// 	position-superhero('scout_guy', 0.35, 0.55, 90%, 40%, true)
-// 	transform rotate(-29deg)
+#SUPERscout_guy
+	width 280px
+	z-index 15
+	position-superhero('scout_guy', 0.5, 0.5, 170px, -120px, true)
+	transform rotate(-25deg)
 
-// #SUPERscythe_girl
-// 	width 300px
-// 	z-index 0
-// 	position-superhero('scythe_girl', 0.6, 0.5, 50%, 28%, true)
-// 	transform rotate(56deg)
+#SUPERscythe_girl
+	width 300px
+	z-index 0
+	position-superhero('scythe_girl', 0.6, 0.5, 0px, -154px, true)
+	transform rotate(58deg)
+
+.superheros .story-text
+	@extend .galileo .story-text .text.italics
+	
+	text-transform lowercase
+
+	color $TEXT_BLUE
+	text-align center
+	white-space nowrap
+	
+	position absolute
+	width 400px
+	
+	center-horizontal()
+	top s('calc(50% + %s + 100px)', $circleRadius)
+	
+	z-index 11
