@@ -6,7 +6,7 @@ let utils = require('../utils.js'),
 	Amazing = require('../../components/modules/amazing.js'),
 	Galileo = require('../../components/modules/galileo.js'),
 	Wonderers = require('../../components/modules/wonderers.js'),
-	Superheros = require('../../components/modules/superheros.js'),
+	Superheroes = require('../../components/modules/superheroes.js'),
 	Melt = require('../../components/modules/melt.js'),
 	MeltMobile = null;// = require('../../components/modules/melt-mobile.js');
 
@@ -40,7 +40,7 @@ ModuleCoordinator.initialize = function (animation) {
 		moduleFactory(Galileo),
 		moduleFactory(Wonderers),
 		moduleFactory(mobile ? MeltMobile : Melt),
-		moduleFactory(Superheros),
+		moduleFactory(Superheroes),
 	]);
 
 	ModuleCoordinator.timeline = new Timeline({

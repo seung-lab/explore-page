@@ -3,11 +3,11 @@ let $ = require('jquery'),
 	Easing = require('../../clientjs/easing.js'),
 	TeaTime = require('../teatime.js');
 
-class Superheros extends TeaTime {
+class Superheroes extends TeaTime {
 	constructor(args = {}) {
 		super(args);
 
-		this.name = 'Superheros';
+		this.name = 'Superheroes';
 		this.allegience = 'light';
 
 		this.view = this.generateView();
@@ -28,7 +28,7 @@ class Superheros extends TeaTime {
 			return $('<div>').addClass(classes);
 		};
 
-		let bg = d('superheros bg-light module');
+		let bg = d('superheroes bg-light module');
 
 		let image = $('<img>').attr({
 			src: '/images/wonderers.png',
@@ -118,4 +118,4 @@ class Superheros extends TeaTime {
 
 }
 
-module.exports = Superheros;
+module.exports = Superheroes;

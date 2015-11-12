@@ -2,14 +2,14 @@
 @require 'mixins.styl'
 @require 'amazing.styl'
 
-.superheros
+.superheroes
 	@extend .module-font
 	// background-image url('../images/superheroes/layout.jpg')
 
 // $circleRadius = 100px
 $circleRadius = 90px
 
-.superheros .play-now
+.superheroes .play-now
 	height $circleRadius * 2
 	width @height
 	
@@ -28,13 +28,13 @@ $circleRadius = 90px
 	color $TEXT_BLUE
 	z-index 10
 
-// .superheros img
+// .superheroes img
 // 	height 400px
 // 	width @height * 1.333 // aspect ratio of this image
 	
 // 	center($dy=-25px)
 	
-.superheros .story-text
+.superheroes .story-text
 	@extend .galileo .story-text .text.italics
 	
 	text-transform lowercase
@@ -51,15 +51,15 @@ $circleRadius = 90px
 	
 	z-index 11
 
-.superheros .story-text:before
+.superheroes .story-text:before
 	top -27px
 	font-size 23px
 
-.superheros .story-text:after
+.superheroes .story-text:after
 	display none
 
 
-.superheros .superhero
+.superheroes .superhero
 	position absolute
 
 // @media (min-height 800px) 
