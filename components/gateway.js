@@ -32,7 +32,12 @@ class Gateway extends Synapse { // You can only build within a pylon field
  			.addClass('primary play-now')
  			.text('Play Now');
 
- 		let explorebtn = $('<div>').addClass('explorebtn');
+ 		let explorebtn = $('<div>')
+ 			.addClass('explorebtn')
+ 			.append(
+ 				$('<div>').addClass('arrow'),
+ 				$('<div>').addClass('text').text('EXPLORE')
+ 			);
 
  		container.append(
  			opening,

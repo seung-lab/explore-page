@@ -32,7 +32,7 @@ div.opening
 	font-weight 400
 	font-size 36px
 	letter-spacing 12px
-	color rgba(255, 255, 255, 0.85)
+	color $LANDING_WHITE
 	text-align center
 	
 .gateway .play-now
@@ -42,18 +42,40 @@ div.opening
 	margin-top 35px
 
 .gateway .explorebtn
-	//width ($primary_width / $PHI)
+	width 150px
+	height @width
+	
 	center-horizontal()
+	border-radius 100%
+
+	bottom 10%
+	cursor pointer
+
+.gateway .explorebtn .arrow
+	position absolute
 	
 	width 0px
 	height 0px
 	border 10px solid rgba(0, 0, 0, 0)
-	border-top 10px solid rgba(255, 255, 255, 0.85)
+	border-top 10px solid $LANDING_WHITE
 	position absolute
+	top calc(50% - 0px / 2 + -3px)
 	left calc(50% - 0px / 2 + -10px)
-	bottom 15%
+
+.gateway .explorebtn .text
+	position absolute
+	top calc(67%)
+	left calc(50% - 38px)
+	letter-spacing 4px
+	font-size 12px
+	font-weight 700
+	opacity 0
 	
-	cursor pointer
+	transition opacity 350ms ease-in-out
+	
+.gateway .explorebtn:hover .text
+	opacity 1
+	
 
 .gateway #continuebtn
 	margin-top 40px
@@ -61,3 +83,6 @@ div.opening
 	display flex
 	justify-content center
 	align-items center
+	
+
+

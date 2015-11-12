@@ -15,21 +15,6 @@
 	pointer-events auto
 	transition opacity 2s
 	
-.header .content
-	position relative
-	margin-left 75px
-	margin-top 16px
-	
-	font-size 12px
-	text-align left
-	color $TEXT_BLUE
-	
-	// transition right 1s ease-in-out
-	
-.header .content:hover
-	cursor pointer
-		
-	
 .header.invisible div,
 .header.invisible div.visible
 	opacity 0
@@ -46,6 +31,8 @@ $corner_offset = 35px
 	background-repeat no-repeat
 	width 150px
 	height 35px
+	
+	cursor pointer
 	
 .header .share,
 .header .login,
@@ -135,6 +122,23 @@ $corner_offset = 35px
 	border-radius 15px
 	width 225px
 	height 48px
+	
+
+.header .register .content
+	position relative
+	margin-left 75px
+	margin-top 16px
+	
+	font-size 12px
+	text-align left
+	color $TEXT_BLUE
+	
+	cursor pointer
+	// transition right 1s ease-in-out	
+	
+// .header .register:hover .content
+// 	background-color $TEXT_BLUE
+// 	color $FILL_WHITE
 	
 .header .register .icon
 	float left

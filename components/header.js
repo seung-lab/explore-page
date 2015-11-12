@@ -65,6 +65,10 @@ class Header extends Synapse {
 	attachEventListeners () {
 		let _this = this;
 
+		_this.view.logo.ion('click', function () {
+			document.location.href = document.location.origin;
+		});
+
 		_this.view.share.icon.ion('click', function () {
 			_this.state.share_activated = !_this.state.share_activated;
 			_this.render();
