@@ -278,14 +278,15 @@ class Melt extends TeaTime {
 							video.style.display = 'none';
 						}
 					}
-				};
+				}
 
 				// ended = false;
 
 				if (seqEl.myautoplay) {
 					seqEl.play();
 					seqEl.started = true;
-				} else if (sequence === 0 && forward) {
+				} 
+				else if (sequence === 0 && forward) {
 					_this.timeouts.initial_play = setTimeout(function () {
 						if (!seqEl.started) {
 							seqEl.play();

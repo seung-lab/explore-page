@@ -229,10 +229,14 @@ function simpleTransition (cur, next, t, animationargs) {
 				MC.seek(t);
 			}
 
+			MC.timeline.fullManual(next.manual_timeline);
+
 			cur.exit(cur.name);
 		})
 		.fail(function () {
 			scrolled.reject();
+
+			MC.timeline.fullManual(cur.manual_timeline);
 
 			MC.transition.always(function () {
 				MC.exitNonDisplayed();
