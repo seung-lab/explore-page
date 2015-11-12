@@ -8,6 +8,7 @@ require('./jquery-url.js');
 require('./jquery-animation.js');
 require('./thinking.js');
 require('./jquery-scrollstart.js');
+require('./jquery-hammer.js');
 
 let Login = require('./login.js'),
 	Utils = require('./utils.js'),
@@ -16,7 +17,6 @@ let Login = require('./login.js'),
 var _intakectrl = new Login.IntakeController();
 		
 $(document).ready(function () {
-
 	Login.initialize();
 
 	let t = $.url(window.location.href).param('t');

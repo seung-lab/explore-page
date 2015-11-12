@@ -55,13 +55,21 @@ ModuleCoordinator.initialize = function (animation) {
 	ModuleCoordinator.initHotkeys();
 
 
-	// $(window).ion('scrollStart', function (e, down) {
-	// 	if (down) {
-	// 		ModuleCoordinator.next();
-	// 	} else {
-	// 		ModuleCoordinator.previous();
-	// 	}
-	// });
+	$(window).ion('scrollStart', function (e, down) {
+		if (down) {
+			ModuleCoordinator.next();
+		} else {
+			ModuleCoordinator.previous();
+		}
+	});
+
+	$(window).ion('swipe', function (e, evt) {
+		if (evt.deltaY < 0) {
+			ModuleCoordinator.next();
+		} else {
+			ModuleCoordinator.previous();
+		}
+	});
 };
 
 ModuleCoordinator.tForName = function (name) {
