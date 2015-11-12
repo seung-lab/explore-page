@@ -30,6 +30,15 @@ class Timeline extends Synapse {
 		};
 	}
 
+	fullManual (manual = true) {
+		if (manual) {
+			this.view.module.addClass('manual');
+		}
+		else {
+			this.view.module.removeClass('manual');
+		}
+	}
+
 	onClick (elem, evt) {
 		let coords = utils.ui.eventOffset(elem, evt);
 		let fract = coords.x / this.view.module.width();

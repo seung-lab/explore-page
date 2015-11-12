@@ -11,6 +11,7 @@ class Melt extends TeaTime {
 
 		this.name = 'Melt';
 		this.allegience = 'dark';
+		this.manual_timeline = true;
 
 		let path = function (name) {
 			return "/animations/melt/" + name;
@@ -33,6 +34,10 @@ class Melt extends TeaTime {
 			_this.resize();
 		};
 		_this.resize();
+
+		this.timeouts = {
+
+		};
 	}
 
 	generateView () {
@@ -41,7 +46,6 @@ class Melt extends TeaTime {
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
 		};
-
 
 		let container = $('<div>').addClass('melt bg-dark module');
 		let vidContainer = $('<div>', { id: 'vidContainer' });
@@ -72,7 +76,6 @@ class Melt extends TeaTime {
 
 		// TODO, fade out before cube goes underneath
 
-
 		let supertext = d('super-text').html("as you solve puzzles");
 		let textcontainer2 = d('story-text visible-supertext on-white bottom');
 		let text2 = d('text caps').html(splitter("You're mapping the brain", true));
@@ -89,11 +92,11 @@ class Melt extends TeaTime {
 				textcontainer3,
 				textcontainer2
 			],
-			white: whitePart
+			white: whitePart,
 		};
 	}
 
-	resize() {
+	resize () {
 		var aspect = window.innerWidth / window.innerHeight;
 		if (aspect > (16 / 10) && aspect < 2) {
 			this.view.module.addClass('wide');
@@ -209,7 +212,13 @@ class Melt extends TeaTime {
 		return this.render(t_prev, t);
 	}
 
+	beforeExit () {
+		clearTimeout(this.timeouts.initial_play);
+	}
+
 	loadVideo(forward, sequence, start, autoplay) {
+		let _this = this;
+
 		// console.log('loadVideo', forward, sequence, start, autoplay);
 		start = start || 0;
 		var cacheResult = videoCache[forward][sequence];
@@ -250,8 +259,6 @@ class Melt extends TeaTime {
 			seqEl.currentTime = start;
 		});
 
-		var _this = this;
-
 		seqEl.addEventListener('seeked', function () {
 			_this.currentVideo = seqEl;
 			// console.log('seeked', forward, sequence);
@@ -279,7 +286,7 @@ class Melt extends TeaTime {
 					seqEl.play();
 					seqEl.started = true;
 				} else if (sequence === 0 && forward) {
-					setTimeout(function () {
+					_this.timeouts.initial_play = setTimeout(function () {
 						if (!seqEl.started) {
 							seqEl.play();
 							seqEl.started = true;
@@ -289,7 +296,6 @@ class Melt extends TeaTime {
 			}, 10); // TODO, maybe increase this? there is still a slight glitch in safari after second playthrough
 				// TODO with safari, try to change the z-index before switching them
 		});
-
 
 		var ended = false;
 
@@ -305,7 +311,6 @@ class Melt extends TeaTime {
 				_this.timeUpdate(SequenceManager.tTime());
 			}
 		}, 15);
-
 
 		seqEl.scrollHandler = function (down) {
 			if (!seqEl.started) {

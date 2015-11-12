@@ -9,6 +9,7 @@ class TeaTime extends Synapse {
 		this.t = 0;
 		this.begin = null;
 		this.parent = args.parent;
+		this.manual_timeline = false;
 
 		this.allegience = 'light';
 		this.duration = 1;

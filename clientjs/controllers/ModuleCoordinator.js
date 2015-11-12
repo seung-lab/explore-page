@@ -177,16 +177,20 @@ ModuleCoordinator.moduleComplete = function () {
 		};
 	}
 
+	ModuleCoordinator.timeline.fullManual(!!cur.manual_timeline && !!next.manual_timeline);
+
 	simpleTransition(cur, next, next.begin, animationargs);
 };
 
 ModuleCoordinator.moduleUncomplete = function () {
-	let currentmod = ModuleCoordinator.currentModule();
-	let prevmod = ModuleCoordinator.previousModule();
+	let cur = ModuleCoordinator.currentModule();
+	let prev = ModuleCoordinator.previousModule();
 
-	let t = prevmod.begin + prevmod.last() * prevmod.duration;
+	let t = prev.begin + prev.last() * prev.duration;
 
-	simpleTransition(currentmod, prevmod, t);
+	ModuleCoordinator.timeline.fullManual(!!prev.manual_timeline && !!cur.manual_timeline);
+
+	simpleTransition(cur, prev, t);
 };
 
 function simpleTransition (cur, next, t, animationargs) {
@@ -295,6 +299,8 @@ ModuleCoordinator.render = function (prev_t, t) {
 	let prev_mod = ModuleCoordinator.moduleAt(prev_t);
 	let current_mod = ModuleCoordinator.moduleAt(t);
 
+	ModuleCoordinator.timeline.fullManual(!!current_mod.manual_timeline);
+
 	if (prev_mod !== current_mod) {
 		prev_mod.exit();
 		current_mod.enter();
@@ -306,9 +312,8 @@ ModuleCoordinator.render = function (prev_t, t) {
 	ModuleCoordinator.exitNonDisplayed(t);
 
 	let t_mod = ModuleCoordinator.toModuleT(current_mod, t);
-
 	current_mod.seek(t_mod);
-
+	
 	ModuleCoordinator.updateTimeline(t);
 }
 
