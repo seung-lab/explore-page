@@ -4,9 +4,13 @@
 
 .superheros
 	@extend .module-font
+	// background-image url('../images/superheroes/layout.jpg')
+
+// $circleRadius = 100px
+$circleRadius = 90px
 
 .superheros .play-now
-	height 300px
+	height $circleRadius * 2
 	width @height
 	
 	border-radius 100%
@@ -19,18 +23,139 @@
 	center()
 	
 	cursor pointer
-
-.superheros img
-	height 400px
-	width @height * 1.333 // aspect ratio of this image
 	
-	center($dy=-25px)
+	font-size 18pt
+	color $TEXT_BLUE
+	z-index 10
+
+// .superheros img
+// 	height 400px
+// 	width @height * 1.333 // aspect ratio of this image
+	
+// 	center($dy=-25px)
 	
 .superheros .story-text
-	@extend .amazing .story-text
+	@extend .galileo .story-text .text.italics
 	
-	white-space normal
+	text-transform lowercase
+
+	color $TEXT_BLUE
+	text-align center
+	white-space nowrap
 	
+	position absolute
+	width 400px
+	
+	center-horizontal()
+	top s('calc(50% + %s + 30px)', $circleRadius)
+	
+	z-index 11
+
 .superheros .story-text:before
+	top -27px
+	font-size 23px
+
+.superheros .story-text:after
 	display none
+
+
+.superheros .superhero
+	position absolute
+
+// @media (min-height 800px) 
+
+
+position-superhero(name, offx, offy, px, py, center = false)
+
+	$url = '/images/superheroes/characters/' + name + '.png'
+
+	height unit(@width / aspect-ratio($url), 'px')
+
+	background-image url($url)
+	background-size contain
+	background-repeat no-repeat
 	
+	if center
+		left s('calc(50% + %s - %s)', px, @width * (1 - offx))
+		top s('calc(50% + %s - %s)', py, @height * (1 - offy))
+	else
+		left s('calc(%s - %s)', px, @width * (1 - offx))
+		top s('calc(%s - %s)', py, @height * (1 - offy))
+
+// #SUPERcat
+// 	width 200px
+// 	z-index 5
+// 	position-superhero('cat', 0.5, 0.5, 50%, 50%)
+// 	top s('calc(50% - %s - 68px)', $circleRadius)
+// 	transform scaleX(-1)
+
+// #SUPERmod_and_amy
+// 	width 900px
+// 	z-index 10
+// 	position-superhero('mod_and_amy', 0.6, 0.38, 10%, 100%)
+// 	transform rotate(-14deg)
+
+// #SUPERmentor
+// 	width 750px
+// 	z-index 10
+// 	position-superhero('mentor', 0.4, 0.35, 90%, 100%)
+// 	transform rotate(-3deg)
+
+// #SUPERalex
+// 	width 550px
+// 	z-index 5
+// 	position-superhero('alex', 0.7, 0.5, 7%, 52%)
+// 	transform scaleX(-1)
+
+// #SUPERscout_girl
+// 	width 350px
+// 	z-index 3
+// 	position-superhero('scout_girl', 0.65, 0.65, 18%, 22%)
+// 	transform scaleX(-1) rotate(-43deg)
+	
+// #SUPERscout_guy
+// 	width 500px
+// 	z-index 5
+// 	position-superhero('scout_guy', 0.35, 0.55, 88%, 45%)
+// 	transform scaleX(-1) rotate(30deg)
+
+// #SUPERscythe_girl
+// 	width 380px
+// 	z-index 3
+// 	position-superhero('scythe_girl', 0.5, 0.5, 77%, 28%)
+// 	transform scaleX(-1) rotate(30deg)
+
+
+#SUPERcat
+	width 130px
+	z-index 20
+	position-superhero('cat', 0.5, 0.5, 0px, -100px, true)
+
+#SUPERmod_and_amy
+	width 310px
+	z-index 5
+	position-superhero('mod_and_amy', 0.5, 0.5, -110px, -80px, true)
+	transform rotate(-2deg)
+
+#SUPERalex
+	width 500px
+	z-index 15
+	position-superhero('alex', 0.5, 0.5, -230px, 130px, true)
+
+// #SUPERscout_girl
+// 	width 500px
+// 	z-index 3
+// 	position-superhero('scout_girl', 0.65, 0.65, 90%, 55%, true)
+// 	transform scaleX(-1) rotate(-16deg)
+	
+// #SUPERscout_guy
+// 	width 300px
+// 	z-index 5
+// 	position-superhero('scout_guy', 0.35, 0.55, 90%, 40%, true)
+// 	transform rotate(-29deg)
+
+// #SUPERscythe_girl
+// 	width 300px
+// 	z-index 0
+// 	position-superhero('scythe_girl', 0.6, 0.5, 50%, 28%, true)
+// 	transform rotate(56deg)
