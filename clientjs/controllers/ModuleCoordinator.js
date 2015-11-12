@@ -168,7 +168,7 @@ ModuleCoordinator.moduleComplete = function () {
 	let animationargs;
 
 	if (cur.name === 'Amazing' && next.name === 'Galileo') {
-		let sigmoid = Easing.sigmoidFactory(9);
+		let sigmoid = Easing.sigmoidFactory(12);
 		animationargs = {
 			msec: 1000,
 			easing: function (t) {
@@ -217,8 +217,8 @@ function simpleTransition (cur, next, t, animationargs) {
 	next.seek(ModuleCoordinator.toModuleT(next, t));
 
 	animationargs = animationargs || {
-		msec: 2000,
-		easing: Easing.sigmoidFactory(9),
+		msec: 1250,
+		easing: Easing.sigmoidFactory(13),
 	};
 
 	MC.transition = MC.container.scrollTo(next.view.module, animationargs)

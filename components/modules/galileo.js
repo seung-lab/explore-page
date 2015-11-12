@@ -165,7 +165,7 @@ class Galileo extends TeaTime {
 		if (frm === 'Amazing') {
 			this.view.module.prepend(this.view.transition);
 
-			let sigmoid = Easing.sigmoidFactory(9, -0.5);
+			let sigmoid = Easing.sigmoidFactory(12, -0.5);
 
 			transition.done(function () {
 				_this.view.module.scrollTo(_this.view.action, {

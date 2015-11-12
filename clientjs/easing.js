@@ -205,6 +205,12 @@ module.exports.sigmoidFactory = function (alpha, offset) {
 
 module.exports.easeInOut = module.exports.sigmoidFactory(12); // a cool default
 
+
+module.exports.parabolic = function (t) {
+	t = Utils.clamp(t, 0, 1);
+	return -t * t + 2 * t;
+};
+
 module.exports.linear = function (t) { return t };
 
 

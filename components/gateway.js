@@ -107,7 +107,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			let transition = $('#viewport')
 				.scrollTo('#explore', {
 					msec: 2000,
-					easing: Easing.sigmoidFactory(9),
+					easing: Easing.sigmoidFactory(12),
 				});
 
 			ModuleCoordinator.initialize(transition);
@@ -115,7 +115,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		})
 
  		this.view.explorebtn.ion('mouseenter', function () {
- 			_this.dipReveal(25);
+ 			_this.dipReveal(5);
  		});
 
  		this.view.explorebtn.ion('mouseleave', function () {
@@ -129,8 +129,8 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		_this.animations.dip.reject();
 
 		_this.animations.dip = $('#viewport').scrollTo(_this.view.module.parent(), {
-			msec: 750,
-			easing: Easing.sigmoidFactory(7),
+			msec: 300,
+			easing: Easing.parabolic,
 			offset: offset,
 		});
  	}
