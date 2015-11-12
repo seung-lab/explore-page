@@ -239,7 +239,7 @@ function simpleTransition (cur, next, t, animationargs) {
 
 			MC.timeline.fullManual(next.manual_timeline);
 
-			cur.exit(cur.name);
+			cur.exit(null, cur.name);
 		})
 		.fail(function () {
 			scrolled.reject();
