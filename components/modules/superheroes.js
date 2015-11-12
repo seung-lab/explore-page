@@ -14,11 +14,31 @@ class Superheroes extends TeaTime {
 
 		this.slides = [
 			{
-				text: "Collaborate and complete unlock achievements for science",
+				text: "Collaborate and compete unlock achievements for science",
 			},
 		];
 
 		this.duration = Utils.nvl(args.duration, this.slides.length);
+
+		this.mobile = args.mobile;
+		
+		let _this = this;
+		window.onresize = function () {
+			_this.resize(window.innerWidth, window.innerHeight);
+		};
+		_this.resize(window.innerWidth, window.innerHeight);
+	}
+
+	resize(w, h) {
+		var diag = Math.sqrt(w * w + h * h);
+
+		if (diag < 1300) {
+			this.view.module.addClass('mobile');
+			this.view.module.removeClass('desktop');
+		} else {
+			this.view.module.addClass('desktop');
+			this.view.module.removeClass('mobile');
+		}
 	}
 
 	generateView () {
@@ -95,11 +115,11 @@ class Superheroes extends TeaTime {
 	attachEventHandlers () {
 		let _this = this;
 
-		// _this.view.play_now.ion('click', function () {
-		// 	Utils.UI.curtainFall(function () {
-		// 		document.location.href = 'https://eyewire.org/signup';
-		// 	});
-		// })
+		_this.view.play_now.ion('click', function () {
+			Utils.UI.curtainFall(function () {
+				document.location.href = 'https://eyewire.org/signup';
+			});
+		})
 	}
 
 	render (t_prev, t) {

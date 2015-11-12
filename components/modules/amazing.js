@@ -68,31 +68,28 @@ class Amazing extends TeaTime {
 
 		let videoContainer = $('<div>');
 
-		var count = 0;
-		var frame = 1;
+		$.getJSON('./animations/amazing/opt/concat.json', function (json) {
+			var frame = 1;
 
-		var thisisnew = 1;
+			for (let i = 0; i < _this.slides.length; i++) {
+				let slide = _this.slides[i];
 
-		for (let i = 0; i < this.slides.length; i++) {
-			let slide = this.slides[i];
+				let slideFrameContainer = $('<div>', { id: `slide${i}`});
 
-			let slideFrameContainer = $('<div>', { id: `slide${count}`});
+				while (frame <= slide.lastRepeatFrame) {
+					var img = $('<img>', {
+						src: 'data:image/jpeg;base64,' + json[frame - 1],
+						class: 'frame',
+						id: 'frame' + frame,
+					});
+					slideFrameContainer.append(img);
 
-			while (frame <= slide.lastRepeatFrame) {
-				var img = $('<img>', {
-					src: `./animations/amazing/opt/opt-f${frame}.jpg`,
-					class: 'frame',
-					id: 'frame' + frame,
-				});
-				slideFrameContainer.append(img);
+					frame++;
+				};
 
-				frame++;
+				videoContainer.append(slideFrameContainer);
 			};
-
-			videoContainer.append(slideFrameContainer);
-
-			count++;
-		};
+		});		
 
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);

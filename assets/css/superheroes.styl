@@ -61,9 +61,7 @@ $circleRadius = 90px
 
 .superheroes .superhero
 	position absolute
-
-// @media (min-height 800px) 
-
+	transition all 1s // superpowers!
 
 position-superhero(name, offx, offy, px, py, center = false)
 
@@ -82,85 +80,89 @@ position-superhero(name, offx, offy, px, py, center = false)
 		left s('calc(%s - %s)', px, @width * (1 - offx))
 		top s('calc(%s - %s)', py, @height * (1 - offy))
 
-// #SUPERcat
-// 	width 200px
-// 	z-index 5
-// 	position-superhero('cat', 0.5, 0.5, 50%, 50%)
-// 	top s('calc(50% - %s - 68px)', $circleRadius)
-// 	transform scaleX(-1)
+.superheroes.desktop #SUPERcat
+	width 200px
+	z-index 15
+	position-superhero('cat', 0.5, 0.5, 50%, 50%)
+	top s('calc(50% - %s - 68px)', $circleRadius)
+	transform scaleX(-1)
 
-// #SUPERmod_and_amy
-// 	width 900px
-// 	z-index 10
-// 	position-superhero('mod_and_amy', 0.6, 0.38, 10%, 100%)
-// 	transform rotate(-14deg)
+.superheroes.desktop #SUPERmod_and_amy
+	width 900px
+	z-index 10
+	position-superhero('mod_and_amy', 0.6, 0.38, 10%, 100%)
+	transform rotate(-14deg)
 
-// #SUPERmentor
-// 	width 750px
-// 	z-index 10
-// 	position-superhero('mentor', 0.4, 0.35, 90%, 100%)
-// 	transform rotate(-3deg)
+.superheroes.desktop #SUPERmentor
+	width 750px
+	z-index 10
+	position-superhero('mentor', 0.4, 0.35, 90%, 100%)
+	transform rotate(-3deg)
 
-// #SUPERalex
-// 	width 550px
-// 	z-index 5
-// 	position-superhero('alex', 0.7, 0.5, 7%, 52%)
-// 	transform scaleX(-1)
+.superheroes.desktop #SUPERalex
+	width 550px
+	z-index 5
+	position-superhero('alex', 0.7, 0.5, 7%, 52%)
+	transform scaleX(-1)
 
-// #SUPERscout_girl
-// 	width 350px
-// 	z-index 3
-// 	position-superhero('scout_girl', 0.65, 0.65, 18%, 22%)
-// 	transform scaleX(-1) rotate(-43deg)
+.superheroes.desktop #SUPERscout_girl
+	width 350px
+	z-index 3
+	position-superhero('scout_girl', 0.65, 0.65, 18%, 22%)
+	transform scaleX(-1) rotate(-43deg)
 	
-// #SUPERscout_guy
-// 	width 500px
-// 	z-index 5
-// 	position-superhero('scout_guy', 0.35, 0.55, 88%, 45%)
-// 	transform scaleX(-1) rotate(30deg)
+.superheroes.desktop #SUPERscout_guy
+	width 500px
+	z-index 5
+	position-superhero('scout_guy', 0.35, 0.55, 88%, 45%)
+	transform scaleX(-1) rotate(30deg)
 
-// #SUPERscythe_girl
-// 	width 380px
-// 	z-index 3
-// 	position-superhero('scythe_girl', 0.5, 0.5, 77%, 28%)
-// 	transform scaleX(-1) rotate(30deg)
+.superheroes.desktop #SUPERscythe_girl
+	width 380px
+	z-index 3
+	position-superhero('scythe_girl', 0.5, 0.5, 77%, 28%)
+	transform scaleX(-1) rotate(30deg)
 
 
-#SUPERcat
+// MOBILE
+.superheroes.mobile #SUPERcat
 	width 130px
 	z-index 20
 	position-superhero('cat', 0.5, 0.5, 0px, -100px, true)
+	
+.superheroes.mobile #SUPERmentor
+	display none
 
-#SUPERmod_and_amy
+.superheroes.mobile #SUPERmod_and_amy
 	width 310px
 	z-index 5
 	position-superhero('mod_and_amy', 0.5, 0.5, -110px, -80px, true)
 	transform rotate(-2deg)
 
-#SUPERalex
+.superheroes.mobile #SUPERalex
 	width 450px
 	z-index 15
 	position-superhero('alex', 0.5, 0.5, -215px, 130px, true)
 
-#SUPERscout_girl
+.superheroes.mobile #SUPERscout_girl
 	width 450px
 	z-index 59
 	position-superhero('scout_girl', 0.5, 0.5, 240px, 100px, true)
 	transform scaleX(-1) rotate(-16deg)
 	
-#SUPERscout_guy
+.superheroes.mobile #SUPERscout_guy
 	width 280px
 	z-index 15
 	position-superhero('scout_guy', 0.5, 0.5, 170px, -120px, true)
 	transform rotate(-25deg)
 
-#SUPERscythe_girl
+.superheroes.mobile #SUPERscythe_girl
 	width 300px
 	z-index 0
 	position-superhero('scythe_girl', 0.6, 0.5, 0px, -154px, true)
 	transform rotate(58deg)
 
-.superheros .story-text
+.superheroes.mobile .story-text
 	@extend .galileo .story-text .text.italics
 	
 	text-transform lowercase

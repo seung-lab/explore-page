@@ -4,7 +4,7 @@ let $ = require('jquery'),
 	Hammer = require('hammerjs');
 
 
-var SLIDE_COUNT = 49 + 1;
+var SLIDE_COUNT = 1;//49 + 1;
 
 var SLIDE_UP_SLIDE = 1;
 
@@ -79,39 +79,36 @@ class MeltMobile extends TeaTime {
 		vidContainer.append(slide0);
 
 
-		for (let i = 1; i < SLIDE_COUNT; i++) {
+		$.getJSON('./animations/Melt_Sequence/mobile/realgood/xt/concat.json', function (json) {
+			console.log('got json', json.length);
+			SLIDE_COUNT += json.length;
 
-			let slide = $('<div>', { id: 'meltMobile' + i, class: 'meltSlide' });
+			_this.slides = _this.slides.concat(utils.range(_this.slides.length, SLIDE_COUNT).map(x => { return {}; }));
 
-			let img = $('<img>', {
-				src: './animations/Melt_Sequence/mobile/realgood/xt/meltCube-Cube_000' + (i - 1) + '-fs8s.png',
-			});
 
-			img.css('z-index', SLIDE_COUNT - i + 10);
-			// img.css('opacity', i > 0 ? 0 : 1);
+			for (let i = 1; i < SLIDE_COUNT; i++) {
+				let slide = $('<div>', { id: 'meltMobile' + i, class: 'meltSlide' });
 
-			slide.append(img);
+				let img = $('<img>', {
+					src: 'data:image/png;base64,' + json[i - 1],
+				});
 
-			if (i === SLIDE_UP_SLIDE) {
-				let textcontainer2 = d('story-text');
-				let text2 = d('text caps').html(splitter("It's a 3D puzzle game", true));
-				let counter2 = d('counter');
-				textcontainer2.append(text2, counter2);
-				slide.append(textcontainer2);
+				img.css('z-index', SLIDE_COUNT - i + 10);
+
+				slide.append(img);
+
+				if (i === SLIDE_UP_SLIDE) {
+					let textcontainer2 = d('story-text');
+					let text2 = d('text caps').html(splitter("It's a 3D puzzle game", true));
+					let counter2 = d('counter');
+					textcontainer2.append(text2, counter2);
+					slide.append(textcontainer2);
+				}
+
+				_this.slides[i].el = slide;
+				vidContainer.append(slide);
 			}
-
-			// if (i === SLIDE_COUNT - 1) {
-			// 	let textcontainer2 = d('story-text');
-			// 	let text2 = d('text caps').html(splitter("You're mapping the brain", true));
-			// 	let counter2 = d('counter');
-			// 	textcontainer2.append(text2, counter2);
-			// 	slide.append(textcontainer2);
-			// }
-
-			this.slides[i].el = slide;
-			vidContainer.append(slide);
-		};
-
+		});
 
 		return {
 			module: container,

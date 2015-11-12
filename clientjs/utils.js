@@ -1104,13 +1104,18 @@ Utils.onceify = function(f) {
  * Returns a range of numbers similar to python range.
  *
  * Required:
- *   [0] end: e.g. 3
+ *   [0] start: e.g. 1
+ *   [1]   end: e.g. 3
  *
- * Return: e.g. [ 0, 1, 2 ]
+ * Return: e.g. [ 1, 2 ]
  */
-Utils.range = function (end) {
+Utils.range = function (start, end) {
+	if (end === undefined) {
+		end = start;
+		start = 0;
+	}
 	var rng = [];
-	for (var i = 0; i < end; i++) {
+	for (var i = start; i < end; i++) {
 		rng.push(i);
 	}
 
