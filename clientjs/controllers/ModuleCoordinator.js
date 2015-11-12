@@ -8,7 +8,7 @@ let utils = require('../utils.js'),
 	Wonderers = require('../../components/modules/wonderers.js'),
 	Superheroes = require('../../components/modules/superheroes.js'),
 	Melt = require('../../components/modules/melt.js'),
-	MeltMobile = null;// = require('../../components/modules/melt-mobile.js');
+	MeltMobile = require('../../components/modules/melt-mobile.js');
 
 let _t = 0;
 
