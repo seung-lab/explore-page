@@ -1,10 +1,9 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
-	TeaTime = require('../teatime.js'),
-	Hammer = require('hammerjs');
+	TeaTime = require('../teatime.js');
 
 
-var SLIDE_COUNT = 1;//49 + 1;
+var SLIDE_COUNT = 49 + 1;
 
 var SLIDE_UP_SLIDE = 1;
 
@@ -78,35 +77,27 @@ class MeltMobile extends TeaTime {
 		this.slides[0].el = slide0;
 		vidContainer.append(slide0);
 
+		for (let i = 1; i < SLIDE_COUNT; i++) {
+			let slide = $('<div>', { id: 'meltMobile' + i, class: 'meltSlide' });
+			let img = $('<img>');
+			slide.append(img);
+			img.css('z-index', SLIDE_COUNT - i + 10);
+			this.slides[i].el = slide;
+
+			if (i === SLIDE_UP_SLIDE) {
+				let textcontainer2 = d('story-text');
+				let text2 = d('text caps').html(splitter("It's a 3D puzzle game", true));
+				let counter2 = d('counter');
+				textcontainer2.append(text2, counter2);
+				slide.append(textcontainer2);
+			}
+
+			vidContainer.append(slide);
+		}
 
 		$.getJSON('./animations/Melt_Sequence/mobile/realgood/xt/concat.json', function (json) {
-			console.log('got json', json.length);
-			SLIDE_COUNT += json.length;
-
-			_this.slides = _this.slides.concat(utils.range(_this.slides.length, SLIDE_COUNT).map(x => { return {}; }));
-
-
 			for (let i = 1; i < SLIDE_COUNT; i++) {
-				let slide = $('<div>', { id: 'meltMobile' + i, class: 'meltSlide' });
-
-				let img = $('<img>', {
-					src: 'data:image/png;base64,' + json[i - 1],
-				});
-
-				img.css('z-index', SLIDE_COUNT - i + 10);
-
-				slide.append(img);
-
-				if (i === SLIDE_UP_SLIDE) {
-					let textcontainer2 = d('story-text');
-					let text2 = d('text caps').html(splitter("It's a 3D puzzle game", true));
-					let counter2 = d('counter');
-					textcontainer2.append(text2, counter2);
-					slide.append(textcontainer2);
-				}
-
-				_this.slides[i].el = slide;
-				vidContainer.append(slide);
+				_this.slides[i].el.children().first().attr('src', 'data:image/png;base64,' + json[i - 1]);
 			}
 		});
 
@@ -121,15 +112,10 @@ class MeltMobile extends TeaTime {
 
 		console.log('melt-mobile after enter');
 
-		var mc = new Hammer.Manager(this.view.module.get()[0]);
-		mc.add(new Hammer.Pan({ threshold: 0, pointers: 0 }));
-
-		mc.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_VERTICAL })).recognizeWith(mc.get('pan')); // todo, what does this do?
-
-		mc.on('panstart panmove', function (evt) {
+		$(window).ion('panmove', function (e, evt) {
 			console.log('panmove');
 
-			var current = this.slideAt(_this.t).el;
+			var current = _this.slideAt(_this.t).el;
 
 			if (current.hasClass('fresh')) {
 				current.removeClass('fresh');
@@ -138,19 +124,13 @@ class MeltMobile extends TeaTime {
 				return;
 			}
 
-			var img = current.children[0];
+			current.removeClass('return');
 
-			img.removeClass('return');
+			var img = current.children().first();
 
 			img.css('top', evt.deltaY + 'px');
 
-			// var negative = evt.deltaY < 0;
-
-			// if (current.donedone || next === null) {
-			// 	return;
-			// }
-
-			var t = Math.max(0, Math.min(1, Math.abs(evt.deltaY) / (window.innerHeight / 1.5)));
+			var t = Math.max(0, Math.min(1, -evt.deltaY / (window.innerHeight / 1.5)));
 
 			if (t > 0.5) {
 				current.removeClass('active');
@@ -158,20 +138,13 @@ class MeltMobile extends TeaTime {
 			}
 		});
 
-		mc.on("hammer.input", function(ev) {
-			if (ev.isFinal) {
-				let slideUp = $(`#meltMobile${SLIDE_UP_SLIDE}.current`);
+		$(window).ion('liftoff', function (e, evt) {
+			let slideUp = $(`#meltMobile${SLIDE_UP_SLIDE}`);
 
+			slideUp.addClass('return');
 
-				if (!slideUp.hasClass('active')) {
-					return;
-				}
-
-				slideUp.addClass('return');
-
-				var img = slideUp.children[0];
-				img.css('top', null);
-			}
+			var img = slideUp.children().first();
+			img.css('top', '0');
 		});
 	}
 
@@ -181,6 +154,7 @@ class MeltMobile extends TeaTime {
 			el.removeClass('reverse');
 			el.removeClass('forward');
 			el.removeClass('exit');
+			el.removeClass('active');
 		}
 	}
 
@@ -248,13 +222,11 @@ class MeltMobile extends TeaTime {
 
 	render (t_prev, t) {
 		console.log('render', this.slideAt(t));
-		// var prevSlide = this.slideAt(t_prev);
 		var currentSlide = this.slideAt(t);
 
 		this.clearEnter();
 
 
-		// currentSlide.el.removeClass('exit');
 		currentSlide.el.addClass('enter');
 
 		var FRAMES_FOR_WHITE = 10;
@@ -275,73 +247,9 @@ class MeltMobile extends TeaTime {
 			$('#meltMobileBg').css('opacity', 0);
 		}
 
-		// $('#meltMobile' + prevSlide).css('opacity', 0);
-
-		// $('#meltMobile' + slide).css('opacity', 1);
-
-		// function addClass (el, name) {
-		// 	el.addClass(name);
-		// }
-
-		// function removeClass (el, name) {
-		// 	el.removeClass(name);
-		// }
-
-		// function doNeighbors(slide, remove) {
-		// 	var foo = remove ? removeClass : addClass;
-
-		// 	var beforeSlideEl = $('#meltMobile' + (slide - 1));
-		// 	var afterSlideEl = $('#meltMobile' + (slide + 1));
-
-		// 	foo(beforeSlideEl, 'before');
-		// 	foo(afterSlideEl, 'after');
-		// }
-
-		// prevSlide.el.removeClass('current');
-		// currentSlideEl.addClass('current');
-
-		// doNeighbors(prevSlide, true);
-		// doNeighbors(currentSlide, false);
-
-		// for (var i = 0; i < SLIDE_COUNT; i++) {
-		// 	var el = this.slides[i].el;
-
-		// 	el.removeClass('rev');
-		// 	el.removeClass('after');
-		// 	el.removeClass('before');
-
-		// 	if (i < currentSlide.index) {
-		// 		el.removeClass('after');
-		// 		el.addClass('before');
-		// 	} else if (i > currentSlide.index) {
-		// 		el.addClass('after');
-		// 		el.removeClass('before');
-		// 	} else {
-		// 		el.removeClass('after');
-		// 		el.removeClass('before');
-		// 		el.addClass('current');
-		// 		if (t_prev > t) {
-		// 			el.addClass('rev');
-		// 		}
-		// 	}
-		// };
-
-		// if (currentSlide.index === SLIDE_COUNT - 1) {
-		// 	var bg = $('#meltMobileBg').addClass('lastSlide');
-		// 	var whitePart = $('#meltMobileWhitePart').addClass('lastSlide');
-		// } else if (prevSlide.index === SLIDE_COUNT - 1) {
-		// 	var bg = $('#meltMobileBg').removeClass('lastSlide');
-		// 	var whitePart = $('#meltMobileWhitePart').removeClass('lastSlide');
-		// }
-
-		// if (prevSlide.index === SLIDE_UP_SLIDE) {
-		// 	prevSlide.el.removeClass('active');
-		// 	prevSlide.el.css('top', '');
-		// }
-
-		// if (currentSlide.index === SLIDE_UP_SLIDE) {
-		// 	currentSlide.el.addClass('fresh');
-		// }
+		if (currentSlide.index === SLIDE_UP_SLIDE) {
+			currentSlide.el.addClass('fresh');
+		}
 	}
 
 	seek (t) {
@@ -359,28 +267,6 @@ class MeltMobile extends TeaTime {
 
 		return this.render(t_prev, t);
 	}
-
-	// recurse(forward) {
-	// 	console.log('recurse', this.slideAt(this.t));
-	// 	// console.log('recurse', this.t);
-
-	// 	var userTriggered = false;
-	// 	if (forward) {
-	// 		super.next(userTriggered);
-	// 	} else {
-	// 		super.previous();
-	// 	}
-
-	// 	var current = this.slideAt(this.t).index;
-
-	// 	if (current < SLIDE_COUNT - 1 && current > SLIDE_UP_SLIDE) {
-	// 		clearTimeout(this.recurseTimeout);
-	// 		this.recurseTimeout = setTimeout(this.recurse.bind(this, forward), 83);
-	// 	} else {
-	// 		console.log('done with recurse');
-	// 		this.recurseTimeout = undefined;
-	// 	}
-	// }
 }
 
 function splitter (txt, inverted) {
