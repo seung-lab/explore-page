@@ -33,7 +33,7 @@ ModuleCoordinator.initialize = function (animation) {
 		})
 	}
 
-	var isMobile = false;
+	let isMobile = utils.isMobile();
 
 	ModuleCoordinator.setModules([
 		moduleFactory(Amazing),

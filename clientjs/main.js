@@ -53,6 +53,7 @@ function jumpToExplore (t, transition) {
 // Globals
 
 window.Login = Login;
+window.Utils = Utils;
 window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
 window.$ = $;
