@@ -68,7 +68,7 @@ class Wonderers extends TeaTime {
 		_this.view.next.hide();
 
 		_this.view.next.drop({
-			msec: 5050,
+			msec: 2000,
 			easing: Easing.bounceFactory(0.5),
 			side: 'bottom',
 			displacement: 25,

@@ -103,7 +103,7 @@ class Melt extends TeaTime {
 	}
 
 	next () { // next slide
-		console.log('next', SequenceManager.tTime(), this.t);
+		// console.log('next', SequenceManager.tTime(), this.t);
 		if (SequenceManager.tTime() > 1 - EPS) {
 			this.parent.moduleComplete();
 		} else {
@@ -112,7 +112,7 @@ class Melt extends TeaTime {
 	}
 
 	previous () { // previous slide
-		console.log('previous', SequenceManager.tTime(), this.t);
+		// console.log('previous', SequenceManager.tTime(), this.t);
 		if (SequenceManager.tTime() < EPS) {
 			this.parent.moduleUncomplete();
 		} else {
@@ -125,7 +125,7 @@ class Melt extends TeaTime {
 	}
 
 	timeUpdate (t) {
-		console.log('timeUpdate', t);
+		// console.log('timeUpdate', t);
 		this.t = t;
 		this.parent.sub_t_update(this.name, t);
 
@@ -172,7 +172,7 @@ class Melt extends TeaTime {
 	}
 
 	render (t_prev, t) {
-		console.log('render', t);
+		// console.log('render', t);
 
 		var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
 
@@ -190,14 +190,14 @@ class Melt extends TeaTime {
 
 		var targetSecond = targetFrame / 30;
 
-		console.log('load', i, targetSecond);
+		// console.log('load', i, targetSecond);
 
 		var vid = this.loadVideo(true, i, targetSecond, false);
 		SequenceManager.active = vid;
 	}
 
 	seek (t) {
-		console.log('seek', t);
+		// console.log('seek', t);
 		let t_prev = this.t;
 		this.timeUpdate(t);
 
@@ -210,7 +210,7 @@ class Melt extends TeaTime {
 	}
 
 	loadVideo(forward, sequence, start, autoplay) {
-		console.log('loadVideo', forward, sequence, start, autoplay);
+		// console.log('loadVideo', forward, sequence, start, autoplay);
 		start = start || 0;
 		var cacheResult = videoCache[forward][sequence];
 
@@ -246,7 +246,7 @@ class Melt extends TeaTime {
 		videoCache[forward][sequence] = seqEl;
 
 		seqEl.addEventListener('loadeddata', function () {
-			console.log('loadeddata');
+			// console.log('loadeddata');
 			seqEl.currentTime = start;
 		});
 
@@ -254,7 +254,7 @@ class Melt extends TeaTime {
 
 		seqEl.addEventListener('seeked', function () {
 			_this.currentVideo = seqEl;
-			console.log('seeked', forward, sequence);
+			// console.log('seeked', forward, sequence);
 			// ended = false;
 
 			seqEl.setupAndReadyToGo = true;
@@ -295,7 +295,7 @@ class Melt extends TeaTime {
 
 		seqEl.addEventListener('pause', function () {
 			if (seqEl.currentTime === seqEl.duration) {
-				console.log('sequence ended', forward, sequence, SequenceManager.tTime());
+				// console.log('sequence ended', forward, sequence, SequenceManager.tTime());
 				ended = true;
 			}
 		});
@@ -309,9 +309,9 @@ class Melt extends TeaTime {
 
 		seqEl.scrollHandler = function (down) {
 			if (!seqEl.started) {
-				console.log('not started', sequence);
+				// console.log('not started', sequence);
 				if (down === forward) {
-					console.log('starting', sequence);
+					// console.log('starting', sequence);
 					seqEl.play();
 					seqEl.started = true;
 
@@ -323,19 +323,19 @@ class Melt extends TeaTime {
 			}
 
 			if (!ended) {
-				console.log('not ended', down, forward);
+				// console.log('not ended', down, forward);
 				if (down === forward) {
-					console.log('double playback', forward, sequence);
+					// console.log('double playback', forward, sequence);
 					seqEl.playbackRate = 2;
 					return true;
 				} else {
-					console.log('pausing', forward, sequence);
+					// console.log('pausing', forward, sequence);
 					// pleaseEnd = true;
 					seqEl.pause();
 					// jumpTime = seqEl.duration - seqEl.currentTime;
 				}
 			} else {
-				console.log('scrollstart and is sended', forward, sequence);
+				// console.log('scrollstart and is sended', forward, sequence);
 			}
 
 			var diff = 0;
@@ -353,13 +353,13 @@ class Melt extends TeaTime {
 
 			var nextIdx = sequence + diff;//.mod(SEQUENCE_COUNT);
 
-			// console.log('switching from', forward, sequence, 'to', down, nextIdx);
+			// // console.log('switching from', forward, sequence, 'to', down, nextIdx);
 
 			if (nextIdx >= 0 && nextIdx < SEQUENCE_COUNT) {
 				ended = false; // prevents double triggers, ended really means just ended
-				console.log('switching from', forward, sequence, 'to', down, nextIdx);
+				// console.log('switching from', forward, sequence, 'to', down, nextIdx);
 
-				// console.log('boo', seqEl.duration - seqEl.currentTime);
+				// // console.log('boo', seqEl.duration - seqEl.currentTime);
 
 				var next = _this.loadVideo(down, nextIdx, seqEl.duration - seqEl.currentTime, true);
 				SequenceManager.active = next;
@@ -368,7 +368,7 @@ class Melt extends TeaTime {
 					// next.playbackRate = 1;
 				// }
 			} else {
-				console.log('ignoring');
+				// console.log('ignoring');
 				// return false;
 			}
 
@@ -409,7 +409,7 @@ var SequenceManager = {
 
 		// var realSeqNum = forward ? seqEl.seqNum : SEQUENCE_COUNT - seqEl.seqNum - 1;
 
-		// console.log('realSeqNum', realSeqNum, currentFrame);
+		// // console.log('realSeqNum', realSeqNum, currentFrame);
 
 		if (video.forward) {
 			for (var i = 0; i < video.seqNum; i++) {
@@ -425,7 +425,7 @@ var SequenceManager = {
 
 		var teaTime = frameTime / totalFrames;
 
-		// console.log('tTime', forward, seqEl.seqNum, teaTime);
+		// // console.log('tTime', forward, seqEl.seqNum, teaTime);
 
 		// return 0.5;
 

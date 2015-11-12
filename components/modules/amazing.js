@@ -128,7 +128,7 @@ class Amazing extends TeaTime {
 
 	afterEnter () {
 		this.view.next.drop({
-			msec: 5050,
+			msec: 2000,
 			easing: Easing.bounceFactory(0.5),
 			side: 'bottom',
 			displacement: 25,
@@ -159,10 +159,8 @@ class Amazing extends TeaTime {
 				delta *= -1;
 			}
 
-			console.log('hiding', frames[index]);
 			$('#frame' + frames[index]).css('visibility', 'hidden');
 			index += delta;
-			console.log('showing', frames[index]);
 			$('#frame' + frames[index]).css('visibility', 'visible');
 
 		}, this.frameRateMsec);
@@ -247,9 +245,6 @@ class Amazing extends TeaTime {
 
 					function loop() {
 						var wait = Math.random() * (max - min) + min;
-						console.log('wait', wait);
-
-
 
 						timeout = setTimeout(function () {
 							_this.animationPromise = _this.blink().done(loop);
@@ -277,7 +272,6 @@ class Amazing extends TeaTime {
 			}, this.frameRateMsec);
 
 			_this.animationPromise = $.Deferred().fail(function () {
-				console.log('rejecting interval');
 				clearInterval(interval);
 			});
 		}
