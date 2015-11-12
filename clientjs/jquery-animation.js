@@ -38,7 +38,6 @@ var $ = require('jquery'),
  	}
 
  	var distance_traveled = 0;
- 	var start_time = window.performance.now();
  	var start_pos = this.scrollTop();
 
  	// if you simply use overflow-y: hidden, the animation is laggy 
@@ -63,6 +62,8 @@ var $ = require('jquery'),
  				cancelAnimationFrame(req);
  			}
  		});
+
+ 	var start_time = window.performance.now();
 
  	function animate () {
 		var now = window.performance.now();

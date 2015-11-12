@@ -28,7 +28,3 @@ var $ = require('jquery');
 		last = now;
 	});
 })();
-
-$(window).ion('scrollStart', function (e, down) {
-	console.log('scrollStart', down);
-});

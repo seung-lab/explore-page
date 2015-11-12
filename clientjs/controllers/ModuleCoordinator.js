@@ -55,13 +55,13 @@ ModuleCoordinator.initialize = function (animation) {
 	ModuleCoordinator.initHotkeys();
 
 
-	$(window).ion('scrollStart', function (e, down) {
-		if (down) {
-			ModuleCoordinator.next();
-		} else {
-			ModuleCoordinator.previous();
-		}
-	});
+	// $(window).ion('scrollStart', function (e, down) {
+	// 	if (down) {
+	// 		ModuleCoordinator.next();
+	// 	} else {
+	// 		ModuleCoordinator.previous();
+	// 	}
+	// });
 };
 
 ModuleCoordinator.tForName = function (name) {
@@ -162,10 +162,22 @@ ModuleCoordinator.previousModule = function () {
 
 
 ModuleCoordinator.moduleComplete = function () {
-	let currentmod = ModuleCoordinator.currentModule();
-	let nextmod = ModuleCoordinator.nextModule();
+	let cur = ModuleCoordinator.currentModule();
+	let next = ModuleCoordinator.nextModule();
 
-	simpleTransition(currentmod, nextmod, nextmod.begin);
+	let animationargs;
+
+	if (cur.name === 'Amazing' && next.name === 'Galileo') {
+		let sigmoid = Easing.sigmoidFactory(9);
+		animationargs = {
+			msec: 1000,
+			easing: function (t) {
+				return 2 * sigmoid(t / 2); // do first half of animation in module transition
+			},
+		};
+	}
+
+	simpleTransition(cur, next, next.begin, animationargs);
 };
 
 ModuleCoordinator.moduleUncomplete = function () {
@@ -177,7 +189,7 @@ ModuleCoordinator.moduleUncomplete = function () {
 	simpleTransition(currentmod, prevmod, t);
 };
 
-function simpleTransition (cur, next, t) {
+function simpleTransition (cur, next, t, animationargs) {
 	if (cur === next) {
 		return;
 	}
@@ -200,29 +212,31 @@ function simpleTransition (cur, next, t) {
 
 	next.seek(ModuleCoordinator.toModuleT(next, t));
 
-	MC.transition = MC.container.scrollTo(next.view.module, {
-		msec: 1500,
-		easing: Easing.springFactory(.9, 0),
-	})
-	.done(function () {
-		scrolled.resolve();
+	animationargs = animationargs || {
+		msec: 2000,
+		easing: Easing.sigmoidFactory(9),
+	};
 
-		if (t === _t) {
-			MC.seek(t);
-		}
+	MC.transition = MC.container.scrollTo(next.view.module, animationargs)
+		.done(function () {
+			scrolled.resolve();
 
-		cur.exit(cur.name);
-	})
-	.fail(function () {
-		scrolled.reject();
+			if (t === _t) {
+				MC.seek(t);
+			}
 
-		MC.transition.always(function () {
-			MC.exitNonDisplayed();
+			cur.exit(cur.name);
 		})
-	})
-	.always(function () {
-		spacer.remove();
-	})
+		.fail(function () {
+			scrolled.reject();
+
+			MC.transition.always(function () {
+				MC.exitNonDisplayed();
+			})
+		})
+		.always(function () {
+			spacer.remove();
+		})
 };
 
 ModuleCoordinator.moduleAt = function (t) {

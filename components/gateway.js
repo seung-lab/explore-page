@@ -100,7 +100,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			let transition = $('#viewport')
 				.scrollTo('#explore', {
 					msec: 2000,
-					easing: Easing.springFactory(.9, 0),
+					easing: Easing.sigmoidFactory(9),
 				});
 
 			ModuleCoordinator.initialize(transition);
