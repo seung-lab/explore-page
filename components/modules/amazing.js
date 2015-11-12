@@ -126,12 +126,19 @@ class Amazing extends TeaTime {
 		};
 	}
 
-	afterEnter () {
-		this.view.next.drop({
-			msec: 2000,
-			easing: Easing.bounceFactory(0.5),
-			side: 'bottom',
-			displacement: 25,
+	afterEnter (transition) {
+		let _this = this;
+
+		_this.view.next.hide();
+
+		transition.done(function () {
+			_this.view.next.drop({
+				msec: 2000,
+				easing: Easing.bounceFactory(0.5),
+				side: 'bottom',
+				displacement: 25,
+			});
+			_this.view.next.show();
 		});
 	}
 

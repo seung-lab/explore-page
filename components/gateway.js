@@ -104,7 +104,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 				});
 
 			ModuleCoordinator.initialize(transition);
-			ModuleCoordinator.seek(0);
+			ModuleCoordinator.seek(0, transition);
  		})
  	}
  }

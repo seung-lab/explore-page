@@ -47,7 +47,7 @@ function jumpToExplore (t, transition) {
 		transition.resolve();
 	});
 
-	ModuleCoordinator.seek(t);
+	ModuleCoordinator.seek(t, transition);
 }
 
 // Globals

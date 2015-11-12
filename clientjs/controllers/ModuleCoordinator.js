@@ -24,22 +24,22 @@ ModuleCoordinator.initialize = function (animation) {
 
 	ModuleCoordinator.transition = $.Deferred();
 
+	let mobile = utils.isMobile();
+
 	function moduleFactory(module, duration) {
 		return new module({
 			parent: ModuleCoordinator,
 			anchor: anchor,
 			duration: duration,
-			mobile: true,
+			mobile: mobile,
 		})
 	}
-
-	let isMobile = utils.isMobile();
 
 	ModuleCoordinator.setModules([
 		moduleFactory(Amazing),
 		moduleFactory(Galileo),
 		moduleFactory(Wonderers),
-		moduleFactory(isMobile ? MeltMobile : Melt),
+		moduleFactory(mobile ? MeltMobile : Melt),
 		moduleFactory(Superheros),
 	]);
 
@@ -286,17 +286,17 @@ ModuleCoordinator.t = function (tee) {
 	return _t;
 };
 
-ModuleCoordinator.seek = function (t) {
+ModuleCoordinator.seek = function (t, transition) {
 	let prev_t = _t;
 	_t = t;
-	return ModuleCoordinator.render(prev_t, t);
+	return ModuleCoordinator.render(prev_t, t, transition);
 };
 
 ModuleCoordinator.toModuleT = function (module, t) {
 	return (t - module.begin) / module.duration;
 }
 
-ModuleCoordinator.render = function (prev_t, t) {
+ModuleCoordinator.render = function (prev_t, t, transition) {
 	prev_t = utils.nvl(prev_t, _t);
 	t = utils.nvl(t, _t);
 
@@ -307,10 +307,10 @@ ModuleCoordinator.render = function (prev_t, t) {
 
 	if (prev_mod !== current_mod) {
 		prev_mod.exit();
-		current_mod.enter();
+		current_mod.enter(transition);
 	}
 	else if (!current_mod.visible) {
-		current_mod.enter();
+		current_mod.enter(transition);
 	}
 
 	ModuleCoordinator.exitNonDisplayed(t);
