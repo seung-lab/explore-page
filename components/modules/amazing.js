@@ -134,7 +134,7 @@ class Amazing extends TeaTime {
 
 		transition.done(function () {
 			_this.view.next.drop({
-				msec: 2000,
+				msec: 1500,
 				easing: Easing.bounceFactory(0.5),
 				side: 'bottom',
 				displacement: 25,

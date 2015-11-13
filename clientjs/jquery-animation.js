@@ -214,15 +214,23 @@ $.fn.scrambleText = function (args = {}) {
 
  	updatefn(vector);
 
- 	let probability = 0.15;
+ 	let probability = 0.6;
+
+ 	let easing = function (t) {
+ 		return Math.pow(t*t - 2*t + 1, 3);
+ 	};
 
  	req = setInterval(function () {
  		let now = window.performance.now();
 
- 		if (now - start_time > msec) {
+ 		let t = (now - start_time) / msec;
+
+ 		if (t >= 1) {
  			deferred.resolve();
  			return;
  		}
+
+ 		let lesser_probability = probability * easing(t);
 
  		let all_solved = true;
  		for (let i = 0; i < vector.length; i++) {
@@ -233,7 +241,7 @@ $.fn.scrambleText = function (args = {}) {
  			if (end_vector[i] === ' ') {
  				vector = Utils.replaceAt(vector, end_vector[i], i);
  			}
- 			else if (probability >= Math.random()) {
+ 			else if (lesser_probability >= Math.random()) {
  				vector = Utils.replaceAt(vector, end_vector[i], i);
  			}
  			else {

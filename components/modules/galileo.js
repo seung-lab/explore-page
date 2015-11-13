@@ -277,7 +277,7 @@ class Galileo extends TeaTime {
 			this.animations.text = elem.scrambleText({
 				begin: elem.html(),
 				end: slide.text,
-				msec: 2000,
+				msec: 1500,
 				tick: 50,
 				update: function (txt) {
 					elem.html(
