@@ -53,9 +53,17 @@ Login.initLogin = function (transition) {
 	_components.authentication.enter(transition);
 };
 
-Login.initExploring = function () {
+Login.initExploring = function (transition) {
+	transition = transition || $.Deferred().resolve();
+
+	_components.header.hide = true;
 	_components.header.mode = 'register';
 	_components.header.render();
+
+	transition.done(function () {
+		_components.header.hide = false;
+		_components.header.render();
+	});
 
 	Login.bindResizeEvents('explore');
 };

@@ -124,14 +124,13 @@ class Gateway extends Synapse { // You can only build within a pylon field
 
 		$('#registration').hide();
 
-		Login.initExploring();
-
 		let transition = $('#viewport')
 			.scrollTo('#explore', {
 				msec: 2000,
 				easing: Easing.sigmoidFactory(12),
 			});
 
+		Login.initExploring(transition);
 		ModuleCoordinator.initialize(transition);
 		ModuleCoordinator.seek(0, transition);
  	}

@@ -15,6 +15,7 @@ class Header extends Synapse {
 		this.view = this.generateView();
 
 		this.mode = args.mode || 'share';
+		this.hide = false;
 
 		this.state = {
 			share_activated: false,
@@ -114,6 +115,12 @@ class Header extends Synapse {
 
 	render () {
 		let _this = this;
+
+		this.view.module.removeClass('invisible');
+		if (this.hide) {
+			this.view.module.addClass('invisible');
+			return;
+		}
 
 		this.view.logo.removeClass('invisible');
 		if (Utils.isMobile() && !this.exploring && this.mode === 'share') {
