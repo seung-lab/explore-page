@@ -28,14 +28,14 @@ $amazing_z = 1
 .amazing .story-text
 	text-transform uppercase
 	color $TEXT_BLUE
-	font-size 30px
-	font-weight 600
+	font-size 42px
+	font-weight 700
 	word-spacing 0px
 	letter-spacing 2px
 	text-align center
 	white-space nowrap
 	
-	width 400px
+	width 666px
 
 	position absolute
 	bottom 20%
@@ -50,33 +50,34 @@ $amazing_z = 1
 	color $TEXT_BLUE
 	
 	position absolute
-	top -32px
+	top -50px
+	text-align center
 	font-style italic
 	text-transform lowercase
 	letter-spacing 0px
-	font-size 23px
+	font-size 36px
 	
 	width 100%
 	center-horizontal()
 
 	z-index $amazing_z
 
-.story-text:after,
-.story-text:before 
-	content "...."
-	position absolute
-	width 100%
-	font-size 10px
-	left 0px
+// .story-text:after,
+// .story-text:before 
+// 	content "...."
+// 	position absolute
+// 	width 100%
+// 	font-size 10px
+// 	left 0px
 	
-	z-index $amazing_z
+// 	z-index $amazing_z
 
-.story-text.visible-supertext:before
-	content ""
+// .story-text.visible-supertext:before
+// 	content ""
 
 
-.story-text:before
-	top -15px
+// .story-text:before
+// 	top -15px
 
 .counter 
 	display flex
@@ -86,13 +87,13 @@ $amazing_z = 1
 	
 	background-color $ACCENT_YELLOW
 	color $TEXT_BLUE
-	border-radius 3px
+	border-radius 9px
 	
 	box-sizing border-box
 	padding-left 5px
 	
 	width 50px
-	height 13px
+	height 20px
 	
 	font-size 6px
 	letter-spacing 5px
