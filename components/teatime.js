@@ -17,6 +17,8 @@ class TeaTime extends Synapse {
 		this.slides = [];
 	}
 
+	preload () {} // should be idempotent
+
 	seek (t) {
 		let t_prev = this.t;
 		this.t = t;

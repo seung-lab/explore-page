@@ -216,6 +216,7 @@ function simpleTransition (cur, next, t, animationargs) {
 
 	let scrolled = $.Deferred();
 
+	next.preload();
 	next.enter(scrolled, cur.name);
 	
 	MC.container.append(spacer);
@@ -316,6 +317,8 @@ ModuleCoordinator.render = function (prev_t, t, transition) {
 	let current_mod = ModuleCoordinator.moduleAt(t);
 
 	ModuleCoordinator.timeline.fullManual(!!current_mod.manual_timeline);
+
+	current_mod.preload();
 
 	if (prev_mod !== current_mod) {
 		prev_mod.exit();
