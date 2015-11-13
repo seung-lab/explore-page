@@ -22,7 +22,10 @@ $(document).ready(function () {
 	let t = $.url(window.location.href).param('t');
 
 	if (t === undefined) {
-		//_intakectrl.playIntro();
+		Utils.UI.curtainRise(function () {
+			_intakectrl.playIntro();
+		}, 250);
+
 		Login.bindResizeEvents('gateway');
 	}
 	else {
@@ -39,16 +42,6 @@ $(document).ready(function () {
 		jumpToExplore(t, transition);
 	}
 });
-
-$(window).load(function () {
-//$(document).ready(function () {
-	let t = $.url(window.location.href).param('t');
-
-	if (t === undefined) {
-		_intakectrl.playIntro();
-		//Login.bindResizeEvents('gateway');
-	}
-})
 
 function jumpToExplore (t, transition) {
 	Login.takeMeTo('explore');

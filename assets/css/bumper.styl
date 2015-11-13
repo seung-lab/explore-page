@@ -40,7 +40,7 @@ $dot-timer = 500ms
 	transform translateX(0px)
 	// transform rotate(45deg)
 		
-	animation-duration 350ms
+	animation-duration 500ms
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function cubic-bezier(0.64, 0.57, 0.67, 1.53)
@@ -55,7 +55,7 @@ $dot-timer = 500ms
 	left 52px
 	top 49px
 	
-	background url(../images/icons/E.svg)
+	background url("../images/icons/E.svg")
 	background-size 150px 150px
 	background-position 117px 133px
 		
@@ -86,7 +86,7 @@ $dot-timer = 500ms
 	left 25px
 	top 85px
 	
-	background url(../images/icons/dot.svg)
+	background url("../images/icons/dot.svg")
 	background-size 150px 150px
 	background-position center
 	
@@ -194,7 +194,7 @@ pop-fn($start, $scale, $multiplier, $animation-name)
 		100%
 			transform scale($displacement, $displacement)
 			
-pop-fn(0, 1, 1,pop-Es)
+pop-fn(0, 1, 1, pop-Es)
 pop-fn(0, 1, 1, pop-dots)
 
 

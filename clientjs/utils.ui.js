@@ -507,7 +507,7 @@ Utils.UI.checkbox = function (state, input) {
 };
 
 
-Utils.UI.curtainRise = function (fn) {
+Utils.UI.curtainRise = function (fn, delay = 100) {
 	let curtain = $('<div>').addClass('curtain');
 	$('body').append(curtain);
 
@@ -518,16 +518,16 @@ Utils.UI.curtainRise = function (fn) {
 			});
 
 		fn();
-	}, 100);
+	}, delay);
 };
 
-Utils.UI.curtainFall = function (fn) {
+Utils.UI.curtainFall = function (fn, delay = 100) {
 	let curtain = $('<div>').addClass('curtain fall');
 	$('body').append(curtain);
 
 	setTimeout(function () {
 		curtain.removeClass('fall').motionend(fn);
-	}, 100);
+	}, delay);
 };
 
 
