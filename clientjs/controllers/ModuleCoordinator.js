@@ -8,7 +8,8 @@ let utils = require('../utils.js'),
 	Wonderers = require('../../components/modules/wonderers.js'),
 	Superheroes = require('../../components/modules/superheroes.js'),
 	Melt = require('../../components/modules/melt.js'),
-	MeltMobile = require('../../components/modules/melt-mobile.js');
+	MeltMobile = require('../../components/modules/melt-mobile.js'),
+	GLOBAL = require('../GLOBAL.js');
 
 let _t = 0;
 
@@ -54,6 +55,9 @@ ModuleCoordinator.initialize = function (animation) {
 
 	ModuleCoordinator.initHotkeys();
 
+	animation.done(function () {
+		$(GLOBAL.viewport).addClass('parallax-off'); // GPU performance boost
+	});
 
 	$(window).ion('scrollStart', function (e, down) {
 		if (down) {

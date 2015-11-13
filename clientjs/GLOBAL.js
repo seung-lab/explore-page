@@ -1,7 +1,8 @@
-
+let $ = require('jquery');
 
 module.exports = {
 	takenusernames: {}, // cache for quick evaluation
 	takenemails: {},
-	lastclick: "standard" // for determining the action of the enter key
+	lastclick: "standard", // for determining the action of the enter key
+	viewport: '#viewport',
 };
