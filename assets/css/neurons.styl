@@ -101,24 +101,28 @@
 	)
 
 @media only screen and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 2)
-	.neuron-layer div
-		background-size 50% !important
-		
 	.neuron-layer.intake-front .left
+		parallax-neuron-mobile("/images/background/front-left-mobile.png")
 		left calc(-470px + 25%)
-		bottom -440px
+		bottom -150px
 		
 	.neuron-layer.intake-front .right
+		parallax-neuron-mobile("/images/background/front-right-mobile.png")
 		left calc(-585px + 75%)
-		bottom -340px
+		bottom -110px
 		
 	.neuron-layer.intake-carpet .neuron
-		bottom -220px
+		parallax-neuron-mobile("/images/background/neural-carpet-blur-mobile.png")
+		bottom -80px
 		left calc(50% - 1000px / 2)
 		
 	.neuron-layer.intake-rear .left
+		parallax-neuron-mobile("/images/background/rear-left-blur-mobile.png")
 		left calc(-180px + 8%)
-		bottom -145px
-		
+		bottom -45px
+	
+	.neuron-layer.intake-rear .right
+		1
+
 	.neuron-layer.intake-middle
 		display none

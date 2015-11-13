@@ -50,7 +50,18 @@ parallax-neuron($url, $side, $dx, $dy)
 		right $computation
 	else if $side is 'center'
 		left s("calc(50% - %s / 2)", @width)
+
+parallax-neuron-mobile($url)
+	width image-size(pathjoin($IMAGES_DIR, $url))[0]
 	
+	// HACK: stylus appearently runs mixins/fns
+	// after evaluating the function body so @height isn't defined yet
+	// if you use preserve-aspect-ratio so I'm inlining it
+	height unit(@width / aspect-ratio($url), 'px') 
+	
+	background-image url($url)
+	background-size contain 
+	background-repeat no-repeat
 	
 .column
 	justify-content center
