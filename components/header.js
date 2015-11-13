@@ -24,7 +24,7 @@ class Header extends Synapse {
 
 	generateView () {
 		let container = $('<div>').addClass('header');
-		let logo = $('<div>').addClass('logotype');
+		let logo = $('<div>').addClass('logotype invisible');
 
 		let share = $('<div>').addClass('icon share');
 		let before = $('<div>').addClass('before');
@@ -114,6 +114,11 @@ class Header extends Synapse {
 
 	render () {
 		let _this = this;
+
+		this.view.logo.removeClass('invisible');
+		if (Utils.isMobile() && !this.exploring && this.mode === 'share') {
+			this.view.logo.addClass("invisible")
+		}
 
 		[ 'login', 'register' ].forEach(function (icon) {
 			_this.view[icon].removeClass('visible');

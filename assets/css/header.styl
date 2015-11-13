@@ -11,6 +11,11 @@
 	z-index 100
 	pointer-events none
 	
+.header .invisible
+	opacity 0
+	transition opacity 250ms ease
+
+	
 .header div
 	pointer-events auto
 	transition opacity 2s
@@ -33,6 +38,7 @@ $corner_offset = 35px
 	height 40px
 	
 	cursor pointer
+	
 	
 .header .share,
 .header .login,
@@ -121,7 +127,7 @@ $corner_offset = 35px
 	border 1px solid $TEXT_BLUE
 	border-radius 15px
 	width 225px
-	height 48px
+	height 50px
 	
 
 .header .register .content
@@ -142,12 +148,12 @@ $corner_offset = 35px
 	
 .header .register .icon
 	float left
-	width 46px 
+	width 50px 
 	height 100%
 	background url("/images/icons/create-account-dark.svg")
 	background-size 50%
 	background-repeat no-repeat
-	background-position 10px 13px
+	background-position 10px 15px
 	
 	margin-left 10px
 	border-right 1px solid $TEXT_BLUE
@@ -169,6 +175,19 @@ $corner_offset = 35px
 		background-size 75px
 		width 50px
 		height 50px
+		
+	.header .content
+		display none
+		
+	.header .register .icon
+		background-position 4px 14px
+		border-right none
+		width 50px
+		height 50px
+		
+	.header .register	
+		border-radius 15px
+		width 50px
 
 	
 
