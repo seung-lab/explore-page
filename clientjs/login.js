@@ -95,8 +95,8 @@ Login.IntakeView = function () {
 
 		setTimeout(function () {
 
-			$('.bumper')
-				.addClass('visible') // triggers shrinking transition
+			$('.bumper').addClass('visible') // triggers shrinking transition
+			
 			setTimeout(function () {
 				$('#viewport').scrollTo('.gateway', {
 					msec: 2500,
