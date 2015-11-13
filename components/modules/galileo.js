@@ -1,8 +1,8 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js'),
-	TeaTime = require('../teatime.js'),
-	NNNSketch = require('./neurons/sketch.js');
+	TeaTime = require('../teatime.js');
+	// NNNSketch = require('./neurons/sketch.js');
 	
 class Galileo extends TeaTime {
 	constructor(args = {}) {

@@ -98,13 +98,13 @@ gulp.task('js', function () {
 	});
 
 	return b.bundle()
-		.pipe(source('intake.js'))
+		.pipe(source('intake.min.js'))
 		.pipe(buffer())
-		// .pipe(sourcemaps.init({loadMaps: true}))
+		.pipe(sourcemaps.init())
 		// 	// Add transformation tasks to the pipeline here.
-		// 	.pipe(uglify())
+			.pipe(uglify())
 		// 	.on('error', gutil.log)
-		// .pipe(sourcemaps.write('./'))
+		.pipe(sourcemaps.write('./'))
 		.pipe(gulp.dest('./dist/public/js/'));
 
 });
@@ -120,6 +120,7 @@ gulp.task('css', [ ], function () {
 		.pipe(autoprefixer({
 			browser: "> 1%, last 2 versions, Firefox ESR"
 		}))
+		.pipe(minifyCss())
 		.pipe(gulp.dest('dist/public/css/'))
 
 	// del([
