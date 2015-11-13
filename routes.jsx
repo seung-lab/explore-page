@@ -1,6 +1,5 @@
-// var React = require('react'),
-// 	Gateway = require('./components/gateway.jsx'),
-// 	Registration = require('./components/registration.jsx');
+
+let GLOBAL = require('./clientjs/GLOBAL.js');
 
 exports.index = function (req, res) {
 	res.render('index', { 
@@ -8,11 +7,6 @@ exports.index = function (req, res) {
 		title: "Explore | EyeWire",
 		mode: "login",
 		translation: " ",
-
-		base_url: "http://eyewire.org/explore",
-		// base_url: "",
-
-		// reactGateway: React.renderToString(<Gateway />),
-		// reactRegistration: React.renderToString(<Registration />),
+		base_url: GLOBAL.base_url,
 	});
 };
