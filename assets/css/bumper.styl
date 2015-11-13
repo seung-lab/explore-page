@@ -2,3 +2,233 @@
 @require 'controls.styl'
 @require 'colors.styl'
 
+/* Bumper Animation */
+
+// Variables
+$dot-delay-1 = 250ms
+$dot-delay-2 = 100ms
+$dot-delay-3 = 700ms
+
+// Dot rotation timer
+$dot-timer = 500ms
+
+.bumper 
+	opacity 0
+	transform-origin 100px 100px
+	transition transform 250ms ease
+	
+.bumper.visible 
+	opacity 1
+
+	animation-duration 1000ms
+	animation-delay $dot-delay-3
+	animation-fill-mode forwards
+	animation-iteration-count once
+	animation-timing-function ease-out
+	
+	animation-name rotate-bumper	
+	
+.bumper .Es
+	position absolute
+	
+	transform-origin 100px 100px
+	transform translateX(0px)
+	// transform rotate(45deg)
+		
+	animation-duration 350ms
+	animation-fill-mode forwards
+	animation-iteration-count once
+	animation-timing-function cubic-bezier(0.64, 0.57, 0.67, 1.53)
+	
+	animation-name pop-Es
+
+.bumper .E
+	position absolute
+	width 100px
+	height 100px
+	
+	left 52px
+	top 49px
+	
+	background url(../images/icons/E.svg)
+	background-size 150px 150px
+	background-position 117px 133px
+		
+.bumper .E-right
+	transform rotate(-180deg)
+	// background-position 100px 100px
+		
+.bumper .dots
+	position absolute
+	opacity 0
+	
+	transform-origin 100px 100px
+	// transform translateX(0px)
+	
+	animation-delay $dot-delay-1
+	animation-duration $dot-timer
+	animation-fill-mode forwards
+	animation-iteration-count once
+	animation-timing-function ease-in
+	
+	animation-name rotate-dots
+	
+.bumper .dot
+	position absolute
+	width 25px
+	height 25px
+	
+	left 25px
+	top 85px
+	
+	background url(../images/icons/dot.svg)
+	background-size 150px 150px
+	background-position center
+	
+	animation-name pop-dots
+	
+.bumper .dot-left
+	animation-duration $dot-timer
+	animation-delay $dot-delay-1
+	animation-fill-mode forwards
+	animation-iteration-count once
+	animation-timing-function ease-in
+	
+	animation-name radius-left-dot 
+
+.bumper .dot-right
+	top 85px
+	left 150px	
+	
+	animation-duration $dot-timer
+	animation-delay $dot-delay-1
+	animation-fill-mode forwards
+	animation-iteration-count once
+	animation-timing-function ease-in
+	
+	animation-name radius-right-dot
+	
+#intake-logo::before,
+#intake-logo::after
+	content " "
+	display block
+	width 0px
+	height 2px
+	
+	background-color $LOGO_BLUE
+	border none
+	outline none
+	position absolute
+	top 50%
+	
+	animation-iteration-count 1
+	animation-timing-function ease-in
+	animation-fill-mode forwards
+	animation-delay 200ms
+	animation-duration 750ms
+
+$logo_rule_start_pos = 100%
+
+#intake-logo::after
+	animation-name motion-rule-right
+	left $logo_rule_start_pos
+	
+#intake-logo::before
+	animation-name motion-rule-left
+	right $logo_rule_start_pos
+
+
+/* Animation Properties */
+
+// Variable for rotation radius
+$radius = 21
+      
+// Radius animaton function generator
+radius-fn($start, $multiplier, $animation-name)
+	$displacement = ($start - $radius) * $multiplier
+	
+	@keyframes {$animation-name}
+		0%
+			transform translateX(unit($start, px))
+		100%
+			transform translateX(unit($displacement, px))
+
+radius-fn(0, -1, radius-left-dot)
+radius-fn(0, 1, radius-right-dot)
+
+
+// Rotation animaton function generator
+rotation-fn($start, $degrees, $multiplier, $animation-name)
+	$displacement = $degrees * $multiplier
+	
+	@keyframes {$animation-name}
+		0%
+			transform rotateZ(unit($start, deg))
+		15%
+			opacity 1
+		100%
+			transform rotateZ(unit($displacement, deg))
+			opacity 1
+			
+rotation-fn(0, 75, 1, rotate-dots)
+rotation-fn(0, 45, 1, rotate-bumper)
+
+
+// Pop scale animaton function generator
+pop-fn($start, $scale, $multiplier, $animation-name)
+	$displacement = $scale * $multiplier
+	
+	@keyframes {$animation-name}
+		0%
+			transform scale($start, $start)
+		100%
+			transform scale($displacement, $displacement)
+			
+pop-fn(0, 1, 1,pop-Es)
+pop-fn(0, 1, 1, pop-dots)
+
+
+// Animation for horizontal rules
+@keyframes motion-rule-right {
+	0% {
+		width 0%
+		left $logo_rule_start_pos
+	}
+	65% {
+		left $logo_rule_start_pos + 25%
+	}
+	100% {
+		left 600%
+		width 500%
+	}
+}	
+
+@keyframes motion-rule-left {
+	0% {
+		width 0%
+		right $logo_rule_start_pos
+	}
+	65% {
+		right $logo_rule_start_pos + 25%
+	}
+	100% {
+		right 600%
+		width 500%
+	}
+}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

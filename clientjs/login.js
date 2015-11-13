@@ -95,18 +95,15 @@ Login.IntakeView = function () {
 
 		setTimeout(function () {
 
-		Bumper.play($('#intake-logo')[0]);
-
+			$('.bumper')
+				.addClass('visible') // triggers shrinking transition
 			setTimeout(function () {
-				$('#gateway-logo').addClass('shrink'); // triggers shrinking transition
-				
 				$('#viewport').scrollTo('.gateway', {
 					msec: 2500,
 					easing: Easing.springFactory(.7, 1),
 				});
-			}, 2000);
-
-		}, 500);
+			}, 650);
+		}, 50);
 	};
 };
 
