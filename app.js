@@ -37,7 +37,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride());
 //app.use(require('stylus').middleware(path.join(__dirname, 'public')));
-app.use(serveStatic('dist/public'));
+app.use(serveStatic('dist/public', {
+	maxAge: '1h'
+}));
 app.use(favicon('dist/public/favicon.ico'));
 
 app.get('/', routes.index);
