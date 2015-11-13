@@ -38,6 +38,8 @@ class Melt extends TeaTime {
 		this.timeouts = {
 
 		};
+
+		this.loaded = false;
 	}
 
 	generateView () {
@@ -98,6 +100,18 @@ class Melt extends TeaTime {
 			],
 			white: whitePart,
 			next: next,
+		};
+	}
+
+	preload () {
+		if (this.loaded) {
+			return;
+		}
+
+		this.loaded = true;
+
+		for (var i = 0; i < SEQUENCE_COUNT; i++) {
+			$('<video>', { src: urlForVideo(true, i)});
 		};
 	}
 
@@ -268,7 +282,7 @@ class Melt extends TeaTime {
 		seqEl.forward = forward;
 
 		var src = document.createElement('source');
-		src.src = `./animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
+		src.src = urlForVideo(forward, sequence);
 
 		seqEl.appendChild(src);
 
@@ -295,6 +309,10 @@ class Melt extends TeaTime {
 			seqEl.style.display = 'inherit';
 
 			setTimeout(function () {
+				if (_this.currentVideo !== seqEl) {
+					return;
+				}
+
 				var videos = videoCache[true].concat(videoCache[false]);
 
 				for (var i = 0; i < videos.length; i++) {
@@ -477,6 +495,10 @@ var SequenceManager = {
 		return Math.min(teaTime, 0.999);
 	}
 };
+
+function urlForVideo(forward, sequence) {
+	return `./animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
+}
 
 function splitter (txt, inverted) {
 	let tokens = txt.split(" ").filter(function (str) { return str !== "" });
