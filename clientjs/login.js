@@ -94,9 +94,8 @@ Login.IntakeView = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
 		setTimeout(function () {
-
 			$('.bumper').addClass('visible') // triggers shrinking transition
-			
+
 			setTimeout(function () {
 				$('#viewport').scrollTo('.gateway', {
 					msec: 2500,

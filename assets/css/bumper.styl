@@ -13,9 +13,14 @@ $dot-delay-3 = 700ms
 $dot-timer = 500ms
 
 .bumper 
+	width 200px
+	height @width
+
 	opacity 0
 	transform-origin 100px 100px
 	transition transform 250ms ease
+	
+	center-horizontal()
 	
 .bumper.visible 
 	opacity 1
