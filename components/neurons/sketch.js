@@ -3,17 +3,17 @@
 
 // Recursive Neuron (P5js)
 
-var Easing = require('../../clientjs/easing.js'),
+let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
 	p5 = require('p5');
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
-var sprout = function (anchor, p) {
+let sprout = function (anchor, p) {
 	// Global Variables
 	// 
 	// Nnn Object
-	var _nnn = null, 
+	let _nnn = null, 
 	
 	// int
 		_counter = 0,
@@ -23,23 +23,20 @@ var sprout = function (anchor, p) {
 		_nnn_count = 0;
 
 	// Global font reference
-	var fontRegular;
+	let _fontRegular;
 
 	// Preload any required assets
 	p.preload = function () {
 		// Load font
-		fontRegular = p.loadFont("assets/WhitneyHTF-Medium.otf");
+		_fontRegular = p.loadFont("assets/WhitneyHTF-Medium.otf");
 	};
 
 	p.setup = function () {
-		var canvas = p.createCanvas(window.innerWidth, window.innerHeight);
 		p.frameRate(30);
-
-		canvas.parent(anchor);
 
 		// Set font characterists
 		p.push();
-			p.textFont(fontRegular);
+			p.textFont(_fontRegular);
 		p.pop();
 
 		// Calculate _nnn_count based on width
@@ -55,7 +52,6 @@ var sprout = function (anchor, p) {
 		// Run the _nnn
 		_nnn.run();
 
-
 		// plus_minus();
 		iterate();
 
@@ -66,15 +62,15 @@ var sprout = function (anchor, p) {
 		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
 		_nnn = new NNN({
 			num_neurons: _nnn_count,
-			complexity:  12,
-			p:           p,
+			complexity: 12,
+			p: p,
 		});
 
 		_nnn.initialize();
 	}
 
 	function plus_minus () {
-		if (p.frameCount % 1080 == 0) {
+		if (p.frameCount % 1080 === 0) {
 			// if (_counter > 0) console.log("Node #" + _nnn.neurons[0].nodes.length);
 			// console.log("");
 			_nnn.remove_neuron(_nnn_count);
@@ -87,7 +83,7 @@ var sprout = function (anchor, p) {
 	}
 
 	function iterate () {
-		if (p.frameCount % 1000 == 0) {
+		if (p.frameCount % 1000 === 0) {
 			_avg = avg_node(_nnn.neurons[0]);
 			network_start();
 			_counter++;
@@ -97,7 +93,7 @@ var sprout = function (anchor, p) {
 	}
 
 	function recurse () {
-		// var neuron = _nnn.neurons[p.round(p.random(_nnn.neurons.length))];
+		// let neuron = _nnn.neurons[p.round(p.random(_nnn.neurons.length))];
 		_nnn.neurons.forEach(function(neuron){
 			neuron.nodes.forEach(function(n) {
 				if (n.leaf) {
@@ -109,7 +105,6 @@ var sprout = function (anchor, p) {
 			});
 		});
 	}
-
 
 	// Quick Max Calc : Returns Integer
 	function max_node (n) {
@@ -126,20 +121,20 @@ var sprout = function (anchor, p) {
 
 	// User Interactions
 	function mousePressed () {
-		var mousePos = p.createVector(p.mouseX, p.mouseY);
+		let mousePos = p.createVector(p.mouseX, p.mouseY);
 		_nnn.add_neuron(mousePos);
 	}
 
-	p.keyPressed = function() {
-		if (p.keyCode == p.UP_ARROW) {
+	p.keyPressed = function () {
+		if (p.keyCode === p.UP_ARROW) {
 			recurse();
 		} 
+
 		return false; // prevent default
 	}
-
 }
 
-module.exports = function (anchor) {
+module.exports.init = function (anchor) {
 	let bound_sprout = sprout.bind(sprout, anchor);
 	return new p5(bound_sprout); // Instantiate the entire P5 sketch
 };

@@ -8,6 +8,8 @@
 // the last branches
 
 // Contructor: P5.Vector, P5.p
+"use strict";
+
 function Synapse (args = {}) {
 	// Private arguments from constructor
 	let p = args.p;

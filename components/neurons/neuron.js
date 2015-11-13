@@ -32,7 +32,7 @@ function Neuron (args) {
 	var list = false;
 
 	// Call methods to access outside of class this way!
-	this.neuron_setup = function() {
+	this.neuron_setup = function () {
 		var _this = this;
 		var start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
 		// Create a new Node instance
@@ -243,20 +243,6 @@ function Neuron (args) {
 	});
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
