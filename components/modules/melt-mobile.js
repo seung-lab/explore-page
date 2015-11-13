@@ -69,7 +69,7 @@ class MeltMobile extends TeaTime {
 		let slide0 = $('<div>', { id: 'meltMobile' + 0, class: 'meltSlide' });
 
 		let textcontainer = d('story-text');
-		let text = d('text caps').html(splitter("EyeWire is the first of it's kind", true));
+		let text = d('text caps').html(splitter("EyeWire is the first of its kind", true));
 		let counter = d('counter');
 		textcontainer.append(text, counter);
 
