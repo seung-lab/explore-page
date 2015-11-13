@@ -124,7 +124,9 @@ class Superheroes extends TeaTime {
 
 	render (t_prev, t) {
 		let _this = this; 
-
+		
+		_this.parent.sub_t_update(_this.name, 1);
+		
 		this.attachEventHandlers();
 
 		let slide = this.slideAt(t);

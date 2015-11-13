@@ -267,7 +267,7 @@ ModuleCoordinator.moduleAt = function (t) {
 		throw new Error("No modules were defined for this timeline.");
 	}
 
-	if (t === 1) {
+	if (Math.abs(1 - t) < 0.00001) {
 		return modules[modules.length - 1];
 	}
 
@@ -330,10 +330,10 @@ ModuleCoordinator.render = function (prev_t, t, transition) {
 
 	ModuleCoordinator.exitNonDisplayed(t);
 
+	ModuleCoordinator.updateTimeline(t);
+
 	let t_mod = ModuleCoordinator.toModuleT(current_mod, t);
 	current_mod.seek(t_mod);
-	
-	ModuleCoordinator.updateTimeline(t);
 }
 
 ModuleCoordinator.exitNonDisplayed = function (t) {
