@@ -56,9 +56,6 @@ body
 
 	transition height 2s ease-out, width 2s ease-out
 
-#intake-logo.shrink
-	transform scale(.33)
-	
 /* parallax layers */
 
 .parallax
@@ -69,6 +66,11 @@ body
 	position absolute
 	z-index 60
 	parallax(-700px)
+	
+#intake-logo.shrink #bumper
+	transition transform 2s ease-in-out
+	transform scale(.75) 
+	
 	
 #intake-logo.safari
 	1

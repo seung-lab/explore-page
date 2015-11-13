@@ -22,7 +22,7 @@ $dot-timer = 500ms
 	
 	center-horizontal()
 	
-.bumper.visible 
+#bumper.visible .bumper
 	opacity 1
 
 	animation-duration 1000ms
@@ -39,8 +39,9 @@ $dot-timer = 500ms
 	transform-origin 100px 100px
 	transform translateX(0px)
 	// transform rotate(45deg)
-		
-	animation-duration 500ms
+	
+#bumper.visible .Es
+	animation-duration 350ms
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function cubic-bezier(0.64, 0.57, 0.67, 1.53)
@@ -70,6 +71,7 @@ $dot-timer = 500ms
 	transform-origin 100px 100px
 	// transform translateX(0px)
 	
+#bumper.visible  .dots
 	animation-delay $dot-delay-1
 	animation-duration $dot-timer
 	animation-fill-mode forwards
@@ -86,13 +88,14 @@ $dot-timer = 500ms
 	left 25px
 	top 85px
 	
-	background url("../images/icons/dot.svg")
+	background url(../images/icons/dot.svg)
 	background-size 150px 150px
 	background-position center
 	
+#bumper.visible .dot
 	animation-name pop-dots
 	
-.bumper .dot-left
+#bumper.visible .dot-left
 	animation-duration $dot-timer
 	animation-delay $dot-delay-1
 	animation-fill-mode forwards
@@ -105,6 +108,7 @@ $dot-timer = 500ms
 	top 85px
 	left 150px	
 	
+#bumper.visible .dot-right
 	animation-duration $dot-timer
 	animation-delay $dot-delay-1
 	animation-fill-mode forwards
@@ -112,7 +116,7 @@ $dot-timer = 500ms
 	animation-timing-function ease-in
 	
 	animation-name radius-right-dot
-	
+
 #bumper 
 	width 200px
 	height 200px
@@ -139,11 +143,11 @@ $dot-timer = 500ms
 
 $logo_rule_start_pos = 100%
 
-#bumper::after
+#bumper.visible::after
 	animation-name motion-rule-right
 	left $logo_rule_start_pos
 	
-#bumper::before
+#bumper.visible::before
 	animation-name motion-rule-left
 	right $logo_rule_start_pos
 
@@ -194,7 +198,7 @@ pop-fn($start, $scale, $multiplier, $animation-name)
 		100%
 			transform scale($displacement, $displacement)
 			
-pop-fn(0, 1, 1, pop-Es)
+pop-fn(0, 1, 1,pop-Es)
 pop-fn(0, 1, 1, pop-dots)
 
 
