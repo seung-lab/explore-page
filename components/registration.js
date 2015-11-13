@@ -340,7 +340,7 @@ class Registration extends Synapse {
 		let logo = $('<img>')
 			.addClass('logo')
 			.attr({
-				src: "/images/ew.svg",
+				src: GLOBAL.base_url + "/images/ew.svg",
 				alt: "EyeWire Logo",
 			});
 
