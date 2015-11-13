@@ -117,7 +117,12 @@ class Superheroes extends TeaTime {
 
 		_this.view.play_now.ion('click', function () {
 			Utils.UI.curtainFall(function () {
-				document.location.href = 'https://eyewire.org/signup';
+				if (_this.mobile) {
+					document.location.href = "https://www.youtube.com/watch?v=bwcuhbj2rSI";
+				}
+				else {
+					document.location.href = 'https://eyewire.org/signup';
+				}
 			});
 		})
 	}
@@ -131,7 +136,12 @@ class Superheroes extends TeaTime {
 
 		let slide = this.slideAt(t);
 
-		// _this.view.play_now.text("PLAY NOW");
+		if (this.mobile) {
+			_this.view.play_now.text("LEARN MORE");
+		}
+		else {
+			_this.view.play_now.text("PLAY NOW");	
+		}
 
 		_this.view.text.html(Utils.pyramidLineBreak(slide.text));
 
