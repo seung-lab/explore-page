@@ -5,4 +5,5 @@ module.exports = {
 	takenemails: {},
 	lastclick: "standard", // for determining the action of the enter key
 	viewport: '#viewport',
+	base_url: 'http://eyewire.org/explore',
 };

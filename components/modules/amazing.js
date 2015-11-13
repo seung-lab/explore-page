@@ -1,7 +1,8 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js'),
-	TeaTime = require('../teatime.js');
+	TeaTime = require('../teatime.js'),
+	GLOBAL = require('../../clientjs/GLOBAL.js');
 	
 class Amazing extends TeaTime {
 	constructor(args = {}) {
@@ -9,10 +10,6 @@ class Amazing extends TeaTime {
 
 		this.name = 'Amazing';
 		this.allegience = 'light';
-
-		let path = function (name) {
-			return "/animations/amazing/" + name;
-		};
 
 		this.frameRateMsec = 83;
 
@@ -76,7 +73,7 @@ class Amazing extends TeaTime {
 		// opt = optimal, came from these bash commands:
 		// for i in *.jpg; do convert $i pnm:- | mozcjpeg -quality 70 > opt-$i; done
 		// for i in $(seq 1 49); do base64 -in f$i.png | xargs printf "\"%s\"," >> concat.json; done 
-		_this.animations.load = $.getJSON('/animations/amazing/sequence.json', function (json) {
+		_this.animations.load = $.getJSON(GLOBAL.base_url + '/animations/amazing/sequence.json', function (json) {
 			var frame = 0;
 
 			for (let i = 0; i < _this.slides.length; i++) {

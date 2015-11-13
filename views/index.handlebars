@@ -5,6 +5,8 @@
 	<title>{{ title }}</title>
 	<meta charset='UTF-8'>
 
+	<base href="{{ base_url }}" />
+
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<meta name="description" content="Play EyeWire to map the 3D structure of neurons and contribute to revolutionary crowd-sourced scientific discovery from Seung Lab.">
@@ -19,18 +21,6 @@
 	<link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Condensed:400,700|Vollkorn:400,400italic' rel='stylesheet' type='text/css'>
 
 	<script type="text/javascript" src="js/intake.min.js"></script> 
-
-	<script>
-		var GLOBAL = {
-			components: {},
-			mode: '{{ mode }}', // 'login' or 'registration'
-			takenusernames: {}, // cache for quick evaluation
-			takenemails: {},
-			registration: {
-				lastclick: "standard" // for determining the action of the enter key
-			}
-		}; 
-	</script>
 </head>
 <body>
 	<section id="viewport" class="parallax">

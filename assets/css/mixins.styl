@@ -1,6 +1,7 @@
 $PHI = 1.618
 
 $IMAGES_DIR = ".."
+$BASE_URL = 'http://eyewire.org/explore'
 
 center-horizontal(offset=0px)
 	position absolute
@@ -36,7 +37,7 @@ parallax-neuron($url, $side, $dx, $dy)
 	// if you use preserve-aspect-ratio so I'm inlining it
 	height unit(@width / aspect-ratio($url), 'px') 
 	
-	background-image url($url)
+	background-image url($BASE_URL + $url)
 	background-size contain 
 	background-repeat no-repeat
 	
@@ -59,7 +60,7 @@ parallax-neuron-mobile($url)
 	// if you use preserve-aspect-ratio so I'm inlining it
 	height unit(@width / aspect-ratio($url), 'px') 
 	
-	background-image url($url)
+	background-image url($BASE_URL + $url)
 	background-size contain 
 	background-repeat no-repeat
 	

@@ -1,7 +1,7 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
-	TeaTime = require('../teatime.js');
-
+	TeaTime = require('../teatime.js'),
+	GLOBAL = require('../../clientjs/GLOBAL.js');
 
 var EPS = 0.01;
 
@@ -12,10 +12,6 @@ class Melt extends TeaTime {
 		this.name = 'Melt';
 		this.allegience = 'dark';
 		this.manual_timeline = true;
-
-		let path = function (name) {
-			return "/animations/melt/" + name;
-		};
 
 		this.duration = 10; // seconds
 
@@ -499,7 +495,7 @@ var SequenceManager = {
 };
 
 function urlForVideo(forward, sequence) {
-	return `./animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
+	return `${GLOBAL.base_url}/animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
 }
 
 function splitter (txt, inverted) {

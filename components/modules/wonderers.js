@@ -1,7 +1,8 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js'),
-	TeaTime = require('../teatime.js');
+	TeaTime = require('../teatime.js'),
+	GLOBAL = require('../../clientjs/GLOBAL.js');
 
 class Wonderers extends TeaTime {
 	constructor(args = {}) {
@@ -32,7 +33,7 @@ class Wonderers extends TeaTime {
 		let bg = d('wonderers bg-light module');
 
 		let image = $('<img>').attr({
-			src: '/images/wonderers.png',
+			src: GLOBAL.base_url + '/images/wonderers.png',
 		});
 
 		let supertext = d('super-text');

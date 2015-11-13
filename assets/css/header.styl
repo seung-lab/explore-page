@@ -1,4 +1,5 @@
 @require 'colors.styl'
+@require 'mixins.styl'
 
 .header
 	position fixed
@@ -32,7 +33,7 @@ $corner_offset = 35px
 	top $corner_offset
 	left $corner_offset
 	
-	background-image url('/images/logotype.svg') 
+	background-image url($BASE_URL + '/images/logotype.svg') 
 	background-size 150px
 	background-repeat no-repeat
 	width 150px
@@ -88,7 +89,7 @@ $corner_offset = 35px
 	
 	float left
 	
-	background-image url('/images/icons/sh-dark.svg') // ad-blocks sometimes block share.svg
+	background-image url($BASE_URL + '/images/icons/sh-dark.svg') // ad-blocks sometimes block share.svg
 	background-size @height @height
 	background-repeat no-repeat
 
@@ -116,7 +117,7 @@ $corner_offset = 35px
 	color $TEXT_BLUE
 
 .header .tertiary:before
-	background url("/images/icons/enter.svg")
+	background url($BASE_URL + "/images/icons/enter.svg")
 	background-size 65%
 	background-repeat no-repeat
 	background-position 5px 6px
@@ -151,7 +152,7 @@ $corner_offset = 35px
 	float left
 	width 50px 
 	height 100%
-	background url("/images/icons/create-account-dark.svg")
+	background url($BASE_URL + "/images/icons/create-account-dark.svg")
 	background-size 50%
 	background-repeat no-repeat
 	background-position 10px 15px
@@ -171,7 +172,7 @@ $corner_offset = 35px
 @media only screen and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 2)
 
 	.header .logotype
-		background-image url('/images/Es-dark.svg')
+		background-image url($BASE_URL + '/images/Es-dark.svg')
 		background-position -12px -12px
 		background-size 75px
 		width 50px

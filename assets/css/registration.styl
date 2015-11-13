@@ -35,15 +35,15 @@
 
 .registration .username 
 	@extend .registration .icon
-	background-image url("/images/icons/username.svg")
+	background-image url($BASE_URL + "/images/icons/username.svg")
 
 .registration .email 
 	@extend .registration .icon
-	background-image url("/images/icons/email.svg")
+	background-image url($BASE_URL + "/images/icons/email.svg")
 	
 .registration .password
 	@extend .registration .icon
-	background-image url("/images/icons/password.svg")
+	background-image url($BASE_URL + "/images/icons/password.svg")
 
 .registration .logo 
 	width 150px
@@ -78,7 +78,7 @@ div.fb-connect
 div.fb-connect::before
 	@extend div.tertiary:before
 	
-	background-image url("/images/icons/fb.svg")
+	background-image url($BASE_URL + "/images/icons/fb.svg")
 	background-repeat no-repeat
 	background-position 6px 2px
 	background-size 20px

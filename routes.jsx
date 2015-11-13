@@ -9,6 +9,8 @@ exports.index = function (req, res) {
 		mode: "login",
 		translation: " ",
 
+		base_url: "http://eyewire.org/explore",
+
 		// reactGateway: React.renderToString(<Gateway />),
 		// reactRegistration: React.renderToString(<Registration />),
 	});
