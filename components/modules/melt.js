@@ -300,6 +300,10 @@ class Melt extends TeaTime {
 			seqEl.currentTime = start;
 		});
 
+		seqEl.addEventListener('play', function () {
+			_this.view.next.hide();
+		});
+
 		seqEl.addEventListener('seeked', function () {
 			_this.currentVideo = seqEl;
 			// console.log('seeked', forward, sequence);
@@ -363,8 +367,6 @@ class Melt extends TeaTime {
 		}, 15);
 
 		seqEl.scrollHandler = function (down) {
-			_this.view.next.hide();
-
 			if (!seqEl.started) {
 				// console.log('not started', sequence);
 				if (down === forward) {
