@@ -29,6 +29,7 @@ Login.initialize = function () {
 		login: Login,
 	});
 	_components.gateway.enter();
+	_components.gateway.render();
 
 	_components.registration = new Registration({ 
 		anchor: '#intake',

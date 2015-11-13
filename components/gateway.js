@@ -61,15 +61,17 @@ class Gateway extends Synapse { // You can only build within a pylon field
 
  		this.view.explorebtn.hide();
 
- 		setTimeout(function () {
- 			_this.view.explorebtn.drop({
-				msec: 2000,
-				easing: Easing.bounceFactory(0.5),
-				side: 'bottom',
-				displacement: 25,
-			});
-			_this.view.explorebtn.show();
- 		}, 3500);
+ 		if (!Utils.isMobile()) {
+	 		setTimeout(function () {
+	 			_this.view.explorebtn.drop({
+					msec: 2000,
+					easing: Easing.bounceFactory(0.5),
+					side: 'bottom',
+					displacement: 25,
+				});
+				_this.view.explorebtn.show();
+	 		}, 3500);
+	 	}
 
  		this.view.startbtn.ion('click', function () {
  			// $('#explore').hide();
@@ -86,6 +88,11 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			// 	Login.initRegistration(transition);
 			// }
 
+			if (Utils.isMobile()) {
+				_this.beginExploring();
+				return;
+			}
+
 			Utils.UI.curtainFall(function () {
 				if ($.cookie('visited')) {
 					document.location.href = 'https://eyewire.org/login';
@@ -97,21 +104,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		});
 
  		this.view.explorebtn.ion('click', function () {
- 			_this.animations.dip.reject();
- 			_this.view.explorebtn.off('mouseenter mouseleave');
-
- 			$('#registration').hide();
-
- 			Login.initExploring();
-
-			let transition = $('#viewport')
-				.scrollTo('#explore', {
-					msec: 2000,
-					easing: Easing.sigmoidFactory(12),
-				});
-
-			ModuleCoordinator.initialize(transition);
-			ModuleCoordinator.seek(0, transition);
+ 			_this.beginExploring();	
  		})
 
  		this.view.explorebtn.ion('mouseenter', function () {
@@ -121,6 +114,26 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.explorebtn.ion('mouseleave', function () {
  			_this.dipReveal(0);
  		});
+ 	}
+
+ 	beginExploring () {
+ 		let _this = this;
+
+ 		_this.animations.dip.reject();
+		_this.view.explorebtn.off('mouseenter mouseleave');
+
+		$('#registration').hide();
+
+		Login.initExploring();
+
+		let transition = $('#viewport')
+			.scrollTo('#explore', {
+				msec: 2000,
+				easing: Easing.sigmoidFactory(12),
+			});
+
+		ModuleCoordinator.initialize(transition);
+		ModuleCoordinator.seek(0, transition);
  	}
 
  	dipReveal (offset) {
@@ -133,6 +146,19 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			easing: Easing.parabolic,
 			offset: offset,
 		});
+ 	}
+
+ 	render () {
+ 		let _this = this;
+ 		let mobile = Utils.isMobile();
+
+ 		if (mobile) {
+ 			_this.view.explorebtn.hide();
+ 			_this.view.startbtn.text("Explore");
+ 		}
+ 		else {
+ 			_this.view.startbtn.text("Play Now");
+ 		}
  	}
  }
 
