@@ -8,6 +8,9 @@
 // the last branches
 
 // Contructor: P5.Vector, Integer, Float, Integer
+
+let p5 = require('p5');
+
 function Neuron (args) {
 	args = args || {};
 
@@ -34,18 +37,18 @@ function Neuron (args) {
 		var start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
 		// Create a new Node instance
 		var n = new Node ({
-					neuron_timer: 	_this.neuron_timer,
-					max_depth: 		_this.max_depth,
-					position: 		_this.position,
-					velocity: 			  start_velocity,
-					depth: 				  0,
-					mass: 				  128, //Huge mass for soma!
-					id: 				  0,
-					p: 					  p,
-				});	
+			neuron_timer: 	_this.neuron_timer,
+			max_depth: 		_this.max_depth,
+			position: 		_this.position,
+			velocity: 		start_velocity,
+			depth: 			0,
+			mass: 			128, // Huge mass for soma!
+			id: 			0,
+			p: 				p,
+		});	
+
 		// Add to arraylist
 		_this.nodes.push(n); 
-
 	}
 
 	this.network_setup = function() {

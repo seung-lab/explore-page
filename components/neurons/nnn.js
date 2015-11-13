@@ -6,7 +6,9 @@
 
 // A class for controlling the interactions across the enire network
 
-function Nnn(args) {
+let p5 = require('p5');
+
+function Nnn (args) {
 	args = args || {};
 
 	// Private arguments from constructor
