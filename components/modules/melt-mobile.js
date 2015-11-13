@@ -95,7 +95,7 @@ class MeltMobile extends TeaTime {
 			vidContainer.append(slide);
 		}
 
-		$.getJSON('./animations/Melt_Sequence/mobile/realgood/xt/concat.json', function (json) {
+		$.getJSON('./animations/melt/mobile/concat.json', function (json) {
 			for (let i = 1; i < SLIDE_COUNT; i++) {
 				_this.slides[i].el.children().first().attr('src', 'data:image/png;base64,' + json[i - 1]);
 			}
