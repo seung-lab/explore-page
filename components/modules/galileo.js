@@ -326,7 +326,7 @@ class Galileo extends TeaTime {
 
 			_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
 
-			if (slide.big.number.length > 2) {
+			if (slide.big.number >= 100) {
 				_this.view.bignumber.number.addClass('hundred');
 			}
 
