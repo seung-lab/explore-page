@@ -4,11 +4,6 @@
 @require 'parallax.styl'
 @require 'scrollbar.styl'
 
-@media only screen and (max-width: 750px) {
-
-
-}
-
 .neuron-layer
 	pointer-events none
 
@@ -104,4 +99,26 @@
 		$dx: 1, 
 		$dy: 150px
 	)
-	
+
+@media only screen and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 2)
+	.neuron-layer div
+		background-size 50% !important
+		
+	.neuron-layer.intake-front .left
+		left calc(-470px + 25%)
+		bottom -440px
+		
+	.neuron-layer.intake-front .right
+		left calc(-585px + 75%)
+		bottom -340px
+		
+	.neuron-layer.intake-carpet .neuron
+		bottom -220px
+		left calc(50% - 1000px / 2)
+		
+	.neuron-layer.intake-rear .left
+		left calc(-180px + 8%)
+		bottom -145px
+		
+	.neuron-layer.intake-middle
+		display none
