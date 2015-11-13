@@ -20,7 +20,7 @@ class Galileo extends TeaTime {
 			},
 			{
 				big: {
-					number: "80",
+					number: 80,
 					high: "Your brain contains",
 					medium: "billion",
 					low: "neurons",
@@ -28,7 +28,7 @@ class Galileo extends TeaTime {
 			},
 			{
 				big: {
-					number: "100",
+					number: 100,
 					high: "Connected through",
 					medium: "trillion",
 					low: "synapses",
@@ -67,6 +67,7 @@ class Galileo extends TeaTime {
 
 		this.animations = {
 			text: $.Deferred().resolve(),
+			count: $.Deferred().resolve(),
 		};
 	}
 
@@ -192,6 +193,80 @@ class Galileo extends TeaTime {
 		}
 	}
 
+	// Reenable if we decide to go for the ticking animation
+
+	// next () {
+	// 	let slide = this.slideAt(this.t);
+	// 	let next_slide = this.slides[slide.index + 1];
+
+	// 	if (next_slide && next_slide.big) {
+	// 		this.animateNumberCount(slide, next_slide);
+	// 	}
+
+	// 	super.next()
+	// }
+
+	// previous () {
+	// 	let slide = this.slideAt(this.t);
+	// 	let prev_slide = this.slides[slide.index + 1];
+
+	// 	if (prev_slide && prev_slide.big) {
+	// 		this.animateNumberCount(prev_slide, slide);
+	// 	}
+
+	// 	super.previous()
+	// }
+
+	animateNumberCount (slide_from, slide_to) {
+		let _this = this;
+
+		_this.animations.count.reject();
+
+		if (!slide_from.big || !slide_to.big) {
+			return;
+		}
+
+		let begin = slide_from.big.number,
+			end = slide_to.big.number;
+
+		let delta = (end - begin);
+
+		let deferred = $.Deferred();
+
+		let start_time = window.performance.now();
+
+		let msec = 1000,
+			tick = 50;
+
+		let timeout = setInterval(function () {
+			let now = window.performance.now();
+
+			let t = (now - start_time) / msec;
+
+			if (t >= 1) {
+				deferred.resolve();
+				return;
+			}
+
+			let proportion = Easing.parabolic(t);
+			let ct = begin + Math.floor(proportion * delta);
+
+			_this.view.bignumber.number.text(ct);
+		}, tick);
+
+		deferred
+			.done(function () {
+				_this.view.bignumber.number.text(end);
+			})
+			.always(function () {
+				clearInterval(timeout);
+			});
+
+		_this.animations.count = deferred;
+
+		return this;
+	}
+
 	animateTextScamble (slide) {
 		let _this = this;
 		let elem = _this.view.story.text;
@@ -216,6 +291,8 @@ class Galileo extends TeaTime {
 				utils.invertedPyramidLineBreak(slide.text)
 			);
 		}
+
+		return this;
 	}
 
 	render (t_prev, t) {
