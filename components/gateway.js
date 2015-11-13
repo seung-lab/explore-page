@@ -103,6 +103,10 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			});
  		});
 
+ 		$(window).one('scrollStart', function () {
+ 			_this.beginExploring();
+ 		});
+
  		this.view.explorebtn.ion('click', function () {
  			_this.beginExploring();	
  		})
