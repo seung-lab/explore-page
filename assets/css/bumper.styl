@@ -113,8 +113,13 @@ $dot-timer = 500ms
 	
 	animation-name radius-right-dot
 	
-#intake-logo::before,
-#intake-logo::after
+#bumper 
+	width 200px
+	height 200px
+	center()
+	
+#bumper::before,
+#bumper::after
 	content " "
 	display block
 	width 0px
@@ -129,16 +134,16 @@ $dot-timer = 500ms
 	animation-iteration-count 1
 	animation-timing-function ease-in
 	animation-fill-mode forwards
-	animation-delay 200ms
+	animation-delay 100ms
 	animation-duration 750ms
 
 $logo_rule_start_pos = 100%
 
-#intake-logo::after
+#bumper::after
 	animation-name motion-rule-right
 	left $logo_rule_start_pos
 	
-#intake-logo::before
+#bumper::before
 	animation-name motion-rule-left
 	right $logo_rule_start_pos
 
