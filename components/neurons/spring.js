@@ -6,10 +6,10 @@
 
 // A class for defining the spring interactions between nodes
 
-let p5 = require('p5');
-
 // Constructor
-function Spring (args = {}) {
+function Spring(args) {
+	args = args || {};
+
 	var p = args.p || p5;
 
 	// Initialize spring with 2 Nodes and a resting length
@@ -17,9 +17,6 @@ function Spring (args = {}) {
 	// No, calculate resting length on instantiation
 	this.node1 = args.node1 || {};
 	this.node2 = args.node2 || {};
-
-	// Spring constant
-	var _k = 0.2;
 
 	// console.log("1: " + this.node1.id + " + 2: " + this.node2.id);
 
@@ -31,6 +28,8 @@ function Spring (args = {}) {
 	// Starting delta (p5.Vector)
 	this.rest_delta = this.delta_position();
 
+	// Spring constant
+	var k = 0.2;
 	// Calculate spring force between neighbors
 	this.neighbor = function() {
 		var _this = this;
@@ -40,14 +39,14 @@ function Spring (args = {}) {
 		var displacement = p5.Vector.sub(_this.rest_delta, force);
 
 		// Calculate force according to Hooke's Law
-		// F = _k * stretch
+		// F = k * stretch
 		// force.normalize();
-		displacement.mult(_k);
-		// force.mult(-1 * _k * displacement);
+		displacement.mult(k);
+		// force.mult(-1 * k * displacement);
 
 		_this.node1.applyForce(displacement);	//
 		displacement.mult(-1); 			// Mult (-1) so they attract || repel !
-		_this.node2.applyForce(displacement);
+		_this.node2.applyForce(displacement);	//
 	}
 
 	this.update = function() {
@@ -66,9 +65,8 @@ function Spring (args = {}) {
 
 		p.push();
 			p.strokeWeight(1);
-			p.stroke(255, 0, 0, 100);
-		
-			// Direction Lines
+			p.stroke(255,0,0,100);
+		// 	// Direction Lines
 			p.line(
 				_this.node1.position.x,
 				_this.node1.position.y,
