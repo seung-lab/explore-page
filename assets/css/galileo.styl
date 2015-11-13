@@ -42,7 +42,7 @@
 	font-style italic
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
 	font-weight 400
-	font-size 24px
+	font-size 30px
 	text-transform none
 	letter-spacing 0px
 
@@ -75,20 +75,27 @@
 	font-size 10px
 	letter-spacing 1px
 	
+.galileo .story-text .counter
+	bottom -52px
+	
 .galileo .story-text-big .counter
-	bottom 0px
+	bottom -20px
+	font-size 6px
+	letter-spacing 5px
 	
 .galileo .story-text-big .high-text
 	@extend .galileo .story-text .text.italics
 	text-transform lowercase
+	font-size 30px
 	
 .galileo .story-text-big .medium-text
-	font-size 70px
-	letter-spacing 10px
-	line-height 70px
+	font-size 85px
+	letter-spacing 5px
+	line-height 1em
 	
 .galileo .story-text-big .low-text
-	letter-spacing 15px
+	font-size 30px
+	letter-spacing 16px
 	
 .galileo .big-number
 	position absolute
@@ -97,14 +104,119 @@
 	z-index 0
 	font-size 400px
 	font-weight 400
+	letter-spacing -15px
+	margin-left -1.5%
 
 	color $BIG_NUMBER_BLUE
 	
 	width 100%
 	height 100%
 	text-align center
+	
+	transition top 250ms ease
+	transition font-size 250ms ease
 
 .neural-network
 	height 100%
 	width 100%
+	
+
+
+/*
+ *	Media Queries
+ */
+
+
+
+// ---> Small Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 1)
+	.galileo .big-number
+		top -25px	
+		font-size 400px
+	
+	.galileo .story-text-big .high-text
+		font-size 30px
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+	.galileo .big-number
+		top -25px	
+		font-size 400px
+		
+	.galileo .story-text-big .high-text
+		font-size 30px
+
+
+
+// ---> Medium Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 1000px) and (-webkit-min-device-pixel-ratio: 1)
+	.galileo .big-number
+		top -85px	
+		font-size 500px
+	
+	.galileo .story-text-big .counter
+		bottom -30px
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+	.galileo .big-number
+		top -85px	
+		font-size 500px
+		
+	.galileo .story-text-big .counter
+		bottom -30px
+		
+		
+
+// ---> Large Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 1500px) and (-webkit-min-device-pixel-ratio: 1)
+	.galileo .big-number
+		top -135px
+		font-size 600px
+		
+	.galileo .story-text-big .medium-text
+		font-size 100px
+		
+	.galileo .story-text-big .high-text
+		font-size 36px
+	
+	.galileo .story-text-big .low-text
+		font-size 36px
+		
+	.galileo .story-text-big .counter
+		bottom -40px
+		
+	.galileo .story-text .text.italics
+		font-size 36px
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 1500px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+	.galileo .big-number
+		top -135px	
+		font-size 600px
+		
+	.galileo .story-text-big .medium-text
+		font-size 100px
+		
+	.galileo .story-text-big .high-text
+		font-size 36px
+		
+	.galileo .story-text-big .low-text
+		font-size 36px
+		
+	.galileo .story-text-big .counter
+		bottom -40
+		
+	.galileo .story-text .text.italics
+		font-size 36px
+
 	

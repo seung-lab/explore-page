@@ -6,10 +6,13 @@
 	@extend .module-font
 
 .wonderers img
-	height 400px
+	height 750px
 	width @height * 1.333 // aspect ratio of this image
 	
-	center($dy=-25px)
+	transition width 250ms ease
+	transition height 250ms ease
+	transition left 250ms ease
+	transition top 250ms ease
 	
 .wonderers .story-text
 	@extend .amazing .story-text
@@ -18,4 +21,81 @@
 	
 .wonderers .story-text:before
 	display none
+	
+
+	
+/*
+ *	Media Queries
+ */
+ 
+
+
+// ---> Small Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 1)
+
+	.wonderers img
+		height 600px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-25px)
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+
+	.wonderers img
+		height 600px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-25px)
+
+
+
+// ---> Medium Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 1000px) and (-webkit-min-device-pixel-ratio: 1)
+	
+	.wonderers img
+		height 700px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-50px)
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+
+	.wonderers img
+		height 700px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-50px)
+
+
+
+// ---> Large Screen
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-width: 1500px) and (-webkit-min-device-pixel-ratio: 1)
+
+	.wonderers img
+		height 800px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-100px)
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 1500px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+
+	.wonderers img
+		height 800px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-100px)
+
+
 	
