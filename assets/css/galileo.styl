@@ -36,8 +36,6 @@
 	
 	white-space nowrap
 	
-// .galileo .story-text .text.caps
-	
 .galileo .story-text .text.italics
 	font-style italic
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
@@ -230,5 +228,89 @@
 		
 	.galileo .story-text .text.italics
 		font-size 36px
+		
+
+		
+/* ----------- Mobile Media Queries ----------- */
+
+/*
+ *	Set to hit an iPhone 6+
+ */
+
+@media only screen and (max-device-width: 414px) and (-webkit-min-device-pixel-ratio: 2)
+		
+		.counter 
+			display none
+
+		.galileo .story-text .text.italics	
+			font-size 30px
+			width 375px
+			height auto
+			bottom 15%
+			white-space normal
+		
+		.galileo .story-text
+			white-space normal
+			width 375px
+			height auto
+			center()
+			
+		.galileo .super-text
+			width 375px
+			height auto
+			top -42px
+			font-size 30px
+			
+/*
+ *	Set to hit an iPhone 6
+ */
+			
+@media only screen and (max-device-width: 375px) and (-webkit-min-device-pixel-ratio: 2)
+			
+		.galileo .story-text .text.italics
+			font-size 24px
+			width 325px
+			height auto
+			white-space normal
+		
+		.galileo .story-text
+			white-space normal
+			width 325px
+			height auto
+			center()
+			
+		.galileo .text-caps
+			height auto
+			
+		.galileo .super-text
+			width 325px
+			height auto
+			font-size 24px
+			top -35px
+			
+/*
+ *	Set to hit an iPhone 5 + 4
+ */
+			
+@media only screen and (max-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2)
+			
+		.galileo .story-text .text.italics
+			font-size 18px
+			width 275px
+			white-space normal
+			height auto
+			
+		.galileo .story-text
+			white-space normal
+			width 275px
+			height auto
+			center()
+			
+		.galileo .super-text
+			width 275px
+			height auto
+			font-size 18px
+			top -25px
+			
 
 	
