@@ -22,7 +22,7 @@ $(document).ready(function () {
 	let t = $.url(window.location.href).param('t');
 
 	if (t === undefined) {
-		_intakectrl.playIntro();
+		//_intakectrl.playIntro();
 		Login.bindResizeEvents('gateway');
 	}
 	else {
@@ -39,6 +39,16 @@ $(document).ready(function () {
 		jumpToExplore(t, transition);
 	}
 });
+
+$(window).load(function () {
+//$(document).ready(function () {
+	let t = $.url(window.location.href).param('t');
+
+	if (t === undefined) {
+		_intakectrl.playIntro();
+		//Login.bindResizeEvents('gateway');
+	}
+})
 
 function jumpToExplore (t, transition) {
 	Login.takeMeTo('explore');
