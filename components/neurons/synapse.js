@@ -8,11 +8,9 @@
 // the last branches
 
 // Contructor: P5.Vector, P5.p
-function Synapse(args) {
-	args = args || {};
-
+function Synapse (args = {}) {
 	// Private arguments from constructor
-	var p = args.p;
+	let p = args.p;
 
 	// 'this' keyword sets the variable to public visibility
 	this.position = args.position.copy() || 0;
@@ -24,7 +22,7 @@ function Synapse(args) {
 	// 
 	// By placing 'this' infront of the function name 'display'  it is now
 	// accessible outside of the scope of the object.
-	this.display = function() {
+	this.display = function () {
 		_this = this;
 		p.noStroke();
 		p.fill(200,200);
@@ -34,6 +32,7 @@ function Synapse(args) {
 			5,
 			5
 		);   
-	}
+	};
 }
 
+module.exports = Synapse;

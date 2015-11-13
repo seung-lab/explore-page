@@ -5,30 +5,30 @@
 // Recursive Neuron (w/ ArrayList)
 
 // A class for controlling the interactions across the enire network
+"use strict";
 
-let p5 = require('p5');
+let p5 = require('p5'),
+	Neuron = require('./neuron.js');
 
-function Nnn (args) {
-	args = args || {};
-
+function NNN (args = {}) {
 	// Private arguments from constructor
-	var p = args.p;
+	let p = args.p;
 
 	// Public arguments from constructor
 	this.num_neurons = args.num_neurons || 1;
 	this.complexity = args.complexity  || 13;
 
-	// Generic public array variable : not an argument though
+	// Generic public array letiable : not an argument though
 	this.neurons = [];
 
 	this.max_depth;
 	this.num_branches;
 
 	// Array of all somas included in the NNN
-	var somas = [];
+	let somas = [];
 
 	this.initialize = function() {
-		var _this = this;
+		let _this = this;
 
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
@@ -44,7 +44,7 @@ function Nnn (args) {
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
 	this.run = function() {
-		var _this = this;
+		let _this = this;
 		_this.neurons.forEach(function(neuron) {
 
 			neuron.render();
@@ -55,7 +55,7 @@ function Nnn (args) {
 				// p.noLoop();
 				neuron.update();
 
-				var radius = neuron.radius();
+				let radius = neuron.radius();
 				
 				neuron.nodes[0].spread(somas, radius);
 			} 
@@ -67,10 +67,10 @@ function Nnn (args) {
 	}
 
 	this.done = function() {
-		var _this = this;
+		let _this = this;
 
-		var n;
-		for (var i = 0; i < _this.neurons.length; i++) {
+		let n;
+		for (let i = 0; i < _this.neurons.length; i++) {
 			n = _this.neurons[i];
 			if (!n.done()) {
 				return false;
@@ -83,10 +83,10 @@ function Nnn (args) {
 
 	// Add neuron to the network --> Accepts P5.Vector for Arg
 	this.add_neuron = function(count) {
-		var _this = this;
-		var x, y;
+		let _this = this;
+		let x, y;
 
-		for (var i = 0; i < count; i++) {
+		for (let i = 0; i < count; i++) {
 			// Set Neuron Soma Position (Root)
 			// Start all neurons in center: Repel()
 			if ((count == 1) || (_this.neurons.length < 1)) {
@@ -107,7 +107,7 @@ function Nnn (args) {
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.
 			// Grow time is inversely proportional to num_branches
-			var neuron_timer = 1000 / _this.num_branches;
+			let neuron_timer = 1000 / _this.num_branches;
 			// _this.neuron_timer = 75;
 			// Initialize the Neuron Object:
 			// 		args[0] = Pvector position
@@ -134,10 +134,10 @@ function Nnn (args) {
 
 	// Remove neuron to the network
 	this.remove_neuron = function(count) {
-		var _this = this;
-		var j;
+		let _this = this;
+		let j;
 		// splice() is a javascript method to working on arrays
-		for (var i = 0; i < count; i++) {
+		for (let i = 0; i < count; i++) {
 			j = p.floor(p.random(_this.neurons.length));
 			_this.neurons.splice(j, 1);
 		}
@@ -145,14 +145,14 @@ function Nnn (args) {
 
 	// Calculate initial separation forces for NNN
 	this.spread = function() {
-		var _this = this;
+		let _this = this;
 
-		somas.forEach(function(soma) {
+		somas.forEach(function (soma) {
 			// Find soma for each neuron
 			soma.separate(somas);
-			soma
 		});
 	}
-
 }
+
+module.exports = NNN;
 
