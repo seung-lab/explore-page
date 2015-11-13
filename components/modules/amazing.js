@@ -102,7 +102,7 @@ class Amazing extends TeaTime {
 		};
 
 		let supertext = d('super-text');
-		let textcontainer = d('story-text');
+		let textcontainer = d('story-text invisible');
 		let text = d('text');
 		let counter = d('counter');
 
@@ -144,7 +144,11 @@ class Amazing extends TeaTime {
 			});
 			_this.view.next.show();
 
+			_this.view.textcontainer.removeClass("invisible")
+
 			_this.playVideo();
+
+
 		});
 	}
 

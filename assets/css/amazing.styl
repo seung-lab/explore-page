@@ -24,6 +24,9 @@ $amazing_z = 1
 
 .amazing .gif
 	height 100%
+	
+.amazing .invisible
+	opacity 0
 
 .amazing .story-text
 	text-transform uppercase
@@ -43,6 +46,8 @@ $amazing_z = 1
 	z-index $amazing_z
 
 	center-horizontal()
+	
+	transition opacity 1000ms ease
 	
 .super-text
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
