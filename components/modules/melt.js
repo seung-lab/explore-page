@@ -21,7 +21,7 @@ class Melt extends TeaTime {
 
 		this.text = [
 			splitter("EyeWire is the first of its kind", true),
-			splitter("It's a 3D puzzle game", true)
+			"It's a 3D puzzle game"
 		];
 
 		this.view = this.generateView();
@@ -82,7 +82,11 @@ class Melt extends TeaTime {
 		let counter2 = d('counter');
 		textcontainer2.append(supertext, text2, counter2);
 
-		container.append(textcontainer2);
+		let next = d('next').ion('click', function () {
+			_this.next();
+		});
+
+		container.append(textcontainer2, next);
 
 		return {
 			module: container,
@@ -93,6 +97,7 @@ class Melt extends TeaTime {
 				textcontainer2
 			],
 			white: whitePart,
+			next: next,
 		};
 	}
 
@@ -144,7 +149,7 @@ class Melt extends TeaTime {
 
 		i++;
 
-		if (t > 0.16 && t < 0.37) {
+		if (t > 0.16 && t < 0.26) {
 			this.view.texts[i].css('opacity', '1');
 		} else {
 			this.view.texts[i].css('opacity', '0');
@@ -152,7 +157,7 @@ class Melt extends TeaTime {
 
 		i++;
 
-		if (t > 0.89 && t < 1) {
+		if (t > 0.875 && t < 1) {
 			this.view.texts[i].css('opacity', '1');
 		} else {
 			this.view.texts[i].css('opacity', '0');
@@ -212,6 +217,30 @@ class Melt extends TeaTime {
 		return this.render(t_prev, t);
 	}
 
+	dropTheBeat () {
+		let _this = this;
+
+		_this.view.next.drop({
+			msec: 2000,
+			easing: Easing.bounceFactory(0.5),
+			side: 'bottom',
+			displacement: 25,
+		});
+
+		_this.view.next.show();
+		
+	}
+
+	afterEnter (transition) {
+		let _this = this;
+
+		_this.view.next.hide();
+
+		transition.done(function () {
+			_this.dropTheBeat();
+		});
+	}
+
 	beforeExit () {
 		clearTimeout(this.timeouts.initial_play);
 	}
@@ -232,8 +261,6 @@ class Melt extends TeaTime {
 			return cacheResult;
 		}
 
-		var fString = forward ? 'forward' : 'backward';
-
 		var seqEl = document.createElement('video');
 
 		seqEl.myautoplay = autoplay;
@@ -241,7 +268,7 @@ class Melt extends TeaTime {
 		seqEl.forward = forward;
 
 		var src = document.createElement('source');
-		src.src = "./animations/Melt_Sequence/small2/melt_" + fString + "_" + sequence + ".mp4";
+		src.src = `./animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
 
 		seqEl.appendChild(src);
 
@@ -307,6 +334,10 @@ class Melt extends TeaTime {
 			}
 		});
 
+		seqEl.addEventListener('ended', function () {
+			_this.dropTheBeat();
+		});
+
 		setInterval(function () {
 			if (SequenceManager.active === seqEl) {
 				_this.timeUpdate(SequenceManager.tTime());
@@ -314,6 +345,8 @@ class Melt extends TeaTime {
 		}, 15);
 
 		seqEl.scrollHandler = function (down) {
+			_this.view.next.hide();
+
 			if (!seqEl.started) {
 				// console.log('not started', sequence);
 				if (down === forward) {
@@ -321,7 +354,7 @@ class Melt extends TeaTime {
 					seqEl.play();
 					seqEl.started = true;
 
-					return true;
+					return;
 				} else {
 					// return true;
 					// return false; // TODO, this may be a mistake if we start at the end
@@ -333,7 +366,7 @@ class Melt extends TeaTime {
 				if (down === forward) {
 					// console.log('double playback', forward, sequence);
 					seqEl.playbackRate = 2;
-					return true;
+					return;
 				} else {
 					// console.log('pausing', forward, sequence);
 					// pleaseEnd = true;
@@ -390,11 +423,13 @@ var videoCache = {
 	false: []
 };
 
-var SEQUENCE_COUNT = 4;
+
 
 var SEQUENCE_LENGTHS = [
-	79, 45, 45, 300
+	74, 44, 195
 ];
+
+var SEQUENCE_COUNT = SEQUENCE_LENGTHS.length;
 
 var SequenceManager = {
 	active: null,

@@ -2,15 +2,12 @@
 @require 'mixins.styl'
 @require 'galileo.styl'
 
-
 .melt-mobile .meltSlide img
 	height 100%
-	left: 0
-	right: 0
 	margin: auto
 	position: absolute
-	top: 0
-	bottom: 0
+	left -9999px
+	right -9999px
 
 #slideContainer div:nth-child(n+40):nth-child(-n+50)
 	background: blue
@@ -33,7 +30,6 @@
 	@extend .galileo .story-text
 	font-family 'Roboto Condensed'
 
-	
 .melt-mobile #meltMobileWhitePart .story-text
 	color: $TEXT_BLUE
 
@@ -55,6 +51,12 @@
 
 // slide 1
 
+// .melt-mobile #meltMobile1.active img
+// 	animation-duration 0s
+
+.melt-mobile #meltMobile1.return img
+	transition top 0.5s
+
 .melt-mobile #meltMobile1 img
 	animation-timing-function linear
 	animation-fill-mode forwards
@@ -74,7 +76,6 @@
 
 #meltMobile1.enter, #meltMobile1.exit
 	opacity 1
-
 
 #meltMobile1 .story-text
 	opacity 0
@@ -142,7 +143,6 @@
 // slide 2
 .melt-mobile #meltMobile2.exit.reverse
 	opacity 1
-	
 
 
 // end sequence
@@ -167,7 +167,7 @@
 	z-index: 1
 	opacity: 0
 	transition: all 160ms
-	
+
 // .melt-mobile #meltMobileWhitePart
 // 	height: 49%
 // 	opacity: 1
