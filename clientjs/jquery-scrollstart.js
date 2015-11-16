@@ -8,7 +8,6 @@ $(document).ready(function () {
 
 	$(window).ion('wheel', function (e) {
 		e = e.originalEvent;
-		e.preventDefault();
 
 		var now = performance.now();
 

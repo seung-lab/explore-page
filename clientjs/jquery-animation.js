@@ -46,9 +46,8 @@ var $ = require('jquery'),
  	// so here are some hacks to display like scrolling is allowed without 
  	// actually allowing it
  	_this
- 		.on('mousewheel DOMMouseScroll', function (evt) {
+ 		.on('wheel', function (evt) {
  			evt.preventDefault();
- 			evt.stopPropagation();
  		});
 
  	var req;
