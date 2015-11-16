@@ -46,7 +46,6 @@ var $ = require('jquery'),
  	// so here are some hacks to display like scrolling is allowed without 
  	// actually allowing it
  	_this
- 		.addClass('autoscrolling') 
  		.on('mousewheel DOMMouseScroll', function (evt) {
  			evt.preventDefault();
  			evt.stopPropagation();
@@ -57,7 +56,6 @@ var $ = require('jquery'),
  	var deferred = $.Deferred()
  		.done(function () {
  			_this.scrollTop(start_pos + position_offset);
- 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
  		})
  		.fail(function () {
  			if (req) {
