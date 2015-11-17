@@ -19,6 +19,10 @@
 	
 	white-space normal
 	
+.wonderers .super-text
+	@extend .amazing .super-text
+	
+	
 .wonderers .story-text:before
 	display none
 	
@@ -33,7 +37,7 @@
 // ---> Small Screen
 
 /* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 1)
+@media screen and (min-width: 300px) and (-webkit-min-device-pixel-ratio: 1)
 
 	.wonderers img
 		height 600px
@@ -43,13 +47,13 @@
 
 
 /* ----------- Retina Screens ----------- */
-@media screen and (min-width: 600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
+@media screen and (min-width: 300px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)
 
 	.wonderers img
 		height 600px
 		width @height * 1.333 // aspect ratio of this image
 		
-		center($dy=-25px)
+		center(0, 25px)
 
 
 
@@ -96,6 +100,63 @@
 		width @height * 1.333 // aspect ratio of this image
 		
 		center($dy=-100px)
+		
+		
+
+		
+/* ----------- Mobile Media Queries ----------- */
+
+/*
+ *	Set to hit an iPhone 6+
+ */
+
+@media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
+
+	.wonderers img
+		height 275px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-100px)
+		
+	.wonderers .super-text
+		font-size 18px
+		
+	.wonderers .story-text
+		bottom 25%
+
+			
+/*
+ *	Set to hit an iPhone 6
+ */
+			
+@media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
+
+	.wonderers img
+		height 250px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-100px)
+		
+	.wonderers .super-text
+		font-size 18px
+
+			
+/*
+ *	Set to hit an iPhone 5 + 4
+ */
+			
+@media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
+
+	.wonderers img
+		height 225px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center($dy=-100px)
+		
+	.wonderers .super-text
+		font-size 18px
+
+
 
 
 	

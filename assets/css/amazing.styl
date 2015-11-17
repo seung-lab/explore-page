@@ -35,6 +35,7 @@ $amazing_z = 1
 	font-weight 700
 	word-spacing 0px
 	letter-spacing 2px
+	line-height 1.25em
 	text-align center
 	white-space nowrap
 	
@@ -127,7 +128,7 @@ $amazing_z = 1
  *	Set to hit an iPhone 6+
  */
 
-@media only screen and (max-device-width: 414px) and (-webkit-min-device-pixel-ratio: 2)
+@media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
 		
 		.counter 
 			display none
@@ -147,7 +148,7 @@ $amazing_z = 1
  *	Set to hit an iPhone 6
  */
 			
-@media only screen and (max-device-width: 375px) and (-webkit-min-device-pixel-ratio: 2)
+@media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
 			
 		.amazing .story-text
 			font-size 30px
@@ -163,7 +164,7 @@ $amazing_z = 1
  *	Set to hit an iPhone 5 + 4
  */
 			
-@media only screen and (max-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2)
+@media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 			
 		.amazing .story-text
 			font-size 24px

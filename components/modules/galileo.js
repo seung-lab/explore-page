@@ -281,14 +281,14 @@ class Galileo extends TeaTime {
 				tick: 50,
 				update: function (txt) {
 					elem.html(
-						utils.invertedPyramidLineBreak(txt)
+						splitter(txt, true)
 					)
 				}
 			});
 		}
 		else {
 			elem.html(
-				utils.invertedPyramidLineBreak(slide.text)
+				splitter(slide.text, true)
 			);
 		}
 
@@ -315,7 +315,7 @@ class Galileo extends TeaTime {
 				}
 				else {
 					_this.view.story.text.html(
-						utils.invertedPyramidLineBreak(slide.text)
+						splitter(slide.text, true)
 					);
 				}
 
@@ -340,6 +340,18 @@ class Galileo extends TeaTime {
 			throw new Error("slide did not specify text or big.");
 		}
 	}
+}
+
+function splitter (txt, inverted = false) {
+	if (Utils.isMobile()) {
+		return txt;
+	}
+
+	if (inverted) {
+		return utils.invertedPyramidLineBreak(txt);
+	}
+
+	return utils.pyramidLineBreak(txt);
 }
 
 module.exports = Galileo;

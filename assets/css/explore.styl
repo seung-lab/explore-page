@@ -99,4 +99,27 @@ $timeline_height = 25px
 	height $timeline_height
 	
 
+/* ----------- Media Queries ----------- */
+
+/*
+ *	Set to hit an iPhone 6+
+ */
+
+@media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
+	
+	$timeline_height = 10px
+	
+	.spacer 
+		width 100%
+		height $timeline_height
+		
+	.timeline 
+		height $timeline_height
+		
+	.module
+		height s("calc(100% - %s)", $timeline_height)
+
+	
+	
+
 	
