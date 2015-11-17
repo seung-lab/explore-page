@@ -30,14 +30,17 @@ body
 	
 	position relative
 
+
 // always display the scrollbar for elements that scroll and push the scrollbar off the screen
 // this prevents having to deal with the width changing on the fly which is especially tricky for perspective
 // this is combined with preventing the default scroll behavior in jquery-scrollstart
+
 $estimated_max_scrollbar_width = 20px // the higher the value, the more the perspective is thrown off
+
 #viewport, #explore, .galileo
 	overflow-y scroll
-	width s('calc(100% + %s)', $estimated_max_scrollbar_width) !important
-	left -($estimated_max_scrollbar_width / 2)
+	width s('calc(100% + %s)', 2 * $estimated_max_scrollbar_width) !important
+	left -1 * $estimated_max_scrollbar_width
 
 .parallax-group > div,
 .parallax-group > section
