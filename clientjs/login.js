@@ -120,6 +120,8 @@ Login.IntakeView = function () {
 						easing: Easing.springFactory(.7, 1),
 					});
 				}, 650);
+
+				Login.bindResizeEvents('gateway');
 			});
 	};
 };

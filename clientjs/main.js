@@ -28,8 +28,6 @@ $(document).ready(function () {
 		Utils.UI.curtainRise(function () {
 			_intakectrl.playIntro();
 		}, 250);
-
-		Login.bindResizeEvents('gateway');
 	}
 	else {
 		let transition = $.Deferred();
