@@ -29,3 +29,9 @@ node_modules
 .DS_Store
 build
 dist
+
+# Production settings
+
+clientjs/GLOBAL.js
+assets/css/mixins.styl
+

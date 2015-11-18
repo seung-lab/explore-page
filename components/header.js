@@ -70,20 +70,26 @@ class Header extends Synapse {
 			document.location.href = document.location.origin;
 		});
 
-		_this.view.share.icon.ion('click', function () {
-			_this.state.share_activated = !_this.state.share_activated;
-			_this.render();
-		});
+		_this.view.share.icon.off('click');
+		_this.view.register.off('click');
 
-		_this.view.share.at_moment.ion('click', function () {
-			_this.render();
-		});
+		if (this.mode === 'share') {
+			_this.view.share.icon.ion('click', function () {
+				_this.state.share_activated = !_this.state.share_activated;
+				_this.render();
+			});
 
-		_this.view.register.ion('click', function () {
-			Utils.UI.curtainFall(function () {
-				document.location.href = 'https://eyewire.org/signup';
-			})
-		});
+			_this.view.share.at_moment.ion('click', function () {
+				_this.render();
+			});
+		}
+		else if (this.mode === 'register') {
+			_this.view.register.ion('click', function () {
+				Utils.UI.curtainFall(function () {
+					document.location.href = 'https://eyewire.org/signup';
+				})
+			});
+		}
 	}
 
 	afterEnter (transition) {
