@@ -62,7 +62,7 @@ $corner_offset = 35px
 	
 	right (-@width + $corner_offset + @height)
 	
-	transition right 1s ease-in-out, opacity 1s ease-in-out
+	transition right 1000ms ease-in-out, opacity 1s ease-in-out
 	
 .header .share.activated
 	right 0px
@@ -126,20 +126,27 @@ $corner_offset = 35px
 	left: -31px;
 
 .header .register
-	border 1px solid $TEXT_BLUE
-	border-radius 15px
-	width 225px
+	background-color $ACCENT_RED
+	border-radius 22px
+	width 175px
 	height 50px
+	box-shadow 0px 0px 0px rgba(45,45,45,0.15)
 	
+	transition box-shadow 250ms ease
+	
+.header .register .galileo
+	background-color #C85B5B 
+	
+.header .register:hover
+	box-shadow 0px 5px 1px rgba(45,45,45,0.15)
 
 .header .register .content
 	position relative
-	margin-left 85px
+	margin-left 62px
 	margin-top 17px
-	
 	font-size 12px
 	text-align left
-	color $TEXT_BLUE
+	color $FILL_WHITE
 	
 	cursor pointer
 	// transition right 1s ease-in-out	
@@ -152,13 +159,12 @@ $corner_offset = 35px
 	float left
 	width 50px 
 	height 100%
-	background url($BASE_URL + "/images/icons/create-account-dark.svg")
+	background url($BASE_URL + "/images/icons/create-account-light.svg")
 	background-size 50%
 	background-repeat no-repeat
-	background-position 10px 15px
+	background-position 10px 14px
 	
-	margin-left 10px
-	border-right 1px solid $TEXT_BLUE
+	margin-left 13px
 	
 /* ----------- Media Queries ----------- */
 

@@ -93,25 +93,30 @@ div.opening
 /* Portrait and Landscape
  *
  *
- *	Set to hit an iPhone 6s+ and everything smaller as well
+ *	Set to hit an iPhone 6s+ and 6 
  *
  */
 
-@media only screen and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 2)
+@media only screen and (max-device-width: 736px) and (min-resolution: 2dppx)
 
-		div.opening
-			width 350px
-			font-size 26px
-			letter-spacing 8px
-			line-height 1.5em
+	div.opening
+		width 350px
+		font-size 26px
+		letter-spacing 8px
+		line-height 1.5em
 			
-@media only screen and (max-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2)
+			
+/*
+ *	Set to hit an iPhone 5 + 4
+ */
+			
+@media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 
-		div.opening
-			width 250px
-			font-size 20px
-			letter-spacing 10px
-			line-height 1.5em
+	div.opening
+		width 275px
+		font-size 18px
+		letter-spacing 8px
+		line-height 1.5em
   
 
 	

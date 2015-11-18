@@ -100,10 +100,10 @@ gulp.task('js', function () {
 	return b.bundle()
 		.pipe(source('intake.min.js'))
 		.pipe(buffer())
-		.pipe(sourcemaps.init())
-		// 	// Add transformation tasks to the pipeline here.
-			.pipe(uglify())
-		// 	.on('error', gutil.log)
+		// .pipe(sourcemaps.init())
+		// // 	// Add transformation tasks to the pipeline here.
+		// 	.pipe(uglify())
+		// // 	.on('error', gutil.log)
 		.pipe(sourcemaps.write('./'))
 		.pipe(gulp.dest('./dist/public/js/'));
 

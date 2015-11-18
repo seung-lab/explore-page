@@ -66,6 +66,8 @@ class Amazing extends TeaTime {
 
 		let bg = $('<div>').addClass('amazing bg-light module');
 
+		// Lose the next-arrow for mobile
+
 		let videoContainer = $('<div>');
 
 		let frames = [];
