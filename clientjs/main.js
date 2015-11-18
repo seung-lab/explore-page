@@ -2,7 +2,10 @@
 
 var $ = require('jquery');
 
+window.jQuery = $; // need to define this for imagesLoaded
+
 require('jquery.cookie');
+require('imagesloaded'); 
 require('./jquery-extra.js');
 require('./jquery-url.js');
 require('./jquery-animation.js');

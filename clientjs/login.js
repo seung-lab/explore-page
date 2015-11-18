@@ -102,17 +102,21 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
-		setTimeout(function () {
-			$('#bumper').addClass('visible') // triggers shrinking transition
-			$('#intake-logo').addClass('shrink') // triggers shrinking transition
+		$('.bumper .Es, .bumper .E, .bumper .dot').imagesLoaded()
+			.always(function () {
+				$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
+			})
+			.done(function () {
+				$('#bumper').addClass('visible') // triggers shrinking transition
+				$('#intake-logo').addClass('shrink') // triggers shrinking transition
 
-			setTimeout(function () {
-				$('#viewport').scrollTo('.gateway', {
-					msec: 2500,
-					easing: Easing.springFactory(.7, 1),
-				});
-			}, 650);
-		}, 50);
+				setTimeout(function () {
+					$('#viewport').scrollTo('.gateway', {
+						msec: 2500,
+						easing: Easing.springFactory(.7, 1),
+					});
+				}, 650);
+			});
 	};
 };
 
