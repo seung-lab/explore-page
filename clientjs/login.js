@@ -102,7 +102,11 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
-		$('.bumper .Es, .bumper .E, .bumper .dot').imagesLoaded()
+		$.when(
+			$('.bumper .Es').imagesLoaded(),
+			$('.bumper .dot').imagesLoaded(),
+			$('.bumper .E').imagesLoaded()
+		)
 			.always(function () {
 				$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 			})
