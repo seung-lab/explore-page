@@ -55,7 +55,7 @@ class Melt extends TeaTime {
 			let text = d('text caps').html(this.text[0]);
 			let counter = d('counter');
 
-			textcontainer.append(text, counter);
+			textcontainer.append(text); // --> Trying no Counter
 		}
 		vidContainer.append(textcontainer);
 
@@ -64,7 +64,7 @@ class Melt extends TeaTime {
 		{
 			let text3 = d('text caps').html(this.text[1]);
 			let counter3 = d('counter');
-			textcontainer3.append(text3, counter3);
+			textcontainer3.append(text3); // --> Trying no Counter
 		}
 		container.append(textcontainer3);
 
@@ -78,7 +78,7 @@ class Melt extends TeaTime {
 		let textcontainer2 = d('story-text visible-supertext on-white bottom');
 		let text2 = d('text caps').html("You're mapping the brain");
 		let counter2 = d('counter');
-		textcontainer2.append(supertext, text2, counter2);
+		textcontainer2.append(supertext, text2); // --> Trying no Counter
 
 		let next = d('next').ion('click', function () {
 			_this.next();
