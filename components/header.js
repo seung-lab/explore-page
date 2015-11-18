@@ -43,7 +43,7 @@ class Header extends Synapse {
 			.append(
 				$("<div>").addClass("icon"),
 				$("<div>")
-					.text("Create new account")
+					.text("Create Account")
 					.addClass("content")
 			);
 

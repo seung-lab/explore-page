@@ -277,7 +277,7 @@ class Galileo extends TeaTime {
 			this.animations.text = elem.scrambleText({
 				begin: elem.html(),
 				end: slide.text,
-				msec: 1500,
+				msec: 500,
 				tick: 50,
 				update: function (txt) {
 					elem.html(
@@ -343,6 +343,7 @@ class Galileo extends TeaTime {
 }
 
 function splitter (txt, inverted = false) {
+	return txt; // Remove this line to enable splitter
 	if (Utils.isMobile()) {
 		return txt;
 	}
