@@ -42,22 +42,11 @@ var $ = require('jquery'),
  	var distance_traveled = 0;
  	var start_pos = this.scrollTop();
 
- 	// if you simply use overflow-y: hidden, the animation is laggy 
- 	// so here are some hacks to display like scrolling is allowed without 
- 	// actually allowing it
- 	_this
- 		.addClass('autoscrolling') 
- 		.on('mousewheel DOMMouseScroll', function (evt) {
- 			evt.preventDefault();
- 			evt.stopPropagation();
- 		});
-
  	var req;
 
  	var deferred = $.Deferred()
  		.done(function () {
  			_this.scrollTop(start_pos + position_offset);
- 			_this.removeClass('autoscrolling').off('mousewheel DOMMouseScroll');
  		})
  		.fail(function () {
  			if (req) {

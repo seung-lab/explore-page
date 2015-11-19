@@ -182,3 +182,9 @@ $.fn.drag = function (fn) {
 			});
 		});
 };
+
+$.fn.disableScrolling = function () {
+	$(this).ion('wheel.disableScrolling', function (e) {
+		e.preventDefault();
+	});
+};

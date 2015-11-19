@@ -1,28 +1,24 @@
-/* Let's get this party started */
+// setting width of scrollbar for webkit browsers to 0 so that we don't have wto
+// (for non webkit browsers there is a small leftward offset for all items in the page)
 ::-webkit-scrollbar {
-    width: 6px;
-    background: rgba(27, 27, 27, 0.3);
-}
-
-.autoscrolling {
-	overflow-y: auto !important;
-}
-
-.autoscrolling::-webkit-scrollbar {
 	width: 0px;
 }
- 
-/* Track */
-::-webkit-scrollbar-track {
-    border-radius: 10px;
-}
- 
-/* Handle */
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
- 	background: rgba(173, 173, 173, 0.65)   
-}
 
-::-webkit-scrollbar-thumb:window-inactive {
-	background: rgba(173, 173, 173, 0.25); 
-}
+
+// always display the scrollbar for elements that scroll and push the scrollbar off the screen
+// this prevents having to deal with the width changing on the fly which is especially tricky for perspective
+// this is combined with preventing the default scroll behavior in jquery-scrollstart
+
+$estimated_max_scrollbar_width = 20px // the higher the value, the more the perspective is thrown off
+
+
+#viewport, #explore, .galileo
+	overflow-y scroll
+	width s('calc(100% + %s)', 2 * $estimated_max_scrollbar_width)
+	left -1 * $estimated_max_scrollbar_width
+
+// revert for webkit
+@media (-webkit-min-device-pixel-ratio:0)
+	#viewport, #explore, .galileo
+		width 100%
+		left auto
