@@ -196,9 +196,11 @@ $.fn.scrambleText = function (args = {}) {
 	}
 
 	let alphabet = []
-		.concat(genAlphabet('a', 26))
-		.concat(genAlphabet('A', 26))
-		.concat(genAlphabet('0', 10));
+		// .concat(genAlphabet('a', 26))
+		// .concat(genAlphabet('A', 26))
+		// .concat(genAlphabet('0', 10));
+
+	alphabet = Utils.unique(alphabet.concat(end.split(""))).filter( x => x !== ' ' )
 
  	let req;
 
@@ -214,10 +216,8 @@ $.fn.scrambleText = function (args = {}) {
 
  	updatefn(vector);
 
- 	let probability = 0.6;
-
  	let easing = function (t) {
- 		return Math.pow(t*t - 2*t + 1, 3);
+ 		return 1 - Math.pow(t*t - 2*t + 1, 1.5);
  	};
 
  	req = setInterval(function () {
@@ -230,8 +230,6 @@ $.fn.scrambleText = function (args = {}) {
  			return;
  		}
 
- 		let lesser_probability = probability * easing(t);
-
  		let all_solved = true;
  		for (let i = 0; i < vector.length; i++) {
  			if (vector[i] === end_vector[i]) {
@@ -241,7 +239,7 @@ $.fn.scrambleText = function (args = {}) {
  			if (end_vector[i] === ' ') {
  				vector = Utils.replaceAt(vector, end_vector[i], i);
  			}
- 			else if (lesser_probability >= Math.random()) {
+ 			else if (easing(t) >= Math.random()) {
  				vector = Utils.replaceAt(vector, end_vector[i], i);
  			}
  			else {

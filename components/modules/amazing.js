@@ -319,7 +319,7 @@ class Amazing extends TeaTime {
 			this.animations.text = _this.view.text.scrambleText({
 				begin: _this.view.text.html(),
 				end: slide.text,
-				msec: 2000,
+				msec: 1500,
 				tick: 50,
 				update: function (txt) {
 					_this.view.text.html(splitter(txt, slide.ipyramid))
