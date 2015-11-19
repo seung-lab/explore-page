@@ -176,7 +176,7 @@ $corner_offset = 35px
  *
  */
 
-@media only screen and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 2)
+@media only screen and (max-device-width: 736px) and (min-resolution: 2dppx)
 
 	.header .logotype
 		background-image url($BASE_URL + '/images/Es-dark.svg')
@@ -200,6 +200,7 @@ $corner_offset = 35px
 	.header .register	
 		border-radius 15px
 		width 50px
+		height 50px
 		top 20px
 		right 20px
 

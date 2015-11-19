@@ -31,7 +31,7 @@ $next_border_width = 14px
 	
 	z-index $amazing_z
 
-.next .arrow	
+.next .arrow
 	width 0px
 	height 0px
 	
@@ -40,6 +40,11 @@ $next_border_width = 14px
 	border-bottom 0px
 	
 	center(-1 * $next_border_width, -1 * $next_border_width / 2)
+	
+	transition border-top 250ms ease-in-out,
+	
+// .next:hover .arrow
+// 	border-top $next_border_width solid $FILL_BLUE -15%
 	
 .bg-dark .next .arrow
 	border-top $next_border_width solid $FILL_LIGHTER_BLUE
@@ -50,7 +55,7 @@ $next_border_width = 14px
 .mobile .next
 	visibility none
 
-$timeline_height = 25px
+$timeline_height = 15px
 
 .timeline 
 	position fixed
@@ -66,6 +71,9 @@ $timeline_height = 25px
 	cursor pointer
 	
 	transition border-top 500ms ease-in-out, background-color 500ms ease-in-out
+	
+.timeline:hover
+	height timeline_height * 2
 
 .timeline.dark
 	background-color $FILL_DARKER_BLUE
