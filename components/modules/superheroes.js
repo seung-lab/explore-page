@@ -79,7 +79,7 @@ class Superheroes extends TeaTime {
 		bg.append(char('scout_guy'));
 		bg.append(char('scythe_girl'));
 
-		textcontainer.append(supertext, text, counter);
+		textcontainer.append(supertext, text); // --> Trying without counter
 
 		bg.append(
 			playnow,
