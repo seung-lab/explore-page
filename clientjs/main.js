@@ -26,7 +26,7 @@ $(document).ready(function () {
 	//
 	// scrolling is enabled at all times but the scrollbar is pushed off the screen
 	// we want manually control the scrolling so we prevent the default behavior
-	$(window).disableScrolling();
+	$(document).disableScrolling();
 
 	Login.initialize();
 
