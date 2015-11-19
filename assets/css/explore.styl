@@ -18,25 +18,33 @@
 	height 100%
 
 $next_border_width = 14px
-
+	
 .next
-	width 0px
-	height @width
+	width 125px
+	height 75px
 	
-	border $next_border_width solid transparent
-	border-top $next_border_width solid $FILL_BLUE
-	
-	center-horizontal(dx=-1 * $next_border_width)
-	bottom 6%
+	center-horizontal()
+	border-radius 100%
 
+	bottom 3%
 	cursor pointer
 	
 	z-index $amazing_z
+
+.next .arrow	
+	width 0px
+	height 0px
 	
-.bg-dark .next
+	border $next_border_width solid transparent
+	border-top $next_border_width solid $FILL_BLUE
+	border-bottom 0px
+	
+	center(-1 * $next_border_width, -1 * $next_border_width / 2)
+	
+.bg-dark .next .arrow
 	border-top $next_border_width solid $FILL_LIGHTER_BLUE
 	
-.next.lighter
+.next.lighter .arrow
 	border-top $next_border_width solid $LANDING_WHITE
 	
 .mobile .next

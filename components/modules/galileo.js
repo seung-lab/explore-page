@@ -82,9 +82,11 @@ class Galileo extends TeaTime {
 
 		let action = d('action');
 
-		let next = d('next').ion('click', function () {
-			_this.next();
-		});
+		let next = d('next')
+			.append(d('arrow'))
+			.ion('click', function () {
+				_this.next();
+			});
 
 		// Standard story container
 

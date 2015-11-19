@@ -41,9 +41,11 @@ class Wonderers extends TeaTime {
 		let text = d('text');
 		let counter = d('counter');
 
-		let next = d('next').ion('click', function () {
-			_this.next();
-		});
+		let next = d('next')
+			.append(d('arrow'))
+			.ion('click', function () {
+				_this.next();
+			});
 
 		textcontainer.append(supertext, text); // --> Trying no Counter
 

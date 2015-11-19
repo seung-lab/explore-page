@@ -1,8 +1,8 @@
 $PHI = 1.618
 
 $IMAGES_DIR = ".."
-// $BASE_URL = 'http://eyewire.org/explore'
-$BASE_URL = ''
+$BASE_URL = 'http://eyewire.org/explore'
+// $BASE_URL = ''
 
 center-horizontal(offset=0px)
 	position absolute
@@ -13,8 +13,8 @@ center-vertical(offset=0px)
 	top s("calc(50% - %s / 2 + %s)", @height, offset)
 	
 center(dx=0px, dy=0px)
-	center-vertical(dx)
-	center-horizontal(dy)
+	center-vertical(dy)
+	center-horizontal(dx)
 	
 preserve-aspect-ratio($path)
 	height unit(@width / aspect-ratio($path), 'px')

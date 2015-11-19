@@ -80,9 +80,11 @@ class Melt extends TeaTime {
 		let counter2 = d('counter');
 		textcontainer2.append(supertext, text2); // --> Trying no Counter
 
-		let next = d('next').ion('click', function () {
-			_this.next();
-		});
+		let next = d('next')
+			.append(d('arrow'))
+			.ion('click', function () {
+				_this.next();
+			});
 
 		container.append(textcontainer2, next);
 
