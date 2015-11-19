@@ -83,11 +83,15 @@ ModuleCoordinator.initialize = function (animation) {
 	MC.initialized = true;
 };
 
-ModuleCoordinator.reset = function () {
+ModuleCoordinator.reset = function (animation) {
 	$(window).off('scrollStart swipe');
 	$(document).off('keydown');
 
 	ModuleCoordinator.timeline.anchorToAnchor();
+
+	animation.done(function () {
+		ModuleCoordinator.timeline.exit();
+	});
 };
 
 ModuleCoordinator.tForName = function (name) {

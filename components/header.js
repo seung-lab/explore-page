@@ -67,12 +67,18 @@ class Header extends Synapse {
 		let _this = this;
 
 		_this.view.logo.ion('click', function () {
-			$('#viewport').scrollTo('#gateway', {
+			let animation = $.Deferred();
+
+			ModuleCoordinator.reset(animation);
+
+			let transition = Login.takeMeTo('gateway', {
 				msec: 1500,
 				easing: Easing.sigmoidFactory(12),
 			});
 
-			ModuleCoordinator.reset();
+			_this.setMode('share', transition);
+
+			animation.then(transition.resolve, transition.reject)
 		});
 
 		_this.view.share.icon.off('click');
@@ -95,6 +101,23 @@ class Header extends Synapse {
 				})
 			});
 		}
+	}
+
+	setMode (mode, animation) {
+		animation = animation || $.Deferred().resolve();
+
+		let _this = this;
+
+		let hidestate = this.hide;
+
+		this.mode = mode;
+		this.hide = true;
+		this.render();
+
+		animation.always(function () {
+			_this.hide = hidestate;
+			_this.render();
+		});
 	}
 
 	afterEnter (transition) {

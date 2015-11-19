@@ -85,17 +85,19 @@ Login.bindResizeEvents = function (stage) {
 Login.takeMeTo = function (stage, options) {
 	options = options || { msec: 0 };
 
-	$('#viewport').scrollTo(`#${stage}`, options);
+	let animation = $('#viewport').scrollTo(`#${stage}`, options);
 
 	if (stage === 'explore') {
 		Login.initExploring();
 	}
 	else if (stage === 'gateway') {
-
+	 	_components.gateway.render();
 	}
 	else {
 		Login.bindResizeEvents(stage);
 	}
+
+	return animation;
 };
 
 Login.IntakeView = function () {
