@@ -6,6 +6,36 @@ let $ = require('jquery'),
 
 let Login = null;
 
+// Thanks veryshare.us
+var _social_networks = {
+	facebook: { 
+		name: 'Facebook', 
+		url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+	},
+	twitter: { 
+		name: 'Twitter', 
+		url: 'http://twitter.com/intent/tweet?source=sharethiscom&text=#{DESCRIPTION}&url=#{URL}',
+	},
+	tumblr: { 
+		name: 'Tumblr', 
+		url: 'http://www.tumblr.com/share?v=3&u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+	},
+	//{ name: 'Reddit', url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}' },
+	
+	pinterest: { 
+		name: 'Pinterest', 
+		url: 'http://pinterest.com/pin/create/button/?url=#{URL}&media=http://#{URL}/#{MEDIA}&description=#{DESCRIPTION}', 
+	},
+	gplus: { 
+		name: 'Google Plus', 
+		url: 'https://plus.google.com/share?url=#{URL}', 
+	},
+	email: { 
+		name: 'Email', 
+		url: 'mailto:myfriends@example.com?subject=#{TITLE}&body=#{DESCRIPTION}',
+	},
+};
+
 class Header extends Synapse {
 	constructor(args = {}) {
 		super(args);
@@ -24,27 +54,31 @@ class Header extends Synapse {
 	}
 
 	generateView () {
-		let container = $('<div>').addClass('header');
-		let logo = $('<div>').addClass('logotype invisible');
+		let d = function (classes) { 
+			return $('<div>').addClass(classes);
+		};
 
-		let share = $('<div>').addClass('icon share');
-		let before = $('<div>').addClass('before');
-		let permalink = $("<div>").addClass('permalink');
-		let at_moment = $("<input>").attr('type', 'checkbox');
+		let container = d('header');
+		let logo = d('logotype invisible');
 
-		share.append(before, permalink);//, at_moment)
+		let fbshare = d('fb-share social');
+		let tshare = d('twitter-share social');
+		let emailshare = d('email-share social');
 
-		let login = $('<div>')
-			.addClass('tertiary login')
-			.text("Player Login");
+		let share_text = d('text').text("Share");
+
+		let icon = d('before');
+
+		// let share = d('icon share').append(share_text, icon, fbshare, tshare, emailshare);
+		let share = d('icon share').append(share_text, icon, fbshare, emailshare);
+
+		let login = d('tertiary login').text("Player Login");
 
 		let register = $('<div>')
 			.addClass('register')
 			.append(
-				$("<div>").addClass("icon"),
-				$("<div>")
-					.text("Create Account")
-					.addClass("content")
+				d("icon"),
+				d('content').text("Create Account")
 			);
 
 		container.append(logo, share, login, register);
@@ -56,9 +90,11 @@ class Header extends Synapse {
 			register: register,
 			share: {
 				container: share,
-				icon: before,
-				permalink: permalink,
-				at_moment: at_moment,
+				fb: fbshare,
+				twitter: tshare,
+				email: emailshare,
+				icon: icon,
+				text: share_text,
 			},
 		};
 	}
@@ -66,14 +102,37 @@ class Header extends Synapse {
 	attachShareEvents () {
 		let _this = this;
 
-		_this.view.share.icon.ion('click', function () {
+		function activateshare () {
 			_this.state.share_activated = !_this.state.share_activated;
 			_this.render();
+		}
+
+		_this.view.share.text.ion('click', activateshare);
+		_this.view.share.icon.ion('click', activateshare);
+
+		_this.view.share.fb.ion('click', function () {
+			shareOnSelectedNetwork({
+				network: "facebook",
+				title: "",
+				description: "",
+			});
 		});
 
-		_this.view.share.at_moment.ion('click', function () {
-			_this.render();
-		});	
+		_this.view.share.twitter.ion('click', function () {
+			shareOnSelectedNetwork({
+				network: "twitter",
+				title: "",
+				description: "",
+			});
+		});		
+
+		_this.view.share.email.ion('click', function () {
+			shareOnSelectedNetwork({
+				network: "email",
+				title: "",
+				description: "",
+			});
+		});
 
 		_this.view.logo.ion('click', function () {
 			document.location.href = document.location.origin;
@@ -155,14 +214,6 @@ class Header extends Synapse {
 
 		_this.view.share.container.addClass('visible');
 
-		let share_url = `${document.location.href}`;
-		if (_this.view.share.at_moment.is(":checked")) {
-			let t = Math.floor(ModuleCoordinator.timeline.t * 100);
-			share_url = `${document.location.href}?t=${t}`; 
-		}
-
-		_this.view.share.permalink.text(share_url);
-
 		_this.view.share.container.removeClass('activated');
 		if (_this.state.share_activated) {
 			_this.view.share.container.addClass('activated');
@@ -202,5 +253,37 @@ class Header extends Synapse {
 		this.attachEvents();
 	}
 }
+
+function shareOnSelectedNetwork (args = {}) {
+	var socialnetwork = _social_networks[args.network];
+	
+	var url = format_url(socialnetwork.url, {
+		URL: 'https://eyewire.org/explore/',
+		TITLE: args.title,
+		DESCRIPTION: args.description,
+		MEDIA: args.media,
+	});
+
+	// Too dangerous for prototype phase
+
+	var win = window.open(url, '_blank');
+	win.focus();
+}
+
+function format_url (url, fmt) {
+	Object.keys(fmt).forEach(function (key) {
+		fmt[key] = encodeURIComponent(fmt[key]);
+	});
+
+	return format(url, fmt);
+}
+
+function format (str, fmt) {
+	Object.keys(fmt).forEach(function (key) {
+		str = str.replace(new RegExp('#\{' + key + '\}', 'g'), fmt[key])
+	});
+
+	return str;
+};
 
 module.exports = Header;
