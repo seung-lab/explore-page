@@ -6,7 +6,7 @@ $(document).ready(function () {
 	var lastDelta = null;
 	var lastStart = 0;
 
-	$(window).ion('wheel', function (e) {
+	$(window).on('wheel', function (e) {
 		e = e.originalEvent;
 
 		var now = performance.now();

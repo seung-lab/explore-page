@@ -42,14 +42,6 @@ var $ = require('jquery'),
  	var distance_traveled = 0;
  	var start_pos = this.scrollTop();
 
- 	// if you simply use overflow-y: hidden, the animation is laggy 
- 	// so here are some hacks to display like scrolling is allowed without 
- 	// actually allowing it
- 	_this
- 		.on('wheel', function (evt) {
- 			evt.preventDefault();
- 		});
-
  	var req;
 
  	var deferred = $.Deferred()
