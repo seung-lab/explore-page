@@ -78,7 +78,9 @@ class Header extends Synapse {
 
 			_this.setMode('share', transition);
 
-			animation.then(transition.resolve, transition.reject)
+			transition.done(function () {
+				animation.resolve();
+			});
 		});
 
 		_this.view.share.icon.off('click');
