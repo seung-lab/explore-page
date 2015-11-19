@@ -54,7 +54,7 @@ class MeltMobile extends TeaTime {
 		let textcontainer2 = d('story-text visible-supertext');
 		let text2 = d('text caps').html(splitter("You're mapping the brain", true));
 		let counter2 = d('counter');
-		textcontainer2.append(supertext, text2, counter2);
+		textcontainer2.append(supertext, text2); // --> Trying no Counter
 		whitePart.append(textcontainer2);
 
 		let vidContainer = $('<div>', { id: 'slideContainer' });
@@ -71,7 +71,7 @@ class MeltMobile extends TeaTime {
 		let textcontainer = d('story-text');
 		let text = d('text caps').html(splitter("EyeWire is the first of its kind", true));
 		let counter = d('counter');
-		textcontainer.append(text, counter);
+		textcontainer.append(text); // --> Trying no Counter
 
 		slide0.append(textcontainer);
 		this.slides[0].el = slide0;
@@ -88,7 +88,7 @@ class MeltMobile extends TeaTime {
 				let textcontainer2 = d('story-text');
 				let text2 = d('text caps').html(splitter("It's a 3D puzzle game", true));
 				let counter2 = d('counter');
-				textcontainer2.append(text2, counter2);
+				textcontainer2.append(text2); // --> Trying no Counter
 				slide.append(textcontainer2);
 			}
 
