@@ -12,6 +12,7 @@ $(document).ready(function () {
 	});
 
 	mc.on('panstart panmove', function (evt) {
+		evt.preventDefault(); // prevent scrolling
 		$(window).trigger('panmove', evt);
 	});
 
