@@ -117,7 +117,16 @@ class Superheroes extends TeaTime {
 		let _this = this;
 
 		_this.view.play_now.ion('click', function () {
-			Utils.UI.curtainFall(function () {
+			Utils.UI.curtainFall(function (curtain) {
+
+				// Fix for mobile devices in the case where you 
+				// navigate to the youtube app rather than the page.
+				// This will leave the current page black when you return
+				// without any controls. - WS, Nov. 2015, Android Samsung Galaxy S4
+				setTimeout(function () {
+					curtain.remove();
+				}, 2000);
+				
 				if (_this.mobile) {
 					document.location.href = "https://www.youtube.com/watch?v=bwcuhbj2rSI";
 				}

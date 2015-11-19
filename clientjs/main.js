@@ -52,6 +52,12 @@ $(document).ready(function () {
 	}
 });
 
+// Ensure browsers don't save the previous
+// blacked out state when navigating.
+$(window).unload(function () {
+	$('.curtain').remove();
+});
+
 function jumpToExplore (t, transition) {
 	Login.takeMeTo('explore');
 

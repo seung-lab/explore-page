@@ -517,7 +517,7 @@ Utils.UI.curtainRise = function (fn, delay = 100) {
 				curtain.remove();
 			});
 
-		fn();
+		fn(curtain);
 	}, delay);
 };
 
@@ -526,7 +526,9 @@ Utils.UI.curtainFall = function (fn, delay = 100) {
 	$('body').append(curtain);
 
 	setTimeout(function () {
-		curtain.removeClass('fall').motionend(fn);
+		curtain.removeClass('fall').motionend(function () {
+			fn(curtain);
+		});
 	}, delay);
 };
 
