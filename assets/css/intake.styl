@@ -5,7 +5,6 @@
 @require 'gateway.styl'
 @require 'neurons.styl'
 @require 'registration.styl'
-@require 'scrollbar.styl'
 
 html, body
     font-family 'Lato', 'Lucida Grande', sans-serif
@@ -20,11 +19,8 @@ html, body
 body
 	overflow-y hidden
 
-#viewport
-	width 100%
 	height 100%
 	overflow-x hidden
-	overflow-y hidden
 	
 	// background linear-gradient(to bottom, #091117, #1D384D)
 	// background url('/images/intake-background.jpg')
@@ -33,7 +29,15 @@ body
 	transition background 1s ease-in-out
 	
 	position relative
-	
+
+// always display the scrollbar for elements that scroll and push the scrollbar off the screen
+// this prevents having to deal with the width changing on the fly which is especially tricky for perspective
+// this is combined with preventing the default scroll behavior in jquery-scrollstart
+$estimated_max_scrollbar_width = 20px // the higher the value, the more the perspective is thrown off
+#viewport, #explore, .galileo
+	overflow-y scroll
+	width s('calc(100% + %s)', $estimated_max_scrollbar_width) !important
+	left -($estimated_max_scrollbar_width / 2)
 
 .parallax-group > div,
 .parallax-group > section

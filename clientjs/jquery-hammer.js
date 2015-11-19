@@ -4,7 +4,11 @@ var $ = require('jquery'),
 $(document).ready(function () {
 	let mc = new Hammer.Manager(document.body);
 	mc.add(new Hammer.Pan({ threshold: 0, pointers: 0 }));
-	mc.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_VERTICAL })).recognizeWith(mc.get('pan')); // todo, what does this do?
+	mc.add(new Hammer.Swipe({
+		direction: Hammer.DIRECTION_VERTICAL,
+		velocity: 0.15,
+		threshold: 5,
+	})).recognizeWith(mc.get('pan'));
 
 
 	mc.on('swipe', function (evt) {
