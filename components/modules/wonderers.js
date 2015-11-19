@@ -45,7 +45,7 @@ class Wonderers extends TeaTime {
 			_this.next();
 		});
 
-		textcontainer.append(supertext, text, counter);
+		textcontainer.append(supertext, text); // --> Trying no Counter
 
 		bg.append(
 			image,

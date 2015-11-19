@@ -92,7 +92,7 @@ class Galileo extends TeaTime {
 		let text = d('text');
 		let counter = d('counter');
 
-		textcontainer.append(text, counter);
+		textcontainer.append(text);  // --> Trying no Counter
 
 		// Big number story
 
@@ -107,8 +107,7 @@ class Galileo extends TeaTime {
 		innercontainer.append(
 			hightext, 
 			medtext, 
-			lowtext,
-			counter2
+			lowtext
 		);
 
 		container2.append(
