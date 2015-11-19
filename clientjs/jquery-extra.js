@@ -201,9 +201,14 @@ $.fn.disableScrolling = function () {
 			return false;
 		}
 	});
+
+	$(this).ion('touchmove.disableScrolling', function (e) {
+		e.preventDefault();
+	});
 };
 
 $.fn.enableScrolling = function () {
 	$(this).off('wheel.disableScrolling');
 	$(this).off('keydown.disableScrolling');
+	$(this).off('touchmove.disableScrolling');
 };
