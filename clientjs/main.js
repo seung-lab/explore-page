@@ -19,21 +19,14 @@ let Login = require('./login.js'),
 
 var _intakectrl = new Login.IntakeController();
 
-
-// if you simply use overflow-y: hidden, the animation is laggy 
-// so here are some hacks to display like scrolling is allowed without 
-// actually allowing it
-//
-// scrolling is enabled at all times but the scrollbar is pushed off the screen
-// we want manually control the scrolling so we prevent the default behavior
-function disableScrolling() {
-	$(window).ion('wheel.disableScrolling', function (e) {
-		e.preventDefault();
-	});
-}
-
 $(document).ready(function () {
-	disableScrolling();
+	// if you simply use overflow-y: hidden, the animation is laggy 
+	// so here are some hacks to display like scrolling is allowed without 
+	// actually allowing it
+	//
+	// scrolling is enabled at all times but the scrollbar is pushed off the screen
+	// we want manually control the scrolling so we prevent the default behavior
+	$(window).disableScrolling();
 
 	Login.initialize();
 
