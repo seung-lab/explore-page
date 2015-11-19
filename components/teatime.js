@@ -70,6 +70,12 @@ class TeaTime extends Synapse {
 	slideAt (t) {
 		let N = this.slides.length;
 
+		// Generally the module exits at t = 1, but in the case of the final module,
+		// you want to stick with the current slide.
+		if (t === 1) {
+			return this.slides[N - 1];
+		}
+
 		let index = Math.floor(utils.round(t * N, 5));
 
 		let slide = this.slides[index]

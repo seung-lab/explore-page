@@ -327,7 +327,8 @@ ModuleCoordinator.seek = function (t, transition) {
 };
 
 ModuleCoordinator.toModuleT = function (module, t) {
-	return (t - module.begin) / module.duration;
+	t = (t - module.begin) / module.duration;
+	return utils.clamp(t, 0, 1);
 }
 
 ModuleCoordinator.render = function (prev_t, t, transition) {
