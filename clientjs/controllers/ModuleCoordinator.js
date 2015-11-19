@@ -122,7 +122,9 @@ ModuleCoordinator.initHotkeys = function () {
 			return false;
 		}
 		else if (key === 37 || key == 38) { // left or up key
+			evt.preventDefault();
 			ModuleCoordinator.previous();
+			return false;
 		}
 	});
 };
