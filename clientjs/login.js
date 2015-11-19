@@ -82,13 +82,16 @@ Login.bindResizeEvents = function (stage) {
 	}
 };
 
-Login.takeMeTo = function (stage) {
-	$('#viewport').scrollTo(`#${stage}`, {
-		msec: 0,
-	});
+Login.takeMeTo = function (stage, options) {
+	options = options || { msec: 0 };
+
+	$('#viewport').scrollTo(`#${stage}`, options);
 
 	if (stage === 'explore') {
 		Login.initExploring();
+	}
+	else if (stage === 'gateway') {
+
 	}
 	else {
 		Login.bindResizeEvents(stage);

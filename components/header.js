@@ -67,7 +67,12 @@ class Header extends Synapse {
 		let _this = this;
 
 		_this.view.logo.ion('click', function () {
-			document.location.href = document.location.origin;
+			$('#viewport').scrollTo('#gateway', {
+				msec: 1500,
+				easing: Easing.sigmoidFactory(12),
+			});
+
+			ModuleCoordinator.reset();
 		});
 
 		_this.view.share.icon.off('click');

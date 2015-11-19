@@ -18,42 +18,47 @@ let ModuleCoordinator = {
 	timeline: null,
 	container: null,
 	transition: null,
+	initialized: false,
 };
 
 ModuleCoordinator.initialize = function (animation) {
 	let anchor = $('#explore');
 
-	ModuleCoordinator.transition = $.Deferred();
+	let MC = ModuleCoordinator;
+
+	MC.transition = $.Deferred();
 
 	let mobile = utils.isMobile();
 
 	function moduleFactory(module, duration) {
 		return new module({
-			parent: ModuleCoordinator,
+			parent: MC,
 			anchor: anchor,
 			duration: duration,
 			mobile: mobile,
 		})
 	}
 
-	ModuleCoordinator.setModules([
-		moduleFactory(Amazing),
-		moduleFactory(Galileo),
-		moduleFactory(Wonderers),
-		moduleFactory(mobile ? MeltMobile : Melt),
-		moduleFactory(Superheroes),
-	]);
+	if (!MC.initialized) {
+		MC.setModules([
+			moduleFactory(Amazing),
+			moduleFactory(Galileo),
+			moduleFactory(Wonderers),
+			moduleFactory(mobile ? MeltMobile : Melt),
+			moduleFactory(Superheroes),
+		]);
 
-	ModuleCoordinator.timeline = new Timeline({
-		parent: ModuleCoordinator,
-		anchor: anchor,
-	});
+		MC.timeline = new Timeline({
+			parent: MC,
+			anchor: anchor,
+		});
+	}
 
-	ModuleCoordinator.container = anchor;
+	MC.container = anchor;
 
-	ModuleCoordinator.timeline.enter(animation);
+	MC.timeline.enter(animation);
 
-	ModuleCoordinator.initHotkeys();
+	MC.initHotkeys();
 
 	animation.done(function () {
 		$(GLOBAL.viewport).addClass('parallax-off'); // GPU performance boost
@@ -61,19 +66,28 @@ ModuleCoordinator.initialize = function (animation) {
 
 	$(window).ion('scrollStart', function (e, down) {
 		if (down) {
-			ModuleCoordinator.next();
+			MC.next();
 		} else {
-			ModuleCoordinator.previous();
+			MC.previous();
 		}
 	});
 
 	$(window).ion('swipe', function (e, evt) {
 		if (evt.deltaY < 0) {
-			ModuleCoordinator.next();
+			MC.next();
 		} else {
-			ModuleCoordinator.previous();
+			MC.previous();
 		}
 	});
+
+	MC.initialized = true;
+};
+
+ModuleCoordinator.reset = function () {
+	$(window).off('scrollStart swipe');
+	$(document).off('keydown');
+
+	ModuleCoordinator.timeline.anchorToAnchor();
 };
 
 ModuleCoordinator.tForName = function (name) {

@@ -63,8 +63,11 @@ class Timeline extends Synapse {
 	}
 
 	beforeExit (transition) {
-		let _this = this;
+		this.anchorToAnchor();
+	}
 
+	anchorToAnchor () {
+		let _this = this;
 		_this.view.module.detach();
 		_this.anchor.append(_this.view.module);
 	}
