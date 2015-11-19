@@ -20,9 +20,13 @@ class Timeline extends Synapse {
 		let progress = $('<div>').addClass('progress');
 		let module = container.append(progress);
 
-		container.on('click', function (evt) {
-			_this.onClick(this, evt);
-		});
+		container
+			.drag(function (evt) {
+				_this.onClick(this, evt);
+			})
+			.ion('click', function (evt) {
+				_this.onClick(this, evt);
+			})
 
 		return {
 			module: module,

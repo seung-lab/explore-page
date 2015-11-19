@@ -16,6 +16,14 @@
 .header.invisible
 	opacity 0
 	transition opacity 1s ease-in-out
+	
+.header .register,
+.header .login
+	pointer-events none
+	user-select none
+	
+.header .visible
+	pointer-events auto	
 
 	
 .header div
@@ -55,34 +63,40 @@ $corner_offset = 35px
 	
 .header div.visible
 	pointer-events all
+	z-index 100
 
 .header .share
 	height 30px
-	width 300px
+	width 225px
 	
-	right (-@width + $corner_offset + @height)
+	right -85px
 	
-	transition right 1000ms ease-in-out, opacity 1s ease-in-out
+	transition right 250ms ease-in-out, opacity 250ms ease-in-out
+	
+	display flex
+	align-items center
+	
+.header .share div
+	float left
+	transition opacity 250ms ease-in-out
+	
+.header .share.visible div
+	opacity 0
+
+.header .share.activated div
+	opacity 1
+	
+.header .share .text
+	color $TEXT_BLUE
+	text-transform uppercase
+	font-weight 700
+	letter-spacing 1.25px
+	padding-right 5px
 	
 .header .share.activated
 	right 0px
-	
-.header .share .permalink
-	display inline-block
-	color $TEXT_BLUE
-	opacity 0
-	
-	float left
-	margin-top 5px
-	margin-left 10px
-	font-size 16px
-	
-	cursor text
 
-.header .share.activated .permalink
-	opacity 1
-
-.header .share .before
+.header .share .image
 	display block
 	height 30px
 	width @height
@@ -92,7 +106,38 @@ $corner_offset = 35px
 	background-image url($BASE_URL + '/images/icons/sh-dark.svg') // ad-blocks sometimes block share.svg
 	background-size @height @height
 	background-repeat no-repeat
+	
+.header .share .before
+	@extend .header .share .image
+	margin-right 7px
 
+.header .share.visible .before,
+.header .share.visible .text
+	opacity 1
+
+
+.header .share .social
+	box-sizing border-box
+	margin-right 10px
+	border 1px solid transparent
+	border-radius 3px
+	transition border 250ms ease-in-out
+	
+.header .share .social:hover
+	border 1px solid $TEXT_BLUE
+
+.header .share .fb-share
+	@extend .header .share .image
+	background-image url($BASE_URL + '/images/icons/fb-dark.svg') 
+	
+.header .share .twitter-share
+	@extend .header .share .image
+	background-image url($BASE_URL + '/images/icons/fb-dark.svg')
+	
+.header .share .email-share
+	@extend .header .share .image
+	background-image url($BASE_URL + '/images/icons/email-dark.svg')
+	
 .header .login,
 .header .register
 	height 30px
