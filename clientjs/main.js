@@ -27,7 +27,7 @@ var _intakectrl = new Login.IntakeController();
 // scrolling is enabled at all times but the scrollbar is pushed off the screen
 // we want manually control the scrolling so we prevent the default behavior
 function disableScrolling() {
-	$(window).on('wheel', function (e) {
+	$(window).ion('wheel.disableScrolling', function (e) {
 		e.preventDefault();
 	});
 }

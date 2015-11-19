@@ -6,7 +6,7 @@ $(document).ready(function () {
 	var lastDelta = null;
 	var lastStart = 0;
 
-	$(window).on('wheel', function (e) {
+	$(window).ion('wheel.scrollStart', function (e) {
 		e = e.originalEvent;
 
 		var now = performance.now();
