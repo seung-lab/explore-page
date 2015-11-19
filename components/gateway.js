@@ -106,7 +106,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		});
  	}
 
- 	afterEnter () {
+ 	afterEnter (transition) {
  		let _this = this;
 
  		this.view.explorebtn.hide();
@@ -123,7 +123,9 @@ class Gateway extends Synapse { // You can only build within a pylon field
 	 		}, 3500);
 	 	}
 
-	 	this.attachEvents();
+	 	transition.done(function () {
+	 		_this.attachEvents();
+	 	});
  	}
 
  	beginExploring () {
@@ -134,13 +136,11 @@ class Gateway extends Synapse { // You can only build within a pylon field
 
 		$('#registration').hide();
 
-		let transition = $('#viewport')
-			.scrollTo('#explore', {
-				msec: 2000,
-				easing: Easing.sigmoidFactory(12),
-			});
-
-		Login.initExploring(transition);
+		let transition = Login.takeMeTo('explore', {
+			msec: 2000,
+			easing: Easing.sigmoidFactory(12),
+		});
+		
 		ModuleCoordinator.initialize(transition);
 		ModuleCoordinator.seek(0, transition);
  	}
@@ -168,8 +168,6 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		else {
  			_this.view.startbtn.text("Play Now");
  		}
-
- 		this.attachEvents();
  	}
  }
 

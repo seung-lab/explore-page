@@ -63,8 +63,31 @@ class Header extends Synapse {
 		};
 	}
 
-	attachEventListeners () {
+	attachShareEvents () {
 		let _this = this;
+
+		_this.view.share.icon.ion('click', function () {
+			_this.state.share_activated = !_this.state.share_activated;
+			_this.render();
+		});
+
+		_this.view.share.at_moment.ion('click', function () {
+			_this.render();
+		});	
+
+		_this.view.logo.ion('click', function () {
+			document.location.href = document.location.origin;
+		});
+	}
+
+	attachRegisterEvents () {
+		let _this = this;
+
+		_this.view.register.ion('click', function () {
+			Utils.UI.curtainFall(function () {
+				document.location.href = 'https://eyewire.org/signup';
+			})
+		});
 
 		_this.view.logo.ion('click', function () {
 			let animation = $.Deferred();
@@ -78,30 +101,27 @@ class Header extends Synapse {
 
 			_this.setMode('share', transition);
 
-			transition.done(function () {
-				animation.resolve();
-			});
+			transition
+				.done(function () {
+					animation.resolve();
+				})
+				.fail(function () {
+					animation.reject();
+				})
 		});
+	}
+
+	attachEvents () {
+		let _this = this;
 
 		_this.view.share.icon.off('click');
 		_this.view.register.off('click');
 
 		if (this.mode === 'share') {
-			_this.view.share.icon.ion('click', function () {
-				_this.state.share_activated = !_this.state.share_activated;
-				_this.render();
-			});
-
-			_this.view.share.at_moment.ion('click', function () {
-				_this.render();
-			});
+			_this.attachShareEvents();
 		}
 		else if (this.mode === 'register') {
-			_this.view.register.ion('click', function () {
-				Utils.UI.curtainFall(function () {
-					document.location.href = 'https://eyewire.org/signup';
-				})
-			});
+			_this.attachRegisterEvents();
 		}
 	}
 
@@ -179,7 +199,7 @@ class Header extends Synapse {
 			_this.renderShare();
 		}
 
-		this.attachEventListeners();
+		this.attachEvents();
 	}
 }
 

@@ -57,13 +57,19 @@ class Timeline extends Synapse {
 		let _this = this;
 
 		transition.done(function () { 
-			_this.view.module.detach();
-			$('body').append(_this.view.module);
+			_this.anchorToBody();
 		})
 	}
 
 	beforeExit (transition) {
 		this.anchorToAnchor();
+	}
+
+	anchorToBody () {
+		let _this = this;
+
+		_this.view.module.detach();
+		$('body').append(_this.view.module);
 	}
 
 	anchorToAnchor () {

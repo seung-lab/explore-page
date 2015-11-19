@@ -14,6 +14,7 @@ let $ = require('jquery'),
 let Login = {};
 
 let _components = {};
+let _stage_transition = $.Deferred().resolve();
 
 Login.initialize = function () {
 	_components.header = new Header({ 
@@ -85,19 +86,21 @@ Login.bindResizeEvents = function (stage) {
 Login.takeMeTo = function (stage, options) {
 	options = options || { msec: 0 };
 
-	let animation = $('#viewport').scrollTo(`#${stage}`, options);
+	_stage_transition.reject();
+
+	_stage_transition = $('#viewport').scrollTo(`#${stage}`, options);
 
 	if (stage === 'explore') {
-		Login.initExploring();
+		Login.initExploring(_stage_transition);
 	}
 	else if (stage === 'gateway') {
-	 	_components.gateway.render();
+	 	_components.gateway.attachEvents();
 	}
 	else {
 		Login.bindResizeEvents(stage);
 	}
 
-	return animation;
+	return _stage_transition;
 };
 
 Login.IntakeView = function () {

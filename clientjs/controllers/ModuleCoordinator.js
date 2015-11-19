@@ -61,6 +61,7 @@ ModuleCoordinator.initialize = function (animation) {
 	MC.initHotkeys();
 
 	animation.done(function () {
+		MC.timeline.anchorToBody();
 		$(GLOBAL.viewport).addClass('parallax-off'); // GPU performance boost
 	});
 
