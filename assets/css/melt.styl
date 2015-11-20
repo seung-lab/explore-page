@@ -2,7 +2,7 @@
 @require 'mixins.styl'
 
 .melt .story-text
-	@extend .galileo .story-text
+	@extend .amazing .story-text
 	font-family 'Roboto Condensed'
 	transition opacity 0.5s
 	z-index 2
@@ -11,8 +11,11 @@
 	color $TEXT_BLUE
 
 .melt .story-text.bottom
-	bottom 15%
+	bottom 10%
 	top auto
+	
+.melt .super-text
+	@extend .amazing .super-text
 
 .melt video
 	margin auto
