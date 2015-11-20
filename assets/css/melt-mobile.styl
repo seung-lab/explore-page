@@ -33,70 +33,169 @@
 .melt-mobile #meltMobileWhitePart .story-text
 	color: $TEXT_BLUE
 
-// slide 0
-.melt-mobile #meltMobile0.meltSlide
-	opacity 0
 
-.melt-mobile #meltMobile0.meltSlide.enter
+
+
+// slide 0
+.melt-mobile #meltMobile0.meltSlide.enter, .melt-mobile #meltMobile1.meltSlide.enter, .melt-mobile #meltMobile0.meltSlide.exit, .melt-mobile #meltMobile1.meltSlide.exit
 	opacity 1
 
-.melt-mobile #meltMobile0.meltSlide.exit.forward
-	transition opacity 1s
-	transition-delay 0.5s
+$movement-duration = 1000ms
 
-.melt-mobile #meltMobile0.meltSlide.enter.reverse
-	transition opacity 1s
-	transition-delay 1.5s
+$slide-0-text-perct = 0.8
 
+.melt-mobile #meltMobile0.meltSlide .story-text
+	transition none // disable transition inherited from galileo
+
+.melt-mobile #meltMobile0.meltSlide.exit.forward .story-text
+	animation-fill-mode forwards
+	animation-name fadeOut
+	animation-duration ($movement-duration * $slide-0-text-perct)
+	animation-timing-function ease-out
+
+.melt-mobile #meltMobile0.meltSlide.enter.reverse .story-text
+	opacity 0 // for the delay
+	animation-fill-mode forwards
+	animation-name fadeIn
+	animation-duration ($movement-duration * $slide-0-text-perct)
+	animation-delay ($movement-duration * (1 - $slide-0-text-perct))
+	animation-timing-function ease-in
 
 // slide 1
 
 // .melt-mobile #meltMobile1.active img
 // 	animation-duration 0s
 
+.melt-mobile #meltMobile1 img
+	transform translateY(100%) // start off the screen
+
+.melt-mobile #meltMobile1.enter img
+	transform translateY(0%) // start off the screen
+
 .melt-mobile #meltMobile1.return img
 	transition top 0.5s
 
 .melt-mobile #meltMobile1 img
-	animation-timing-function linear
 	animation-fill-mode forwards
-	animation-duration 1.5s
+	animation-duration $movement-duration
 
 .melt-mobile #meltMobile1.enter.forward img
-	animation-name enterFromBottom
+	animation-name enterFromBottom, shake
+	animation-duration $movement-duration, 2000ms
+	animation-iteration-count 1, infinite
+	animation-delay 0s, $movement-duration
+	animation-timing-function ease-out, linear
+
+.melt-mobile #meltMobile1.enter.forward.active img
+	animation none
 
 .melt-mobile #meltMobile1.exit.reverse img
 	animation-name exitToBottom
+	animation-timing-function ease-in
 
 .melt-mobile #meltMobile1.exit.forward img
 	animation-name exitToTop
+	animation-timing-function ease-in
 
 .melt-mobile #meltMobile1.enter.reverse img
 	animation-name enterFromTop
+	animation-timing-function ease-out
 
-#meltMobile1.enter, #meltMobile1.exit
-	opacity 1
+// #meltMobile1.enter, #meltMobile1.exit
+// 	opacity 1
+
+
+$m1-story-text-perct = (1/3)
 
 #meltMobile1 .story-text
 	opacity 0
+	animation-fill-mode forwards
+	animation-duration ($movement-duration * $m1-story-text-perct)
 	top auto
 	bottom 20%
-	transition opacity 2s
 
-#meltMobile1.enter .story-text
-	opacity 1
-	
 #meltMobile1.enter.forward .story-text
-	// transition opacity 2s
-	transition-delay 1.5s
+	animation-name fadeIn
+	animation-timing-function ease-in
+	animation-delay ($movement-duration * (1 - $m1-story-text-perct))
+
+#meltMobile1.exit.reverse .story-text
+	animation-name fadeOut
+	animation-timing-function ease-out
 
 #meltMobile1.exit.forward .story-text
-	// transition opacity 2s
-
+	animation-name fadeOut
+	animation-timing-function ease-out
 
 #meltMobile1.enter.reverse .story-text
-	transition-delay 2s
+	animation-name fadeIn
+	animation-timing-function ease-in
+	animation-delay ($movement-duration * (1 - $m1-story-text-perct))
 
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+   	opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+   	opacity: 0;
+  }
+}
+
+// @keyframes shake {
+// 	from {
+// 		transform: rotate(0deg);
+// 	}
+	
+// 	4% {
+// 		transform: rotate(1deg);
+// 	}
+	
+// 	12% {
+// 		transform: rotate(-1deg);
+// 	}
+	
+// 	16% {
+// 		transform: rotate(0deg);
+// 	}
+
+// 	to {
+// 		transform: rotate(0deg);
+// 	}
+// }
+
+@keyframes shake {
+	from {
+		transform translateY(0px)
+	}
+	
+	4% {
+		transform translateY(2px)
+	}
+	
+	12% {
+		transform translateY(-2px)
+	}
+	
+	16% {
+		transform translateY(0px)
+	}
+
+	to {
+		transform translateY(0px)
+	}
+}
 
 @keyframes enterFromTop {
   from {

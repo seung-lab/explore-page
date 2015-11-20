@@ -19,6 +19,7 @@ class MeltMobile extends TeaTime {
 
 		this.name = 'Melt';
 		this.allegience = 'dark';
+		this.manual_timeline = true;
 
 		let path = function (name) {
 			return "/animations/melt/" + name;
@@ -110,11 +111,7 @@ class MeltMobile extends TeaTime {
 	afterEnter (from) {
 		var _this = this;
 
-		console.log('melt-mobile after enter');
-
 		$(window).ion('panmove', function (e, evt) {
-			console.log('panmove');
-
 			var current = _this.slideAt(_this.t).el;
 
 			if (current.hasClass('fresh')) {
@@ -148,34 +145,28 @@ class MeltMobile extends TeaTime {
 		});
 	}
 
-	clearClasses (classes) {
+	beforeExit () {
+		clearTimeout(this.recurseTimeout);
+		this.clearClasses();
+	}
+
+	clearClasses () {
 		for (var i = 0; i < SLIDE_COUNT; i++) {
 			var el = this.slides[i].el;
 			el.removeClass('reverse');
 			el.removeClass('forward');
 			el.removeClass('exit');
 			el.removeClass('active');
-		}
-	}
-
-	clearEnter () {
-		for (var i = 0; i < SLIDE_COUNT; i++) {
-			var el = this.slides[i].el;
 			el.removeClass('enter');
 		}
 	}
 
-	next () { // next slide
-		console.log('next');
-		this.clearClasses();
-
+	next () {
 		var last = this.slideAt(this.t);
 
 		super.next();
 
 		var current = this.slideAt(this.t);
-
-		console.log('current', current.index);
 
 		if (current.index === last.index) {
 			return;
@@ -183,7 +174,6 @@ class MeltMobile extends TeaTime {
 
 		last.el.addClass('exit forward');
 
-		// current.el.removeClass('reverse');
 		current.el.addClass('forward');
 
 		if (current.index > SLIDE_UP_SLIDE && current.index < SLIDE_COUNT - 1) {
@@ -192,13 +182,8 @@ class MeltMobile extends TeaTime {
 		}
 	}
 
-	previous () { // previous slide
-		console.log('previous');
-		this.clearClasses();
-
+	previous () {
 		var last = this.slideAt(this.t);
-
-		// last.el.removeClass('enter forward');
 
 		super.previous();
 
@@ -210,22 +195,15 @@ class MeltMobile extends TeaTime {
 
 		last.el.addClass('exit reverse');
 
-		// current.el.removeClass('forward');
 		current.el.addClass('reverse');
-		// current.el.addClass('rev');
 
 		if (current.index > SLIDE_UP_SLIDE) {
-			// this.recurse(true);
 			this.recurseTimeout = setTimeout(this.previous.bind(this), MS_PER_FRAME);
 		}
 	}
 
 	render (t_prev, t) {
-		console.log('render', this.slideAt(t));
 		var currentSlide = this.slideAt(t);
-
-		this.clearEnter();
-
 
 		currentSlide.el.addClass('enter');
 
@@ -235,7 +213,7 @@ class MeltMobile extends TeaTime {
 
 		var delta = currentSlide.index - (SLIDE_COUNT - FRAMES_FOR_WHITE - 1);
 
-		if (delta >= 0) {
+		if (delta > 0) {
 			var t = delta / FRAMES_FOR_WHITE;
 			$('#meltMobileWhitePart').css('opacity', t);
 			$('#meltMobileWhitePart').css('height', (heightStart + (heightEnd - heightStart) * t) + "%");
@@ -244,7 +222,7 @@ class MeltMobile extends TeaTime {
 		} else {
 			$('#meltMobileWhitePart').css('opacity', 0);
 			$('#meltMobileWhitePart').css('height', heightStart + "%");
-			$('#meltMobileBg').css('opacity', 0);
+			$('#meltMobileBg').css('opacity', 0.05); // this fixes a stutter HACK!
 		}
 
 		if (currentSlide.index === SLIDE_UP_SLIDE) {
@@ -253,7 +231,8 @@ class MeltMobile extends TeaTime {
 	}
 
 	seek (t) {
-		console.log('seek', t);
+		this.clearClasses();
+
 		let t_prev = this.t;
 		this.t = t;
 		this.parent.sub_t_update(this.name, t);
