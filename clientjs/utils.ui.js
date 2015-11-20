@@ -86,7 +86,13 @@ Utils.UI.eventOffset = function (elem, evt) {
 
 	var offset = { x: 0, y: 0 };
 
-	if (!(evt.offsetX || evt.offsetY)) {
+	elem = $(elem);
+
+	if (elem[0] === window) {
+		offset.x = evt.pageX;
+		offset.y = evt.pageY;
+	}
+	else if (!(evt.offsetX || evt.offsetY)) {
 		offset.x = evt.pageX - $(elem).offset().left;
 		offset.y = evt.pageY - $(elem).offset().top;
 	} 

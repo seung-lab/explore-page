@@ -5,9 +5,11 @@
 .wonderers
 	@extend .module-font
 
+$WONDERERS_ASPECT_RATIO = 1.333;
+
 .wonderers img
 	height 750px
-	width @height * 1.333 // aspect ratio of this image
+	width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 	
 	transition width 250ms ease
 	transition height 250ms ease
@@ -26,13 +28,9 @@
 .wonderers .story-text:before
 	display none
 	
-
-	
 /*
  *	Media Queries
  */
- 
-
 
 // ---> Small Screen
 
@@ -41,9 +39,9 @@
 
 	.wonderers img
 		height 300px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-25px)
+		center(0px, -25px)
 
 
 /* ----------- Retina Screens ----------- */
@@ -51,7 +49,7 @@
 
 	.wonderers img
 		height 300px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
 		center(0, 25px)
 
@@ -64,9 +62,9 @@
 	
 	.wonderers img
 		height 600px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-50px)
+		center(0px, -50px)
 
 
 /* ----------- Retina Screens ----------- */
@@ -74,9 +72,9 @@
 
 	.wonderers img
 		height 600px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-50px)
+		center(0px, -50px)
 
 
 
@@ -87,9 +85,9 @@
 
 	.wonderers img
 		height 800px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-100px)
+		center(0px, -100px)
 
 
 /* ----------- Retina Screens ----------- */
@@ -97,9 +95,9 @@
 
 	.wonderers img
 		height 800px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-100px)
+		center(0px, -100px)
 		
 		
 
@@ -114,9 +112,9 @@
 
 	.wonderers img
 		height 275px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-100px)
+		center(0px, -50px)
 		
 	.wonderers .super-text
 		font-size 18px
@@ -133,9 +131,9 @@
 
 	.wonderers img
 		height 250px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-100px)
+		center(0px, -50px)
 		
 	.wonderers .super-text
 		font-size 18px
@@ -144,14 +142,14 @@
 /*
  *	Set to hit an iPhone 5 + 4
  */
-			
+
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 
 	.wonderers img
 		height 225px
-		width @height * 1.333 // aspect ratio of this image
+		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center($dy=-100px)
+		center(0px, -50px)
 		
 	.wonderers .super-text
 		font-size 18px
