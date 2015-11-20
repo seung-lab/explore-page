@@ -11,6 +11,9 @@ class Timeline extends Synapse {
 		this.view = this.generateView();
 		this.anchor = args.anchor;
 		this.visible = false;
+
+		this.manual = false;
+		this.scrubbing = false;
 	}
 
 	generateView () {
@@ -22,7 +25,15 @@ class Timeline extends Synapse {
 
 		container
 			.drag(function (evt) {
+				_this.fullManual(true);
+				this.scrubbing = true;
+				
 				_this.onClick(this, evt);
+
+				container.one('mouseup', function () {
+					this.scrubbing = false;
+					_this.fullManual(false);
+				});
 			})
 			.ion('click', function (evt) {
 				_this.onClick(this, evt);
@@ -35,6 +46,12 @@ class Timeline extends Synapse {
 	}
 
 	fullManual (manual = true) {
+		if (this.scrubbing) {
+			return;
+		}
+
+		this.manual = manual;
+
 		if (manual) {
 			this.view.module.addClass('manual');
 		}
