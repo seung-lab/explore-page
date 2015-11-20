@@ -53,8 +53,6 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 		
 		center(0, 25px)
 
-
-
 // ---> Medium Screen
 
 /* ----------- Non-Retina Screens ----------- */
@@ -71,11 +69,41 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 @media screen and (min-width: 750px), screen and (min-height: 700px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 
 	.wonderers img
-		height 600px
+		height 550px
 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
 		center(0px, -50px)
 
+@media screen and (max-height: 700px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (max-width: 600px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+	.wonderers img
+		height 400px
+		width @height * $WONDERERS_ASPECT_RATIO
+		
+		center(0px, -50px)
+		
+	.wonderers .super-text
+		font-size 22px
+		top -35px
+	
+	.wonderers .story-text
+		font-size 28px
+		bottom 18%
+
+		
+@media screen and (max-height: 500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+	.wonderers img
+		height 250px
+		width @height * $WONDERERS_ASPECT_RATIO
+		
+		center(0px, -50px)
+		
+	.wonderers .super-text
+		font-size 18px
+		top -35px
+	
+	.wonderers .story-text
+		font-size 24px
+		bottom 20%
 
 
 // ---> Large Screen
