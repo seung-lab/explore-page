@@ -10,6 +10,7 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 .wonderers img
 	height 750px
 	width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
+	center(0px, -50px)
 	
 	transition width 250ms ease
 	transition height 250ms ease
@@ -32,51 +33,9 @@ $WONDERERS_ASPECT_RATIO = 1.333;
  *	Media Queries
  */
 
-// ---> Small Screen
-
-/* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 400px), screen and (min-height: 400px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
-
+@media screen and (max-height: 900px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (max-width: 950px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.wonderers img
-		height 300px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
-		
-		center(0px, -25px)
-
-
-/* ----------- Retina Screens ----------- */
-@media screen and (min-width: 400px), screen and (min-height: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-
-	.wonderers img
-		height 300px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
-		
-		center(0, 25px)
-
-// ---> Medium Screen
-
-/* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 750px), screen and (min-height: 700px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
-	
-	.wonderers img
-		height 600px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
-		
-		center(0px, -50px)
-
-
-/* ----------- Retina Screens ----------- */
-@media screen and (min-width: 750px), screen and (min-height: 700px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-
-	.wonderers img
-		height 550px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
-		
-		center(0px, -50px)
-
-@media screen and (max-height: 700px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (max-width: 600px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-	.wonderers img
-		height 400px
+		height 500px
 		width @height * $WONDERERS_ASPECT_RATIO
 		
 		center(0px, -50px)
@@ -90,9 +49,9 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 		bottom 18%
 
 		
-@media screen and (max-height: 500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+@media screen and (max-height: 600px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (max-width: 650px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.wonderers img
-		height 250px
+		height 300px
 		width @height * $WONDERERS_ASPECT_RATIO
 		
 		center(0px, -50px)
@@ -106,26 +65,26 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 		bottom 20%
 
 
-// ---> Large Screen
+// // ---> Large Screen
 
-/* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 1500px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+// /* ----------- Non-Retina Screens ----------- */
+// @media screen and (min-width: 1500px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 
-	.wonderers img
-		height 800px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
+// 	.wonderers img
+// 		height 800px
+// 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center(0px, -100px)
+// 		center(0px, -100px)
 
 
-/* ----------- Retina Screens ----------- */
-@media screen and (min-width: 1500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+// /* ----------- Retina Screens ----------- */
+// @media screen and (min-width: 1500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 
-	.wonderers img
-		height 800px
-		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
+// 	.wonderers img
+// 		height 800px
+// 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
 		
-		center(0px, -100px)
+// 		center(0px, -100px)
 		
 		
 

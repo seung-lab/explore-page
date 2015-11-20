@@ -30,6 +30,10 @@ ModuleCoordinator.initialize = function (animation) {
 
 	let mobile = utils.isMobile();
 
+	if (mobile) {
+		anchor.addClass('mobile');
+	}
+
 	function moduleFactory(module, duration) {
 		return new module({
 			parent: MC,
