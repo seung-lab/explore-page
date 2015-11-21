@@ -7,13 +7,16 @@ let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
 	p5 = require('p5'),
-	GLOBAL = require('../../clientjs/GLOBAL.js');
+	GLOBAL = require('../../clientjs/GLOBAL.js'),
+	$ = require('jquery');
 
 let _options = {
 	width: 100,
 	height: 100,
 	anchor: null,
 };
+
+let _canvas = $.Deferred();
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -45,6 +48,8 @@ let sprout = function (p) {
 
 		canvas.parent(_options.anchor);
 
+		_canvas.resolve(canvas.elt);
+
 		// Set font characterists
 		p.push();
 			p.textFont(_fontRegular);
@@ -59,7 +64,8 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		p.background(27,39,49);
+		p.clear();
+
 		// Run the _nnn
 		_nnn.run();
 
@@ -119,7 +125,10 @@ let sprout = function (p) {
 
 	// Quick Max Calc : Returns Integer
 	function max_node (n) {
-		if (n.nodes.length > _mxn) _mxn = n.nodes.length;
+		if (n.nodes.length > _mxn) {
+			_mxn = n.nodes.length;
+		}
+
 		return _mxn;
 	}
 
@@ -154,5 +163,7 @@ module.exports.init = function (args = {}) {
 };
 
 
-
+module.exports.canvas = function () {
+	return _canvas;
+};
 
