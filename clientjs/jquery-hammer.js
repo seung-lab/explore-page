@@ -1,8 +1,11 @@
 var $ = require('jquery'),
-	Hammer = require('hammerjs');
+	Hammer = require('hammerjs'),
+	propagating = require('propagating-hammerjs');
+
+Hammer = propagating(Hammer);
 
 $(document).ready(function () {
-	let mc = new Hammer.Manager(document.body);
+	let mc = new Hammer.Manager($('#viewport').get(0));
 	mc.add(new Hammer.Pan({ threshold: 0, pointers: 0 }));
 	mc.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_VERTICAL })).recognizeWith(mc.get('pan')); // todo, what does this do?
 

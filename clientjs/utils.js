@@ -1139,9 +1139,13 @@ Utils.UI = Utils.ui;
 Utils.timeoutDeferred = function (ms) {
 	var d = $.Deferred();
 
-	setTimeout(function () {
+	let timer = setTimeout(function () {
 		d.resolve();
 	}, ms);
+
+	d.fail(function () {
+		clearTimeout(timer);
+	});
 
 	return d;
 }

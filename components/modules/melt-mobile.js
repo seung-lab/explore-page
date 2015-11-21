@@ -1,6 +1,10 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
-	TeaTime = require('../teatime.js');
+	TeaTime = require('../teatime.js'),
+	Hammer = require('hammerjs'),
+	propagating = require('propagating-hammerjs');
+
+Hammer = propagating(Hammer);
 
 
 var SLIDE_COUNT = 49 + 1;
@@ -30,6 +34,72 @@ class MeltMobile extends TeaTime {
 		this.slides = utils.range(SLIDE_COUNT).map(x => { return {}; });
 
 		this.view = this.generateView();
+
+		this.recurseTimeout = $.Deferred().resolve();
+
+
+
+		let slideUp = this.slides[SLIDE_UP_SLIDE].el;
+		// slideUp.addClass('return');
+		var img = slideUp.children().first().get(0);
+		// img.css('top', '0');
+
+
+		let mc = new Hammer.Manager(img);
+		mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_VERTICAL, threshold: 0, pointers: 0 }));
+		mc.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_VERTICAL })).recognizeWith(mc.get('pan')); // todo, what does this do?
+
+
+		let _this = this;
+
+		mc.on('swipeup', function (evt) {
+			evt.stopPropagation();
+		});
+
+		mc.on('panstart panmove', function (evt) {
+			if (evt.deltaY > 0) {
+				return;
+			}
+
+			evt.stopPropagation();
+
+			var current = _this.slideAt(_this.t).el;
+
+			if (current.hasClass('fresh')) {
+				current.removeClass('fresh');
+				current.addClass('active');
+				$('#meltMobile2').addClass('visible');
+			} else if (!current.hasClass('active')) {
+				return;
+			}
+
+			current.removeClass('return');
+
+			var img = current.children().first();
+
+			img.css('top', evt.deltaY + 'px');
+
+			var t = Math.max(0, Math.min(1, -evt.deltaY / (window.innerHeight / 1.5)));
+
+			if (t > 0.4) {
+				current.removeClass('active');
+				$('#meltMobile2').removeClass('visible');
+				_this.next();
+			}
+		});
+
+		$(window).ion('liftoff.melt', function (e, evt) {
+			var current = _this.slideAt(_this.t);
+
+			if (current.index === SLIDE_UP_SLIDE) {
+				let slideUpEl = current.el;
+
+				slideUpEl.addClass('return');
+
+				let img = slideUpEl.children().first();
+				img.css('top', '0');
+			}
+		});
 	}
 
 	generateView () {
@@ -108,56 +178,32 @@ class MeltMobile extends TeaTime {
 		};
 	}
 
-	afterEnter (from) {
+	afterEnter (transition) {
 		var _this = this;
 
-		$(window).ion('panmove', function (e, evt) {
-			var current = _this.slideAt(_this.t).el;
+		transition.done(function () {
+			
+			_this.recurseTimeout.reject();
 
-			if (current.hasClass('fresh')) {
-				current.removeClass('fresh');
-				current.addClass('active');
-			} else if (!current.hasClass('active')) {
-				return;
+			if (_this.slideAt(_this.t).index === 0) {// && t_prev <= _this.t) {
+				_this.recurseTimeout = utils.timeoutDeferred(2000).done(function () {
+					 _this.next();
+				});
 			}
-
-			current.removeClass('return');
-
-			var img = current.children().first();
-
-			img.css('top', evt.deltaY + 'px');
-
-			var t = Math.max(0, Math.min(1, -evt.deltaY / (window.innerHeight / 1.5)));
-
-			if (t > 0.5) {
-				current.removeClass('active');
-				_this.next();
-			}
-		});
-
-		$(window).ion('liftoff', function (e, evt) {
-			let slideUp = $(`#meltMobile${SLIDE_UP_SLIDE}`);
-
-			slideUp.addClass('return');
-
-			var img = slideUp.children().first();
-			img.css('top', '0');
 		});
 	}
 
 	beforeExit () {
-		clearTimeout(this.recurseTimeout);
+		this.recurseTimeout.reject();
+		// clearTimeout(this.recurseTimeout);
 		this.clearClasses();
 	}
 
 	clearClasses () {
 		for (var i = 0; i < SLIDE_COUNT; i++) {
 			var el = this.slides[i].el;
-			el.removeClass('reverse');
-			el.removeClass('forward');
-			el.removeClass('exit');
-			el.removeClass('active');
-			el.removeClass('enter');
+			el.removeClass();
+			el.addClass('meltSlide');
 		}
 	}
 
@@ -177,9 +223,14 @@ class MeltMobile extends TeaTime {
 		current.el.addClass('forward');
 
 		if (current.index > SLIDE_UP_SLIDE && current.index < SLIDE_COUNT - 1) {
-			let delay = current.index === SLIDE_UP_SLIDE + 1 ? 1000 : MS_PER_FRAME;
-			this.recurseTimeout = setTimeout(this.next.bind(this, true), delay);
+			let delay = current.index === SLIDE_UP_SLIDE + 1 ? 500 : MS_PER_FRAME;
+			let _this = this;
+			this.recurseTimeout = utils.timeoutDeferred(delay).done(function () {
+				_this.next();
+			});
 		}
+
+
 	}
 
 	previous () {
@@ -198,14 +249,30 @@ class MeltMobile extends TeaTime {
 		current.el.addClass('reverse');
 
 		if (current.index > SLIDE_UP_SLIDE) {
-			this.recurseTimeout = setTimeout(this.previous.bind(this), MS_PER_FRAME);
+			let _this = this;
+			this.recurseTimeout = utils.timeoutDeferred(MS_PER_FRAME).done(function () {
+				_this.previous();
+			});
+			// this.recurseTimeout = setTimeout(this.previous.bind(this), MS_PER_FRAME);
 		}
 	}
 
 	render (t_prev, t) {
+		let _this = this;
+
+		this.clearClasses();
+
+		this.recurseTimeout.reject();
+
 		var currentSlide = this.slideAt(t);
 
 		currentSlide.el.addClass('enter');
+
+		this.view.vidContainer.removeClass().addClass(`slide${currentSlide.index}`);
+
+		if (currentSlide.index === SLIDE_UP_SLIDE) {
+			currentSlide.el.children().first().css('top', '');
+		}
 
 		var FRAMES_FOR_WHITE = 10;
 		var heightStart = 30;
@@ -228,23 +295,6 @@ class MeltMobile extends TeaTime {
 		if (currentSlide.index === SLIDE_UP_SLIDE) {
 			currentSlide.el.addClass('fresh');
 		}
-	}
-
-	seek (t) {
-		this.clearClasses();
-
-		let t_prev = this.t;
-		this.t = t;
-		this.parent.sub_t_update(this.name, t);
-
-
-		clearTimeout(this.recurseTimeout);
-
-		if (this.slideAt(this.t).index === 0 && t_prev <= this.t) {
-			this.recurseTimeout = setTimeout(this.next.bind(this), 2000);
-		}
-
-		return this.render(t_prev, t);
 	}
 }
 
