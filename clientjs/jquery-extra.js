@@ -176,7 +176,7 @@ $.fn.drag = function (fn) {
 				fn.apply(elem, arguments);
 			});
 
-			$(document).one('mouseup', function () {
+			$(document).one('mouseup.' + klass, function () {
 				dragging = false;
 				$(document).off('mousemove.' + klass);
 			});

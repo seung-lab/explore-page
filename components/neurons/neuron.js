@@ -9,7 +9,9 @@
 
 // Contructor: P5.Vector, Integer, Float, Integer
 
-let p5 = require('p5');
+let p5 = require('p5'),
+	Node = require('./node.js'),
+	Synapse = require('./synapse.js');
 
 function Neuron (args) {
 	args = args || {};
@@ -94,9 +96,9 @@ function Neuron (args) {
 		}
 
 		// Add boutons --> Synapses to leaves of neuron :: Could definitely be improved
-		_this.leaves.forEach(function (synapse) {
-			// synapse.display(); 
-		});
+		// _this.leaves.forEach(function (synapse) {
+		// 	// synapse.display(); 
+		// });
 	}
 
 	this.done = function() {
@@ -215,6 +217,7 @@ function Neuron (args) {
 		// n.start_point = true;
 		var parent_arr = [];
 			parent_arr.push(n.parent);
+
 		return recurseMore(n, parent_arr);
 	}
 
@@ -237,14 +240,13 @@ function Neuron (args) {
 
 		// Take average of total radius
 		avg_radius = p.floor(total_radius / leaf_count);
-		console.log(avg_radius);
 
 		return avg_radius;
 	});
 
 }
 
-
+module.exports = Neuron;
 
 
 

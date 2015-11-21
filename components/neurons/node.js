@@ -15,7 +15,9 @@
 	// 
 "use strict";
 
-let Utils = require('../../clientjs/utils.js');
+let Utils = require('../../clientjs/utils.js'),
+	p5 = require('p5'),
+	Spring = require('./spring.js');
 
 function Node (args = {}) {
 	// Private arguments from constructor

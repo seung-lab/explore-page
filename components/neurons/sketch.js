@@ -6,10 +6,17 @@
 let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
-	p5 = require('p5');
+	p5 = require('p5'),
+	GLOBAL = require('../../clientjs/GLOBAL.js');
+
+let _options = {
+	width: 100,
+	height: 100,
+	anchor: null,
+};
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
-let sprout = function (anchor, p) {
+let sprout = function (p) {
 	// Global Variables
 	// 
 	// Nnn Object
@@ -28,11 +35,15 @@ let sprout = function (anchor, p) {
 	// Preload any required assets
 	p.preload = function () {
 		// Load font
-		_fontRegular = p.loadFont("assets/WhitneyHTF-Medium.otf");
+		_fontRegular = p.loadFont(GLOBAL.base_url + "/fonts/WhitneyHTF-Medium.otf");
 	};
 
 	p.setup = function () {
 		p.frameRate(30);
+
+		let canvas = p.createCanvas(_options.width, _options.height);
+
+		canvas.parent(_options.anchor);
 
 		// Set font characterists
 		p.push();
@@ -125,18 +136,21 @@ let sprout = function (anchor, p) {
 		_nnn.add_neuron(mousePos);
 	}
 
-	p.keyPressed = function () {
-		if (p.keyCode === p.UP_ARROW) {
-			recurse();
-		} 
+	// p.keyPressed = function () {
+	// 	if (p.keyCode === p.UP_ARROW) {
+	// 		recurse();
+	// 	} 
 
-		return false; // prevent default
-	}
+	// 	return false; // prevent default
+	// }
 }
 
-module.exports.init = function (anchor) {
-	let bound_sprout = sprout.bind(sprout, anchor);
-	return new p5(bound_sprout); // Instantiate the entire P5 sketch
+module.exports.init = function (args = {}) {
+	_options.anchor = args.anchor;
+	_options.width = args.width;
+	_options.height = args.height;
+
+	return new p5(sprout); // Instantiate the entire P5 sketch
 };
 
 

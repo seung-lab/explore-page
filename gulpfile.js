@@ -27,7 +27,7 @@ var extend = require('node.extend');
 
 gulp.task('default', ['make']);
 
-gulp.task('make', ['images', 'animations', 'js', 'css' ]);
+gulp.task('make', [ 'images', 'animations', 'js', 'css', 'fonts' ]);
 
 // gulp.task('sprite', function () {
 // 	gulp.src("assets/images/sprite")
@@ -100,10 +100,10 @@ gulp.task('js', function () {
 	return b.bundle()
 		.pipe(source('intake.min.js'))
 		.pipe(buffer())
-		// .pipe(sourcemaps.init())
-		// // 	// Add transformation tasks to the pipeline here.
-		// 	.pipe(uglify())
-		// // 	.on('error', gutil.log)
+		.pipe(sourcemaps.init())
+		// 	// Add transformation tasks to the pipeline here.
+			.pipe(uglify())
+		// 	.on('error', gutil.log)
 		.pipe(sourcemaps.write('./'))
 		.pipe(gulp.dest('./dist/public/js/'));
 
@@ -128,10 +128,21 @@ gulp.task('css', [ ], function () {
 	// ]);
 });
 
+gulp.task('fonts', function () {
+	gulp.src([
+		'assets/fonts/**'
+	])
+		.pipe(gulp.dest('dist/public/fonts/'))
+})
+
 gulp.task('watch', function () {
 	gulp.watch([
 		'assets/animations/**'
 	], [ 'animations' ]);
+
+	gulp.watch([
+		'assets/fonts/**'
+	], [ 'fonts' ]);
 
 	gulp.watch([
 		'assets/css/*'

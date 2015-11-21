@@ -2,8 +2,8 @@ let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	Easing = require('../../clientjs/easing.js'),
 	TeaTime = require('../teatime.js'),
-	GLOBAL =require('../../clientjs/GLOBAL.js');
-	// NNNSketch = require('./neurons/sketch.js');
+	GLOBAL =require('../../clientjs/GLOBAL.js'),
+	NNNSketch = require('../neurons/sketch.js');
 	
 class Galileo extends TeaTime {
 	constructor(args = {}) {
@@ -69,6 +69,8 @@ class Galileo extends TeaTime {
 			text: $.Deferred().resolve(),
 			count: $.Deferred().resolve(),
 		};
+
+		this.sketch = null; // p5 sketch for neurons
 	}
 
 	generateView () {
@@ -192,6 +194,12 @@ class Galileo extends TeaTime {
 		else {
 			dropfn();
 		}
+
+		this.sketch = NNNSketch.init({
+			anchor: this.anchor[0],
+			width: $(this.anchor).width(),
+			height: $(this.anchor).height(),
+		});
 	}
 
 	// Reenable if we decide to go for the ticking animation
@@ -296,8 +304,9 @@ class Galileo extends TeaTime {
 		return this;
 	}
 
-	render (t_prev, t) {
-		let _this = this; 
+
+	renderText (prev_t, t) {
+		let _this = this;
 
 		let slide = this.slideAt(t);
 
@@ -340,6 +349,17 @@ class Galileo extends TeaTime {
 		else {
 			throw new Error("slide did not specify text or big.");
 		}
+	}
+
+	renderNeurons (prev_t, t) {
+
+	}
+
+	render (t_prev, t) {
+		let _this = this; 
+
+		_this.renderText(t_prev, t);
+		_this.renderNeurons(t_prev, t);
 	}
 }
 
