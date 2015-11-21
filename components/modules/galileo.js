@@ -191,23 +191,10 @@ class Galileo extends TeaTime {
 		else {
 			dropfn();
 		}
-
-		this.sketch = NNNSketch.init({
-			anchor: this.anchor[0],
-			width: $(this.anchor).width(),
-			height: $(this.anchor).height(),
-		});
-
-		
-		NNNSketch.canvas().done(function (canvas) {
-			_this.view.canvas = $(canvas);
-			_this.view.canvas.addClass('neural-network');
-		});
 	}
 
 	afterExit () {
-		this.sketch.noLoop();
-		this.sketch.noCanvas();
+		this.removeNeurons();
 	}
 
 	// Reenable if we decide to go for the ticking animation
@@ -359,8 +346,33 @@ class Galileo extends TeaTime {
 		}
 	}
 
-	renderNeurons (prev_t, t) {
+	removeNeurons () {
+		if (this.sketch) {
+			this.sketch.noLoop();
+			this.sketch.noCanvas();
+			this.sketch = null;
+		}
+	}
 
+	renderNeurons (prev_t, t) {
+		let _this = this; 
+
+		let slide = this.slideAt(t);
+
+		if (slide.index === 1) {
+			_this.removeNeurons();
+
+			_this.sketch = NNNSketch.init({
+				anchor: _this.view.action[0],
+				width: _this.view.action.width(),
+				height: _this.view.action.height(),
+			});
+			
+			NNNSketch.canvas().done(function (canvas) {
+				_this.view.canvas = $(canvas);
+				_this.view.canvas.addClass('neural-network');
+			});
+		}
 	}
 
 	render (t_prev, t) {

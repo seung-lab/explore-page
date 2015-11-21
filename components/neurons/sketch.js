@@ -159,6 +159,8 @@ module.exports.init = function (args = {}) {
 	_options.width = args.width;
 	_options.height = args.height;
 
+	_canvas = $.Deferred();
+
 	return new p5(sprout); // Instantiate the entire P5 sketch
 };
 
