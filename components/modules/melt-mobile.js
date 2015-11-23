@@ -122,7 +122,7 @@ class MeltMobile extends TeaTime {
 		});
 
 		let supertext = d('super-text').html("as you solve puzzles");
-		let textcontainer2 = d('story-text visible-supertext');
+		let textcontainer2 = d('story-text white-space visible-supertext');
 		let text2 = d('text caps').html(splitter("You're mapping the brain", true));
 		let counter2 = d('counter');
 		textcontainer2.append(supertext, text2); // --> Trying no Counter
