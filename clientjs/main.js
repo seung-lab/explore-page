@@ -41,8 +41,8 @@ $(document).ready(function () {
 		let transition = $.Deferred();
 		ModuleCoordinator.initialize(transition);
 
-		if (t.match(/^\d+$/)) {
-			t = parseInt(t, 10) / 100;
+		if (t.match(/^\d+(\.\d+)?$/)) {
+			t = parseFloat(t, 10) / 100;
 		}
 		else {
 			t = ModuleCoordinator.tForName(t);

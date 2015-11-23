@@ -175,14 +175,13 @@ class Melt extends TeaTime {
 			this.view.texts[i].css('opacity', '0');
 		}
 
-		var whiteTStart = 0.87;
+		var whiteTStart = 0.87; // global t = 91.2, end = 96.1
 
-		if (t > whiteTStart) {
+		if (t >= whiteTStart) {
 			var p = (t - whiteTStart) / (1 - whiteTStart);
 
-			var heightStart = 27;
-			var heightEnd = 37;
-
+			var heightStart = 28.45;
+			var heightEnd = 38;
 
 			this.view.white.css('opacity', p); 
 			this.view.white.css('height', (p * heightEnd + (1-p) * heightStart) + '%');
