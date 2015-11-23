@@ -1,0 +1,72 @@
+$e = 2.71828
+$PI = 3.14159
+
+
+/* springFactory
+ * 
+ * Simulate an actual spring.
+ *
+ * For a very detailed explaination see:
+ * https://medium.com/@willsilversmith/the-spring-factory-4c3d988e7129
+ * 
+ * This stylus implementation by Alex Norton + William Silversmith
+ * 
+ * c.f. https://en.wikipedia.org/wiki/Harmonic_oscillator#Universal_oscillator_equation
+ * look for the underdamped solution.
+ *
+ * Solve for the boundary conditions: x(0) = 1, x(1) = 0
+ *
+ * The bounce can look jerky towards the end because the motion is less than a pixel
+ * per frame. Use the optional arguments to create a minimum motion if you can't use
+ * anti-aliasing.
+ *
+ * Required:
+ *   [0] zeta: Damping constant in [0, 1) (0: undamped, < 1: underdamped)
+ *   [1] k: integer in [0..inf]
+ *
+ * Optional:
+ *   [1] pixels: total distance in pixels we're moving
+ *   [2] dynamics: number of pixels above 0 for undamped sinusoidal component
+ *
+ * Returns: f(t), t in 0..1
+ */
+springFactory(zeta, k)
+
+	$fraction = 5%
+
+	$odd_number = 1 + 2 * k
+
+	$omega = $odd_number / 4 / 	((1- zeta * zeta) ** (1/2)) // solution set for x(1) = 0
+	$omega = $omega * 2 * $PI // normalize sinusoid period to 0..1
+	
+
+	$values = ()
+	
+	$fs = (1 - zeta ** 2) ** (1/2) * 2 * $PI * $omega 
+
+	
+	for i in range(0, 1, $fs)
+		push($values, ($e ** (-2 * zeta * $PI * $omega * i) * cos(((1 - zeta * zeta) ** (1/2)) * 2 * $PI * $omega * i)))
+		
+	return $values
+		
+$max-height = 100px
+$heights = springFactory(0.15 9)
+
+$fraction = 5%
+
+@keyframes shake
+    0%
+        transform translateY(0px)
+    for x, i in $heights
+        {$fraction * (i + 1) / length(heights)}
+            transform translateY(x * $max-height)
+    100%
+        transform translateY(0px)
+	
+	
+// Run springFactory through a for loop to return an array of keyframe values
+
+
+
+
