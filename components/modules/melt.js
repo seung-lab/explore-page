@@ -444,7 +444,7 @@ var videoCache = {
 
 
 var SEQUENCE_LENGTHS = [
-	74, 44, 195
+	74, 195
 ];
 
 var SEQUENCE_COUNT = SEQUENCE_LENGTHS.length;
