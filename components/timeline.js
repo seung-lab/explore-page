@@ -103,18 +103,6 @@ class Timeline extends Synapse {
 		this.parent.seek(fract);
 	}
 
-	// Extra target space for timeline hover state
-	/*
-	$(_this).mousemove(function(e) {
-		console.log(e.pageY);
-		if (e.pageY <= 50) {
-			$(container).addClass("hover");
-		} else {
-			$(container).removeClass("hover");
-		}
-	});
-	*/
-
 	afterEnter (transition) {
 		let _this = this;
 
