@@ -16,7 +16,7 @@ class Superheroes extends TeaTime {
 		this.slides = [
 			{
 				text: "Collaborate and compete unlock achievements for science",
-			},
+			}
 		];
 
 		this.duration = Utils.nvl(args.duration, this.slides.length);
@@ -148,12 +148,12 @@ class Superheroes extends TeaTime {
 
 		if (this.mobile) {
 			_this.view.play_now.text("LEARN MORE");
+			_this.view.text.text("Eyewire is only available for play on desktop. Tap above to see us from the TED stage.");
 		}
 		else {
 			_this.view.play_now.text("PLAY NOW");	
+			_this.view.text.html(Utils.pyramidLineBreak(slide.text));
 		}
-
-		_this.view.text.html(Utils.pyramidLineBreak(slide.text));
 
 		_this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 	}
