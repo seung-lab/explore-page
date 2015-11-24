@@ -91,9 +91,11 @@ Login.takeMeTo = function (stage, options) {
 
 	if (stage === 'explore') {
 		Login.initExploring(_stage_transition);
+		Login.bindResizeEvents('explore');
 	}
 	else if (stage === 'gateway') {
 	 	_components.gateway.attachEvents();
+	 	Login.bindResizeEvents('gateway');
 	}
 	else {
 		Login.bindResizeEvents(stage);
