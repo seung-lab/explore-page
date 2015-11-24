@@ -111,6 +111,8 @@ Login.IntakeView = function () {
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
+		_components.gateway.unattachSwipeEvents();
+
 		$.when(
 			$('.bumper .Es').imagesLoaded(),
 			$('.bumper .dot').imagesLoaded(),
@@ -127,6 +129,9 @@ Login.IntakeView = function () {
 					$('#viewport').scrollTo('.gateway', {
 						msec: 2500,
 						easing: Easing.springFactory(.7, 1),
+					})
+					.done(function () {
+						_components.gateway.attachEvents();
 					});
 				}, 650);
 

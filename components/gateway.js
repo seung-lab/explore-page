@@ -93,8 +93,11 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			});
  		});
 
- 		$(window).one('scrollStart', function () {
- 			_this.beginExploring();
+ 		$(window).ion('scrollStart.gateway', function (e, up) {
+ 			if (up) {
+	 			_this.beginExploring();
+	 			$(window).off('scrollStart.gateway');
+	 		}
  		});
 
 		$(window).ion('swipe.gateway', function (e, evt) {
@@ -115,6 +118,10 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.explorebtn.ion('mouseleave', function () {
  			_this.dipReveal(0);
  		});
+ 	}
+
+ 	unattachSwipeEvents () {
+ 		$(window).off('scrollStart.gateway swipe.gateway');
  	}
 
  	afterEnter (transition) {
