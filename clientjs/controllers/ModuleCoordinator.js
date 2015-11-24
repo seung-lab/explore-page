@@ -325,6 +325,16 @@ ModuleCoordinator.t = function (tee) {
 };
 
 ModuleCoordinator.seek = function (t, transition) {
+	try {
+		mixpanel.track('seek', {
+			global_t: t,
+			module: ModuleCoordinator.moduleAt(t).name,
+		});
+	}
+	catch (e) {
+		console.trace();
+	}
+
 	let prev_t = _t;
 	_t = t;
 	return ModuleCoordinator.render(prev_t, t, transition);

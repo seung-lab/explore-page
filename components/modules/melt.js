@@ -34,7 +34,7 @@ class Melt extends TeaTime {
 		this.timeouts = {
 
 		};
-
+		
 		this.loaded = false;
 	}
 

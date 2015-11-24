@@ -87,6 +87,10 @@ class Gateway extends Synapse { // You can only build within a pylon field
 					document.location.href = 'https://eyewire.org/signup';
 				}
 			});
+
+			mixpanel.track('play-now', {
+				from: 'gateway',
+			});
  		});
 
  		$(window).one('scrollStart', function () {

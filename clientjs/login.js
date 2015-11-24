@@ -3,7 +3,6 @@
 let $ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
-	Bumper = require('./bumper.js'),
 	Validate = require('./validate.js'),
 	Gateway = require('../components/gateway.js'),
 	Header = require('../components/header.js'),
@@ -131,6 +130,8 @@ Login.IntakeView = function () {
 
 				Login.bindResizeEvents('gateway');
 			});
+
+		mixpanel.track('play-intro');
 	};
 };
 

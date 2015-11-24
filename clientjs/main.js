@@ -15,7 +15,8 @@ require('./jquery-hammer.js');
 
 let Login = require('./login.js'),
 	Utils = require('./utils.js'),
-	ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
+	ModuleCoordinator = require('./controllers/ModuleCoordinator.js'),
+	GLOBAL = require('./GLOBAL.js');
 
 var _intakectrl = new Login.IntakeController();
 
@@ -74,6 +75,7 @@ window.Login = Login;
 window.Utils = Utils;
 window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
+window.GLOBAL = GLOBAL;
 window.$ = $;
 
 // Polyfills
@@ -81,3 +83,11 @@ window.$ = $;
 window.performance = window.performance || {
 	now: Date.now
 };
+
+if (!GLOBAL.production) {
+	window.mixpanel = {
+		track: function () {},
+	};
+}
+
+

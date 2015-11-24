@@ -53,6 +53,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-minify-css": "^1.2.0",
     "gulp-print": "^1.1.0",
+    "gulp-replace": "^0.5.4",
     "gulp-rsync": "0.0.5",
     "gulp-shell": "^0.4.2",
     "gulp-sourcemaps": "^1.5.2",
