@@ -54,7 +54,10 @@
 	center()
 	
 .big-number.hundred:first-letter
-	// letter-spacing -67.5px
+	letter-spacing -67.5px
+	
+.big-number.hundred
+	margin-left -5%
 
 .galileo .story-text-big .inner
 	display flex
@@ -67,10 +70,10 @@
 	height 200px
 	center-vertical()
 	
-.galileo .inner:after
-	content "...."
-	font-size 10px
-	letter-spacing 1px
+// .galileo .inner:after
+// 	content "...."
+// 	font-size 10px
+// 	letter-spacing 1px
 	
 .galileo .story-text .counter
 	bottom -40px
@@ -135,7 +138,7 @@
 // ---> Small Screen
 
 /* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 600px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+@media screen and (min-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	.galileo .big-number
 		top 165px	
 		font-size 350px
@@ -154,7 +157,7 @@
 
 
 /* ----------- Retina Screens ----------- */
-@media screen and (min-width: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+@media screen and (min-width: 450px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.galileo .big-number
 		top 165px	
 		font-size 350px
@@ -232,14 +235,20 @@
 		display none
 		
 	.galileo .big-number
-		top 150px
+		top 175px
 		font-size 300px
+		margin-left -1.5%
+	
+	.galileo .big-number.hundred
+		margin-left -3%
 
 	.galileo .story-text .text.italics	
 		font-size 30px
 		width 375px
 		bottom 15%
 		white-space normal
+		
+		center()
 	
 	.galileo .story-text
 		white-space normal
@@ -259,8 +268,12 @@
 @media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
 
 	.galileo .big-number
-		top 150px
+		top 185px	
 		font-size 300px
+		margin-left -1.5%
+		
+	.galileo .big-number.hundred
+		margin-left -3%
 		
 	.galileo .big-number.hundred:first-letter
 		letter-spacing -52px
@@ -269,6 +282,8 @@
 		font-size 24px
 		width 325px
 		white-space normal
+		
+		center()
 	
 	.galileo .story-text
 		white-space normal
@@ -299,8 +314,12 @@
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 
 	.galileo .big-number
-		top 150px
+		top 165px
 		font-size 300px
+		margin-left -1.5%
+		
+	.galileo .big-number.hundred
+		margin-left -3%
 
 	.galileo.big-number.hundred:first-letter
 		letter-spacing -85px
@@ -309,6 +328,8 @@
 		font-size 18px
 		width 275px
 		white-space normal
+		
+		center()
 		
 	.galileo .story-text
 		white-space normal
