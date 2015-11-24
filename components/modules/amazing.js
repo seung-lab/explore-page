@@ -182,7 +182,7 @@ class Amazing extends TeaTime {
 				return;
 			}
 
-			if (index === frames.length -1) {
+			if (index === blink_frames.length - 1) {
 				delta *= -1;
 			}
 
