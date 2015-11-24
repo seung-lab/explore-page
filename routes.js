@@ -1,5 +1,8 @@
 
-let GLOBAL = require('./clientjs/GLOBAL.js');
+let base_url = '';
+if (process.env.NODE_ENV === 'production') {
+	base_url = 'http://eyewire.org/explore'
+}
 
 exports.index = function (req, res) {
 	res.render('index', { 
@@ -7,7 +10,7 @@ exports.index = function (req, res) {
 		title: "Explore | EyeWire",
 		mode: "login",
 		translation: " ",
-		base_url: GLOBAL.base_url,
+		base_url: base_url,
 		production: process.env.NODE_ENV === 'production',
 	});
 };
