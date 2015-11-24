@@ -143,6 +143,10 @@ class Header extends Synapse {
 		let _this = this;
 
 		_this.view.register.ion('click', function () {
+			mixpanel.track('play-now', {
+				from: 'header',
+			});
+			
 			Utils.UI.curtainFall(function () {
 				document.location.href = 'https://eyewire.org/signup';
 			})

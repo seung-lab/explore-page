@@ -3,6 +3,7 @@ var argv = require('yargs').argv,
 	concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
 	stylus = require('gulp-stylus'),
+	replace = require('gulp-replace'),
 	include = require('gulp-include'),
 	browserify = require('browserify'),
 	minifyCss = require('gulp-minify-css'),
@@ -24,6 +25,10 @@ var fs = require('fs');
 var del = require('del');
 var path = require('path');
 var extend = require('node.extend');
+
+var BASEURL = argv.production 
+	? 'http://eyewire.org/explore'
+	: '';
 
 gulp.task('default', ['make']);
 
@@ -97,14 +102,19 @@ gulp.task('js', function () {
 		transform: [ babelify, browserify_shim ],
 	});
 
-	return b.bundle()
+	var stream = b.bundle()
 		.pipe(source('intake.min.js'))
 		.pipe(buffer())
-		// .pipe(sourcemaps.init())
-		// // 	// Add transformation tasks to the pipeline here.
-		// 	.pipe(uglify())
-		// // 	.on('error', gutil.log)
-		// .pipe(sourcemaps.write('./'))
+		.pipe(replace(/__BASE_URL/g, `'${BASEURL}'`));
+
+	if (argv.production) {
+		stream
+			.pipe(sourcemaps.init())
+				.pipe(uglify())
+			.pipe(sourcemaps.write('./'))
+	}
+
+	return stream
 		.pipe(gulp.dest('./dist/public/js/'));
 
 });
@@ -117,6 +127,7 @@ gulp.task('css', [ ], function () {
 	])
 		.pipe(concat('all.styl'))
 		.pipe(stylus())
+		.pipe(replace(/\$GULP_BASE_URL/g, BASEURL))
 		.pipe(autoprefixer({
 			browser: "> 1%, last 2 versions, Firefox ESR"
 		}))
