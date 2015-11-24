@@ -1,6 +1,5 @@
-$e = 2.71828
-$PI = 3.14159
-
+$e = 2.7182818285
+$PI = 3.1415926536
 
 /* springFactory
  * 
@@ -25,12 +24,11 @@ $PI = 3.14159
  *   [1] k: integer in [0..inf]
  *
  * Optional:
- *   [1] pixels: total distance in pixels we're moving
- *   [2] dynamics: number of pixels above 0 for undamped sinusoidal component
+ *   [2] phase: in radians, default 0
  *
  * Returns: f(t), t in 0..1
  */
-springFactory($zeta, $k)
+springFactory($zeta, $k, $phase = 0)
 
 	$odd_number = 1 + 2 * $k
 
@@ -46,7 +44,7 @@ springFactory($zeta, $k)
 	$frequency = ((1 - $zeta * $zeta) ** (1/2)) * $omega
 
 	for $t in range(0, 1, $incr)
-		$y = ($e ** (-1 * $zeta * $omega * $t)) * sin($frequency * $t)
+		$y = ($e ** (-1 * $zeta * $omega * $t)) * sin($frequency * $t + $phase)
 		push($values, $y)
 		
 	return $values
