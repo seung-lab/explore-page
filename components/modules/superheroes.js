@@ -117,9 +117,14 @@ class Superheroes extends TeaTime {
 		let _this = this;
 
 		_this.view.play_now.ion('click', function () {
-			mixpanel.track('play-now', {
-				from: "Superheroes",
-			});
+			try {
+				mixpanel.track('play-now', {
+					from: "Superheroes",
+				});
+			}
+			catch (e) {
+				console.trace();
+			}
 
 			Utils.UI.curtainFall(function (curtain) {
 
