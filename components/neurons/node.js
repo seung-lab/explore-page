@@ -67,7 +67,7 @@ function Node (args = {}) {
 	let _maxspeed = 1.5;       // Default 2
 	let _maxforce = p.random(0.8, 1);    // Default 0.05
 	let _damping = 0.85;
-	let _pow = 1000; // Huge starting multipliers!
+	let _pow = 5000; // Huge starting multipliers!
 
 	// Increment for each instantiation at a branch event
 	this.depth++;
@@ -203,12 +203,12 @@ function Node (args = {}) {
 		// Normalize _target and scale to maximum speed
 		_target.normalize();
 
-		if (_this.distribute) {
-			// Calculate distance from center
-			let center = p.createVector(p.width/2, p.height/2);
-			let cd = p.abs(p5.Vector.dist(_this.position, center));
-			target.div(cd*cd*cd*cd*cd); // Weight by distance
-		}
+		// if (_this.distribute) {
+		// 	// Calculate distance from center
+		// 	let center = p.createVector(p.width/2, p.height/2);
+		// 	let cd = p.abs(p5.Vector.dist(_this.position, center));
+		// 	target.div(cd*cd); // Weight by distance
+		// }
 
 		_target.mult(_maxspeed);
 		// Steering = Desired minus Velocity
@@ -276,14 +276,15 @@ function Node (args = {}) {
 	// Inverse Square
 	this.check_edges = function() {
 		let _this = this;
-		let x,y;
+		let x,
+			y;
 		let force = p.createVector();
 		let mult_x = 1;
 		let mult_y = 1;
 
 		// Calculate 'x' edge offset
 		if (_this.position.x < p.width / 2) {
-			x = _this.position.x + _radius;
+			x = (_this.position.x - _radius);
 		}
 		else {
 			x = p.width - _this.position.x + _radius;
@@ -292,22 +293,28 @@ function Node (args = {}) {
 
 		// Calculate 'y' edge offset
 		if (_this.position.y < p.height / 2) {
-			y = _this.position.y + _radius;
+			y = (_this.position.y - _radius);
 		}
 		else {
 			y = p.height - _this.position.y + _radius;
 			mult_y = -1;
 		}
 
-		x = Math.max(x, 0.01);
-		y = Math.max(y, 0.01);
+		x = x / (p.width / 2);
+		y = y / (p.height / 2);
+
+		x = Math.max(x, 0.001);
+		y = Math.max(y, 0.001);
+
+		x = Math.min(x, p.width);
+		y = Math.min(y, p.height);
 
 		// Inverse Square
-		x = mult_x / x;
-		y = mult_y / y;
+		let force_x = mult_x / (x*x);
+		let force_y = mult_y / (y*y);
 
 		// Set position
-		force.set(x,y);
+		force.set(force_x,force_y);
 
 		return force;
 	}
@@ -338,8 +345,8 @@ function Node (args = {}) {
 		}
 
 		// Inverse Square
-		x = 1 / x * x;
-		y = 1 / y * y;
+		x = 1 / (x * x);
+		y = 1 / (y * y);
 
 		// Set position
 		force.set(x,y);
@@ -354,23 +361,23 @@ function Node (args = {}) {
 	// !Important --> Requires list of nodes
 	this.spread = function(somas, rad) {
 		let _this = this;
+		let center = p.createVector(p.width/2, p.height/2); // Center point
+		
 		_radius = rad;
-		// Center point
-		let center = p.createVector(p.width/2, p.height/2);
 
 		// Set distribute to true
 		_this.distribute = true;
 
 		// Test Radius
-		_this.render_radius();
+		// _this.render_radius();
 		
 		let cen = _this.seek(center).mult(-1); // Simply seek away from center
 		let edg = _this.check_edges(); // Move away from edges
 		let sep = _this.separate(somas); // Move away from eachother
 
 		// Carefully weight these forces
-		// cen.mult(_pow);
-		edg.mult(_pow);
+		cen.mult(_pow);
+		edg.mult(1);
 		sep.mult(_pow);
 
 		// Add the force vectors to acceleration
@@ -378,9 +385,10 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.9;
+		_pow *= 0.99;
 		if (_pow <= 1) {
 			_pow = 0;
+			console.log('stop');
 		}
 	}
 
@@ -421,9 +429,13 @@ function Node (args = {}) {
 		// Update velocity
 		_this.velocity.add(_this.acceleration);
 		// If we are a spring, at friction (lower energy)
-		if(_this.sprung) {
+		if (_this.sprung) {
 			_this.velocity.mult(_damping);
 			_maxspeed = 100;
+		}
+
+		if (_this.distribute) {
+			_this.velocity.mult(_damping);
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
@@ -502,12 +514,6 @@ function Node (args = {}) {
 			);
 		}
 
-		// Draw Soma
-		p.push();
-			// p.fill(41,59,73); // blue
-			p.fill(200); // white
-			// if (_this.depth == 2) p.ellipse(_this.pt_1().x,_this.pt_1().y,15,15);
-		p.pop();
 		// Debug Neighborhood
 		p.push();
 			// p.noStroke();
@@ -516,6 +522,17 @@ function Node (args = {}) {
 			// p.fill(255,255);
 		p.pop();
 
+	}
+
+	this.render_soma = function() {
+		let _this = this;
+		// Draw Soma
+		p.push();
+			p.noStroke();
+			// p.fill(41,59,73); // blue
+			p.fill(200); // white
+			p.ellipse(_this.pt_2().x,_this.pt_2().y,15,15);
+		p.pop();
 	}
 
 	this.render_radius = function() {
@@ -545,6 +562,13 @@ function Node (args = {}) {
 		} else  {
 			_this.dw = false;
 		}
+	}
+
+	// Accepts an Array of Node Objects
+	this.space = function(nodes) {
+		let _this = this;
+			_this.spread(nodes, 100);
+			_this.update();
 	}
 
 	// Recurse through nodes to root
@@ -657,66 +681,13 @@ function Node (args = {}) {
 			_this.springs.push(s);
 		}
 
-		
-
-		// Check for child nodes, add to the adjacency list
-		// for (let i = 0; i < _this.children.length; i++) {
-		// 	// Create a new spring 
-		// 	getSprung(_this.children[i]);
-		// }
-
 		// // Check for parent nodes, add to adjaceny list
 		if (_this.parent) {
 			// Create a new spring 
 			getSprung(_this.parent);
-		}
-
-		/*
-
-		// First sort
-		if (distFrom(min2_ref) < distFrom(min1_ref)) {
-			min1_ref = nodes[1];
-			min2_ref = nodes[0];
-		}
-
-		NEIGHBOR: for (let i = 2; i < nodes.length; i++){
-			
-			n = nodes[i];
-			
-			// Make sure the node isn't already in our list
-			for (let j = 0; j < _this.springs.length; j++) {
-				if (n.id == _this.springs[j].node2.id) {
-					continue NEIGHBOR;
-				}
-			}
-			// Avoid adding self to list
-			if (n.id == _this.id) {
-				continue NEIGHBOR;
-			}
-			// Check only nodes on same level
-			if (n.depth !== _this.depth) {
-				continue NEIGHBOR;
-			}
-			// Check for 2 closest nodes that are not also parent or child
-			if (distFrom(n) < distFrom(min1_ref)) {
-				min2_ref = min1_ref;
-				min1_ref = n;
-			} 
-			else if (distFrom(n) < distFrom(min2_ref)) {
-				min2_ref = n;
-			}
-		}
-
-		// Add closest 2 neurons to neighborhood
-		getSprung(min1_ref);
-		getSprung(min2_ref);
-
-		*/
-
-		
+		}		
 
 		let new_spring = _this.leftNode();
-
 
 		if (new_spring && new_spring.id !== _this.id) {
 			getSprung(new_spring);
