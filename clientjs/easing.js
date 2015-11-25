@@ -218,6 +218,10 @@ module.exports.easeOutCubic = function (t) {
 	return Math.pow((t - 1), 3) + 1;
 };
 
+module.exports.easeOutSine = function (t) {
+	t = Utils.clamp(t, 0, 1);
+	return Math.sin(2 * Math.PI * t / 4);
+};
 
 module.exports.linear = function (t) { return t };
 
