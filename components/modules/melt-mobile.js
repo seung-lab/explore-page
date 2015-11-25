@@ -2,7 +2,8 @@ let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	TeaTime = require('../teatime.js'),
 	Hammer = require('hammerjs'),
-	propagating = require('propagating-hammerjs');
+	propagating = require('propagating-hammerjs'),
+	GLOBAL = require('../../clientjs/GLOBAL.js');
 
 Hammer = propagating(Hammer);
 
@@ -25,10 +26,6 @@ class MeltMobile extends TeaTime {
 		this.allegience = 'dark';
 		this.manual_timeline = true;
 
-		let path = function (name) {
-			return "/animations/melt/" + name;
-		};
-
 		this.duration = 10; // seconds
 
 		this.slides = utils.range(SLIDE_COUNT).map(x => { return {}; });
@@ -36,8 +33,6 @@ class MeltMobile extends TeaTime {
 		this.view = this.generateView();
 
 		this.recurseTimeout = $.Deferred().resolve();
-
-
 
 		let slideUp = this.slides[SLIDE_UP_SLIDE].el;
 		// slideUp.addClass('return');
@@ -114,7 +109,7 @@ class MeltMobile extends TeaTime {
 
 		let bg = $('<img>', {
 			id: 'meltMobileBg',
-			src: './animations/Melt_Sequence/mobile/neuron_bg_light.png'
+			src: GLOBAL.base_url + '/animations/Melt_Sequence/mobile/neuron_bg_light.png',
 		});
 
 		let whitePart = $('<div>', {
@@ -166,7 +161,7 @@ class MeltMobile extends TeaTime {
 			vidContainer.append(slide);
 		}
 
-		$.getJSON('./animations/melt/mobile/concat.json', function (json) {
+		$.getJSON(GLOBAL.base_url + '/animations/melt/mobile/concat.json', function (json) {
 			for (let i = 1; i < SLIDE_COUNT; i++) {
 				_this.slides[i].el.children().first().attr('src', 'data:image/png;base64,' + json[i - 1]);
 			}
