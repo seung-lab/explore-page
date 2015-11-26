@@ -20,23 +20,37 @@ function NNN (args = {}) {
 
 	// Generic public array letiable : not an argument though
 	this.neurons = [];
+	// Array of all somas included in the NNN
+	this.somas = [];
 
 	this.max_depth;
 	this.num_branches;
 
-	// Array of all somas included in the NNN
-	let somas = [];
+	this.initialized = false;
 
 	this.initialize = function() {
 		let _this = this;
-
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
+	}
 
-		// Fill up the somas array
+	this.distribute = function() {
+		let _this = this;
+
+		// Once the MST is built...
 		_this.neurons.forEach(function(neuron) {
-			// Find soma for each neuron
-			somas.push(neuron.nodes[0]);
+
+			let soma = neuron.nodes[0];
+				soma.render_soma();
+
+			if (p.frameCount >= 1000) {
+				neuron.network_setup(); // Create seed branching
+				return;
+			}
+
+			// Repel from center
+			soma.space(_this.somas);
+
 		});
 
 	}
@@ -57,7 +71,7 @@ function NNN (args = {}) {
 
 				let radius = neuron.radius();
 				
-				neuron.nodes[0].spread(somas, radius);
+				neuron.nodes[0].spread(_this.somas, radius);
 			} 
 			else {
 				neuron.grow();
@@ -88,33 +102,17 @@ function NNN (args = {}) {
 
 		for (let i = 0; i < count; i++) {
 			// Set Neuron Soma Position (Root)
-			// Start all neurons in center: Repel()
-			if ((count == 1) || (_this.neurons.length < 1)) {
-				x = (window.innerWidth / 2) + p.random(1);
-				y = (window.innerHeight / 2) + p.random(1);
-			}
-			else {
-				x = (p.random(window.innerWidth));
-				y = (p.random(window.innerHeight));
-			}
+			x = (window.innerWidth / 2) + p.random(-1,1);
+			y = (window.innerHeight / 2) + p.random(-1,1);
 
 			// Create Neurons with similar general levels of complexity
 			_this.num_branches = p.round(p.random(6,8));
-			// _this.num_branches = p.floor(p.randomGaussian(7,1));
-			// _this.num_branches = 1; 
 			_this.max_depth = _this.complexity - _this.num_branches;
-			// _this.max_depth = 4;    
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.
 			// Grow time is inversely proportional to num_branches
 			let neuron_timer = 1000 / _this.num_branches;
-			// _this.neuron_timer = 75;
-			// Initialize the Neuron Object:
-			// 		args[0] = Pvector position
-			// 		args[1] = int num_branches
-			// 		args[2] = float neuron_timer
-			// 		args[3] = int max_depth
-			// 		args[4] = 'p' instance
+
 			_this.neurons.push(
 				new Neuron ({
 					x: 				x,
@@ -126,8 +124,10 @@ function NNN (args = {}) {
 				})	
 			);
 
-			_this.neurons[_this.neurons.length - 1].neuron_setup();
-			_this.neurons[_this.neurons.length - 1].network_setup();
+			// Get the soma setup
+			let soma = _this.neurons[_this.neurons.length - 1]; // --> 1st soma in [0] position
+				soma.neuron_start();
+				_this.somas.push(soma.nodes[0]);
 
 		}
 	}
@@ -147,9 +147,9 @@ function NNN (args = {}) {
 	this.spread = function() {
 		let _this = this;
 
-		somas.forEach(function (soma) {
+		_this.somas.forEach(function (soma) {
 			// Find soma for each neuron
-			soma.separate(somas);
+			soma.separate(_this.somas);
 		});
 	}
 }

@@ -60,22 +60,27 @@ let sprout = function (p) {
 		_nnn_count = p.ceil(p.min((p.width / 100), 25));
 		// _nnn_count = 1;
 
-		network_start();
+		nnn_start();
 	};
 
 	p.draw = function() {
 		p.clear();
 
-		// Run the _nnn
-		_nnn.run();
+		// console.log(_nnn.initialize()); --> This is currently not returning as expected
+
+		// Run the _nnn if it has finished spreading
+		if (_nnn.distribute()) {
+			_nnn.run();
+			console.log('potato');
+		}
 
 		// plus_minus();
-		iterate();
+		// iterate();
 
 		// if (_nnn.done()) recurse();
 	}
 
-	function network_start () {
+	function nnn_start () {
 		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
 		_nnn = new NNN({
 			num_neurons: _nnn_count,
@@ -102,7 +107,7 @@ let sprout = function (p) {
 	function iterate () {
 		if (p.frameCount % 1000 === 0) {
 			_avg = avg_node(_nnn.neurons[0]);
-			network_start();
+			nnn_start();
 			_counter++;
 			// p.noLoop();
 
