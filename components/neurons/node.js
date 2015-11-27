@@ -284,19 +284,23 @@ function Node (args = {}) {
 
 		// Calculate 'x' edge offset
 		if (_this.position.x < p.width / 2) {
-			x = (_this.position.x - _radius);
+			// x = (_this.position.x - _radius);
+			x = _this.position.x;
 		}
 		else {
-			x = p.width - _this.position.x + _radius;
+			// x = p.width - _this.position.x + _radius;
+			x = p.width - _this.position.x;
 			mult_x = -1;
 		}
 
 		// Calculate 'y' edge offset
 		if (_this.position.y < p.height / 2) {
-			y = (_this.position.y - _radius);
+			// y = (_this.position.y - _radius);
+			y = _this.position.y;
 		}
 		else {
-			y = p.height - _this.position.y + _radius;
+			// y = p.height - _this.position.y + _radius;
+			y = p.height - _this.position.y;
 			mult_y = -1;
 		}
 
@@ -369,7 +373,7 @@ function Node (args = {}) {
 		_this.distribute = true;
 
 		// Test Radius
-		// _this.render_radius();
+		_this.render_radius();
 		
 		let cen = _this.seek(center).mult(-1); // Simply seek away from center
 		let edg = _this.check_edges(); // Move away from edges
@@ -377,7 +381,7 @@ function Node (args = {}) {
 
 		// Carefully weight these forces
 		cen.mult(_pow);
-		edg.mult(1);
+		edg.mult(_pow / 10);
 		sep.mult(_pow);
 
 		// Add the force vectors to acceleration
@@ -385,7 +389,7 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.99;
+		_pow *= 0.85;
 		if (_pow <= 1) {
 			_pow = 0;
 			console.log('stop');
@@ -436,6 +440,7 @@ function Node (args = {}) {
 
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
+			_maxspeed = 10;
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
@@ -567,7 +572,7 @@ function Node (args = {}) {
 	// Accepts an Array of Node Objects
 	this.space = function(nodes) {
 		let _this = this;
-			_this.spread(nodes, 100);
+			_this.spread(nodes, 300);
 			_this.update();
 	}
 

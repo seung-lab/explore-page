@@ -57,7 +57,7 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		// 2000 yields 20
-		_nnn_count = p.ceil(p.min((p.width / 100), 25));
+		_nnn_count = p.ceil(p.min((p.width / 60), 25));
 		// _nnn_count = 1;
 
 		nnn_start();
