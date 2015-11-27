@@ -21,6 +21,8 @@ let Login = require('./login.js'),
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
+	$(GLOBAL.viewport)[0].scrollTo(0,0);
+	
 	// if you simply use overflow-y: hidden, the animation is laggy 
 	// so here are some hacks to display like scrolling is allowed without 
 	// actually allowing it

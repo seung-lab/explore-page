@@ -92,6 +92,8 @@ ModuleCoordinator.reset = function (animation) {
 	$(window).off('scrollStart swipe');
 	$(document).off('keydown');
 
+	$(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
+
 	ModuleCoordinator.timeline.anchorToAnchor();
 
 	animation.done(function () {
