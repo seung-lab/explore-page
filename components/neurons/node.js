@@ -69,6 +69,12 @@ function Node (args = {}) {
 	let _damping = 0.85;
 	let _pow = 5000; // Huge starting multipliers!
 
+	// Make our PVectors
+	let p_0 = p.createVector();
+	let p_1 = p.createVector();
+	let p_2 = p.createVector();
+	let p_3 = p.createVector();
+
 	// Increment for each instantiation at a branch event
 	this.depth++;
 
@@ -94,7 +100,6 @@ function Node (args = {}) {
 	// Set curve points
 	this.pt_0 = function() {
 		let _this = this;
-		let p_0 = p.createVector();
 		if (_this.depth == 1 || _this.depth == 2) {
 			p_0 = _this.position; 
 			return p_0;
@@ -106,7 +111,6 @@ function Node (args = {}) {
 
 	this.pt_1 = function() {
 		let _this = this;
-		let p_1 = p.createVector();
 		let isAlone =  _this.parent instanceof Node;
 		if (!isAlone) {
 			p_1 = _this.start.copy(); 
@@ -119,13 +123,11 @@ function Node (args = {}) {
 
 	this.pt_2 = function() {
 		let _this = this;
-		let p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
 	}
 
 	this.pt_3 = function() {
 		let _this = this;
-		let p_3 = p.createVector();
 		if (_this.children.length == 1) {
 			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
 		} 
@@ -378,14 +380,14 @@ function Node (args = {}) {
 		_this.distribute = true;
 
 		// Test Radius
-		_this.render_radius();
+		// _this.render_radius();
 		
 		let cen = _this.seek(center).mult(-1); // Simply seek away from center
 		let edg = _this.check_edges(); // Move away from edges
 		let sep = _this.separate(somas); // Move away from eachother
 
 		// Carefully weight these forces
-		cen.mult(_pow);
+		cen.mult(_pow * 1.25);
 		edg.mult(_pow / 15);
 		sep.mult(_pow);
 
@@ -394,10 +396,10 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.9;
+		_pow *= 0.85;
 		if (_pow <= 1) {
 			_pow = 0;
-			console.log('stop');
+			// console.log('stop');
 		}
 	}
 
@@ -445,7 +447,7 @@ function Node (args = {}) {
 
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
-			_maxspeed = 10;
+			_maxspeed = 15;
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 

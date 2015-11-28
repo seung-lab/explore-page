@@ -42,7 +42,7 @@ let sprout = function (p) {
 	};
 
 	p.setup = function () {
-		p.frameRate(30);
+		p.frameRate(60);
 
 		let canvas = p.createCanvas(_options.width, _options.height);
 

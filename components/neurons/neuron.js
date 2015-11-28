@@ -81,7 +81,7 @@ function Neuron (args) {
 			);
 		}
 
-		console.log(_this.nodes);
+		// console.log(_this.nodes);
 
 	});
 
