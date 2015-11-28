@@ -363,6 +363,11 @@ function Node (args = {}) {
 	// Calculate initial distribution forces
 	// !Important --> Must be called outside of node 
 	// !Important --> Requires list of nodes
+	/*
+	 *  Avoid iniform sampling by exploring something like a poisson disc
+	 *  distribution of the somas
+	*/
+
 	this.spread = function(somas, rad) {
 		let _this = this;
 		let center = p.createVector(p.width/2, p.height/2); // Center point
@@ -381,7 +386,7 @@ function Node (args = {}) {
 
 		// Carefully weight these forces
 		cen.mult(_pow);
-		edg.mult(_pow / 10);
+		edg.mult(_pow / 15);
 		sep.mult(_pow);
 
 		// Add the force vectors to acceleration
@@ -389,7 +394,7 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.85;
+		_pow *= 0.9;
 		if (_pow <= 1) {
 			_pow = 0;
 			console.log('stop');
@@ -572,9 +577,15 @@ function Node (args = {}) {
 	// Accepts an Array of Node Objects
 	this.space = function(nodes) {
 		let _this = this;
-			_this.spread(nodes, 300);
+			_this.spread(nodes, _this.radius_size());
 			_this.update();
 	}
+
+	// Parameterize Radius
+	this.radius_size = Utils.cacheify(function() {
+		let _radius_size = p.round(p.random(150, 400));
+		return _radius_size;
+	});
 
 	// Recurse through nodes to root
 	// Accepts Node object
