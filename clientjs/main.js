@@ -18,6 +18,30 @@ let Login = require('./login.js'),
 	ModuleCoordinator = require('./controllers/ModuleCoordinator.js'),
 	GLOBAL = require('./GLOBAL.js');
 
+
+// Globals
+
+window.Login = Login;
+window.Utils = Utils;
+window.ModuleCoordinator = ModuleCoordinator;
+window.Easing = require('./easing.js');
+window.$ = $;
+
+GLOBAL = $.extend(GLOBAL, window.GLOBAL);
+window.GLOBAL = GLOBAL;
+
+// Polyfills
+
+window.performance = window.performance || {
+	now: Date.now
+};
+
+if (!GLOBAL.production) {
+	window.mixpanel = {
+		track: function () {},
+	};
+}
+
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
@@ -70,26 +94,3 @@ function jumpToExplore (t, transition) {
 
 	ModuleCoordinator.seek(t, transition);
 }
-
-// Globals
-
-window.Login = Login;
-window.Utils = Utils;
-window.ModuleCoordinator = ModuleCoordinator;
-window.Easing = require('./easing.js');
-window.GLOBAL = GLOBAL;
-window.$ = $;
-
-// Polyfills
-
-window.performance = window.performance || {
-	now: Date.now
-};
-
-if (!GLOBAL.production) {
-	window.mixpanel = {
-		track: function () {},
-	};
-}
-
-
