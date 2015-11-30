@@ -1,0 +1,52 @@
+$e = 2.7182818285
+$PI = 3.1415926536
+
+/* springFactory
+ * 
+ * Simulate an actual spring.
+ *
+ * For a very detailed explaination see:
+ * https://medium.com/@willsilversmith/the-spring-factory-4c3d988e7129
+ * 
+ * This stylus implementation by Alex Norton + William Silversmith
+ * 
+ * c.f. https://en.wikipedia.org/wiki/Harmonic_oscillator#Universal_oscillator_equation
+ * look for the underdamped solution.
+ *
+ * Solve for the boundary conditions: x(0) = 1, x(1) = 0
+ *
+ * The bounce can look jerky towards the end because the motion is less than a pixel
+ * per frame. Use the optional arguments to create a minimum motion if you can't use
+ * anti-aliasing.
+ *
+ * Required:
+ *   [0] zeta: Damping constant in [0, 1) (0: undamped, < 1: underdamped)
+ *   [1] k: integer in [0..inf]
+ *
+ * Optional:
+ *   [2] phase: in radians, default 0
+ *
+ * Returns: f(t), t in 0..1
+ */
+springFactory($zeta, $k, $phase = 0)
+
+	$odd_number = 1 + 2 * $k
+
+	$omega = $odd_number / (4 * ((1 - $zeta * $zeta) ** (1/2))) // solution set for x(1) = 0
+	$omega = $omega * 2 * $PI // normalize sinusoid period to 0..1
+	
+	$values = ()
+
+	$num_periods = 0.25 + $k / 2;
+
+	$incr = 1 / $num_periods / 16
+	
+	$frequency = ((1 - $zeta * $zeta) ** (1/2)) * $omega
+
+	for $t in range(0, 1, $incr)
+		$y = ($e ** (-1 * $zeta * $omega * $t)) * sin($frequency * $t + $phase)
+		push($values, $y)
+		
+	return $values
+
+// Run springFactory through a for loop to return an array of keyframe values

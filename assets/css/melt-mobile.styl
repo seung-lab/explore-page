@@ -1,6 +1,7 @@
 @require 'colors.styl'
 @require 'mixins.styl'
 @require 'galileo.styl'
+@require 'animation.styl'
 
 .melt-mobile .meltSlide img
 	height 100%
@@ -28,9 +29,11 @@
 .melt-mobile .story-text
 	@extend .galileo .story-text
 	font-family 'Roboto Condensed'
-	top 50%
 	font-size 30px
 	line-height 1.25em
+	
+.melt-mobile .story-text.white-space
+	top 45%
 	
 
 .melt-mobile #meltMobileWhitePart .story-text
@@ -90,7 +93,7 @@ $slide-0-text-perct = 0.8
 	animation-name enterFromBottom, shake
 	animation-duration $movement-duration, 3000ms
 	animation-iteration-count 1, infinite
-	animation-delay 0s, ($movement-duration + 1000ms)
+	animation-delay 0s, ($movement-duration)
 	animation-timing-function ease-out, linear
 
 .melt-mobile #meltMobile1.enter.forward.active img
@@ -163,19 +166,20 @@ $m1-story-text-perct = (1/3)
   }
 }
 
-$max-height = 100px
-$heights = .45 -.2 .1 -.04 .001 -0.008 0.003 0
+$max-height = 50px
+$heights = springFactory(0.15, 9)
 
-$fraction = 5%
+push($heights, 0)
+
+$count = length($heights)
 
 @keyframes shake
 	0%
 		transform translateY(0px)
-	for x, i in $heights
-		{$fraction * (i + 1) / length(heights)}
-			transform translateY(-1 * x * $max-height)
-	100%
-		transform translateY(0px)
+	for $y, $i in $heights
+		$percent = unit($i / $count * 50, '%') + (100 - 50)
+		{$percent}
+			transform translateY($y * $max-height)
 
 @keyframes enterFromTop {
   from {

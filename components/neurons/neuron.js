@@ -17,7 +17,7 @@ function Neuron (args) {
 	args = args || {};
 
 	// Private arguments from constructor
-	var p = args.p;
+	let p = args.p;
 	
 	// Public arguments from constructor
 	this.position = p.createVector(args.x, args.y)    	|| p.createVector(0,0);
@@ -31,14 +31,14 @@ function Neuron (args) {
 	this.nodes = [];
 	this.leaves = [];
 
-	var list = false;
+	let list = false;
 
 	// Call methods to access outside of class this way!
-	this.neuron_setup = function () {
-		var _this = this;
-		var start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
+	this.neuron_start = function () {
+		let _this = this;
+		let start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
 		// Create a new Node instance
-		var n = new Node ({
+		let n = new Node ({
 			neuron_timer: 	_this.neuron_timer,
 			max_depth: 		_this.max_depth,
 			position: 		_this.position,
@@ -53,44 +53,47 @@ function Neuron (args) {
 		_this.nodes.push(n); 
 	}
 
-	this.network_setup = function() {
-		var _this = this;
+	this.network_setup = Utils.onceify(function() {
+		let _this = this;
 		 
-		 // Get things moving
-		 var n = _this.nodes[0];
-		n.velocity.set(2,2);
-		n.size == true;
+		// Get things moving
+		let v = p.round(-2,2);
+		let n = _this.nodes[0];
+			n.velocity.set(v,v);
+			n.size == true;
 
-		var theta = p.TWO_PI / _this.num_branches;  
+		let theta = p.TWO_PI / _this.num_branches;  
 		// Random rotational offset constant
-		var theta_const = p.random(p.TWO_PI); 
-		var start_angle;
+		let theta_const = p.random(p.TWO_PI); 
+		let start_angle;
 
 		// Create seed dendritees
-		for (var i = 0; i < _this.num_branches; i++) {
+		for (let i = 0; i < _this.num_branches; i++) {
 			// Create a unique initial offset velocity heading for each branch with respect to the total
 			// number of seed branches, for additional diversity, add a random rotational offset
 			start_angle = (theta * i) + p.radians(p.random(-15, 15)) + theta_const;
 			// Convert from polar to cartesian coordinates
-			// var x = p.cos(start_angle);
-			// var y = p.sin(start_angle);
+			// let x = p.cos(start_angle);
+			// let y = p.sin(start_angle);
 			// Branch a bunch of times
 			_this.nodes.push(
 				n.branch(p.degrees(start_angle, _this.nodes.length), i + 1) // No need for ';'
 			);
 		}
 
-	}
+		// console.log(_this.nodes);
+
+	});
 
 	// Render the Neurons + Nodes
 	this.render = function() {
-		var _this = this;
-		var n;
+		let _this = this;
+		let n;
 
 		// Special Case for Soma
 		// _this.nodes[0].render();
 		
-		for (var i = _this.nodes.length - 1; i >= 1; i--) {
+		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			n = _this.nodes[i];
 			n.render();
 		}
@@ -102,10 +105,10 @@ function Neuron (args) {
 	}
 
 	this.done = function() {
-		var _this = this;
-		var n;
+		let _this = this;
+		let n;
 		
-		for (var i = _this.nodes.length - 1; i >= 1; i--) {
+		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			n = _this.nodes[i];
 			if (n.isGrowing()) {
 				return false;
@@ -132,7 +135,7 @@ function Neuron (args) {
 
 	// Following growing, we update
 	this.update = function() {
-		var _this = this;
+		let _this = this;
 		
 		// Once neuron has completed, create adjacency list
 		_this.nodes.forEach(function(n){
@@ -142,12 +145,12 @@ function Neuron (args) {
 	}
 
 	this.grow = function() {
-		var _this = this;
-		var n;
+		let _this = this;
+		let n;
 
 		// Let's stop when the neuron gets too deep
 		// For every dendrite in the arraylist
-		for (var i = _this.nodes.length - 1; i >= 1; i--) {
+		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			// Get the Node object, update and draw it
 			n = _this.nodes[i];
 			n.grow(_this.nodes);
@@ -177,7 +180,7 @@ function Neuron (args) {
 					// Additional method for probabalistic branching
 					// Default rnd = 15% : could be push higher
 					// Neuron feels slightly over complicated given complexity: 13 & min [5] branches
-					var rnd = p.random(1);
+					let rnd = p.random(1);
 					if ((rnd < 0.15) && ((n.depth + 1) < _this.max_depth )) {
 						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
 						_this.nodes.push(n.branch(20, _this.nodes.length));   // Add one going left
@@ -202,7 +205,7 @@ function Neuron (args) {
 		//  Args[0]:Node, Args[1]:Array of Nodes
 		function recurseMore (n, parents) {
 			// Make a 'shallow' copy of an array
-			var path = parents.slice();
+			let path = parents.slice();
 			if (n.parent == null) {
 				return path;
 			} 
@@ -215,7 +218,7 @@ function Neuron (args) {
 		// Make a 'shallow' copy of an array
 		// I see what I'm doing, but it requires refactoring
 		// n.start_point = true;
-		var parent_arr = [];
+		let parent_arr = [];
 			parent_arr.push(n.parent);
 
 		return recurseMore(n, parent_arr);
@@ -224,10 +227,10 @@ function Neuron (args) {
 	// Calculate the average radius of neuron
 	// Wrap it in cacheify() to cache first returned value
 	this.radius = Utils.cacheify(function() {
-		var _this = this;
-		var avg_radius = 0;
-		var total_radius = 0;
-		var leaf_count = 0;
+		let _this = this;
+		let avg_radius = 0;
+		let total_radius = 0;
+		let leaf_count = 0;
 
 		// Look through all the leaf nodes
 		_this.nodes.forEach(function(node) {

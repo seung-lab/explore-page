@@ -39,6 +39,15 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 		width @height * $WONDERERS_ASPECT_RATIO
 		
 		center(0px, -50px)
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-width: 400px), (min-height: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+	.wonderers img
+		height 300px
+		width @height * 1.333 // aspect ratio of this image
+		
+		center(0px, -50px)
 		
 	.wonderers .super-text
 		font-size 22px
@@ -65,6 +74,37 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 		bottom 20%
 
 
+@media screen and (min-width: 600px) and (min-height: 550px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.wonderers img
+		height 450px
+		width @height * $WONDERERS_ASPECT_RATIO
+		
+		center(0px, -50px)
+		
+	.wonderers .super-text
+		font-size 24px
+		top -35px
+	
+	.wonderers .story-text
+		font-size 30px
+		bottom 20%
+		
+@media screen and (min-width: 800px) and (min-height: 800px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.wonderers img
+		height 600px
+		width @height * $WONDERERS_ASPECT_RATIO
+		
+		center(0px, -50px)
+		
+	.wonderers .super-text
+		font-size 28px
+		top -35px
+	
+	.wonderers .story-text
+		font-size 34px
+		bottom 15%
+
+
 // // ---> Large Screen
 
 // /* ----------- Non-Retina Screens ----------- */
@@ -79,7 +119,6 @@ $WONDERERS_ASPECT_RATIO = 1.333;
 
 // /* ----------- Retina Screens ----------- */
 // @media screen and (min-width: 1500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-
 // 	.wonderers img
 // 		height 800px
 // 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
@@ -96,7 +135,6 @@ $WONDERERS_ASPECT_RATIO = 1.333;
  */
 
 @media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
-
 	.wonderers img
 		height 275px
 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
@@ -115,7 +153,6 @@ $WONDERERS_ASPECT_RATIO = 1.333;
  */
 			
 @media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
-
 	.wonderers img
 		height 250px
 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image
@@ -131,7 +168,6 @@ $WONDERERS_ASPECT_RATIO = 1.333;
  */
 
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
-
 	.wonderers img
 		height 225px
 		width @height * $WONDERERS_ASPECT_RATIO // aspect ratio of this image

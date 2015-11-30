@@ -15,7 +15,7 @@ $circleRadius = 90px
 	width @height
 	
 	border-radius 100%
-	background rgb(254, 231, 156)
+	background $ACCENT_YELLOW_2
 	
 	display: flex;
 	align-items: center;
@@ -29,10 +29,16 @@ $circleRadius = 90px
 	color $TEXT_BLUE
 	z-index 10
 	
+	transition background-color 100ms ease
+
+.superheroes .play-now:hover
+	background-color $ACCENT_YELLOW_2 - 5%
+	
 .superheroes .story-text
 	@extend .galileo .story-text .text.italics
 	
 	text-transform none
+	font-size 24px
 
 	color $TEXT_BLUE
 	text-align center
@@ -160,17 +166,40 @@ position-superhero(name, offx, offy, px, py, center = false)
 
 .superheroes.mobile .story-text
 	@extend .galileo .story-text .text.italics
-	
-	text-transform lowercase
 
 	color $TEXT_BLUE
 	text-align center
-	white-space nowrap
 	
 	position absolute
-	width 400px
+	
+	font-size 16px
+	width 275px
+	white-space normal
+	text-transform initial
 	
 	center-horizontal()
 	top s('calc(50% + %s + 100px)', $circleRadius)
 	
 	z-index 11
+	
+
+/*
+ *	Set to hit an iPhone 6+
+ */
+
+@media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
+		
+	.superheroes.mobile .story-text	
+		top s('calc(50% + %s + 100px)', $circleRadius)
+		
+/*
+ *	Set to hit an iPhone 5 + 4
+ */
+			
+@media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
+
+	.superheroes.mobile .story-text	
+		top 75%
+		width 200px
+		
+		center-horizontal()

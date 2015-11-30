@@ -8,6 +8,9 @@
 	
 	@extend .module-font
 	
+	background-image url($BASE_URL + '/images/deep-dream.jpg')
+	background-size cover
+	
 
 .galileo .transition
 	$height_factor = 3;
@@ -15,6 +18,7 @@
 	width 100%
 	height $height_factor * 100%
 	background-image linear-gradient($FILL_WHITE, $FILL_DARKER_BLUE);
+	opacity .90
 	
 .galileo .action
 	position relative
@@ -22,6 +26,7 @@
 	height 100%
 	
 	background-color $FILL_DARKER_BLUE
+	opacity .90
 	
 	overflow-y hidden
 
@@ -54,7 +59,10 @@
 	center()
 	
 .big-number.hundred:first-letter
-	// letter-spacing -67.5px
+	letter-spacing -67.5px
+	
+.big-number.hundred
+	margin-left -5%
 
 .galileo .story-text-big .inner
 	display flex
@@ -67,10 +75,10 @@
 	height 200px
 	center-vertical()
 	
-.galileo .inner:after
-	content "...."
-	font-size 10px
-	letter-spacing 1px
+// .galileo .inner:after
+// 	content "...."
+// 	font-size 10px
+// 	letter-spacing 1px
 	
 .galileo .story-text .counter
 	bottom -40px
@@ -96,7 +104,7 @@
 	
 .galileo .big-number
 	position absolute
-	top -25px
+	top 185px
 	
 	z-index 0
 	font-size 400px
@@ -135,9 +143,9 @@
 // ---> Small Screen
 
 /* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 600px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+@media screen and (min-width: 400px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	.galileo .big-number
-		top 165px	
+		top 185px	
 		font-size 350px
 	
 	.galileo .story-text-big .high-text
@@ -156,7 +164,7 @@
 /* ----------- Retina Screens ----------- */
 @media screen and (min-width: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.galileo .big-number
-		top 165px	
+		top 185px	
 		font-size 350px
 	
 	.galileo .story-text-big .high-text
@@ -178,8 +186,8 @@
 /* ----------- Non-Retina Screens ----------- */
 @media screen and (min-width: 1000px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	.galileo .big-number
-		top 165px
-		font-size 450px
+		top 185px
+		font-size 400px
 	
 	.galileo .big-number.hundred:first-letter
 		letter-spacing -75px
@@ -200,8 +208,8 @@
 /* ----------- Retina Screens ----------- */
 @media screen and (min-width: 1000px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.galileo .big-number
-		top 165px
-		font-size 450px
+		top 185px
+		font-size 400px
 		
 	.galileo.big-number.hundred:first-letter
 		letter-spacing -75px
@@ -232,14 +240,20 @@
 		display none
 		
 	.galileo .big-number
-		top 150px
+		top 175px
 		font-size 300px
+		margin-left -1.5%
+	
+	.galileo .big-number.hundred
+		margin-left -3%
 
 	.galileo .story-text .text.italics	
 		font-size 30px
-		width 375px
+		width 360px
 		bottom 15%
 		white-space normal
+		
+		center()
 	
 	.galileo .story-text
 		white-space normal
@@ -259,8 +273,12 @@
 @media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
 
 	.galileo .big-number
-		top 150px
-		font-size 300px
+		top 185px	
+		font-size 275px
+		margin-left -1.5%
+		
+	.galileo .big-number.hundred
+		margin-left -3%
 		
 	.galileo .big-number.hundred:first-letter
 		letter-spacing -52px
@@ -269,6 +287,8 @@
 		font-size 24px
 		width 325px
 		white-space normal
+		
+		center()
 	
 	.galileo .story-text
 		white-space normal
@@ -299,8 +319,12 @@
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 
 	.galileo .big-number
-		top 150px
-		font-size 300px
+		top 190px
+		font-size 250px
+		margin-left -1.5%
+		
+	.galileo .big-number.hundred
+		margin-left -3%
 
 	.galileo.big-number.hundred:first-letter
 		letter-spacing -85px
@@ -309,6 +333,8 @@
 		font-size 18px
 		width 275px
 		white-space normal
+		
+		center()
 		
 	.galileo .story-text
 		white-space normal
@@ -320,6 +346,17 @@
 		width 275px
 		font-size 18px
 		top -25px
+		
+	.galileo .story-text-big .medium-text
+		font-size 60px
+		
+	.galileo .story-text-big .high-text
+		font-size 20px
+		line-height 1.5em
+		
+	.galileo .story-text-big .low-text
+		font-size 18px
+		letter-spacing 14px
 			
 
 	

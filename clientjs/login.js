@@ -3,7 +3,6 @@
 let $ = require('jquery'),
 	Utils = require('./utils.js'),
 	Easing = require('./easing.js'),
-	Bumper = require('./bumper.js'),
 	Validate = require('./validate.js'),
 	Gateway = require('../components/gateway.js'),
 	Header = require('../components/header.js'),
@@ -92,9 +91,11 @@ Login.takeMeTo = function (stage, options) {
 
 	if (stage === 'explore') {
 		Login.initExploring(_stage_transition);
+		Login.bindResizeEvents('explore');
 	}
 	else if (stage === 'gateway') {
 	 	_components.gateway.attachEvents();
+	 	Login.bindResizeEvents('gateway');
 	}
 	else {
 		Login.bindResizeEvents(stage);
@@ -109,6 +110,8 @@ Login.IntakeView = function () {
 
 	_this.playIntro = function () {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
+
+		_components.gateway.unattachSwipeEvents();
 
 		$.when(
 			$('.bumper .Es').imagesLoaded(),
@@ -126,11 +129,16 @@ Login.IntakeView = function () {
 					$('#viewport').scrollTo('.gateway', {
 						msec: 2500,
 						easing: Easing.springFactory(.7, 1),
+					})
+					.done(function () {
+						_components.gateway.attachEvents();
 					});
 				}, 650);
 
 				Login.bindResizeEvents('gateway');
 			});
+
+		mixpanel.track('play-intro');
 	};
 };
 

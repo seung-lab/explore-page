@@ -58,6 +58,7 @@ $amazing_z = 1
 	
 	position absolute
 	top -50px
+	height 50px
 	text-align center
 	font-style italic
 	text-transform lowercase
@@ -131,8 +132,8 @@ $amazing_z = 1
 
 // ---> Small Screen
 
-/* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 400px) and (min-resolution: 1dppx)
+/* ----------- Non-Retina Screens Horizontal ----------- */
+@media screen and (min-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	
 	.amazing .super-text
 		top -25px
@@ -148,8 +149,8 @@ $amazing_z = 1
 
 
 
-/* ----------- Retina Screens ----------- */
-@media screen and (min-width: 400px) and (min-resolution: 2dppx)
+/* ----------- Retina Screens Horizontal ----------- */
+@media screen and (min-width: 450px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 
 	.amazing .super-text
 		top -25px
@@ -161,15 +162,25 @@ $amazing_z = 1
 		font-size 24px
 		width 350px
 		
+/* ----------- Retina Screens Vertical ----------- */
+@media screen and (min-height: 450px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+
+	.amazing .super-text
+		top -25px
+		font-size 18px
+	
 		center-horizontal()
+		
+	.amazing .story-text
+		font-size 24px
 
 
 
 
 // ---> Medium Screen
 
-/* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 750px) and (min-resolution: 1dppx)
+/* ----------- Non-Retina Screens Horizontal ----------- */
+@media screen and (min-width: 750px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	
 	.amazing .super-text
 		top -35px
@@ -185,8 +196,8 @@ $amazing_z = 1
 
 
 
-/* ----------- Retina Screens ----------- */
-@media screen and (min-width: 750px) and (min-resolution: 2dppx)
+/* ----------- Retina Screens Horizontal ----------- */
+@media screen and (min-width: 750px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 
 	.amazing .super-text
 		top -35px
@@ -205,7 +216,7 @@ $amazing_z = 1
 
 // ---> Large Screen
 
-/* ----------- Non-Retina Screens ----------- */
+/* ----------- Non-Retina Screens Horizontal ----------- */
 @media screen and (min-width: 1500px) and (min-resolution: 1dppx)
 
 	.amazing .super-text
@@ -222,7 +233,7 @@ $amazing_z = 1
 
 
 
-/* ----------- Retina Screens ----------- */
+/* ----------- Retina Screens Horizontal ----------- */
 @media screen and (min-width: 1500px) and (min-resolution: 2dppx)
 
 	.amazing .super-text
@@ -250,7 +261,7 @@ $amazing_z = 1
 		.amazing .story-text	
 			font-size 36px
 			width 375px
-			bottom 15%
+			bottom 10%
 			white-space normal
 			center-horizontal()
 			

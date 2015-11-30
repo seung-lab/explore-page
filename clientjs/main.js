@@ -15,11 +15,14 @@ require('./jquery-hammer.js');
 
 let Login = require('./login.js'),
 	Utils = require('./utils.js'),
-	ModuleCoordinator = require('./controllers/ModuleCoordinator.js');
+	ModuleCoordinator = require('./controllers/ModuleCoordinator.js'),
+	GLOBAL = require('./GLOBAL.js');
 
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
+	// $(GLOBAL.viewport)[0].scrollTo(0,0);
+	
 	// if you simply use overflow-y: hidden, the animation is laggy 
 	// so here are some hacks to display like scrolling is allowed without 
 	// actually allowing it
@@ -41,8 +44,8 @@ $(document).ready(function () {
 		let transition = $.Deferred();
 		ModuleCoordinator.initialize(transition);
 
-		if (t.match(/^\d+$/)) {
-			t = parseInt(t, 10) / 100;
+		if (t.match(/^\d+(\.\d+)?$/)) {
+			t = parseFloat(t, 10) / 100;
 		}
 		else {
 			t = ModuleCoordinator.tForName(t);
@@ -74,6 +77,7 @@ window.Login = Login;
 window.Utils = Utils;
 window.ModuleCoordinator = ModuleCoordinator;
 window.Easing = require('./easing.js');
+window.GLOBAL = GLOBAL;
 window.$ = $;
 
 // Polyfills
@@ -81,3 +85,11 @@ window.$ = $;
 window.performance = window.performance || {
 	now: Date.now
 };
+
+if (!GLOBAL.production) {
+	window.mixpanel = {
+		track: function () {},
+	};
+}
+
+
