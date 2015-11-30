@@ -192,22 +192,10 @@ class Galileo extends TeaTime {
 			dropfn();
 		}
 
-		this.sketch = NNNSketch.init({
-			anchor: this.anchor[0],
-			width: $(this.anchor).width(),
-			height: $(this.anchor).height(),
-		});
-
-		
-		NNNSketch.canvas().done(function (canvas) {
-			_this.view.canvas = $(canvas);
-			_this.view.canvas.addClass('neural-network');
-		});
 	}
 
 	afterExit () {
-		this.sketch.noLoop();
-		this.sketch.noCanvas();
+
 	}
 
 	// Reenable if we decide to go for the ticking animation
