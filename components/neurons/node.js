@@ -387,8 +387,8 @@ function Node (args = {}) {
 		let sep = _this.separate(somas); // Move away from eachother
 
 		// Carefully weight these forces
-		cen.mult(_pow * 1.25);
-		edg.mult(_pow / 15);
+		cen.mult(_pow);
+		edg.mult(_pow / 5);
 		sep.mult(_pow);
 
 		// Add the force vectors to acceleration
@@ -396,7 +396,7 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.85;
+		_pow *= 0.6;
 		if (_pow <= 1) {
 			_pow = 0;
 			// console.log('stop');
@@ -447,7 +447,8 @@ function Node (args = {}) {
 
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
-			_maxspeed = 15;
+			_maxspeed = p.width / 35;	
+			// _maxspeed = 20;
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 

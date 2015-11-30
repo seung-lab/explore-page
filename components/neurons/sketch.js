@@ -57,7 +57,7 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		// 2000 yields 20
-		_nnn_count = p.ceil(p.min((p.width / 60), 25));
+		_nnn_count = p.ceil(p.min((p.width / 50), 25));
 		// _nnn_count = 1;
 
 		nnn_start();
@@ -69,9 +69,11 @@ let sprout = function (p) {
 		// console.log(_nnn.initialize()); --> This is currently not returning as expected
 
 		// Run the _nnn if it has finished spreading
-		if (_nnn.distribute()) {
-			_nnn.run();
-			console.log('potato');
+		if (p.frameCount > 100) {
+			if (_nnn.distribute()) {
+				_nnn.run();
+				console.log('potato');
+			}
 		}
 
 		// plus_minus();
