@@ -69,6 +69,12 @@ function Node (args = {}) {
 	let _damping = 0.85;
 	let _pow = 5000; // Huge starting multipliers!
 
+	// Make our PVectors
+	let p_0 = p.createVector();
+	let p_1 = p.createVector();
+	let p_2 = p.createVector();
+	let p_3 = p.createVector();
+
 	// Increment for each instantiation at a branch event
 	this.depth++;
 
@@ -94,7 +100,6 @@ function Node (args = {}) {
 	// Set curve points
 	this.pt_0 = function() {
 		let _this = this;
-		let p_0 = p.createVector();
 		if (_this.depth == 1 || _this.depth == 2) {
 			p_0 = _this.position; 
 			return p_0;
@@ -106,7 +111,6 @@ function Node (args = {}) {
 
 	this.pt_1 = function() {
 		let _this = this;
-		let p_1 = p.createVector();
 		let isAlone =  _this.parent instanceof Node;
 		if (!isAlone) {
 			p_1 = _this.start.copy(); 
@@ -119,13 +123,11 @@ function Node (args = {}) {
 
 	this.pt_2 = function() {
 		let _this = this;
-		let p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
 	}
 
 	this.pt_3 = function() {
 		let _this = this;
-		let p_3 = p.createVector();
 		if (_this.children.length == 1) {
 			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
 		} 
@@ -284,19 +286,23 @@ function Node (args = {}) {
 
 		// Calculate 'x' edge offset
 		if (_this.position.x < p.width / 2) {
-			x = (_this.position.x - _radius);
+			// x = (_this.position.x - _radius);
+			x = _this.position.x;
 		}
 		else {
-			x = p.width - _this.position.x + _radius;
+			// x = p.width - _this.position.x + _radius;
+			x = p.width - _this.position.x;
 			mult_x = -1;
 		}
 
 		// Calculate 'y' edge offset
 		if (_this.position.y < p.height / 2) {
-			y = (_this.position.y - _radius);
+			// y = (_this.position.y - _radius);
+			y = _this.position.y;
 		}
 		else {
-			y = p.height - _this.position.y + _radius;
+			// y = p.height - _this.position.y + _radius;
+			y = p.height - _this.position.y;
 			mult_y = -1;
 		}
 
@@ -359,6 +365,11 @@ function Node (args = {}) {
 	// Calculate initial distribution forces
 	// !Important --> Must be called outside of node 
 	// !Important --> Requires list of nodes
+	/*
+	 *  Avoid iniform sampling by exploring something like a poisson disc
+	 *  distribution of the somas
+	*/
+
 	this.spread = function(somas, rad) {
 		let _this = this;
 		let center = p.createVector(p.width/2, p.height/2); // Center point
@@ -376,8 +387,8 @@ function Node (args = {}) {
 		let sep = _this.separate(somas); // Move away from eachother
 
 		// Carefully weight these forces
-		cen.mult(_pow);
-		edg.mult(1);
+		cen.mult(_pow * 1.25);
+		edg.mult(_pow / 15);
 		sep.mult(_pow);
 
 		// Add the force vectors to acceleration
@@ -385,10 +396,10 @@ function Node (args = {}) {
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.99;
+		_pow *= 0.85;
 		if (_pow <= 1) {
 			_pow = 0;
-			console.log('stop');
+			// console.log('stop');
 		}
 	}
 
@@ -436,6 +447,7 @@ function Node (args = {}) {
 
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
+			_maxspeed = 15;
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
@@ -567,9 +579,15 @@ function Node (args = {}) {
 	// Accepts an Array of Node Objects
 	this.space = function(nodes) {
 		let _this = this;
-			_this.spread(nodes, 100);
+			_this.spread(nodes, _this.radius_size());
 			_this.update();
 	}
+
+	// Parameterize Radius
+	this.radius_size = Utils.cacheify(function() {
+		let _radius_size = p.round(p.random(150, 400));
+		return _radius_size;
+	});
 
 	// Recurse through nodes to root
 	// Accepts Node object

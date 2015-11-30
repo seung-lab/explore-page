@@ -43,7 +43,7 @@ function NNN (args = {}) {
 			let soma = neuron.nodes[0];
 				soma.render_soma();
 
-			if (p.frameCount >= 1000) {
+			if (p.frameCount >= 250) {
 				neuron.network_setup(); // Create seed branching
 				return;
 			}
