@@ -330,6 +330,7 @@ ModuleCoordinator.seek = function (t, transition) {
 	try {
 		mixpanel.track('seek', {
 			global_t: t,
+			module_t: ModuleCoordinator.toModuleT(t),
 			module: ModuleCoordinator.moduleAt(t).name,
 		});
 	}
