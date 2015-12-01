@@ -42,7 +42,6 @@ module.exports.mst = function (nodes, edges) {
 
 module.exports.kruskal = function (nodes, edges) {
   // forest (F) on Wikipedia
-  // Working
   let forest = nodes.map(function(node) {
     return new Tree({
       vertex: node,
@@ -51,11 +50,9 @@ module.exports.kruskal = function (nodes, edges) {
 
   // edge list sorted by minimum cost (set S on Wikipedia)
   // Make local deep copy of edges
-  // Working
   edges = edges.slice();
 
   // Sort edges by increasing cost
-  // Working
   edges.sort(function (a, b) {
     if (a[2] === b[2]) {
       return 0;
@@ -67,13 +64,10 @@ module.exports.kruskal = function (nodes, edges) {
     return -1;
   });
 
-  // If the graph is disconnected this while loop will never exit
-  // I'll work on it next week... (11.10.15)
-  // Sort of working
   while (edges.length) { 
     let edge = edges.pop();
     let n1 = edge[0],
-      n2 = edge[1];
+        n2 = edge[1];
 
     let t1 = find_tree_in_forest(forest, n1);
     let t2 = find_tree_in_forest(forest, n2);
@@ -108,8 +102,9 @@ function Tree (args) {
 } 
 
 function find_tree_in_forest (forest, n) {
-  let t1 = forest.filter( (tree) => tree.V.contains(n) );
-  return t1[0];
+  console.log(forest);
+  let t3 = forest.filter( (tree) => tree.V.contains(n) );
+  return t3[0];
 }
 
 // Merge t1 + t2 into a new Tree Object
@@ -152,6 +147,13 @@ function forest_log (forest) {
     console.log(tree.V.get());
   });
 }
+
+module.exports.forest_log = function (forest) {
+  forest.forEach(function (tree) {
+    console.log(tree.V.get());
+    console.log(tree.E.get());
+  });
+};
 
 
 

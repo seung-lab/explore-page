@@ -24,6 +24,7 @@ function Neuron (args) {
 	this.num_branches = args.num_branches 				|| 7;
 	this.neuron_timer = args.neuron_timer 				|| 60;
 	this.max_depth = args.max_depth 	  				|| 6;
+	this.id = args.id 									|| 0;
 
 	// Generic public array variable : not an argument though
 	this.growing = true;
@@ -46,6 +47,7 @@ function Neuron (args) {
 			depth: 			0,
 			mass: 			128, // Huge mass for soma!
 			id: 			0,
+			neuron_id:      _this.id,
 			p: 				p,
 		});	
 

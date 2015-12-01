@@ -87,6 +87,7 @@ let sprout = function (p) {
 		_nnn = new NNN({
 			num_neurons: _nnn_count,
 			complexity: 12,
+			kruskal: Kruskal,
 			p: p,
 		});
 

@@ -36,6 +36,9 @@ function Node (args = {}) {
 
 	// Node ID
 	this.id = args.id || 0;
+
+	// Neuron ID
+	this.neuron_id = args.neuron_id || 0;
 	
 	// Not in constructor
 	this.acceleration = p.createVector(0,0);

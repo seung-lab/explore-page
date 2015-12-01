@@ -108,10 +108,17 @@ describe('Kruskal', function () {
 
 	it('Cyclic connected', function () {
 		var forest = Kruskal.kruskal(graphs.cyclic_connected.V, graphs.cyclic_connected.E);
+		var forest_mst = Kruskal.mst(graphs.cyclic_connected.V, graphs.cyclic_connected.E);
+
+		// Kruskal.forest_log(forest);
 		
 		forest.length.should.equal(1);
 
 		var tree = forest[0];
+		var vertices = tree.V.get();
+
+		console.log(tree.V.get());
+		console.log(tree.E.get());
 
 		tree.V.contains("A").should.equal(true);
 		tree.V.contains("B").should.equal(true);

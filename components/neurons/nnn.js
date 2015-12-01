@@ -17,6 +17,7 @@ function NNN (args = {}) {
 	// Public arguments from constructor
 	this.num_neurons = args.num_neurons || 1;
 	this.complexity = args.complexity  || 13;
+	this.kruskal = args.kruskal  || {};
 
 	// Generic public array letiable : not an argument though
 	this.neurons = [];
@@ -25,6 +26,7 @@ function NNN (args = {}) {
 
 	this.max_depth;
 	this.num_branches;
+	this.neuron_id = 0;
 
 	this.initialized = false;
 
@@ -45,7 +47,9 @@ function NNN (args = {}) {
 
 			if (p.frameCount >= 250) {
 				neuron.network_setup(); // Create seed branching
-				return;
+				console.log('moo');
+				_this.mst();
+				return true;
 			}
 
 			// Repel from center
@@ -120,9 +124,13 @@ function NNN (args = {}) {
 					num_branches: 	_this.num_branches,
 					neuron_timer: 	_this.neuron_timer,
 					max_depth: 		_this.max_depth,
+					id:  			_this.neuron_id,
 					p: 				p,
 				})	
 			);
+
+			// Increase the id counter each loop
+			_this.neuron_id++;
 
 			// Get the soma setup
 			let soma = _this.neurons[_this.neurons.length - 1]; // --> 1st soma in [0] position
@@ -152,6 +160,56 @@ function NNN (args = {}) {
 			soma.separate(_this.somas);
 		});
 	}
+
+	// Create MST --> Kruskal
+	this.mst = Utils.onceify(function() {
+		let _this = this;
+		let graph = {
+			V: [],
+			E: [],
+		};
+
+		// Calculate distance from/to every Soma
+		// Build MST input graph
+		_this.somas.forEach(function(soma) {
+			let soma_pos = soma.position;
+			graph.V.push(
+				soma.neuron_id.toString()
+			);
+			_this.somas.forEach(function(other_soma) {
+				// Check for recurrent connections <cycles>
+				if (soma.neuron_id !== other_soma.neuron_id) {
+					let other_soma_pos = other_soma.position;
+					let d = soma_pos.dist(other_soma_pos);
+					let edge = [
+						soma.neuron_id.toString(),
+						other_soma.neuron_id.toString(),
+						d
+					];
+
+					graph.E.push(edge);
+				}
+			});
+		});
+
+		let forest = _this.kruskal.mst(graph.V, graph.E);
+
+		let tree = forest[0];
+		let vertices = tree.V.get();
+
+
+		console.log(tree.V.get());
+		console.log(vertices[2]);
+
+		// debugger;
+
+		// Helper function to log forest contents
+		function forest_log (forest) {
+		  forest.forEach(function (tree) {
+		    console.log(tree.V.get());
+		  });
+		}
+	});
 }
 
 module.exports = NNN;
