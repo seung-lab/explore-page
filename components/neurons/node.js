@@ -545,9 +545,9 @@ function Node (args = {}) {
 		// Draw Soma
 		p.push();
 			p.noStroke();
-			// p.fill(41,59,73); // blue
-			p.fill(200); // white
-			p.ellipse(_this.pt_2().x,_this.pt_2().y,15,15);
+			p.fill(115,135,150); // blue
+			// p.fill(200); // white
+			p.ellipse(_this.pt_2().x,_this.pt_2().y,10,10);
 		p.pop();
 	}
 

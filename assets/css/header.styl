@@ -173,7 +173,7 @@ $corner_offset = 35px
 .header .register
 	background-color $ACCENT_RED
 	border-radius 22px
-	width 160px
+	width 100px
 	height 45px
 	box-shadow 0px 0px 0px rgba(45,45,45,0.15)
 	
@@ -192,7 +192,14 @@ $corner_offset = 35px
 	margin-top 14px
 	font-size 12px
 	text-align left
+	letter-spacing 0.5px
 	color $FILL_WHITE
+	
+.header .register-mobile
+	width 75px 
+	
+.header .content-mobile
+	margin-left 25px
 	
 	cursor pointer
 	// transition right 1s ease-in-out	
@@ -232,20 +239,19 @@ $corner_offset = 35px
 		width 50px
 		height 50px
 		
-	.header .content
+	.header .register .icon
 		display none
 		
-	.header .register .icon
-		background-position 4px 14px
-		margin-left 10px
-		border-right none
-		width 50px
-		height 50px
+	.header .register .content
+		margin-left auto
+		margin-right auto
+		position relative
+		text-align center
 		
 	.header .register	
-		border-radius 15px
-		width 50px
-		height 50px
+		border-radius 25px
+		width 60px
+		height 45px
 		top 20px
 		right 20px
 

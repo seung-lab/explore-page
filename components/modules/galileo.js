@@ -351,6 +351,8 @@ class Galileo extends TeaTime {
 			this.sketch.noLoop();
 			this.sketch.noCanvas();
 			this.sketch = null;
+
+			NNNSketch.grow(false);
 		}
 	}
 
@@ -367,11 +369,15 @@ class Galileo extends TeaTime {
 				width: _this.view.action.width(),
 				height: _this.view.action.height(),
 			});
-			
+
 			NNNSketch.canvas().done(function (canvas) {
 				_this.view.canvas = $(canvas);
 				_this.view.canvas.addClass('neural-network');
 			});
+		}
+
+		if (slide.index === 2) {
+			NNNSketch.grow();
 		}
 	}
 

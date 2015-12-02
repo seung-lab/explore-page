@@ -8,6 +8,7 @@
 "use strict";
 
 let p5 = require('p5'),
+	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js');
 
 function NNN (args = {}) {
@@ -23,6 +24,8 @@ function NNN (args = {}) {
 	this.neurons = [];
 	// Array of all somas included in the NNN
 	this.somas = [];
+	// Spring system array
+	this.springs = [];
 
 	this.max_depth;
 	this.num_branches;
@@ -47,8 +50,12 @@ function NNN (args = {}) {
 
 			if (p.frameCount >= 250) {
 				neuron.network_setup(); // Create seed branching
-				console.log('moo');
-				_this.mst();
+				_this.mst(); 
+				// Update spring positions --> Run through array
+				_this.springs.forEach(function(s) {
+					s.update();
+					s.display();
+				});
 				return true;
 			}
 
@@ -162,6 +169,7 @@ function NNN (args = {}) {
 	}
 
 	// Create MST --> Kruskal
+	// Additionally create spring connections
 	this.mst = Utils.onceify(function() {
 		let _this = this;
 		let graph = {
@@ -178,37 +186,44 @@ function NNN (args = {}) {
 			);
 			_this.somas.forEach(function(other_soma) {
 				// Check for recurrent connections <cycles>
-				if (soma.neuron_id !== other_soma.neuron_id) {
-					let other_soma_pos = other_soma.position;
-					let d = soma_pos.dist(other_soma_pos);
-					let edge = [
-						soma.neuron_id.toString(),
-						other_soma.neuron_id.toString(),
-						d
-					];
-
-					graph.E.push(edge);
+				if (soma.neuron_id === other_soma.neuron_id) {
+					return;
 				}
+
+				let other_soma_pos = other_soma.position;
+				let d = soma_pos.dist(other_soma_pos);
+				let edge = [
+					soma.neuron_id.toString(),
+					other_soma.neuron_id.toString(),
+					d
+				];
+
+				graph.E.push(edge);
 			});
 		});
 
-		let forest = _this.kruskal.mst(graph.V, graph.E);
-
-		let tree = forest[0];
-		let vertices = tree.V.get();
-
-
-		console.log(tree.V.get());
-		console.log(vertices[2]);
-
-		// debugger;
-
-		// Helper function to log forest contents
-		function forest_log (forest) {
-		  forest.forEach(function (tree) {
-		    console.log(tree.V.get());
-		  });
+		// Create + Add a Spring object to springs array
+		function getSprung(edge) {
+			let n1 = _this.somas[edge[0]];
+			let n2 = _this.somas[edge[1]];
+			// Make new Spring object
+			let s = new Spring ({
+				node1: n1,
+				node2: n2,
+				p: p,
+			});
+			// Add a new spring 
+			_this.springs.push(s);
 		}
+
+		let mst = _this.kruskal.mst(graph.V, graph.E);
+
+		let vertices = mst[0]; // Array of Edge objects
+		let edges = mst[1]; // Array of Vertex objects
+
+		edges.forEach(function(edge) {
+			getSprung(edge);
+		});
 	});
 }
 

@@ -40,6 +40,14 @@ var graphs = {
 			[ "C", "A", 2 ],
 		],
 	},
+	number_tree: {
+		V: [ "0", "5", "50", "52.3" ],
+		E: [  
+			[ "0", "5", 1 ],
+			[ "5", "50", 2 ],
+			[ "50", "52.3", 3 ],
+		],
+	}
 };
 
 describe('Kruskal', function () {
@@ -109,16 +117,10 @@ describe('Kruskal', function () {
 	it('Cyclic connected', function () {
 		var forest = Kruskal.kruskal(graphs.cyclic_connected.V, graphs.cyclic_connected.E);
 		var forest_mst = Kruskal.mst(graphs.cyclic_connected.V, graphs.cyclic_connected.E);
-
-		// Kruskal.forest_log(forest);
 		
 		forest.length.should.equal(1);
 
 		var tree = forest[0];
-		var vertices = tree.V.get();
-
-		console.log(tree.V.get());
-		console.log(tree.E.get());
 
 		tree.V.contains("A").should.equal(true);
 		tree.V.contains("B").should.equal(true);
@@ -137,6 +139,26 @@ describe('Kruskal', function () {
 
 		tree.E.get().length.should.equal(6);
 	});
+
+	it("Number tree", function () {
+		var forest = Kruskal.kruskal(graphs.number_tree.V, graphs.number_tree.E);
+
+		forest.length.should.equal(1);
+
+		var tree = forest[0];
+
+		tree.V.contains("0").should.equal(true);
+		tree.V.contains("5").should.equal(true);
+		tree.V.contains("50").should.equal(true);
+		tree.V.contains("52.3").should.equal(true);
+
+		tree.E.contains([ "0", "5", 1 ]).should.equal(true);
+		tree.E.contains([ "5", "50", 2 ]).should.equal(true);
+		tree.E.contains([ "50", "52.3", 3 ]).should.equal(true);
+		
+		tree.V.get().length.should.equal(4);
+		tree.E.get().length.should.equal(3);
+	})
 });
 
 describe('MST', function () {

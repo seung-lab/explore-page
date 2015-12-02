@@ -17,6 +17,7 @@ let _options = {
 };
 
 let _canvas = $.Deferred();
+let _runtime = false;
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -57,8 +58,8 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		// 2000 yields 20
-		_nnn_count = p.ceil(p.min((p.width / 50), 25));
-		// _nnn_count = 1;
+		_nnn_count = p.ceil(p.min((p.width / 20), 25));
+		// _nnn_count = 250;
 
 		nnn_start();
 	};
@@ -66,14 +67,15 @@ let sprout = function (p) {
 	p.draw = function() {
 		p.clear();
 
-		// console.log(_nnn.initialize()); --> This is currently not returning as expected
-
 		// Run the _nnn if it has finished spreading
-		if (p.frameCount > 100) {
+		if (p.frameCount > 30) {
 			if (_nnn.distribute()) {
-				_nnn.run();
 				console.log('potato');
 			}
+		}
+
+		if (_runtime) {
+			_nnn.run();
 		}
 
 		// plus_minus();
@@ -170,6 +172,10 @@ module.exports.init = function (args = {}) {
 	_canvas = $.Deferred();
 
 	return new p5(sprout); // Instantiate the entire P5 sketch
+};
+
+module.exports.grow = function (yes = true) {
+	_runtime = yes; // Enable neuron growth
 };
 
 

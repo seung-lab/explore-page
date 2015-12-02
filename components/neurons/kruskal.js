@@ -28,24 +28,38 @@ let Set = require('set');
 // and http://programmingpraxis.com/2010/04/06/minimum-spanning-tree-kruskals-algorithm/
 
 module.exports.mst = function (nodes, edges) {
-  let forest = module.exports.kruskal(nodes, edges);
+	let forest = module.exports.kruskal(nodes, edges);
 
-  if (forest.length > 1) {
-    throw new Error("Your graph is not connected.");
-  }
-  else if (forest.length === 0) {
-    throw new Error("Graph has no verticies.");
-  }
+	if (forest.length > 1) {
+		throw new Error("Your graph is not connected.");
+	}
+	else if (forest.length === 0) {
+		throw new Error("Graph has no verticies.");
+	}
 
-  return forest[0];
+	// Convert the stringified values back into numbers
+	let e = forest[0].E.get();
+	let v = forest[0].V.get();
+
+	e = e.map(function (edge) {
+		return JSON.parse(edge).map(Number);
+	});
+
+	v = v.map(function (vertex) {
+		return parseInt(vertex);
+	});
+
+	let mst = [v, e];
+
+	return mst;
 };
 
 module.exports.kruskal = function (nodes, edges) {
   // forest (F) on Wikipedia
   let forest = nodes.map(function(node) {
-    return new Tree({
-      vertex: node,
-    })
+	return new Tree({
+		vertex: node,
+	})
   });
 
   // edge list sorted by minimum cost (set S on Wikipedia)
@@ -54,40 +68,40 @@ module.exports.kruskal = function (nodes, edges) {
 
   // Sort edges by increasing cost
   edges.sort(function (a, b) {
-    if (a[2] === b[2]) {
-      return 0;
-    }
-    else if (a[2] < b[2]) {
-      return 1;
-    }
-    
-    return -1;
+	if (a[2] === b[2]) {
+	  return 0;
+	}
+	else if (a[2] < b[2]) {
+	  return 1;
+	}
+	
+	return -1;
   });
 
   while (edges.length) { 
-    let edge = edges.pop();
-    let n1 = edge[0],
-        n2 = edge[1];
+	let edge = edges.pop();
+	let n1 = edge[0],
+		n2 = edge[1];
 
-    let t1 = find_tree_in_forest(forest, n1);
-    let t2 = find_tree_in_forest(forest, n2);
+	let t1 = find_tree_in_forest(forest, n1);
+	let t2 = find_tree_in_forest(forest, n2);
 
-    // If t1 + t1 are not part of the same tree
-    // We should add them 
-    if (!treeEqual(t1, t2)) {
-      // Update forest array with current edge
-      // Create a new Tree Object that merges t1 + t2
-      let tn = merge(t1, t2);
+	// If t1 + t1 are not part of the same tree
+	// We should add them 
+	if (!treeEqual(t1, t2)) {
+	  // Update forest array with current edge
+	  // Create a new Tree Object that merges t1 + t2
+	  let tn = merge(t1, t2);
 
-      // Remove t1 + t2 from forest array
-      forest.splice(findKey(forest, t1.V.get()[0]), 1);
-      forest.splice(findKey(forest, t2.V.get()[0]), 1);
+	  // Remove t1 + t2 from forest array
+	  forest.splice(findKey(forest, t1.V.get()[0]), 1);
+	  forest.splice(findKey(forest, t2.V.get()[0]), 1);
 
-      tn.E.add(edge);
+	  tn.E.add(edge);
 
-      // Add tn to forest array
-      forest.push(tn);
-    }
+	  // Add tn to forest array
+	  forest.push(tn);
+	}
   }
 
   return forest;
@@ -97,12 +111,15 @@ module.exports.kruskal = function (nodes, edges) {
 function Tree (args) {
   args = args || {};
 
+  if (args.vertex && !Array.isArray(args.vertex)) {
+	args.vertex = [ args.vertex ];
+  }
+
   this.V = new Set(args.vertex);
   this.E = new Set();
 } 
 
 function find_tree_in_forest (forest, n) {
-  console.log(forest);
   let t3 = forest.filter( (tree) => tree.V.contains(n) );
   return t3[0];
 }
@@ -123,19 +140,19 @@ function merge (t1, t2) {
 // Check set difference
 function treeEqual (t1, t2) {
   return (
-    !(
-      t1.V.difference(t2.V).size() +
-      t2.V.difference(t1.V).size()
-    )
+	!(
+	  t1.V.difference(t2.V).size() +
+	  t2.V.difference(t1.V).size()
+	)
   );
 }
 
 // Helper function to find key in associative array
 function findKey (obj, value) {
   for (let key of Object.keys(obj)) {
-    if (obj[key].V.get()[0] === value) {
-      return key;
-    }
+	if (obj[key].V.get()[0] === value) {
+	  return key;
+	}
   }
 
   return null;
@@ -144,14 +161,14 @@ function findKey (obj, value) {
 // Helper function to log forest contents
 function forest_log (forest) {
   forest.forEach(function (tree) {
-    console.log(tree.V.get());
+	console.log(tree.V.get());
   });
 }
 
 module.exports.forest_log = function (forest) {
   forest.forEach(function (tree) {
-    console.log(tree.V.get());
-    console.log(tree.E.get());
+	console.log(tree.V.get());
+	console.log(tree.E.get());
   });
 };
 
