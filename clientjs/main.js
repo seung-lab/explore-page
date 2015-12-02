@@ -81,7 +81,7 @@ $(document).ready(function () {
 
 // Ensure browsers don't save the previous
 // blacked out state when navigating.
-$(window).unload(function () {
+$(window).ion('unload', function () {
 	$('.curtain').remove();
 });
 

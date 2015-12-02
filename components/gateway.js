@@ -107,6 +107,12 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			}
 		});
 
+		$(window).ion('unload.gateway', function () {
+			mixpanel.track('unload', {
+				from: 'gateway',
+			});
+		});
+
  		this.view.explorebtn.ion('click', function () {
  			_this.beginExploring();	
  		})
@@ -153,6 +159,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 		_this.view.explorebtn.off('mouseenter mouseleave');
 
 		$('#registration').hide();
+		$(window).off('unload.gateway');
 
 		let transition = Login.takeMeTo('explore', {
 			msec: 2000,

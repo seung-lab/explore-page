@@ -85,11 +85,22 @@ ModuleCoordinator.initialize = function (animation) {
 		}
 	});
 
+	$(window).ion('unload.explore', function () {
+		let module = MC.currentModule();
+
+		mixpanel.track('unload', {
+			from: 'explore',
+			global_t: _t,
+			sub_t: MC.toModuleT(module.name, _t),
+			module: module.name,
+		});
+	});
+
 	MC.initialized = true;
 };
 
 ModuleCoordinator.reset = function (animation) {
-	$(window).off('scrollStart swipe');
+	$(window).off('scrollStart swipe unload.explore');
 	$(document).off('keydown');
 
 	$(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
@@ -326,17 +337,12 @@ ModuleCoordinator.t = function (tee) {
 	return _t;
 };
 
-ModuleCoordinator.seek = function (t, transition) {
-	try {
-		mixpanel.track('seek', {
-			global_t: t,
-			module_t: ModuleCoordinator.toModuleT(t),
-			module: ModuleCoordinator.moduleAt(t).name,
-		});
-	}
-	catch (e) {
-		console.trace();
-	}
+ModuleCoordinator.seek = function (t, transition) {	
+	mixpanel.track('seek', {
+		global_t: t,
+		module_t: ModuleCoordinator.toModuleT(t),
+		module: ModuleCoordinator.moduleAt(t).name,
+	});
 
 	let prev_t = _t;
 	_t = t;
