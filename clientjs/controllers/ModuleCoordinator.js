@@ -67,22 +67,22 @@ ModuleCoordinator.initialize = function (animation) {
 	animation.done(function () {
 		MC.timeline.anchorToBody();
 		$(GLOBAL.viewport).addClass('parallax-off'); // GPU performance boost
-	});
+		
+		$(window).ion('scrollStart', function (e, down) {
+			if (down) {
+				MC.next();
+			} else {
+				MC.previous();
+			}
+		});
 
-	$(window).ion('scrollStart', function (e, down) {
-		if (down) {
-			MC.next();
-		} else {
-			MC.previous();
-		}
-	});
-
-	$(window).ion('swipe', function (e, evt) {
-		if (evt.deltaY < 0) {
-			MC.next();
-		} else {
-			MC.previous();
-		}
+		$(window).ion('swipe', function (e, evt) {
+			if (evt.deltaY < 0) {
+				MC.next();
+			} else {
+				MC.previous();
+			}
+		});
 	});
 
 	$(window).ion('unload.explore', function () {
