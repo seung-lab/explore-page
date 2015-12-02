@@ -42,9 +42,17 @@ if (!GLOBAL.production) {
 	};
 }
 
+// Setup and Start Introduction
+
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
+
+	// Forgive Me - Edge is not rendering the logo correctly in opening
+	if (window.navigator.userAgent.match(/Edge/)) {
+		$('body').addClass('edge');
+	}
+
 	$(GLOBAL.viewport).scrollTop(0);
 
 	// if you simply use overflow-y: hidden, the animation is laggy 

@@ -63,7 +63,10 @@ $dot-timer = 500ms
 .bumper .E-right
 	transform rotate(-180deg)
 	// background-position 100px 100px
-		
+
+.edge .bumper .E-right
+	top 52px
+
 .bumper .dots
 	position absolute
 	opacity 0
@@ -103,11 +106,17 @@ $dot-timer = 500ms
 	animation-timing-function ease-in
 	
 	animation-name radius-left-dot 
+	
+.edge .bumper .dot-left
+	left 24px
 
 .bumper .dot-right
 	top 85px
 	left 150px	
 	
+.edge .bumper .dot-right
+	left 151px
+
 #bumper.visible .dot-right
 	animation-duration $dot-timer
 	animation-delay $dot-delay-1
@@ -150,7 +159,11 @@ $logo_rule_start_pos = 100%
 #bumper.visible::before
 	animation-name motion-rule-left
 	right $logo_rule_start_pos
-
+	
+#bumper.no-rule::after,
+#bumper.no-rule::before
+	opacity 0
+	
 
 /* Animation Properties */
 

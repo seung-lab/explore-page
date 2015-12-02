@@ -131,6 +131,7 @@ Login.IntakeView = function () {
 						easing: Easing.springFactory(.7, 1),
 					})
 					.done(function () {
+						$('#bumper').addClass('no-rule');
 						_components.gateway.attachEvents();
 					});
 				}, 650);
