@@ -120,7 +120,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('css', [ ], function () {
-	gulp.src([
+	var stream = gulp.src([
 		'assets/css/normalize.css',
 		'assets/css/*.css',
 		'assets/css/main.styl'
@@ -131,8 +131,12 @@ gulp.task('css', [ ], function () {
 		.pipe(autoprefixer({
 			browser: "> 1%, last 2 versions, Firefox ESR"
 		}))
-		.pipe(minifyCss())
-		.pipe(gulp.dest('dist/public/css/'))
+
+	if (argv.production) {
+		stream.pipe(minifyCss());
+	}
+		
+	stream.pipe(gulp.dest('dist/public/css/'))
 
 	// del([
 	// 	'assets/css/sprites/**'

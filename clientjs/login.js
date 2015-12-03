@@ -113,15 +113,17 @@ Login.IntakeView = function () {
 
 		_components.gateway.unattachSwipeEvents();
 
-		$.when(
-			$('.bumper .Es').imagesLoaded(),
-			$('.bumper .dot').imagesLoaded(),
-			$('.bumper .E').imagesLoaded()
-		)
+		let deferred = $.when(
+				$('.bumper .Es').imagesLoaded(),
+				$('.bumper .dot').imagesLoaded(),
+				$('.bumper .E').imagesLoaded()
+			)
 			.always(function () {
 				$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
-			})
-			.done(function () {
+			});
+
+		setTimeout(function () {
+			deferred.done(function () {
 				$('#bumper').addClass('visible') // triggers shrinking transition
 				$('#intake-logo').addClass('shrink') // triggers shrinking transition
 
@@ -134,10 +136,11 @@ Login.IntakeView = function () {
 						$('#bumper').addClass('no-rule');
 						_components.gateway.attachEvents();
 					});
-				}, 650);
+				}, 1050);
 
 				Login.bindResizeEvents('gateway');
 			});
+		}, 1050);
 
 		mixpanel.track('play-intro');
 	};
