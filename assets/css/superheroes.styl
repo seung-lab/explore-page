@@ -35,7 +35,7 @@ $circleRadius = 90px
 	background-color $ACCENT_YELLOW_2 - 5%
 	
 .superheroes .story-text
-	@extend .galileo .story-text .text.italics
+	@extend .galileo .story-text.italics .text
 	
 	text-transform none
 	font-size 24px
@@ -165,7 +165,7 @@ position-superhero(name, offx, offy, px, py, center = false)
 	transform rotate(58deg)
 
 .superheroes.mobile .story-text
-	@extend .galileo .story-text .text.italics
+	@extend .galileo .story-text.italics .text
 
 	color $TEXT_BLUE
 	text-align center

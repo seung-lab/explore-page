@@ -312,7 +312,7 @@ class Galileo extends TeaTime {
 		if (slide.text) {
 			_this.view.story.container.show();
 
-			_this.view.story.text
+			_this.view.story.container
 				.removeClass('caps italics')
 				.addClass(slide.format);
 

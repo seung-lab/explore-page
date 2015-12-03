@@ -36,18 +36,22 @@
 	line-height 1.5em
 	white-space normal
 	color $TEXT_BLUE_LIGHT
-	height 100px
+	height 200px
+	
+	display flex
+	align-items center
+	justify-content center
 	
 	center()
 	
-.galileo .story-text .text.italics
+.galileo .story-text.italics .text
 	font-style italic
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
 	font-weight 400
-	font-size 30px
+	font-size 24px
 	text-transform none
 	line-height 1.25em
-	letter-spacing 0px
+	letter-spacing 0.5px
 
 .galileo .story-text-big
 	@extend .amazing .story-text
@@ -89,7 +93,7 @@
 	letter-spacing 5px
 	
 .galileo .story-text-big .high-text
-	@extend .galileo .story-text .text.italics
+	@extend .galileo .story-text.italics .text
 	text-transform lowercase
 	font-size 30px
 	
@@ -137,17 +141,19 @@
 /*
  *	Media Queries
  */
-
-
-
-// ---> Small Screen
+ 
 
 /* ----------- Non-Retina Screens ----------- */
-@media screen and (min-width: 400px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+// handle conflict from amazing
+@media screen and (max-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.galileo .story-text-big
+		font-size 48px
+
+@media screen and (max-width: 499px) and (min-resolution: 1dppx) and (min-resolution: 96dpi), screen and (max-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	.galileo .big-number
 		top 185px	
 		font-size 350px
-	
+
 	.galileo .story-text-big .high-text
 		font-size 24px
 		
@@ -159,10 +165,19 @@
 		
 	.galileo .big-number.hundred:first-letter
 		letter-spacing -67.5px
+		
+		
+@media screen and (max-width: 500px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.galileo .story-text-big .inner
+		height 400px
+		center-vertical(0px)
 
+	.galileo .story-text-big .medium-text
+		position relative
+		top 0px
 
 /* ----------- Retina Screens ----------- */
-@media screen and (min-width: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+@media screen and (min-width: 500px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.galileo .big-number
 		top 185px	
 		font-size 350px
@@ -247,7 +262,7 @@
 	.galileo .big-number.hundred
 		margin-left -3%
 
-	.galileo .story-text .text.italics	
+	.galileo .story-text.italics .text
 		font-size 30px
 		width 360px
 		bottom 15%
@@ -270,7 +285,7 @@
  *	Set to hit an iPhone 6
  */
 			
-@media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
+@media only screen and (max-width: 375px) and (max-device-width: 375px) and (min-resolution: 2dppx)
 
 	.galileo .big-number
 		top 185px	
@@ -283,16 +298,16 @@
 	.galileo .big-number.hundred:first-letter
 		letter-spacing -52px
 			
-	.galileo .story-text .text.italics
+	.galileo .story-text.italics .text
 		font-size 24px
-		width 325px
+		width 275px
 		white-space normal
 		
 		center()
 	
 	.galileo .story-text
 		white-space normal
-		width 325px
+		width 275px
 		
 		center()
 		
@@ -302,6 +317,11 @@
 		width 325px
 		font-size 24px
 		top -35px
+		
+	.galileo .story-text-big .inner
+		height 400px
+		center-vertical(25px)
+		font-size 30px
 	
 	.galileo .story-text-big .medium-text
 		font-size 72px
@@ -311,6 +331,9 @@
 	
 	.galileo .story-text-big .low-text
 		font-size 24px
+		
+		position relative
+		top -12px
 			
 /*
  *	Set to hit an iPhone 5 + 4
@@ -329,7 +352,7 @@
 	.galileo.big-number.hundred:first-letter
 		letter-spacing -85px
 			
-	.galileo .story-text .text.italics
+	.galileo .story-text.italics .text
 		font-size 18px
 		width 275px
 		white-space normal
@@ -358,5 +381,42 @@
 		font-size 18px
 		letter-spacing 14px
 			
+/* ----------- Horizontal ----------- */
 
+@media screen and (max-width: 749px) and (min-resolution: 2dppx) and (min-resolution: 192dpi) and (min-device-width: 600px), screen and (max-width: 749px) and (min-resolution: 1dppx) and (min-resolution: 96dpi) and (min-device-width: 600px)
+
+	.galileo .story-text.caps
+		font-size 22px
+		width 350px
 	
+		center-horizontal()
+	
+	.galileo .story-text.italics
+		width 305px
+		center-horizontal()
+		
+	.galileo .story-text-big .inner
+		height 400px
+		center-vertical(15px)
+
+	.galileo .story-text-big .medium-text
+		position relative
+		top 4px
+
+@media screen and (min-width: 750px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (min-width: 750px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+
+	.galileo .story-text.italics
+		width 675px
+		center-horizontal()
+
+@media screen and (min-width: 1300px) and (min-resolution: 2dppx) and (min-resolution: 192dpi), screen and (min-width: 1300px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.galileo .story-text.italics .text
+		font-size 30px
+		
+	.galileo .story-text.italics
+		width 700px 
+		center-horizontal()
+		
+
+
+
