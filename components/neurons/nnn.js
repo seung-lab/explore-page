@@ -29,6 +29,7 @@ function NNN (args = {}) {
 
 	this.max_depth;
 	this.num_branches;
+	this.neuron_timer;
 	this.neuron_id = 0;
 
 	this.initialized = false;
@@ -47,23 +48,26 @@ function NNN (args = {}) {
 
 			let soma = neuron.nodes[0];
 				soma.render_soma();
+				// soma.render_radius();
+				// soma.meta();
 
-			if (p.frameCount >= 250) {
-				neuron.network_setup(); // Create seed branching
-				_this.mst(); 
-				// Update spring positions --> Run through array
-				_this.springs.forEach(function(s) {
-					s.update();
-					s.display();
-				});
-				return true;
+			if ((soma.pow <= 0) && (soma.spread_countdown >= 0)) {
+				soma.spread_countdown--;
 			}
 
-			// Repel from center
-			soma.space(_this.somas);
+			if (soma.spread_countdown >= 0) {
+				soma.space(_this.somas); // Repel from center
+				return;
+			}
 
+			neuron.network_setup(); // Create seed branching
+			_this.mst(); 
+			// Update spring positions --> Run through array
+			_this.springs.forEach(function(s) {
+				// s.update();
+				// s.display();
+			});
 		});
-
 	}
 	
 	// Simple method for running the neurons
@@ -82,7 +86,7 @@ function NNN (args = {}) {
 
 				let radius = neuron.radius();
 				
-				neuron.nodes[0].spread(_this.somas, radius);
+				// neuron.nodes[0].spread(_this.somas, radius);
 			} 
 			else {
 				neuron.grow();
@@ -113,8 +117,9 @@ function NNN (args = {}) {
 
 		for (let i = 0; i < count; i++) {
 			// Set Neuron Soma Position (Root)
-			x = (window.innerWidth / 2) + p.random(-1,1);
-			y = (window.innerHeight / 2) + p.random(-1,1);
+			// For some reason the y value must lean towards less?
+			x = (window.innerWidth / 2) + p.random(-10,10);
+			y = (window.innerHeight / 2) + p.random(-15,0);
 
 			// Create Neurons with similar general levels of complexity
 			_this.num_branches = p.round(p.random(6,8));
@@ -122,7 +127,11 @@ function NNN (args = {}) {
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.
 			// Grow time is inversely proportional to num_branches
-			let neuron_timer = 1000 / _this.num_branches;
+			if (window.innerWidth < 500) {
+				_this.neuron_timer = 250 / _this.num_branches;	
+			} else {
+				_this.neuron_timer = 350 / _this.num_branches;
+			}
 
 			_this.neurons.push(
 				new Neuron ({

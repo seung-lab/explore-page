@@ -31,7 +31,10 @@ let sprout = function (p) {
 		_mxn = 0,
 		_avg = 0,
 		_all_nodes = 0,
-		_nnn_count = 0;
+		_nnn_count = 0,
+
+	// canvas
+		canvas;
 
 	// Global font reference
 	let _fontRegular;
@@ -45,8 +48,7 @@ let sprout = function (p) {
 	p.setup = function () {
 		p.frameRate(60);
 
-		let canvas = p.createCanvas(_options.width, _options.height);
-
+		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
 
 		_canvas.resolve(canvas.elt);
@@ -58,8 +60,8 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		// 2000 yields 20
-		_nnn_count = p.ceil(p.min((p.width / 20), 25));
-		// _nnn_count = 250;
+		_nnn_count = p.ceil(p.min((p.width / 60), 25));
+		// _nnn_count = 100;
 
 		nnn_start();
 	};
@@ -69,9 +71,7 @@ let sprout = function (p) {
 
 		// Run the _nnn if it has finished spreading
 		if (p.frameCount > 30) {
-			if (_nnn.distribute()) {
-				console.log('potato');
-			}
+			_nnn.distribute();
 		}
 
 		if (_runtime) {
@@ -162,6 +162,12 @@ let sprout = function (p) {
 
 	// 	return false; // prevent default
 	// }
+
+	// Deal with resize events
+	window.onresize = function() { 
+		$(canvas).width(window.innerWidth)
+			     .height(window.innerHeight);
+	}
 }
 
 module.exports.init = function (args = {}) {

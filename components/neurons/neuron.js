@@ -11,7 +11,7 @@
 
 let p5 = require('p5'),
 	Node = require('./node.js'),
-	Synapse = require('./synapse.js');
+	Bouton = require('./bouton.js');
 
 function Neuron (args) {
 	args = args || {};
@@ -22,7 +22,7 @@ function Neuron (args) {
 	// Public arguments from constructor
 	this.position = p.createVector(args.x, args.y)    	|| p.createVector(0,0);
 	this.num_branches = args.num_branches 				|| 7;
-	this.neuron_timer = args.neuron_timer 				|| 60;
+	this.neuron_timer = args.neuron_timer 				|| 0;
 	this.max_depth = args.max_depth 	  				|| 6;
 	this.id = args.id 									|| 0;
 
@@ -30,7 +30,7 @@ function Neuron (args) {
 	this.growing = true;
 	// Setup public arrays and add one dendrite to it
 	this.nodes = [];
-	this.leaves = [];
+	this.boutons = [];
 
 	let list = false;
 
@@ -45,6 +45,7 @@ function Neuron (args) {
 			position: 		_this.position,
 			velocity: 		start_velocity,
 			depth: 			0,
+			radius: 		_this.radius(),
 			mass: 			128, // Huge mass for soma!
 			id: 			0,
 			neuron_id:      _this.id,
@@ -100,10 +101,10 @@ function Neuron (args) {
 			n.render();
 		}
 
-		// Add boutons --> Synapses to leaves of neuron :: Could definitely be improved
-		// _this.leaves.forEach(function (synapse) {
-		// 	// synapse.display(); 
-		// });
+		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
+		_this.boutons.forEach(function (bouton) {
+			bouton.display(); 
+		});
 	}
 
 	this.done = function() {
@@ -146,6 +147,21 @@ function Neuron (args) {
 
 	}
 
+	this.create_bouton = Utils.cacheify(function() {
+		let _this = this;
+		let n;
+		for (let i = _this.nodes.length - 1; i >= 1; i--) {
+			// Get the Node object, update and draw it
+			n = _this.nodes[i];
+			_this.boutons.push(
+				new Bouton ({
+					position: n.position,
+					p: p,
+				})
+			);
+		};
+	});
+
 	this.grow = function() {
 		let _this = this;
 		let n;
@@ -162,12 +178,7 @@ function Neuron (args) {
 			}
 
 			if (n.depth >= _this.max_depth) {
-				_this.leaves.push(
-					new Synapse ({
-						position: n.position,
-						p: p,
-					})
-				);
+				_this.create_bouton();
 				continue;
 			}
 			
@@ -188,7 +199,7 @@ function Neuron (args) {
 						_this.nodes.push(n.branch(20, _this.nodes.length));   // Add one going left
 					} 
 					else {
-						// Added leaves to end of Neuron --> Can be vastly improved to consider
+						// Added boutons to end of Neuron --> Can be vastly improved to consider
 						// the entire 'distal' zone of the neuron.
 						_this.nodes.push(
 							// n.branch(p.round(p.random(-20,20)))
@@ -228,6 +239,7 @@ function Neuron (args) {
 
 	// Calculate the average radius of neuron
 	// Wrap it in cacheify() to cache first returned value
+	/*
 	this.radius = Utils.cacheify(function() {
 		let _this = this;
 		let avg_radius = 0;
@@ -248,6 +260,11 @@ function Neuron (args) {
 
 		return avg_radius;
 	});
+	*/
+
+	this.radius = function() {
+		return this.num_branches * 40;
+	}
 
 }
 

@@ -31,7 +31,7 @@
     "method-override": "^2.3.0",
     "morgan": "^1.5.0",
     "node.extend": "^1.1.5",
-    "p5": "^0.4.17",
+    "p5": "^0.4.19",
     "propagating-hammerjs": "^1.4.3",
     "react": "^0.13.3",
     "sax": "^0.6.1",

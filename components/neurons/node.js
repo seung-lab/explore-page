@@ -23,6 +23,7 @@ function Node (args = {}) {
 	// Private arguments from constructor
 	let p = args.p;
 
+
 	// Public P5.Vector objects
 	this.start = args.position.copy() || p.createVector();
 	this.position = args.position.copy() || p.createVector();
@@ -33,6 +34,7 @@ function Node (args = {}) {
 	this.max_depth = args.max_depth || 7;
 	this.depth = args.depth || 0;
 	this.mass = args.mass || 5;
+	this.radius = args.radius || 200;
 
 	// Node ID
 	this.id = args.id || 0;
@@ -69,14 +71,10 @@ function Node (args = {}) {
 	let _wan_const = 0;
 	let _maxspeed = 1.5;       // Default 2
 	let _maxforce = p.random(0.8, 1);    // Default 0.05
-	let _damping = 0.85;
-	let _pow = 5000; // Huge starting multipliers!
 
-	// Make our PVectors
-	let p_0 = p.createVector();
-	let p_1 = p.createVector();
-	let p_2 = p.createVector();
-	let p_3 = p.createVector();
+	this.spread_countdown = 30;
+	this.pow = 1; // Huge starting multipliers!
+	let _damping = 0.85;
 
 	// Increment for each instantiation at a branch event
 	this.depth++;
@@ -103,6 +101,7 @@ function Node (args = {}) {
 	// Set curve points
 	this.pt_0 = function() {
 		let _this = this;
+		let p_0 = p.createVector();
 		if (_this.depth == 1 || _this.depth == 2) {
 			p_0 = _this.position; 
 			return p_0;
@@ -114,6 +113,7 @@ function Node (args = {}) {
 
 	this.pt_1 = function() {
 		let _this = this;
+			let p_1 = p.createVector();
 		let isAlone =  _this.parent instanceof Node;
 		if (!isAlone) {
 			p_1 = _this.start.copy(); 
@@ -126,11 +126,13 @@ function Node (args = {}) {
 
 	this.pt_2 = function() {
 		let _this = this;
+			let p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
 	}
 
 	this.pt_3 = function() {
 		let _this = this;
+			let p_3 = p.createVector();
 		if (_this.children.length == 1) {
 			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
 		} 
@@ -390,18 +392,38 @@ function Node (args = {}) {
 		let sep = _this.separate(somas); // Move away from eachother
 
 		// Carefully weight these forces
-		cen.mult(_pow);
-		edg.mult(_pow / 5);
-		sep.mult(_pow);
+		// cen.mult(_this.pow * 2);
+		// edg.mult(_this.pow / 3);
+		// sep.mult(_this.pow * 1.5);
+
+		// Vertical Multiplier
+		let vm = p.height / (p.width * 1.5);
+		
+		cen.y = cen.y * vm;
+		edg.y = edg.y * vm;
+		sep.y = sep.y * vm;
+
+		cen.mult(_this.pow * 10 * 2);
+		edg.mult(_this.pow * 1.5);
+		sep.mult(_this.pow * 10 * 2);
 
 		// Add the force vectors to acceleration
 		_this.applyForce(cen);
 		_this.applyForce(edg);
 		_this.applyForce(sep);
 
-		_pow *= 0.6;
-		if (_pow <= 1) {
-			_pow = 0;
+		// let pm = p.width * p.height;
+		let area = p.width * p.height;
+		let space = p.sqrt(area);
+		// let pm = p.map(space, 300, 1500, 0.5, 0.95);
+		let pm = p.max(p.height, p.width);
+		pm = p.map(pm, 400, 3000, 0.8, 0.9);
+		console.log(vm + " " + pm);
+
+		_this.pow *= pm;
+
+		if (_this.pow <= .01) {
+			_this.pow = 0;
 			// console.log('stop');
 		}
 	}
@@ -468,8 +490,9 @@ function Node (args = {}) {
 		let _this = this;
 		// Basic Fractal Lines
 		// p.stroke(41,59,73); // blue
-		p.stroke(200); // white
-		p.strokeWeight(2);
+		// p.stroke(200); // white
+		p.stroke(115,135,150);
+		p.strokeWeight(1);
 		p.noFill();
 			
 		// p.line(_this.start.x, _this.start.y, _this.position.x, _this.position.y);
@@ -547,6 +570,7 @@ function Node (args = {}) {
 			p.noStroke();
 			p.fill(115,135,150); // blue
 			// p.fill(200); // white
+			let soma_radius = _this.neuron_timer;
 			p.ellipse(_this.pt_2().x,_this.pt_2().y,10,10);
 		p.pop();
 	}
@@ -557,6 +581,7 @@ function Node (args = {}) {
 		// Render Radius
 		// console.log(_radius);
 		p.push();
+			p.noStroke();
 			p.fill(200,100);
 			p.ellipse(_this.position.x, _this.position.y, _radius, _radius);
 		p.pop();
@@ -573,7 +598,7 @@ function Node (args = {}) {
 
 			// Make leaves go crazy on final level
 			if (_this.depth == (_this.max_depth - 1)) {
-				_wan_const = 0.5;
+				_wan_const = 1.5;
 			}
 		} else  {
 			_this.dw = false;
@@ -583,15 +608,9 @@ function Node (args = {}) {
 	// Accepts an Array of Node Objects
 	this.space = function(nodes) {
 		let _this = this;
-			_this.spread(nodes, _this.radius_size());
+			_this.spread(nodes, _this.radius);
 			_this.update();
 	}
-
-	// Parameterize Radius
-	this.radius_size = Utils.cacheify(function() {
-		let _radius_size = p.round(p.random(150, 400));
-		return _radius_size;
-	});
 
 	// Recurse through nodes to root
 	// Accepts Node object
@@ -667,7 +686,8 @@ function Node (args = {}) {
 	this.meta = function() {
 		let _this = this;
 		// Render meta information on vertex
-		let str_id = String(_this.id + ":" + _this.mass);
+		// let str_id = String(_this.id + ":" + _this.mass);
+		let str_id = String(_this.id + ":" + _radius);
 		p.push();
 			p.fill(0,255,0).strokeWeight(0).textSize(10);
 			p.text(str_id, _this.position.x, _this.position.y - 15);
@@ -773,7 +793,7 @@ function Node (args = {}) {
 		// Update spring positions --> Run through array
 		_this.springs.forEach(function(s) {
 			s.update();
-			s.display();
+			// s.display();
 		});
 	}
 
