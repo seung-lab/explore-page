@@ -294,7 +294,7 @@ class Amazing extends TeaTime {
 		// ensure all frames are hidden
 		$('.amazing .frame').css('visibility', 'hidden');
 
-		var jump = Math.abs(slide.lastFrame - _this.currentFrame) > (3000 / _this.frameRateMsec);
+		var jump = Math.abs(slide.lastFrame - _this.currentFrame) > (4000 / _this.frameRateMsec); // experimentally determined
 
 		var frame = jump
 			? slide.lastFrame
@@ -318,7 +318,7 @@ class Amazing extends TeaTime {
 				frame += delta;
 
 				if (frame === slide.lastRepeatFrame + 1 
-					|| (frame <= _this.slides[0].lastFrame && delta < 0)) { // you shouldn't be able to make the brain go away
+					|| (frame <= slide.lastFrame && delta < 0)) { // you shouldn't be able to make the brain go away
 
 					delta = 1;
 					frame = slide.lastFrame + 1;
