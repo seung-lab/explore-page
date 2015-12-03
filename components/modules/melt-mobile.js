@@ -35,10 +35,7 @@ class MeltMobile extends TeaTime {
 		this.recurseTimeout = $.Deferred().resolve();
 
 		let slideUp = this.slides[SLIDE_UP_SLIDE].el;
-		// slideUp.addClass('return');
 		var img = slideUp.children().first().get(0);
-		// img.css('top', '0');
-
 
 		let mc = new Hammer.Manager(img);
 		mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_VERTICAL, threshold: 0, pointers: 0 }));
@@ -95,6 +92,16 @@ class MeltMobile extends TeaTime {
 				img.css('top', '0');
 			}
 		});
+
+		$(window).ion('touch.melt', function (e, evt) {
+			var current = _this.slideAt(_this.t);
+
+			if (current.hasClass('fresh')) {
+				current.removeClass('fresh');
+				current.addClass('active');
+				$('#meltMobile2').addClass('visible');
+			} 
+		});
 	}
 
 	generateView () {
@@ -145,7 +152,7 @@ class MeltMobile extends TeaTime {
 
 		for (let i = 1; i < SLIDE_COUNT; i++) {
 			let slide = $('<div>', { id: 'meltMobile' + i, class: 'meltSlide' });
-			let img = $('<img>');
+			let img = $('<img>').attr('draggable', false);
 			slide.append(img);
 			img.css('z-index', SLIDE_COUNT - i + 10);
 			this.slides[i].el = slide;
@@ -284,7 +291,7 @@ class MeltMobile extends TeaTime {
 		} else {
 			$('#meltMobileWhitePart').css('opacity', 0);
 			$('#meltMobileWhitePart').css('height', heightStart + "%");
-			$('#meltMobileBg').css('opacity', 0.05); // this fixes a stutter HACK!
+			$('#meltMobileBg').css('opacity', 0.03); // this fixes a stutter HACK!
 		}
 
 		if (currentSlide.index === SLIDE_UP_SLIDE) {

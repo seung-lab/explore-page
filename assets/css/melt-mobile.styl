@@ -4,6 +4,8 @@
 @require 'animation.styl'
 
 .melt-mobile .meltSlide img
+	user-select: none;
+	user-drag: none;
 	height 100%
 	margin: auto
 	position: absolute
@@ -80,7 +82,12 @@ $slide-0-text-perct = 0.8
 	transform translateY(-100%) // leave off the screen
 
 .melt-mobile #meltMobile1.enter img
+	transition transform 0s
 	transform translateY(0%) // start off the screen
+
+// .melt-mobile #meltMobile1.exit img
+	// transform translateY(0%) // start off the screen
+
 
 .melt-mobile #meltMobile1.return img
 	transition top 0.5s
@@ -89,34 +96,31 @@ $slide-0-text-perct = 0.8
 	// animation-fill-mode forwards
 	animation-duration $movement-duration
 
+.melt-mobile #meltMobile1.enter.forward.active img
+	animation none
+
 .melt-mobile #meltMobile1.enter.forward img
+	// transform translateY(0%)
 	animation-name enterFromBottom, shake
 	animation-duration $movement-duration, 3000ms
 	animation-iteration-count 1, infinite
 	animation-delay 0s, ($movement-duration)
 	animation-timing-function ease-out, linear
 
-.melt-mobile #meltMobile1.enter.forward.active img
-	animation none
+// .melt-mobile #meltMobile1.enter.forward.active img
+	// animation none
 
 .melt-mobile #meltMobile1.exit.reverse img
 	animation-name exitToBottom
 	animation-timing-function ease-in
 
 // .melt-mobile #meltMobile1.exit.forward img
-// 	// transition transform 2s
-// 	// translate translateY(-100%)
-// 	// animation none
-// 	//-name exitToTop
-// 	//animation-timing-function ease-in
+	// animation-name exitToTop
+	// animation-timing-function ease-in
 
 .melt-mobile #meltMobile1.enter.reverse img
 	animation-name enterFromTop
 	animation-timing-function ease-out
-
-// #meltMobile1.enter, #meltMobile1.exit
-// 	opacity 1
-
 
 $m1-story-text-perct = (1/3)
 
@@ -248,7 +252,6 @@ $count = length($heights)
 	bottom: 0px
 	z-index: 1
 	opacity: 0
-	transition: all 160ms
 
 // .melt-mobile #meltMobileWhitePart
 // 	height: 49%
