@@ -404,12 +404,12 @@ function Node (args = {}) {
 		sep.y = sep.y * vm;
 
 		cen.mult(_this.pow * 10 * 2);
-		edg.mult(_this.pow * 1.5);
+		edg.mult(_this.pow * 1.25);
 		sep.mult(_this.pow * 10 * 2);
 
 		// Add the force vectors to acceleration
 		_this.applyForce(cen);
-		_this.applyForce(edg);
+		// _this.applyForce(edg);
 		_this.applyForce(sep);
 
 		// let pm = p.width * p.height;
@@ -417,8 +417,7 @@ function Node (args = {}) {
 		let space = p.sqrt(area);
 		// let pm = p.map(space, 300, 1500, 0.5, 0.95);
 		let pm = p.max(p.height, p.width);
-		pm = p.map(pm, 400, 3000, 0.8, 0.9);
-		console.log(vm + " " + pm);
+		pm = p.map(pm, 400, 3000, 0.8, 0.95);
 
 		_this.pow *= pm;
 
@@ -489,9 +488,9 @@ function Node (args = {}) {
 	this.render = function() {
 		let _this = this;
 		// Basic Fractal Lines
-		// p.stroke(41,59,73); // blue
 		// p.stroke(200); // white
-		p.stroke(115,135,150);
+		// p.stroke(115,135,150); //blue
+		p.stroke(41,59,73); // dark blue
 		p.strokeWeight(1);
 		p.noFill();
 			
@@ -569,9 +568,10 @@ function Node (args = {}) {
 		p.push();
 			p.noStroke();
 			p.fill(115,135,150); // blue
+			// p.fill(41,59,73); // dark blue
 			// p.fill(200); // white
 			let soma_radius = _this.neuron_timer;
-			p.ellipse(_this.pt_2().x,_this.pt_2().y,10,10);
+			p.ellipse(_this.pt_2().x,_this.pt_2().y,5,5);
 		p.pop();
 	}
 

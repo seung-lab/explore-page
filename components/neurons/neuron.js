@@ -121,12 +121,12 @@ function Neuron (args) {
 		// When we're finished growing, springify all the nodes
 		if (!list) {
 			// Once neuron has completed, create adjacency list
-			_this.nodes.forEach(function(n){
-				n.springify(_this.nodes);
-				// n.neighbor_nodes.forEach(function(neighbor) {
-				// 	console.log("Node #" + n.id + " : Neighbor : " + neighbor.node + " ID : " + neighbor.id + " Distance From : " +neighbor.distance);
-				// });
-			});
+			// _this.nodes.forEach(function(n){
+			// 	n.springify(_this.nodes);
+			// 	// n.neighbor_nodes.forEach(function(neighbor) {
+			// 	// 	console.log("Node #" + n.id + " : Neighbor : " + neighbor.node + " ID : " + neighbor.id + " Distance From : " +neighbor.distance);
+			// 	// });
+			// });
 
 			list = true;
 

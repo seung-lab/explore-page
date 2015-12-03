@@ -66,7 +66,8 @@ function Spring (args = {}) {
 
 		p.push();
 			p.strokeWeight(1);
-			p.stroke(255, 0, 0, 100);
+			// p.stroke(255, 0, 0, 100);
+			p.stroke(115,135,150); // blue
 		
 			// Direction Lines
 			p.line(

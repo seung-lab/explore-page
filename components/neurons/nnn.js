@@ -61,7 +61,7 @@ function NNN (args = {}) {
 			}
 
 			neuron.network_setup(); // Create seed branching
-			_this.mst(); 
+			// _this.mst(); 
 			// Update spring positions --> Run through array
 			_this.springs.forEach(function(s) {
 				// s.update();
@@ -82,7 +82,7 @@ function NNN (args = {}) {
 				// console.log("NNN Complete");
 				// console.log(_this.neurons.length);
 				// p.noLoop();
-				neuron.update();
+				// neuron.update();
 
 				let radius = neuron.radius();
 				
@@ -123,6 +123,10 @@ function NNN (args = {}) {
 
 			// Create Neurons with similar general levels of complexity
 			_this.num_branches = p.round(p.random(6,8));
+			// Exception for new idea -->
+			if (_this.num_neurons > 50) {
+				_this.complexity = 10;
+			}
 			_this.max_depth = _this.complexity - _this.num_branches;
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.

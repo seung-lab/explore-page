@@ -60,8 +60,8 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		// 2000 yields 20
-		_nnn_count = p.ceil(p.min((p.width / 60), 25));
-		// _nnn_count = 100;
+		// _nnn_count = p.ceil(p.min((p.width / 60), 30));
+		_nnn_count = 150;
 
 		nnn_start();
 	};
@@ -70,12 +70,12 @@ let sprout = function (p) {
 		p.clear();
 
 		// Run the _nnn if it has finished spreading
-		if (p.frameCount > 30) {
-			_nnn.distribute();
-		}
-
 		if (_runtime) {
 			_nnn.run();
+		}
+
+		if (p.frameCount > 30) {
+			_nnn.distribute();
 		}
 
 		// plus_minus();
