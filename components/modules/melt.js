@@ -1,9 +1,30 @@
 let $ = require('jquery'),
 	utils = require('../../clientjs/utils.js'),
 	TeaTime = require('../teatime.js'),
-	GLOBAL = require('../../clientjs/GLOBAL.js');
+	GLOBAL = require('../../clientjs/GLOBAL.js'),
+	Easing = require('../../clientjs/easing.js');
 
-var EPS = 0.01;
+let EPS = 0.01;
+
+let videoCache = {
+	true: [],
+	false: []
+};
+
+let FRAME_RATE = 45;
+
+let SEQUENCE_LENGTHS = [
+	73, 194
+];
+
+Math.easeOutQuad = function (t, b, c, d) {
+	t /= d;
+	return -c * t*(t-2) + b;
+};
+
+let TOTAL_FRAMES = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
+
+let SEQUENCE_COUNT = SEQUENCE_LENGTHS.length;
 
 class Melt extends TeaTime {
 	constructor(args = {}) {
@@ -25,11 +46,6 @@ class Melt extends TeaTime {
 		this.slideIndex = 0;
 
 		var _this = this;
-
-		window.onresize = function () {
-			_this.resize();
-		};
-		_this.resize();
 
 		this.timeouts = {
 
@@ -113,8 +129,8 @@ class Melt extends TeaTime {
 		};
 	}
 
-	resize () {
-		var aspect = window.innerWidth / window.innerHeight;
+	resize (w, h) {
+		var aspect = w / h;
 		if (aspect > (16 / 10) && aspect < 2) {
 			this.view.module.addClass('wide');
 		} else {
@@ -123,20 +139,18 @@ class Melt extends TeaTime {
 	}
 
 	next () { // next slide
-		// console.log('next', SequenceManager.tTime(), this.t);
-		if (SequenceManager.tTime() > 1 - EPS) {
+		if (TOTAL_FRAMES - this.currentFrame() < 1) {
 			this.parent.moduleComplete();
 		} else {
-			SequenceManager.scrollHandler(true)
+			this.scrollHandler(true)
 		}
 	}
 
 	previous () { // previous slide
-		// console.log('previous', SequenceManager.tTime(), this.t);
-		if (SequenceManager.tTime() < EPS) {
+		if (this.currentFrame() < 1) {
 			this.parent.moduleUncomplete();
 		} else {
-			SequenceManager.scrollHandler(false)
+			this.scrollHandler(false)
 		}
 	}
 
@@ -144,58 +158,75 @@ class Melt extends TeaTime {
 		return 0.999;
 	}
 
-	timeUpdate (t) {
-		// console.log('timeUpdate', t);
-		this.t = t;
-		this.parent.sub_t_update(this.name, t);
+	frameUpdate () {
+		let currentFrame = this.currentFrame();
 
-		var i = 0;
+		let safeT = Math.min(0.999, currentFrame / TOTAL_FRAMES);
 
-		if (t < 0.01) {
-			this.view.texts[i].css('opacity', '1');
-			this.view.texts[i].css('transition', 'opacity 0s');
-		} else {
-			this.view.texts[i].css('transition', 'opacity 0.5s');
-			this.view.texts[i].css('opacity', '0');
+		this.t = safeT;
+		this.parent.sub_t_update(this.name, safeT);
+
+
+		function foo(start, end, st, et, cb) {
+			let m1 = start + st;
+			let m2 = end - et;
+
+			return function (t) {
+				if (t < start || t > end) {
+					cb(0);
+					return;
+				}
+
+				if (t < m1) {
+					cb(Easing.parabolic((t - start) / st));
+					return;
+				}
+
+				if (t > m2) {
+					cb(Easing.parabolic(1 - ((t - m2) / et)));
+					return;
+				}
+
+				cb(1);
+			}
 		}
 
-		i++;
+		this.view.texts[0].css('transition', 'opacity 0s');
+		this.view.texts[1].css('transition', 'opacity 0s');
+		this.view.texts[2].css('transition', 'opacity 0s');
 
-		if (t > 0.16 && t < 0.26) {
-			this.view.texts[i].css('opacity', '1');
-		} else {
-			this.view.texts[i].css('opacity', '0');
-		}
+		let _this = this;
 
-		i++;
+		let first = foo(0, 15, 0, 15, function (p) {
+			_this.view.texts[0].css('opacity', p);
+		});
+		first(currentFrame);
 
-		if (t > 0.875 && t < 1) {
-			this.view.texts[i].css('opacity', '1');
-		} else {
-			this.view.texts[i].css('opacity', '0');
-		}
+		let second = foo(30, 73 + 15, 15, 15, function (p) {
+			_this.view.texts[1].css('opacity', p);
+		});
+		second(currentFrame);
 
-		var whiteTStart = 0.87; // global t = 91.2, end = 96.1
+		_this.view.texts[2].css('opacity', '0');
 
-		if (t >= whiteTStart) {
-			var p = (t - whiteTStart) / (1 - whiteTStart);
+		let whiteTStart = 0.87; // global t = 91.2, end = 96.1
 
-			var heightStart = 28.45;
-			var heightEnd = 38;
+		let heightStart = 28;
+		let heightEnd = 38;
 
-			this.view.white.css('opacity', p); 
-			this.view.white.css('height', (p * heightEnd + (1-p) * heightStart) + '%');
-		} else {
-			this.view.white.css('opacity', 0);
-		}
+		let height = foo(226, TOTAL_FRAMES, (TOTAL_FRAMES - 226), 0, function (p) {
+			// p = Easing.easeOutSine(p);
+			_this.view.white.css('height', (p * heightEnd + (1-p) * heightStart) + '%');
+			_this.view.white.css('opacity', p);
+		});
+
+		height(currentFrame);
 	}
 
 	render (t_prev, t) {
-		// console.log('render', t);
+		let totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
 
-		var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
-
-		var targetFrame = t * totalFrames;
+		let targetFrame = t * totalFrames;
 
 		for (var i = 0; i < SEQUENCE_LENGTHS.length; i++) {
 			let length = SEQUENCE_LENGTHS[i];
@@ -207,22 +238,18 @@ class Melt extends TeaTime {
 			}
 		};
 
-		var targetSecond = targetFrame / 30;
+		let targetSecond = targetFrame / FRAME_RATE;
 
-		// console.log('load', i, targetSecond);
-
-		var vid = this.loadVideo(true, i, targetSecond, false);
-		SequenceManager.active = vid;
+		this.activeVideo = this.loadVideo(true, i, targetSecond, false);
 	}
 
 	seek (t) {
-		// console.log('seek', t);
 		let t_prev = this.t;
-		this.timeUpdate(t);
+		this.frameUpdate(t);
 
 
-		if (SequenceManager.active) {
-			SequenceManager.active.pause();
+		if (this.activeVideo) {
+			this.activeVideo.pause();
 		}
 
 		return this.render(t_prev, t);
@@ -254,6 +281,43 @@ class Melt extends TeaTime {
 
 	beforeExit () {
 		clearTimeout(this.timeouts.initial_play);
+		if (this.activeVideo) {
+			this.activeVideo.pause();
+		}
+	}
+
+	scrollHandler (down) {
+		if (this.activeVideo) {
+			return this.activeVideo.scrollHandler(down);
+		}
+	}
+
+	currentFrame () {
+		let video = this.activeVideo;
+
+		if (!video) {
+			return Math.floor(this.t * TOTAL_FRAMES);
+		}
+
+		let currentSeqFrame = video.currentTime * FRAME_RATE;
+
+		var currentLength = SEQUENCE_LENGTHS[video.seqNum];
+
+		let lagBuffer = 0; //video.forward ? 0 : 5;
+
+		var frameTime = Math.min(currentSeqFrame + lagBuffer, currentLength);
+
+		if (video.forward) {
+			for (var i = 0; i < video.seqNum; i++) {
+				frameTime += SEQUENCE_LENGTHS[i];
+			};
+		} else {
+			for (var i = video.seqNum + 1; i < SEQUENCE_COUNT; i++) {
+				frameTime += SEQUENCE_LENGTHS[i];
+			};
+		}
+
+		return Math.floor(video.forward ? frameTime : TOTAL_FRAMES - frameTime); 
 	}
 
 	loadVideo(forward, sequence, start, autoplay) {
@@ -293,8 +357,16 @@ class Melt extends TeaTime {
 		videoCache[forward][sequence] = seqEl;
 
 		seqEl.addEventListener('loadeddata', function () {
-			// console.log('loadeddata');
 			seqEl.currentTime = start;
+
+			var lastTime = -1;
+
+			setInterval(function () {
+				if (_this.activeVideo === seqEl) {
+					let frame = seqEl.currentTime * FRAME_RATE;
+					_this.frameUpdate();
+				}
+			}, 15);
 		});
 
 		seqEl.addEventListener('play', function () {
@@ -303,8 +375,6 @@ class Melt extends TeaTime {
 
 		seqEl.addEventListener('seeked', function () {
 			_this.currentVideo = seqEl;
-			// console.log('seeked', forward, sequence);
-			// ended = false;
 
 			seqEl.setupAndReadyToGo = true;
 			seqEl.style.display = 'inherit';
@@ -348,7 +418,6 @@ class Melt extends TeaTime {
 
 		seqEl.addEventListener('pause', function () {
 			if (seqEl.currentTime === seqEl.duration) {
-				// console.log('sequence ended', forward, sequence, SequenceManager.tTime());
 				ended = true;
 			}
 		});
@@ -357,41 +426,25 @@ class Melt extends TeaTime {
 			_this.dropTheBeat();
 		});
 
-		setInterval(function () {
-			if (SequenceManager.active === seqEl) {
-				_this.timeUpdate(SequenceManager.tTime());
-			}
-		}, 15);
-
 		seqEl.scrollHandler = function (down) {
 			if (!seqEl.started) {
-				// console.log('not started', sequence);
 				if (down === forward) {
-					// console.log('starting', sequence);
 					seqEl.play();
 					seqEl.started = true;
 
 					return;
-				} else {
-					// return true;
-					// return false; // TODO, this may be a mistake if we start at the end
 				}
 			}
 
 			if (!ended) {
-				// console.log('not ended', down, forward);
 				if (down === forward) {
-					// console.log('double playback', forward, sequence);
 					seqEl.playbackRate = 2;
 					return;
 				} else {
-					// console.log('pausing', forward, sequence);
 					// pleaseEnd = true;
 					seqEl.pause();
 					// jumpTime = seqEl.duration - seqEl.currentTime;
 				}
-			} else {
-				// console.log('scrollstart and is sended', forward, sequence);
 			}
 
 			var diff = 0;
@@ -407,96 +460,27 @@ class Melt extends TeaTime {
 				}
 			}
 
-			var nextIdx = sequence + diff;//.mod(SEQUENCE_COUNT);
+			var nextIdx = sequence + diff;
 
-			// // console.log('switching from', forward, sequence, 'to', down, nextIdx);
 
 			if (nextIdx >= 0 && nextIdx < SEQUENCE_COUNT) {
 				ended = false; // prevents double triggers, ended really means just ended
-				// console.log('switching from', forward, sequence, 'to', down, nextIdx);
-
-				// // console.log('boo', seqEl.duration - seqEl.currentTime);
 
 				var next = _this.loadVideo(down, nextIdx, seqEl.duration - seqEl.currentTime, true);
-				SequenceManager.active = next;
+				_this.activeVideo = next;
 				// if (next.setupAndReadyToGo) {
 					// next.currentTime = seqEl.duration - seqEl.currentTime;
 					// next.playbackRate = 1;
 				// }
-			} else {
-				// console.log('ignoring');
-				// return false;
 			}
-
-			// return true;
 		};
 
 		return seqEl;
 	}
 }
 
-var videoCache = {
-	true: [],
-	false: []
-};
-
-
-
-var SEQUENCE_LENGTHS = [
-	74, 195
-];
-
-var SEQUENCE_COUNT = SEQUENCE_LENGTHS.length;
-
-var SequenceManager = {
-	active: null,
-	scrollHandler: function (down) {
-		if (SequenceManager.active) {
-			return SequenceManager.active.scrollHandler(down);
-		}
-	},
-	tTime: function () {
-		var video = SequenceManager.active;
-
-
-		var currentFrame = video.currentTime * 30;
-
-		var currentLength = SEQUENCE_LENGTHS[video.seqNum];
-
-		var frameTime = Math.min(currentFrame, currentLength);//forward ? currentFrame : currentLength - currentFrame;
-
-		// var realSeqNum = forward ? seqEl.seqNum : SEQUENCE_COUNT - seqEl.seqNum - 1;
-
-		// // console.log('realSeqNum', realSeqNum, currentFrame);
-
-		if (video.forward) {
-			for (var i = 0; i < video.seqNum; i++) {
-				frameTime += SEQUENCE_LENGTHS[i];
-			};
-		} else {
-			for (var i = video.seqNum + 1; i < SEQUENCE_COUNT; i++) {
-				frameTime += SEQUENCE_LENGTHS[i];
-			};
-		}
-
-		var totalFrames = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
-
-		var teaTime = frameTime / totalFrames;
-
-		// // console.log('tTime', forward, seqEl.seqNum, teaTime);
-
-		// return 0.5;
-
-		if (!video.forward) {
-			return Math.min(1 - teaTime, 0.999);
-		}
-
-		return Math.min(teaTime, 0.999);
-	}
-};
-
 function urlForVideo(forward, sequence) {
-	return `${GLOBAL.base_url}/animations/melt/desktop/o${sequence}${forward ? '' : 'r'}.mp4`;
+	return `${GLOBAL.base_url}/animations/melt/desktop/oooo${sequence}${forward ? '' : 'r'}.mp4`;
 }
 
 function splitter (txt, inverted) {
