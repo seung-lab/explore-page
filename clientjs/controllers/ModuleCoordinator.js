@@ -18,7 +18,36 @@ let ModuleCoordinator = {
 	timeline: null,
 	container: null,
 	transition: null,
-	initialized: false,
+};
+
+function createModules () {
+	let mobile = utils.isMobile();
+	let MC = ModuleCoordinator;
+	let anchor = $('#explore');
+
+	function moduleFactory(module, duration) {
+		return new module({
+			parent: MC,
+			anchor: anchor,
+			duration: duration,
+			mobile: mobile,
+		})
+	}
+
+	if (!MC.modules.length) {
+		MC.setModules([
+			moduleFactory(Amazing),
+			moduleFactory(Galileo),
+			moduleFactory(Wonderers),
+			moduleFactory(mobile ? MeltMobile : Melt),
+			moduleFactory(Superheroes),
+		]);
+
+		MC.timeline = new Timeline({
+			parent: MC,
+			anchor: anchor,
+		});
+	}
 };
 
 ModuleCoordinator.initialize = function (animation) {
@@ -34,29 +63,7 @@ ModuleCoordinator.initialize = function (animation) {
 		anchor.addClass('mobile');
 	}
 
-	function moduleFactory(module, duration) {
-		return new module({
-			parent: MC,
-			anchor: anchor,
-			duration: duration,
-			mobile: mobile,
-		})
-	}
-
-	if (!MC.initialized) {
-		MC.setModules([
-			moduleFactory(Amazing),
-			moduleFactory(Galileo),
-			moduleFactory(Wonderers),
-			moduleFactory(mobile ? MeltMobile : Melt),
-			moduleFactory(Superheroes),
-		]);
-
-		MC.timeline = new Timeline({
-			parent: MC,
-			anchor: anchor,
-		});
-	}
+	createModules();
 
 	MC.container = anchor;
 
@@ -95,9 +102,21 @@ ModuleCoordinator.initialize = function (animation) {
 			module: module.name,
 		});
 	});
-
-	MC.initialized = true;
 };
+
+ModuleCoordinator.preload = function (module_name) {
+	createModules();
+
+	let mod = getModuleByName(module_name);
+	if (mod) {
+		mod.preload();
+	}
+};
+
+function getModuleByName (name) {
+	let module_list = ModuleCoordinator.modules.filter( (mod) => mod.name === name );
+	return module_list[0];
+}
 
 ModuleCoordinator.reset = function (animation) {
 	$(window).off('scrollStart swipe unload.explore');

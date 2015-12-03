@@ -135,12 +135,13 @@ Login.IntakeView = function () {
 					.done(function () {
 						$('#bumper').addClass('no-rule');
 						_components.gateway.attachEvents();
+						_components.gateway.preloadExplore();
 					});
 				}, 1050);
 
 				Login.bindResizeEvents('gateway');
 			});
-		}, 1050);
+		}, 750);
 
 		mixpanel.track('play-intro');
 	};

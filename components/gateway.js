@@ -144,12 +144,16 @@ class Gateway extends Synapse { // You can only build within a pylon field
 					displacement: 25,
 				});
 				_this.view.explorebtn.show();
-	 		}, 3500);
+	 		}, 4500);
 	 	}
 
 	 	transition.done(function () {
 	 		_this.attachEvents();
 	 	});
+ 	}
+
+ 	preloadExplore () {
+ 		ModuleCoordinator.preload('Amazing');
  	}
 
  	beginExploring () {

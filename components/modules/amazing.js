@@ -59,6 +59,16 @@ class Amazing extends TeaTime {
 		this.view = this.generateView();
 	}
 
+	preload () {
+		let _this = this;
+
+		if (!_this.animations.load) {
+			_this.animations.load = $.getJSON(GLOBAL.base_url + '/animations/amazing/sequence.json');
+		}
+
+		return _this.animations.load;
+	}
+
 	generateView () {
 		let _this = this;
 
@@ -70,10 +80,14 @@ class Amazing extends TeaTime {
 
 		let frames = [];
 
+		if (!_this.animations.load) {
+			_this.preload();
+		}
+
 		// opt = optimal, came from these bash commands:
 		// for i in *.jpg; do convert $i pnm:- | mozcjpeg -quality 70 > opt-$i; done
 		// for i in $(seq 1 49); do base64 -in f$i.png | xargs printf "\"%s\"," >> concat.json; done 
-		_this.animations.load = $.getJSON(GLOBAL.base_url + '/animations/amazing/sequence.json', function (json) {
+		_this.animations.load.done(function (json) {
 			var frame = 0;
 
 			for (let i = 0; i < _this.slides.length; i++) {
@@ -92,7 +106,11 @@ class Amazing extends TeaTime {
 
 				videoContainer.append(slideFrameContainer);
 			};
-		});		
+		})
+		.always(function () {
+			// throw away extra copy of data, it's like 2MB
+			_this.animations.load = $.Deferred().resolve();
+		});
 
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
@@ -146,8 +164,6 @@ class Amazing extends TeaTime {
 			_this.view.textcontainer.removeClass("invisible")
 
 			_this.playVideo();
-
-
 		});
 	}
 
