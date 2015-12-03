@@ -13,11 +13,14 @@ class Amazing extends TeaTime {
 
 		this.frameRateMsec = 83;
 
+		this.currentFrame = 0;
+
 		this.slides = [
 			{
 				video: "",
 				text: "Your brain makes you amazing!",
 				ipyramid: true,
+				firstFrame: 0,
 				lastFrame: 14,
 				lastRepeatFrame: 18,
 			},
@@ -25,24 +28,28 @@ class Amazing extends TeaTime {
 				supertext: "it allows you to:",
 				text: "Learn intricate skills",
 				ipyramid: true,
+				firstFrame: 19,
 				lastFrame: 46,
 				lastRepeatFrame: 62,
 			},
 			{
 				text: "Dream fantastic dreams",
 				ipyramid: true,
+				firstFrame: 63,
 				lastFrame: 87,
 				lastRepeatFrame: 94,
 			},
 			{
 				text: "Even laugh at goofy cat videos",
 				ipyramid: false,
+				firstFrame: 95,
 				lastFrame: 112,
 				lastRepeatFrame: 116,
 			},
 			{
 				text: "But how?",
 				ipyramid: true,
+				firstFrame: 117,
 				lastFrame: 144,
 				lastRepeatFrame: 148,
 			},
@@ -188,9 +195,7 @@ class Amazing extends TeaTime {
 		var index = 0;
 		var delta = 1;
 
-		_this.view.frames[
-			blink_frames[0]
-		].css('visibility', 'visible');
+		_this.showFrame(blink_frames[0]);
 
 		let interval = setInterval(function () {
 			if (index === 0 && delta < 0) {
@@ -202,9 +207,9 @@ class Amazing extends TeaTime {
 				delta *= -1;
 			}
 
-			_this.view.frames[blink_frames[index]].css('visibility', 'hidden');
+			_this.hideFrame(blink_frames[index]);
 			index += delta;
-			_this.view.frames[blink_frames[index]].css('visibility', 'visible');
+			_this.showFrame(blink_frames[index]);
 
 		}, this.frameRateMsec);
 
@@ -232,10 +237,14 @@ class Amazing extends TeaTime {
 			? beforeSlide.lastRepeatFrame 
 			: 0;
 
+		_this.currentFrame = frame;
+
 		let interval = setInterval(function () {
-			_this.view.frames[frame].css('visibility', 'hidden');
+			_this.hideFrame(frame);
 			frame++;
-			_this.view.frames[frame].css('visibility', 'visible');
+
+			_this.currentFrame = frame;
+			_this.showFrame(frame);
 
 			if (frame === slide.lastFrame + 1) {
 				_this.animations.video.resolve();
@@ -269,7 +278,7 @@ class Amazing extends TeaTime {
 		});
 	}
 
-	playVideo () {
+	playVideo (forward = true) {
 		let _this = this;
 
 		if (!_this.view.frames.length) {
@@ -285,34 +294,57 @@ class Amazing extends TeaTime {
 		// ensure all frames are hidden
 		$('.amazing .frame').css('visibility', 'hidden');
 
-		var beforeSlide = this.slides[slide.index - 1];
-		var frame = beforeSlide 
-			? beforeSlide.lastRepeatFrame 
-			: 0;
+		var jump = Math.abs(slide.lastFrame - _this.currentFrame) > (3000 / _this.frameRateMsec);
 
-		_this.view.frames[frame].css('visibility', 'visible');
+		var frame = jump
+			? slide.lastFrame
+			: _this.currentFrame;
+
+		_this.currentFrame = frame;
+
+		_this.showFrame(frame);
 
 		_this.animations.video.reject();
+
+		let delta = forward ? 1 : -1;
 
 		if (slide.index === 4) {
 			_this.playCatBlinking();
 		} 
 		else {
 			let interval = setInterval(function () {
-				_this.view.frames[frame].css('visibility', 'hidden');
+				_this.hideFrame(frame);
 
-				frame++;
-				if (frame === slide.lastRepeatFrame + 1) {
+				frame += delta;
+
+				if (frame === slide.lastRepeatFrame + 1 
+					|| (frame <= _this.slides[0].lastFrame && delta < 0)) { // you shouldn't be able to make the brain go away
+
+					delta = 1;
 					frame = slide.lastFrame + 1;
 				}
 
-				_this.view.frames[frame].css('visibility', 'visible');
-			}, this.frameRateMsec);
+				frame = Utils.clamp(frame, 
+					_this.slides[0].firstFrame, 
+					_this.slides[_this.slides.length - 1].lastRepeatFrame
+				);
+
+				_this.currentFrame = frame;
+				_this.showFrame(frame);
+			}, _this.frameRateMsec);
 
 			_this.animations.video = $.Deferred().fail(function () {
 				clearInterval(interval);
 			});
 		}
+	}
+
+	showFrame (frame) {
+		this.view.frames[frame].css('visibility', 'visible');
+	}
+
+	hideFrame (frame) {
+		this.view.frames[frame].css('visibility', 'hidden');
 	}
 
 	render (t_prev, t) {
@@ -349,7 +381,7 @@ class Amazing extends TeaTime {
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 
 		if (this.entered) {
-			this.playVideo();
+			this.playVideo(t > t_prev);
 		}
 	}
 }
