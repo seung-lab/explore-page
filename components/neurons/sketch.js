@@ -18,6 +18,7 @@ let _options = {
 
 let _canvas = $.Deferred();
 let _runtime = false;
+let loop;
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -92,7 +93,7 @@ let sprout = function (p) {
 		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
 		_nnn = new NNN({
 			num_neurons: _nnn_count,
-			complexity: 12,
+			complexity: 13,
 			kruskal: Kruskal,
 			p: p,
 		});
@@ -167,6 +168,10 @@ let sprout = function (p) {
 	// 	return false; // prevent default
 	// }
 
+	loop = Utils.onceify(function() {
+		p.loop();
+	});
+
 	// Deal with resize events
 	window.onresize = function() { 
 		$(canvas).width(window.innerWidth)
@@ -186,6 +191,7 @@ module.exports.init = function (args = {}) {
 
 module.exports.grow = function (yes = true) {
 	_runtime = yes; // Enable neuron growth
+	loop();
 
 };
 

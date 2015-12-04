@@ -68,9 +68,10 @@ function Node (args = {}) {
 	// Private variables
 	let _radius = 0;
 	let _wandertheta = 0;
-	let _wan_const = 1.25;
+	let _wan_const = 0.5;
 	let _maxspeed = 2.5;       // Default 2
-	let _maxforce = p.random(0.8, 1);    // Default 0.05
+	// let _maxforce = p.random(0.9, 1.15);    // Default 0.05
+	let _maxforce = 0.85;
 
 	this.spread_countdown_1 = 30;
 	this.spread_countdown_2 = 10;
@@ -490,7 +491,7 @@ function Node (args = {}) {
 		// p.stroke(200); // white
 		// p.stroke(115,135,150); //blue
 		p.stroke(41,59,73); // dark blue
-		p.strokeWeight(1);
+		p.strokeWeight(2);
 		p.noFill();
 			
 		// p.line(_this.start.x, _this.start.y, _this.position.x, _this.position.y);
@@ -561,7 +562,7 @@ function Node (args = {}) {
 
 	}
 
-	this.render_soma = function() {
+	this.render_soma = function(rad) {
 		let _this = this;
 		// Draw Soma
 		p.push();
@@ -570,7 +571,7 @@ function Node (args = {}) {
 			// p.fill(41,59,73); // dark blue
 			// p.fill(200); // white
 			let soma_radius = _this.neuron_timer;
-			p.ellipse(_this.pt_2().x,_this.pt_2().y,5,5);
+			p.ellipse(_this.pt_2().x,_this.pt_2().y,rad,rad);
 		p.pop();
 	}
 
@@ -596,10 +597,10 @@ function Node (args = {}) {
 			// Display Wandering Debug
 
 			// Make leaves go crazy on final level
-			if ((_this.depth == (_this.max_depth)) || (_this.depth == 1)) {
-				_wan_const = 1.5;
+			if ((_this.depth == (_this.max_depth)) || ((_this.depth < 3) && (_this.depth !== 10))) {
+				_wan_const = 0.5;
 			} else  {
-				_wan_const = 1;
+				_wan_const = 0;
 			}
 		} else  {
 			_this.dw = false;
@@ -641,17 +642,17 @@ function Node (args = {}) {
 
 	// Calc T(--)
 	this.sub_t = function (mxd) {
-		let tt = mxd / 0.75;
+		let tt = mxd / 0.5;
 		return tt;
-	}
+	} 
 
 	// Did the timer run out?
 	// Returns boolean --> Growing?
 	this.tick = function () {
 		let _this = this;
 		
-		if (_this.depth < 3) {
-			_this.timer -= 7;
+		if (_this.depth < 5) {
+			_this.timer -= 20;
 			return;
 		} 
 		
@@ -689,7 +690,7 @@ function Node (args = {}) {
 		let _this = this;
 		// Render meta information on vertex
 		// let str_id = String(_this.id + ":" + _this.mass);
-		let str_id = String(_this.id + ":" + _radius);
+		let str_id = String(_this.neuron_id);
 		p.push();
 			p.fill(0,255,0).strokeWeight(0).textSize(10);
 			p.text(str_id, _this.position.x, _this.position.y - 15);
@@ -806,7 +807,7 @@ function Node (args = {}) {
 		let _this = this;
 		_this.repel();
 		_this.update();
-		// _this.meta();
+		_this.meta();
 		// Find position, then stop moving! --> Each resize event
 		// if (_damping > 0.1) _damping *= 0.98;
 	}

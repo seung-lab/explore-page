@@ -92,14 +92,15 @@ function Neuron (args) {
 	this.render = function() {
 		let _this = this;
 		let n;
-
-		// Special Case for Soma
-		// _this.nodes[0].render();
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			n = _this.nodes[i];
 			n.render();
 		}
+
+		// Special Case for Soma
+		// _this.nodes[0].meta();
+		_this.nodes[0].render_soma(10);
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
 		_this.boutons.forEach(function (bouton) {
@@ -147,15 +148,15 @@ function Neuron (args) {
 
 	}
 
-	this.create_bouton = Utils.cacheify(function() {
+	this.create_bouton = Utils.onceify(function() {
 		let _this = this;
 		let n;
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			// Get the Node object, update and draw it
 			n = _this.nodes[i];
-			// if (!n.leaf) {
-			// 	return;
-			// }
+			if (!n.leaf) {
+				return;
+			}
 			_this.boutons.push(
 				new Bouton ({
 					position: n.position,
@@ -196,7 +197,7 @@ function Neuron (args) {
 					// Additional method for probabalistic branching
 					// Default rnd = 15% : could be push higher
 					let rnd = p.random(1);
-					if ((rnd < 0.15) && ((n.depth + 1) < _this.max_depth )) {
+					if ((rnd < 0.25) && ((n.depth + 1) < _this.max_depth )) {
 						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
 						_this.nodes.push(n.branch(20, _this.nodes.length));   // Add one going left
 					} 

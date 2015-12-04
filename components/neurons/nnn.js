@@ -34,10 +34,25 @@ function NNN (args = {}) {
 
 	this.initialized = false;
 
+	let _scale_power_1,
+		_scale_power_2;
+
 	this.initialize = function() {
 		let _this = this;
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
+
+		// Calculate power offset
+		// During Distribute_2 --> Ensure consistant neuron density
+		// across different displays
+		if (p.width < 500) {
+			_scale_power_1 = 0.95;
+			_scale_power_2 = 1.07;
+			return;
+		}
+
+		_scale_power_1 = 1.02;
+		_scale_power_2 = p.map(p.width, 3000, 400, 1, 1.1);
 	}
 
 	this.distribute_1 = function() {
@@ -47,16 +62,21 @@ function NNN (args = {}) {
 		_this.neurons.forEach(function(neuron) {
 
 			let soma = neuron.nodes[0];
-				soma.render_soma();
+				soma.render_soma(5);
 				// soma.render_radius();
 				// soma.meta();
+
+			if (soma.spread_countdown_1 <= 0) {
+				p.noLoop();
+				return;
+			}
 
 			if ((soma.pow <= 0) && (soma.spread_countdown_1 >= 0)) {
 				soma.spread_countdown_1--;
 			}
 
 			if (soma.spread_countdown_1 >= 0) {
-				soma.space(_this.somas, 1); // Repel from center
+				soma.space(_this.somas, _scale_power_1); // Repel from center
 				return;
 			}
 
@@ -72,7 +92,7 @@ function NNN (args = {}) {
 		// Once the MST is built...
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
-				soma.render_soma();
+				soma.render_soma(5);
 				soma.reset_pow();
 				// soma.render_radius();
 				// soma.meta();
@@ -82,7 +102,7 @@ function NNN (args = {}) {
 			}
 
 			if (soma.spread_countdown_2 >= 0) {
-				soma.space(_this.somas, 1.05); // Repel from center
+				soma.space(_this.somas, _scale_power_2); // Repel from center
 				ret = true;
 				return;
 			}
@@ -165,7 +185,8 @@ function NNN (args = {}) {
 			y = (window.innerHeight / 2) + p.random(-15,0);
 
 			// Create Neurons with similar general levels of complexity
-			_this.num_branches = p.round(p.random(6,8));
+			// _this.num_branches = p.round(p.random(6,8));
+			_this.num_branches = 7;
 			// Exception for new idea -->
 			// if (_this.num_neurons > 50) {
 			// 	_this.complexity = 10;
@@ -175,9 +196,9 @@ function NNN (args = {}) {
 			// does not effect morphology.
 			// Grow time is inversely proportional to num_branches
 			if (window.innerWidth < 500) {
-				_this.neuron_timer = 250 / _this.num_branches;	
+				_this.neuron_timer = 1000 / _this.num_branches;	
 			} else {
-				_this.neuron_timer = 1000 / _this.num_branches;
+				_this.neuron_timer = 2000 / _this.num_branches;
 			}
 
 			_this.neurons.push(
