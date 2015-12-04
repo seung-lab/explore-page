@@ -9,24 +9,27 @@
 	@extend .module-font
 	
 	// background-image url($BASE_URL + '/images/deep-dream.jpg')
-	// background-size cover
-	
+	background-image url($BASE_URL + '/images/galileo/backdrop-desktop.jpg')
+	background-size cover
+
+.mobile .galileo
+	background-image url($BASE_URL + '/images/galileo/backdrop-mobile.jpg')
+
+$galileo_bgcolor = rgba($FILL_DARKER_BLUE, 0.7);
 
 .galileo .transition
 	$height_factor = 3;
 
 	width 100%
 	height $height_factor * 100%
-	background-image linear-gradient($FILL_WHITE, $FILL_DARKER_BLUE);
-	//opacity .90
+	background-image linear-gradient($FILL_WHITE, $galileo_bgcolor);
 	
 .galileo .action
 	position relative
 	width 100%
 	height 100%
 	
-	background-color $FILL_DARKER_BLUE
-	// opacity .90
+	background-color $galileo_bgcolor
 	
 	overflow-y hidden
 
@@ -61,6 +64,13 @@
 
 	color $TEXT_BLUE_LIGHT
 	center()
+	
+	opacity 0.7
+	transition opacity 1000ms 250ms ease
+	
+.galileo .story-text-big.invisible
+	opacity 0
+	transition opacity 250ms 0ms ease
 	
 .big-number.hundred:first-letter
 	letter-spacing -67.5px

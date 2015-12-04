@@ -63,7 +63,7 @@ class Galileo extends TeaTime {
 		this.duration = utils.nvl(args.duration, this.slides.length);
 
 		this.view.story.container.hide();
-		this.view.bignumber.container.hide();
+		this.view.bignumber.container.addClass('invisible');
 
 		this.animations = {
 			text: $.Deferred().resolve(),
@@ -309,7 +309,7 @@ class Galileo extends TeaTime {
 		let slide = this.slideAt(t);
 
 		_this.view.story.container.hide();
-		_this.view.bignumber.container.hide();
+		_this.view.bignumber.container.addClass('invisible');
 
 		if (slide.text) {
 			_this.view.story.container.show();
@@ -330,7 +330,7 @@ class Galileo extends TeaTime {
 			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
 		}
 		else if (slide.big) {
-			_this.view.bignumber.container.show();
+			_this.view.bignumber.container.removeClass('invisible');
 
 			_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
 
