@@ -249,14 +249,13 @@ class Melt extends TeaTime {
 		let _this = this;
 
 		_this.view.next.drop({
-			msec: 2000,
-			easing: Easing.bounceFactory(0.5),
+			msec: 1500,
+			easing: Easing.bounceFactory(11),
 			side: 'bottom',
 			displacement: 25,
 		});
 
 		_this.view.next.show();
-		
 	}
 
 	afterEnter (transition) {

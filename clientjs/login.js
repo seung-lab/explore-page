@@ -15,20 +15,20 @@ let Login = {};
 let _components = {};
 let _stage_transition = $.Deferred().resolve();
 
-Login.initialize = function () {
+Login.initialize = function (transition) {
 	_components.header = new Header({ 
 		anchor: '#header',
 		name: "Header",
 		login: Login,
 	});
 
-	_components.header.enter().render();
+	_components.header.enter(transition).render();
 
 	_components.gateway = new Gateway({ 
 		anchor: '#gateway',
 		login: Login,
 	});
-	_components.gateway.enter();
+	_components.gateway.enter(transition);
 	_components.gateway.render();
 
 	_components.registration = new Registration({ 
@@ -108,7 +108,7 @@ Login.IntakeView = function () {
 	var _this = this;
 
 
-	_this.playIntro = function () {
+	_this.playIntro = function (transition) {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
 		_components.gateway.unattachSwipeEvents();
@@ -133,6 +133,8 @@ Login.IntakeView = function () {
 						easing: Easing.springFactory(.7, 1),
 					})
 					.done(function () {
+						transition.resolve();
+
 						$('#bumper').addClass('no-rule');
 						_components.gateway.attachEvents();
 						_components.gateway.preloadExplore();

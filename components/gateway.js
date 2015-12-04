@@ -137,15 +137,15 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.explorebtn.hide();
 
  		if (!Utils.isMobile()) {
-	 		setTimeout(function () {
+	 		transition.done(function () {
 	 			_this.view.explorebtn.drop({
 					msec: 2000,
-					easing: Easing.bounceFactory(0.5),
+					easing: Easing.bounceFactory(12),
 					side: 'bottom',
 					displacement: 25,
 				});
 				_this.view.explorebtn.show();
-	 		}, 4500);
+	 		});
 	 	}
 
 	 	transition.done(function () {

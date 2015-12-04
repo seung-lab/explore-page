@@ -210,8 +210,12 @@ class Header extends Synapse {
 	afterEnter (transition) {
 		let _this = this;
 		
+		_this.hide = true;
+		_this.render();
+
 		transition.done(function () {
-			_this.view.module.removeClass('invisible');
+			_this.hide = false;
+			_this.render();
 		});
 	}
 

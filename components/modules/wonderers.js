@@ -70,14 +70,16 @@ class Wonderers extends TeaTime {
 		
 		_this.view.next.hide();
 
-		_this.view.next.drop({
-			msec: 2000,
-			easing: Easing.bounceFactory(0.5),
-			side: 'bottom',
-			displacement: 25,
-		});
+		transition.done(function () {
+			_this.view.next.drop({
+				msec: 1500,
+				easing: Easing.bounceFactory(11),
+				side: 'bottom',
+				displacement: 25,
+			});
 
-		_this.view.next.show();
+			_this.view.next.show();
+		});
 	}
 
 	render (t_prev, t) {

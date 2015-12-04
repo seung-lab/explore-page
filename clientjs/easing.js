@@ -70,11 +70,10 @@ module.exports.springFactory = function (zeta, k, pixels, dynamics) {
  * Simulate a physical bouncing motion based on physics equations of motion.
  *
  * We assume mass and gravity = 1 as they are immaterial when we normalize both
- * the y and t axis to 1. The length of the animation in msec will determine "gravity"
- * and the elasticity will determine the number of bounces.
+ * the y and t axis to 1. The length of the animation in msec will determine "gravity".
  *
  * Required:
- *   [0] elasticity: [0..1), how much fractional energy is retained after each bounce
+ *   [0] bounces: (int > 0) Number of bounces 
  * 
  * Optional:
  *   [1] threshold: [0..1],  (default 0.1%) percent of energy remaining 
@@ -82,7 +81,7 @@ module.exports.springFactory = function (zeta, k, pixels, dynamics) {
  *
  * Return: f(t), t in 0..1
  */
-module.exports.bounceFactory = function (elasticity, threshold) {
+module.exports.bounceFactory = function (bounces, threshold) {
 	threshold = threshold || 0.001;
 
 	function energy_to_height (energy) {
@@ -104,10 +103,8 @@ module.exports.bounceFactory = function (elasticity, threshold) {
 	var height = 1;
 	var potential = height_to_energy(height);
 
-	var bounces = elasticity === 1 // a perfectly elastic object will never settle
-		? 100
-		: Math.ceil(Math.log(threshold / potential) / Math.log(elasticity));
-
+	var elasticity = Math.pow(threshold, 1 / bounces);
+	
 	// The critical points are the points where the object contacts the "ground"
 	// Since the object is initially suspended at 1 height, this either creates an
 	// exception for the following code, or you can use the following trick of placing

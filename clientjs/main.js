@@ -63,16 +63,20 @@ $(document).ready(function () {
 	// we want manually control the scrolling so we prevent the default behavior
 	$(document).disableScrolling();
 
-	Login.initialize();
+	let scrollTransition = $.Deferred();
+
+	Login.initialize(scrollTransition);
 
 	let t = $.url(window.location.href).param('t');
 
 	if (t === undefined) {
 		Utils.UI.curtainRise(function () {
-			_intakectrl.playIntro();
+			_intakectrl.playIntro(scrollTransition);
 		}, 250);
 	}
 	else {
+		scrollTransition.resolve();
+
 		let transition = $.Deferred();
 		ModuleCoordinator.initialize(transition);
 

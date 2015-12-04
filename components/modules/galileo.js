@@ -156,8 +156,8 @@ class Galileo extends TeaTime {
 
 		let dropfn = function () {
 			_this.view.next.drop({
-				msec: 2000,
-				easing: Easing.bounceFactory(0.5),
+				msec: 1500,
+				easing: Easing.bounceFactory(11),
 				side: 'bottom',
 				displacement: 25,
 			});
@@ -189,7 +189,9 @@ class Galileo extends TeaTime {
 			});
 		}
 		else {
-			dropfn();
+			transition.done(function () {
+				dropfn();
+			});
 		}
 
 	}
