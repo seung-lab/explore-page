@@ -116,7 +116,7 @@ class MeltMobile extends TeaTime {
 
 		let bg = $('<img>', {
 			id: 'meltMobileBg',
-			src: GLOBAL.base_url + '/animations/Melt_Sequence/mobile/neuron_bg_light.png',
+			src: GLOBAL.base_url + '/animations/melt/mobile/neuron_bg_light.png',
 		});
 
 		let whitePart = $('<div>', {
@@ -168,7 +168,7 @@ class MeltMobile extends TeaTime {
 			vidContainer.append(slide);
 		}
 
-		$.getJSON(GLOBAL.base_url + '/animations/melt/mobile/concat.json', function (json) {
+		$.getJSON(GLOBAL.base_url + '/animations/melt/mobile/sequence.json', function (json) {
 			for (let i = 1; i < SLIDE_COUNT; i++) {
 				_this.slides[i].el.children().first().attr('src', 'data:image/png;base64,' + json[i - 1]);
 			}
