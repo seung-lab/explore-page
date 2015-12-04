@@ -17,11 +17,6 @@ let SEQUENCE_LENGTHS = [
 	73, 194
 ];
 
-Math.easeOutQuad = function (t, b, c, d) {
-	t /= d;
-	return -c * t*(t-2) + b;
-};
-
 let TOTAL_FRAMES = SEQUENCE_LENGTHS.reduce((a, b) => a + b);
 
 let SEQUENCE_COUNT = SEQUENCE_LENGTHS.length;
@@ -48,7 +43,7 @@ class Melt extends TeaTime {
 		var _this = this;
 
 		this.timeouts = {
-
+			initial_play: false,
 		};
 		
 		this.loaded = false;
@@ -61,7 +56,7 @@ class Melt extends TeaTime {
 			return $('<div>').addClass(classes);
 		};
 
-		let container = $('<div>').addClass('melt bg-dark module');
+		let container = d('melt bg-dark module');
 		let vidContainer = $('<div>', { id: 'vidContainer' });
 
 		container.append(vidContainer);
@@ -159,68 +154,64 @@ class Melt extends TeaTime {
 	}
 
 	frameUpdate () {
+		let _this = this;
+
 		let currentFrame = this.currentFrame();
 
-		let safeT = Math.min(0.999, currentFrame / TOTAL_FRAMES);
+		this.t = Math.min(0.999, currentFrame / TOTAL_FRAMES);
+		this.parent.sub_t_update(this.name, this.t);
 
-		this.t = safeT;
-		this.parent.sub_t_update(this.name, safeT);
+		function easeInWaitOut(in_start_frame, last_frame, in_duration, out_duration, cb) {
+			let in_end_frame = in_start_frame + in_duration;
+			let out_begin_frame = last_frame - out_duration;
 
+			let frame = currentFrame;
 
-		function foo(start, end, st, et, cb) {
-			let m1 = start + st;
-			let m2 = end - et;
-
-			return function (t) {
-				if (t < start || t > end) {
-					cb(0);
-					return;
-				}
-
-				if (t < m1) {
-					cb(Easing.parabolic((t - start) / st));
-					return;
-				}
-
-				if (t > m2) {
-					cb(Easing.parabolic(1 - ((t - m2) / et)));
-					return;
-				}
-
-				cb(1);
+			if (frame < in_start_frame || frame > last_frame) {
+				cb(0);
+				return;
 			}
+
+			if (frame < in_end_frame) {
+				let t = (frame - in_start_frame) / in_duration;
+				cb(Easing.parabolic(t)); // U shape
+				return;
+			}
+
+			if (frame > out_begin_frame) {
+				let t = 1 - (frame - out_begin_frame) / out_duration;
+				cb(Easing.parabolic(t)); // upside-down U shape
+				return;
+			}
+
+			cb(1);
 		}
 
 		this.view.texts[0].css('transition', 'opacity 0s');
 		this.view.texts[1].css('transition', 'opacity 0s');
 		this.view.texts[2].css('transition', 'opacity 0s');
 
-		let _this = this;
-
-		let first = foo(0, 15, 0, 15, function (p) {
+		easeInWaitOut(0, 15, 0, 10, function (p) {
 			_this.view.texts[0].css('opacity', p);
 		});
-		first(currentFrame);
 
-		let second = foo(30, 73 + 15, 15, 15, function (p) {
+		easeInWaitOut(30, 73 + 15, 15, 15, function (p) {
 			_this.view.texts[1].css('opacity', p);
 		});
-		second(currentFrame);
 
-		_this.view.texts[2].css('opacity', '0');
+		easeInWaitOut(TOTAL_FRAMES - 10, TOTAL_FRAMES, 15, 0, function (p) {
+			_this.view.texts[2].css('opacity', p);
+		});
 
 		let whiteTStart = 0.87; // global t = 91.2, end = 96.1
 
 		let heightStart = 28;
 		let heightEnd = 38;
 
-		let height = foo(226, TOTAL_FRAMES, (TOTAL_FRAMES - 226), 0, function (p) {
-			// p = Easing.easeOutSine(p);
+		easeInWaitOut(226, TOTAL_FRAMES, (TOTAL_FRAMES - 226), 0, function (p) {
 			_this.view.white.css('height', (p * heightEnd + (1-p) * heightStart) + '%');
 			_this.view.white.css('opacity', p);
 		});
-
-		height(currentFrame);
 	}
 
 	render (t_prev, t) {
@@ -245,8 +236,7 @@ class Melt extends TeaTime {
 
 	seek (t) {
 		let t_prev = this.t;
-		this.frameUpdate(t);
-
+		this.frameUpdate();
 
 		if (this.activeVideo) {
 			this.activeVideo.pause();
