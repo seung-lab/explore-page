@@ -40,7 +40,7 @@ function NNN (args = {}) {
 		_this.add_neuron(_this.num_neurons);
 	}
 
-	this.distribute = function() {
+	this.distribute_1 = function() {
 		let _this = this;
 
 		// Once the MST is built...
@@ -51,37 +51,80 @@ function NNN (args = {}) {
 				// soma.render_radius();
 				// soma.meta();
 
-			if ((soma.pow <= 0) && (soma.spread_countdown >= 0)) {
-				soma.spread_countdown--;
+			if ((soma.pow <= 0) && (soma.spread_countdown_1 >= 0)) {
+				soma.spread_countdown_1--;
 			}
 
-			if (soma.spread_countdown >= 0) {
-				soma.space(_this.somas); // Repel from center
+			if (soma.spread_countdown_1 >= 0) {
+				soma.space(_this.somas, 1); // Repel from center
+				return;
+			}
+
+		});
+
+	}
+
+	this.distribute_2 = function() {
+		let _this = this;
+
+		let ret = false;
+
+		// Once the MST is built...
+		_this.neurons.forEach(function(neuron) {
+			let soma = neuron.nodes[0];
+				soma.render_soma();
+				soma.reset_pow();
+				// soma.render_radius();
+				// soma.meta();
+
+			if ((soma.pow <= 0) && (soma.spread_countdown_2 >= 0)) {
+				soma.spread_countdown_2--;
+			}
+
+			if (soma.spread_countdown_2 >= 0) {
+				soma.space(_this.somas, 1.05); // Repel from center
+				ret = true;
+				return;
+			}
+
+			if ((soma.position.x < 0) || (soma.position.x > p.width)) {
+				_this.remove_neuron(neuron.id);
+				return;
+			}
+
+			if ((soma.position.y < 0) || (soma.position.y > p.height)) {
+				_this.remove_neuron(neuron.id);
 				return;
 			}
 
 			neuron.network_setup(); // Create seed branching
 			// _this.mst(); 
 			// Update spring positions --> Run through array
-			_this.springs.forEach(function(s) {
-				// s.update();
-				// s.display();
-			});
+			// _this.springs.forEach(function(s) {
+			// 	// s.update();
+			// 	// s.display();
+			// });
 		});
+
+		return ret;
 	}
 	
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
 	this.run = function() {
 		let _this = this;
+
+		// Space the neurons out again
+		if (_this.distribute_2()) {
+			return;
+		}
+
 		_this.neurons.forEach(function(neuron) {
 
 			neuron.render();
 
 			if (_this.done()) {
-				// console.log("NNN Complete");
-				// console.log(_this.neurons.length);
-				// p.noLoop();
+				p.noLoop();
 				// neuron.update();
 
 				let radius = neuron.radius();
@@ -124,9 +167,9 @@ function NNN (args = {}) {
 			// Create Neurons with similar general levels of complexity
 			_this.num_branches = p.round(p.random(6,8));
 			// Exception for new idea -->
-			if (_this.num_neurons > 50) {
-				_this.complexity = 10;
-			}
+			// if (_this.num_neurons > 50) {
+			// 	_this.complexity = 10;
+			// }
 			_this.max_depth = _this.complexity - _this.num_branches;
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.
@@ -134,7 +177,7 @@ function NNN (args = {}) {
 			if (window.innerWidth < 500) {
 				_this.neuron_timer = 250 / _this.num_branches;	
 			} else {
-				_this.neuron_timer = 350 / _this.num_branches;
+				_this.neuron_timer = 1000 / _this.num_branches;
 			}
 
 			_this.neurons.push(
@@ -160,14 +203,15 @@ function NNN (args = {}) {
 		}
 	}
 
-	// Remove neuron to the network
-	this.remove_neuron = function(count) {
+	// Remove neuron + soma from the network
+	this.remove_neuron = function(id) {
 		let _this = this;
-		let j;
-		// splice() is a javascript method to working on arrays
-		for (let i = 0; i < count; i++) {
-			j = p.floor(p.random(_this.neurons.length));
-			_this.neurons.splice(j, 1);
+		for (let i = 0; i < _this.neurons.length; i++) {
+			let neuron = _this.neurons[i];
+			if (neuron.id == id) {
+				_this.neurons.splice(i, 1);
+				_this.somas.splice(i, 1);
+			}
 		}
 	}
 

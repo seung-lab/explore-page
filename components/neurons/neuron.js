@@ -153,6 +153,9 @@ function Neuron (args) {
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			// Get the Node object, update and draw it
 			n = _this.nodes[i];
+			// if (!n.leaf) {
+			// 	return;
+			// }
 			_this.boutons.push(
 				new Bouton ({
 					position: n.position,
@@ -192,7 +195,6 @@ function Neuron (args) {
 				else {
 					// Additional method for probabalistic branching
 					// Default rnd = 15% : could be push higher
-					// Neuron feels slightly over complicated given complexity: 13 & min [5] branches
 					let rnd = p.random(1);
 					if ((rnd < 0.15) && ((n.depth + 1) < _this.max_depth )) {
 						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
@@ -202,8 +204,7 @@ function Neuron (args) {
 						// Added boutons to end of Neuron --> Can be vastly improved to consider
 						// the entire 'distal' zone of the neuron.
 						_this.nodes.push(
-							// n.branch(p.round(p.random(-20,20)))
-							n.branch(0, _this.nodes.length) // Not missing ';'
+							n.branch(0, _this.nodes.length)
 						);
 					} 
 				}

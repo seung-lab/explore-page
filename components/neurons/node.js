@@ -68,11 +68,12 @@ function Node (args = {}) {
 	// Private variables
 	let _radius = 0;
 	let _wandertheta = 0;
-	let _wan_const = 0;
-	let _maxspeed = 1.5;       // Default 2
+	let _wan_const = 1.25;
+	let _maxspeed = 2.5;       // Default 2
 	let _maxforce = p.random(0.8, 1);    // Default 0.05
 
-	this.spread_countdown = 30;
+	this.spread_countdown_1 = 30;
+	this.spread_countdown_2 = 10;
 	this.pow = 1; // Huge starting multipliers!
 	let _damping = 0.85;
 
@@ -367,6 +368,12 @@ function Node (args = {}) {
 	}
 	*/
 
+	this.reset_pow = Utils.cacheify(function() {
+		let _this = this;
+		_this.pow = 1;
+
+	});
+
 	// Calculate initial distribution forces
 	// !Important --> Must be called outside of node 
 	// !Important --> Requires list of nodes
@@ -375,11 +382,13 @@ function Node (args = {}) {
 	 *  distribution of the somas
 	*/
 
-	this.spread = function(somas, rad) {
+	this.spread = function(somas, rad, multiplier) {
 		let _this = this;
 		let center = p.createVector(p.width/2, p.height/2); // Center point
 		
 		_radius = rad;
+
+		_this.pow *= multiplier; // Factor in timer
 
 		// Set distribute to true
 		_this.distribute = true;
@@ -388,23 +397,18 @@ function Node (args = {}) {
 		// _this.render_radius();
 		
 		let cen = _this.seek(center).mult(-1); // Simply seek away from center
-		let edg = _this.check_edges(); // Move away from edges
+		// let edg = _this.check_edges(); // Move away from edges
 		let sep = _this.separate(somas); // Move away from eachother
-
-		// Carefully weight these forces
-		// cen.mult(_this.pow * 2);
-		// edg.mult(_this.pow / 3);
-		// sep.mult(_this.pow * 1.5);
 
 		// Vertical Multiplier
 		let vm = p.height / (p.width * 1.5);
 		
 		cen.y = cen.y * vm;
-		edg.y = edg.y * vm;
+		// edg.y = edg.y * vm;
 		sep.y = sep.y * vm;
 
 		cen.mult(_this.pow * 10 * 2);
-		edg.mult(_this.pow * 1.25);
+		// edg.mult(_this.pow * 1.25);
 		sep.mult(_this.pow * 10 * 2);
 
 		// Add the force vectors to acceleration
@@ -412,10 +416,6 @@ function Node (args = {}) {
 		// _this.applyForce(edg);
 		_this.applyForce(sep);
 
-		// let pm = p.width * p.height;
-		let area = p.width * p.height;
-		let space = p.sqrt(area);
-		// let pm = p.map(space, 300, 1500, 0.5, 0.95);
 		let pm = p.max(p.height, p.width);
 		pm = p.map(pm, 400, 3000, 0.8, 0.95);
 
@@ -423,7 +423,6 @@ function Node (args = {}) {
 
 		if (_this.pow <= .01) {
 			_this.pow = 0;
-			// console.log('stop');
 		}
 	}
 
@@ -597,8 +596,10 @@ function Node (args = {}) {
 			// Display Wandering Debug
 
 			// Make leaves go crazy on final level
-			if (_this.depth == (_this.max_depth - 1)) {
+			if ((_this.depth == (_this.max_depth)) || (_this.depth == 1)) {
 				_wan_const = 1.5;
+			} else  {
+				_wan_const = 1;
 			}
 		} else  {
 			_this.dw = false;
@@ -606,9 +607,9 @@ function Node (args = {}) {
 	}
 
 	// Accepts an Array of Node Objects
-	this.space = function(nodes) {
+	this.space = function(nodes, multiplier) {
 		let _this = this;
-			_this.spread(nodes, _this.radius);
+			_this.spread(nodes, _this.radius, multiplier);
 			_this.update();
 	}
 
@@ -640,7 +641,7 @@ function Node (args = {}) {
 
 	// Calc T(--)
 	this.sub_t = function (mxd) {
-		let tt = mxd / 1.5;
+		let tt = mxd / 0.75;
 		return tt;
 	}
 
@@ -648,12 +649,13 @@ function Node (args = {}) {
 	// Returns boolean --> Growing?
 	this.tick = function () {
 		let _this = this;
-		if ((_this.depth == 2) || (_this.depth == 3)) {
-			_this.timer -= p.round(p.random(2,_this.sub_t(_this.max_depth)));;
+		
+		if (_this.depth < 3) {
+			_this.timer -= 7;
+			return;
 		} 
-		else {
-			_this.timer--;
-		}
+		
+		_this.timer -= p.round(p.random(2,_this.sub_t(_this.max_depth)));
 	}
 
 	this.isGrowing = function() {

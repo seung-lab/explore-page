@@ -36,6 +36,9 @@ let sprout = function (p) {
 	// canvas
 		canvas;
 
+	// bools
+	let running = false;
+
 	// Global font reference
 	let _fontRegular;
 
@@ -59,9 +62,9 @@ let sprout = function (p) {
 		p.pop();
 
 		// Calculate _nnn_count based on width
-		// 2000 yields 20
 		// _nnn_count = p.ceil(p.min((p.width / 60), 30));
-		_nnn_count = 150;
+		_nnn_count = p.ceil(p.min((p.width / 10), 200));
+		// _nnn_count = 200;
 
 		nnn_start();
 	};
@@ -72,10 +75,11 @@ let sprout = function (p) {
 		// Run the _nnn if it has finished spreading
 		if (_runtime) {
 			_nnn.run();
+			running = true;
 		}
 
-		if (p.frameCount > 30) {
-			_nnn.distribute();
+		if ((p.frameCount > 30) && (!running)) {
+			_nnn.distribute_1();
 		}
 
 		// plus_minus();
@@ -182,6 +186,7 @@ module.exports.init = function (args = {}) {
 
 module.exports.grow = function (yes = true) {
 	_runtime = yes; // Enable neuron growth
+
 };
 
 
