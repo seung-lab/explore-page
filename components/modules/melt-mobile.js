@@ -94,7 +94,7 @@ class MeltMobile extends TeaTime {
 		});
 
 		$(window).ion('touch.melt', function (e, evt) {
-			var current = _this.slideAt(_this.t);
+			var current = _this.slideAt(_this.t).el;
 
 			if (current.hasClass('fresh')) {
 				current.removeClass('fresh');

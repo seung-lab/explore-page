@@ -48,6 +48,10 @@
 .melt-mobile #meltMobile0.meltSlide.enter, .melt-mobile #meltMobile1.meltSlide.enter, .melt-mobile #meltMobile0.meltSlide.exit, .melt-mobile #meltMobile1.meltSlide.exit
 	opacity 1
 
+#meltMobile0 .story-text
+	width 325px
+	center-horizontal()
+
 #meltMobile1.meltSlide
 	opacity 1
 
@@ -129,7 +133,7 @@ $m1-story-text-perct = (1/3)
 	animation-fill-mode forwards
 	animation-duration ($movement-duration * $m1-story-text-perct)
 	top auto
-	bottom 20%
+	bottom 10%
 
 #meltMobile1.enter.forward .story-text
 	animation-name fadeIn
