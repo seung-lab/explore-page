@@ -135,6 +135,7 @@ class Header extends Synapse {
 		});
 
 		_this.view.logo.ion('click', function () {
+			$(window).off('unload.track');
 			document.location.href = document.location.origin;
 		});
 	}
@@ -148,6 +149,7 @@ class Header extends Synapse {
 			});
 			
 			Utils.UI.curtainFall(function () {
+				$(window).off('unload.track');
 				document.location.href = 'https://eyewire.org/signup';
 			})
 		});

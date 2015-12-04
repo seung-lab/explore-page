@@ -92,7 +92,7 @@ ModuleCoordinator.initialize = function (animation) {
 		});
 	});
 
-	$(window).ion('unload.explore', function () {
+	$(window).ion('unload.track.explore', function () {
 		let module = MC.currentModule();
 
 		mixpanel.track('unload', {

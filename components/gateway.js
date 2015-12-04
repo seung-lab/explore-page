@@ -80,6 +80,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			}
 
 			Utils.UI.curtainFall(function () {
+				$(window).off('unload.track');
 				if ($.cookie('visited')) {
 					document.location.href = 'https://eyewire.org/login';
 				}
@@ -107,7 +108,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			}
 		});
 
-		$(window).ion('unload.gateway', function () {
+		$(window).ion('unload.track.gateway', function () {
 			mixpanel.track('unload', {
 				from: 'gateway',
 			});
