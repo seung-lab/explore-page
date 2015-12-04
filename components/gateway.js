@@ -160,6 +160,10 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	beginExploring () {
  		let _this = this;
 
+		mixpanel.track('begin-exploring', {
+			delay: Math.round(window.performance.now() / 1000),
+		});
+
  		_this.animations.dip.reject();
 		_this.view.explorebtn.off('mouseenter mouseleave');
 
