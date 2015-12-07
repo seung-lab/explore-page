@@ -9,7 +9,8 @@ let utils = require('../utils.js'),
 	Superheroes = require('../../components/modules/superheroes.js'),
 	Melt = require('../../components/modules/melt.js'),
 	MeltMobile = require('../../components/modules/melt-mobile.js'),
-	GLOBAL = require('../GLOBAL.js');
+	GLOBAL = require('../GLOBAL.js'),
+	Keycodes = require('../keycodes.js');
 
 let _t = 0;
 
@@ -102,6 +103,18 @@ ModuleCoordinator.initialize = function (animation) {
 			module: module.name,
 		});
 	});
+
+	$(document).ion('keydown.wow', function () {
+		let last3 = Keycodes.lastKeys(3).join('').toLowerCase();
+		if (last3 === 'wow') {
+			if (anchor.hasClass('wow')) {
+				anchor.removeClass('wow');
+			}
+			else {
+				anchor.addClass('wow')
+			}
+		}
+	});
 };
 
 ModuleCoordinator.preload = function (module_name) {
@@ -120,7 +133,7 @@ function getModuleByName (name) {
 
 ModuleCoordinator.reset = function (animation) {
 	$(window).off('scrollStart swipe unload.explore');
-	$(document).off('keydown');
+	$(document).off('keydown.hotkeys');
 
 	$(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
 
@@ -149,7 +162,7 @@ ModuleCoordinator.tForName = function (name) {
 
 
 ModuleCoordinator.initHotkeys = function () {
-	$(document).ion('keydown', function (evt) {
+	$(document).ion('keydown.hotkeys', function (evt) {
 		let key = evt.keyCode;
 
 		// right or down key or spacebar or enter

@@ -2,6 +2,8 @@
 @require 'mixins.styl'
 @require 'amazing.styl'
 
+@require 'galileo-puppet.styl'
+
 .galileo
 	height 100%
 	width 100%
@@ -15,7 +17,16 @@
 .mobile .galileo
 	background-image url($BASE_URL + '/images/galileo/backdrop-mobile.jpg')
 
-$galileo_bgcolor = rgba($FILL_DARKER_BLUE, 0.7);
+.wow .galileo
+	background-image url($BASE_URL + '/images/deep-dream.jpg')
+	
+.wow .galileo .transition
+	background-image linear-gradient($FILL_WHITE, rgba($FILL_DARKER_BLUE, 0.7))
+	
+.wow .galileo .action
+	background rgba($FILL_DARKER_BLUE, 0.9)
+
+$galileo_bgcolor = rgba($FILL_DARKER_BLUE, 0.9);
 
 .galileo .transition
 	$height_factor = 3;
