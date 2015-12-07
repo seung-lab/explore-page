@@ -53,6 +53,12 @@ class Superheroes extends TeaTime {
 
 		let bg = d('superheroes bg-light module');
 
+		if (_this.mobile) {
+			bg.ion('click', function () {
+				_this.next();
+			});
+		}
+
 		let image = $('<img>').attr({
 			src: GLOBAL.base_url + '/images/wonderers.png',
 		});

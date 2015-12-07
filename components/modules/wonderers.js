@@ -32,6 +32,12 @@ class Wonderers extends TeaTime {
 
 		let bg = d('wonderers bg-light module');
 
+		if (_this.mobile) {
+			bg.ion('click', function () {
+				_this.next();
+			});
+		}
+
 		let image = $('<img>').attr({
 			src: GLOBAL.base_url + '/images/wonderers.png',
 		});

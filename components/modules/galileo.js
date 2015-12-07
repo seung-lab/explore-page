@@ -82,6 +82,12 @@ class Galileo extends TeaTime {
 
 		let bg = d('galileo bg-dark module');
 
+		if (_this.mobile) {
+			bg.ion('click', function () {
+				_this.next();
+			});
+		}
+
 		let action = d('action');
 
 		let next = d('next')

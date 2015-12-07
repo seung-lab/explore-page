@@ -111,8 +111,9 @@ class MeltMobile extends TeaTime {
 			return $('<div>').addClass(classes);
 		};
 
-		let container = $('<div>').addClass('melt-mobile bg-dark module');
-
+		let container = $('<div>').addClass('melt-mobile bg-dark module').ion('click', function () {
+			_this.next();
+		});
 
 		let bg = $('<img>', {
 			id: 'meltMobileBg',
