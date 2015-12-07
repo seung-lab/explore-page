@@ -73,7 +73,7 @@ Login.bindResizeEvents = function (stage) {
 		|| stage === 'intake'
 		|| stage === 'explore') {
 
-		$(window).ion('resize', function () {
+		$(window).ion('resize.login', function () {
 			Login.takeMeTo(stage);
 		});
 	}
