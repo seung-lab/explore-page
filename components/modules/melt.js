@@ -124,15 +124,6 @@ class Melt extends TeaTime {
 		};
 	}
 
-	resize (w, h) {
-		var aspect = w / h;
-		if (aspect > (16 / 10) && aspect < 2) {
-			this.view.module.addClass('wide');
-		} else {
-			this.view.module.removeClass('wide');
-		}
-	}
-
 	next () { // next slide
 		if (TOTAL_FRAMES - this.currentFrame() < 1) {
 			this.parent.moduleComplete();

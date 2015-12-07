@@ -25,9 +25,10 @@ class Superheroes extends TeaTime {
 		
 		let _this = this;
 
-		$(window).resize(function () {
+		$(window).ion('resize.superheroes', function () {
 			_this.resize(window.innerWidth, window.innerHeight);
-		});
+ 		});
+
 		_this.resize(window.innerWidth, window.innerHeight);
 	}
 
