@@ -1,9 +1,86 @@
 @require 'colors.styl'
 
 
+.puppet
+	position absolute
+	bottom -20%
+	right -17%
+	
+	width 55%
+	height 500px
 
+	opacity 0
+	transition opacity 1s ease
 
+.puppet.visible
+	opacity 1	
 
+puppet-part($name, $z)
+	position absolute
+	top 0px
+	left 0px
+	
+	background-image url(s("/images/galileo/puppet/%s.png", $name))
+	background-size contain
+	background-repeat no-repeat
+	height 100%
+	width 100%
+	
+	z-index $z
+	
+// Transform Origins were manually determined
+
+.puppet .coat-bottom
+	puppet-part(coat-bottom, 8)
+	transform-origin 51.9% 58.0% 
+	
+.puppet .coat-middle
+	puppet-part(coat-middle, 9)
+	transform-origin 51.7% 59.4%
+	
+.puppet .coat-top
+	puppet-part(coat-top, 10)
+	transform-origin 45.7% 43.3%
+
+.puppet .head
+	puppet-part(head, 12)
+	transform-origin 45.6% 36.1%
+
+.puppet .left-arm
+	puppet-part(left-arm, 11)
+	transform-origin 48.0% 51.2%
+	
+.puppet .right-arm
+	puppet-part(right-arm, 0)
+	transform-origin 45.5% 42.1%
+	
+.puppet .right-forearm
+	puppet-part(right-forearm, 0)
+	transform-origin 37.6% 50.3%
+
+.puppet .shin-1
+	puppet-part(shin-1, 0)
+	transform-origin 55.7% 91.6%
+	
+.puppet .shin-2
+	puppet-part(shin-2, 0)
+	transform-origin 50.0% 91.6%
+	
+.puppet .shoes
+	puppet-part(shoes, 0)
+	transform-origin 49.9% 93.8%
+	
+.puppet .telescope
+	puppet-part(telescope, 0)
+	transform-origin 30.4% 49.7%
+	
+.puppet .telescope-eyepiece
+	puppet-part(telescope-eyepiece, 0)
+	transform-origin 30.4% 49.7%
+	
+.puppet .tripod
+	puppet-part(tripod, 0)
+	transform-origin 30.4% 49.7%
 
 
 
