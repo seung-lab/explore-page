@@ -45,12 +45,12 @@ class Galileo extends TeaTime {
 			{
 				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
 				format: "italics",
-				galileo: 1,
+				galileo: "one",
 			},
 			{
 				text: "Today, neuroscience is revolutionizing how we see the world within us.",
 				format: "italics",
-				galileo: 2,
+				galileo: "two",
 			},
 			{
 				text: "We’re calling on gamers to help connect the dots by playing a game to map the brain.",
@@ -406,9 +406,9 @@ class Galileo extends TeaTime {
 
 		let slide = this.slideAt(t);
 
-		_this.view.puppet.galileo.removeClass('visible');
+		_this.view.puppet.galileo.removeClass('visible one two');
 		if (slide.galileo) {
-			_this.view.puppet.galileo.addClass('visible');
+			_this.view.puppet.galileo.addClass('visible ' + slide.galileo);
 		}
 	}
 
