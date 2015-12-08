@@ -48,15 +48,15 @@ function NNN (args = {}) {
 		if (p.width < 500) {
 			_scale_power_1 = 0.95;
 			_scale_power_2 = 1.07;
-			return;
+		} else {
+			_scale_power_1 = 1.02;
+			_scale_power_2 = p.map(p.width, 3000, 400, 1, 1.1);
 		}
-
-		_scale_power_1 = 1.02;
-		_scale_power_2 = p.map(p.width, 3000, 400, 1, 1.1);
 	}
 
 	this.distribute_1 = function() {
 		let _this = this;
+		let ret = false;
 
 		// Once the MST is built...
 		_this.neurons.forEach(function(neuron) {
@@ -67,7 +67,7 @@ function NNN (args = {}) {
 				// soma.meta();
 
 			if (soma.spread_countdown_1 <= 0) {
-				p.noLoop();
+				ret = true;
 				return;
 			}
 
@@ -81,6 +81,8 @@ function NNN (args = {}) {
 			}
 
 		});
+
+		return ret;
 
 	}
 
@@ -107,11 +109,11 @@ function NNN (args = {}) {
 				return;
 			}
 
+			// Remove nodes that leave the canvas
 			if ((soma.position.x < 0) || (soma.position.x > p.width)) {
 				_this.remove_neuron(neuron.id);
 				return;
 			}
-
 			if ((soma.position.y < 0) || (soma.position.y > p.height)) {
 				_this.remove_neuron(neuron.id);
 				return;
@@ -131,7 +133,7 @@ function NNN (args = {}) {
 	
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
-	this.run = function() {
+	this.grow = function() {
 		let _this = this;
 
 		// Space the neurons out again
@@ -140,20 +142,15 @@ function NNN (args = {}) {
 		}
 
 		_this.neurons.forEach(function(neuron) {
-
 			neuron.render();
 
 			if (_this.done()) {
-				p.noLoop();
+				// Physics --> Waggle
 				// neuron.update();
-
-				let radius = neuron.radius();
-				
-				// neuron.nodes[0].spread(_this.somas, radius);
-			} 
-			else {
-				neuron.grow();
+				return; 
 			}
+			
+			neuron.grow();
 
 		});
 	}

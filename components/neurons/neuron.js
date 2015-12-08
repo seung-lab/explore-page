@@ -80,12 +80,9 @@ function Neuron (args) {
 			// let y = p.sin(start_angle);
 			// Branch a bunch of times
 			_this.nodes.push(
-				n.branch(p.degrees(start_angle, _this.nodes.length), i + 1) // No need for ';'
+				n.branch(p.degrees(start_angle, _this.nodes.length), i + 1)
 			);
 		}
-
-		// console.log(_this.nodes);
-
 	});
 
 	// Render the Neurons + Nodes
@@ -99,7 +96,6 @@ function Neuron (args) {
 		}
 
 		// Special Case for Soma
-		// _this.nodes[0].meta();
 		_this.nodes[0].render_soma(10);
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
@@ -135,6 +131,14 @@ function Neuron (args) {
 
 		return true;
 
+	}
+
+	this.fadeOut = function() {
+		_this.nodes.forEach(function(n){
+			if (!n.id == 0) {
+				n.fill = $;
+			}
+		});	
 	}
 
 	// Following growing, we update
@@ -229,44 +233,15 @@ function Neuron (args) {
 				return recurseMore(n.parent, path);
 			}
 		}
-
-		// Make a 'shallow' copy of an array
-		// I see what I'm doing, but it requires refactoring
-		// n.start_point = true;
 		let parent_arr = [];
 			parent_arr.push(n.parent);
 
 		return recurseMore(n, parent_arr);
 	}
 
-	// Calculate the average radius of neuron
-	// Wrap it in cacheify() to cache first returned value
-	/*
 	this.radius = Utils.cacheify(function() {
-		let _this = this;
-		let avg_radius = 0;
-		let total_radius = 0;
-		let leaf_count = 0;
-
-		// Look through all the leaf nodes
-		_this.nodes.forEach(function(node) {
-			if (node.leaf) {
-				// Calculate the distance from leaf to soma
-				total_radius += p5.Vector.dist(node.position, _this.nodes[0].position);
-				leaf_count++;
-			}
-		});
-
-		// Take average of total radius
-		avg_radius = p.floor(total_radius / leaf_count);
-
-		return avg_radius;
-	});
-	*/
-
-	this.radius = function() {
 		return this.num_branches * 40;
-	}
+	});
 
 }
 

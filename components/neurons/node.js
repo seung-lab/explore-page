@@ -205,24 +205,15 @@ function Node (args = {}) {
 
 	this.seek = function(target) {
 		let _this = this;
+
 		let _target = target.copy();
 		
-		_target.sub(_this.position);  // A vector pointing from the position to the _target
+		_target.sub(_this.position);  	// A vector pointing from the position to the _target
+		_target.normalize();			// Normalize _target
 
-		// Normalize _target and scale to maximum speed
-		_target.normalize();
-
-		// if (_this.distribute) {
-		// 	// Calculate distance from center
-		// 	let center = p.createVector(p.width/2, p.height/2);
-		// 	let cd = p.abs(p5.Vector.dist(_this.position, center));
-		// 	target.div(cd*cd); // Weight by distance
-		// }
-
-		_target.mult(_maxspeed);
-		// Steering = Desired minus Velocity
-		_target.sub(_this.velocity);
-		_target.limit(_maxforce);  // Limit to maximum steering force
+		_target.mult(_maxspeed);		// Scale to maximum speed
+		_target.sub(_this.velocity);	// Steering = Desired minus Velocity
+		_target.limit(_maxforce);  		// Limit to maximum steering force
 
 		return _target;
 	}
@@ -232,25 +223,30 @@ function Node (args = {}) {
 	// Accepts Array as input
 	// If called as spring, accepts neighbor_nodes object
 
-	this.separate = function(nodes) {
+	this.separate = function(nodes, leaf) {
 		let _this = this;
 		let desiredseparation = 25.0;
 		let steer = p.createVector(0,0);
 		let count = 0;
 		let node;
 
-		// For every node in the system that is a leaf, check if it's too close
+		// For every node in the system check if it's too close
 		nodes.forEach(function(other) {
+
+			// When we are growing, only sample leafs for forces
+			// This does affect neuron shape, but improves performance
+			// if (leaf === "leaf") {
+			// 	if (!other.leaf) {
+			// 		return;
+			// 	}
+			// }
 
 		  	if (_this.distribute) {
 		  		// If we're in spring mode, desired separation = distance from this to other
-		  		// Update desiredseparation to match starting position of adjacency list
 		  		desiredseparation = _radius;
 		  	}
 	  		
 	  		// Calc distance from growing nodes
-	  		// Or the displacement of the system given a window resize event
-	  		// Maybe even a mouse over c:
 			let d = p5.Vector.dist(_this.position, other.position);	
 			
 			// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yosurself)
@@ -258,7 +254,7 @@ function Node (args = {}) {
 				// Calculate vector pointing away from neighbor
 				let diff = p5.Vector.sub(_this.position,other.position);
 					diff.normalize();
-					diff.div(d*d);        				// Weight by distance
+					diff.div(d*d);        				// Weight by distance (inverse square)
 				steer.add(diff);
 				count++;             					// Keep track of how many
 			}
@@ -332,42 +328,6 @@ function Node (args = {}) {
 		return force;
 	}
 
-	// Calculate force away from area
-	// Weight by Distance
-	// Inverse Square
-	/*
-	this.check_area = function(u,v) {
-		let _this = this;
-		let x,y;
-		let force = p.createVector();
-
-		// Calculate 'x' edge offset
-		if (_this.position.x < p.width / 2) {
-			x = _this.position.x;
-		}
-		else {
-			x = p.width - _this.position.y;
-		}
-
-		// Calculate 'y' edge offset
-		if (_this.position.y < p.height / 2) {
-			y = _this.position.y;
-		}
-		else {
-			y = p.height - _this.position.y;
-		}
-
-		// Inverse Square
-		x = 1 / (x * x);
-		y = 1 / (y * y);
-
-		// Set position
-		force.set(x,y);
-
-		// Apply the force!
-		_this.applyForce(force);
-	}
-	*/
 
 	this.reset_pow = Utils.cacheify(function() {
 		let _this = this;
@@ -431,9 +391,9 @@ function Node (args = {}) {
 	// Accepts an Array of Node objects
 	this.expand = function(nodes) {
 		let _this = this;
-		let sep = _this.separate(nodes);      				// Separation
+		let sep = _this.separate(nodes, "leaf");      		// Separation
 		let ini = _this.seek(_this.findRoot(_this)).mult(-1); 	// Root Node (multiply by -1 to repel)
-		let wan = _this.wander();             				// Wander
+		let wan = _this.wander();             					// Wander
 
 		// Carefully weight these forces
 		sep.mult(1);
@@ -452,9 +412,9 @@ function Node (args = {}) {
 		let _this = this;
 		let _force = force;
 		// In spring mode, weight each nodes response by mass
-		if (_this.sprung) {
-			// _force.div(_this.mass);
-		}
+		// if (_this.sprung) {
+		// 	// _force.div(_this.mass);
+		// }
 		_this.acceleration.add(_force);
 	}
 
@@ -472,7 +432,6 @@ function Node (args = {}) {
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
 			_maxspeed = p.width / 35;	
-			// _maxspeed = 20;
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
@@ -480,16 +439,13 @@ function Node (args = {}) {
 		// Limit speed
 		_this.velocity.limit(_maxspeed);
 		_this.position.add(_this.velocity);
-		// Reset accelertion to 0 each cycle
-		_this.acceleration.mult(0);
+		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
 	}
 
 	// Draw a dot at position
 	this.render = function() {
 		let _this = this;
 		// Basic Fractal Lines
-		// p.stroke(200); // white
-		// p.stroke(115,135,150); //blue
 		p.stroke(41,59,73); // dark blue
 		p.strokeWeight(2);
 		p.noFill();
@@ -553,12 +509,12 @@ function Node (args = {}) {
 		}
 
 		// Debug Neighborhood
-		p.push();
-			// p.noStroke();
-			// p.fill(255,10);
-			// p.ellipse(_this.position.x,_this.position.y,50,50);
-			// p.fill(255,255);
-		p.pop();
+		// p.push();
+		// 	// p.noStroke();
+		// 	// p.fill(255,10);
+		// 	// p.ellipse(_this.position.x,_this.position.y,50,50);
+		// 	// p.fill(255,255);
+		// p.pop();
 
 	}
 
@@ -568,8 +524,6 @@ function Node (args = {}) {
 		p.push();
 			p.noStroke();
 			p.fill(115,135,150); // blue
-			// p.fill(41,59,73); // dark blue
-			// p.fill(200); // white
 			let soma_radius = _this.neuron_timer;
 			p.ellipse(_this.pt_2().x,_this.pt_2().y,rad,rad);
 		p.pop();
@@ -579,7 +533,6 @@ function Node (args = {}) {
 		let _this = this;
 
 		// Render Radius
-		// console.log(_radius);
 		p.push();
 			p.noStroke();
 			p.fill(200,100);
@@ -699,11 +652,6 @@ function Node (args = {}) {
 
 	// Calculates adjacency list for generating tensive graph between a neighborhood of nodes
 	// comprised of a parent, children and 2 closest non-related nodes
-	/*
-
-		There is a mini bug in here~!
-
-	*/
 	this.springify = function(nodes) {
 		let _this = this;
 		let ndist,
@@ -759,8 +707,6 @@ function Node (args = {}) {
 	        }
 	    };
 
-	    // left most = 0
-
 	    if (parentIdx > 0 || this.parent.parent === undefined) {
 	        let index = Utils.modulo((parentIdx - 1), parentsC.length);
 
@@ -781,24 +727,24 @@ function Node (args = {}) {
 
 	// Method to be called on window resize to keep nodes in tension
 	// MousePos for debugging 
-	this.repel = function() {
-		let _this = this;
-		if(p.mouseIsPressed) {
-			let mousePos = p.createVector(p.mouseX, p.mouseY);
+	// this.repel = function() {
+	// 	let _this = this;
+	// 	if (p.mouseIsPressed) {
+	// 		let mousePos = p.createVector(p.mouseX, p.mouseY);
 
-			// Move soma
-			let soma = _this.findSoma(_this);
-			soma.position = mousePos;
+	// 		// Move soma
+	// 		let soma = _this.findSoma(_this);
+	// 		soma.position = mousePos;
 
-			return false;
-		}
+	// 		return false;
+	// 	}
 		
-		// Update spring positions --> Run through array
-		_this.springs.forEach(function(s) {
-			s.update();
-			// s.display();
-		});
-	}
+	// 	// Update spring positions --> Run through array
+	// 	_this.springs.forEach(function(s) {
+	// 		s.update();
+	// 		// s.display();
+	// 	});
+	// }
 
 	// Method to shift nodes around
 	// Only to be called once growing has completed!

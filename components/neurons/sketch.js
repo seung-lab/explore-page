@@ -18,7 +18,6 @@ let _options = {
 
 let _canvas = $.Deferred();
 let _runtime = false;
-let loop;
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -36,9 +35,6 @@ let sprout = function (p) {
 
 	// canvas
 		canvas;
-
-	// bools
-	let running = false;
 
 	// Global font reference
 	let _fontRegular;
@@ -63,7 +59,6 @@ let sprout = function (p) {
 		p.pop();
 
 		// Calculate _nnn_count based on width
-		// _nnn_count = p.ceil(p.min((p.width / 60), 30));
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
 		// _nnn_count = 200;
 
@@ -73,20 +68,15 @@ let sprout = function (p) {
 	p.draw = function() {
 		p.clear();
 
-		// Run the _nnn if it has finished spreading
-		if (_runtime) {
-			_nnn.run();
-			running = true;
+		if (p.frameCount > 30) {
+			if (_nnn.distribute_1() == true) {	
+				// Run the _nnn if it has finished spreading
+				if (_runtime) {
+					_nnn.grow();
+					return;
+				}
+			}
 		}
-
-		if ((p.frameCount > 30) && (!running)) {
-			_nnn.distribute_1();
-		}
-
-		// plus_minus();
-		// iterate();
-
-		// if (_nnn.done()) recurse();
 	}
 
 	function nnn_start () {
@@ -101,76 +91,17 @@ let sprout = function (p) {
 		_nnn.initialize();
 	}
 
-	function plus_minus () {
-		if (p.frameCount % 1080 === 0) {
-			// if (_counter > 0) console.log("Node #" + _nnn.neurons[0].nodes.length);
-			// console.log("");
-			_nnn.remove_neuron(_nnn_count);
-			_nnn.add_neuron(_nnn_count);
-			_counter++;
-			// console.log("Neuron #" + _counter);
-			// console.log("Branches #" + _nnn.neurons[0].num_branches);
-			// console.log("Max Depth #" + _nnn.neurons[0].max_depth);
-		}
-	}
-
-	function iterate () {
-		if (p.frameCount % 1000 === 0) {
-			_avg = avg_node(_nnn.neurons[0]);
-			nnn_start();
-			_counter++;
-			// p.noLoop();
-
-		}
-	}
-
 	function recurse () {
-		// let neuron = _nnn.neurons[p.round(p.random(_nnn.neurons.length))];
 		_nnn.neurons.forEach(function(neuron){
 			neuron.nodes.forEach(function(n) {
 				if (n.leaf) {
 					neuron.adj(n).forEach(function(nn) {
 						nn.size = true;
 					});
-					// console.log(neuron.adj(n));
 				}
 			});
 		});
 	}
-
-	// Quick Max Calc : Returns Integer
-	function max_node (n) {
-		if (n.nodes.length > _mxn) {
-			_mxn = n.nodes.length;
-		}
-
-		return _mxn;
-	}
-
-	// Quick Avg Calc : Returns Integer
-	function avg_node (n) {
-		_all_nodes += n.nodes.length;
-		_avg = p.round(_all_nodes / (_counter+1));
-		return _avg;
-	}
-
-	// User Interactions
-	function mousePressed () {
-		let mousePos = p.createVector(p.mouseX, p.mouseY);
-		_nnn.add_neuron(mousePos);
-	}
-
-	// p.keyPressed = function () {
-	// 	if (p.keyCode === p.UP_ARROW) {
-	// 		recurse();
-	// 	} 
-
-	// 	return false; // prevent default
-	// }
-
-	loop = Utils.onceify(function() {
-		p.loop();
-	});
 
 	// Deal with resize events
 	window.onresize = function() { 
@@ -191,8 +122,6 @@ module.exports.init = function (args = {}) {
 
 module.exports.grow = function (yes = true) {
 	_runtime = yes; // Enable neuron growth
-	loop();
-
 };
 
 
