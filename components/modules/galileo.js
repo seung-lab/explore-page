@@ -45,10 +45,12 @@ class Galileo extends TeaTime {
 			{
 				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
 				format: "italics",
+				galileo: 1,
 			},
 			{
 				text: "Today, neuroscience is revolutionizing how we see the world within us.",
 				format: "italics",
+				galileo: 2,
 			},
 			{
 				text: "We’re calling on gamers to help connect the dots by playing a game to map the brain.",
@@ -114,6 +116,8 @@ class Galileo extends TeaTime {
 			lowtext = d('low-text'),
 			counter2 = d('counter');
 
+		let puppet_view = _this.generatePuppet();
+
 		innercontainer.append(
 			hightext, 
 			medtext, 
@@ -126,6 +130,7 @@ class Galileo extends TeaTime {
 		);
 
 		action.append(
+			puppet_view.galileo,
 			textcontainer,
 			container2,
 			next
@@ -151,8 +156,45 @@ class Galileo extends TeaTime {
 				low: lowtext,
 				counter: counter2,
 			},
+			puppet: puppet_view,
 			canvas: null,
 		};
+	}
+
+	generatePuppet () {
+		let _this = this;
+
+		let d = function (classes) { 
+			return $('<div>').addClass(classes);
+		};
+
+		let puppet = d('puppet');
+
+		let view = {
+			galileo: puppet,
+		};
+
+		[
+			'coat-bottom',
+			'coat-middle',
+			'coat-top',
+			'head',
+			'left-arm',
+			'right-arm',
+			'right-forearm',
+			'shin-1',
+			'shin-2',
+			'shoes',
+			'telescope',
+			'telescope-eyepiece',
+			'tripod'
+		]
+		.forEach(function (part) {
+			view[part] = d(part);
+			puppet.append(view[part]);
+		});
+
+		return view;		
 	}
 
 	afterEnter (transition, frm) {
@@ -359,11 +401,23 @@ class Galileo extends TeaTime {
 
 	}
 
+	renderGalileo (t_prev, t) {
+		let _this = this;
+
+		let slide = this.slideAt(t);
+
+		_this.view.puppet.galileo.removeClass('visible');
+		if (slide.galileo) {
+			_this.view.puppet.galileo.addClass('visible');
+		}
+	}
+
 	render (t_prev, t) {
 		let _this = this; 
 
 		_this.renderText(t_prev, t);
 		_this.renderNeurons(t_prev, t);
+		_this.renderGalileo(t_prev, t);
 	}
 }
 
