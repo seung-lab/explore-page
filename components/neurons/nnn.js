@@ -7,7 +7,8 @@
 // A class for controlling the interactions across the enire network
 "use strict";
 
-let p5 = require('p5'),
+let $ = require('jquery'),
+	p5 = require('p5'),
 	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js');
 
@@ -22,6 +23,8 @@ function NNN (args = {}) {
 
 	// Generic public array letiable : not an argument though
 	this.neurons = [];
+	// Bounded Neurons
+	this.active_neurons = [];
 	// Array of all somas included in the NNN
 	this.somas = [];
 	// Spring system array
@@ -34,16 +37,23 @@ function NNN (args = {}) {
 
 	this.initialized = false;
 
+	let _this = this;
+
 	let _scale_power_1,
 		_scale_power_2;
 
+	// Promises
+	let scatter_promise = $.Deferred();
+	let scatter_2_promise = $.Deferred();
+	let rebound_promise = $.Deferred();
+	let grow_promise = $.Deferred();
+
 	this.initialize = function() {
-		let _this = this;
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
 
 		// Calculate power offset
-		// During Distribute_2 --> Ensure consistant neuron density
+		// During scatter_2 --> Ensure consistant neuron density
 		// across different displays
 		if (p.width < 500) {
 			_scale_power_1 = 0.95;
@@ -54,8 +64,28 @@ function NNN (args = {}) {
 		}
 	}
 
-	this.distribute_1 = function() {
-		let _this = this;
+	this.rebound = function() {
+		let deferred = $.Deferred();
+		let ret = false;
+
+		// Once the MST is built...
+		_this.neurons.forEach(function(neuron) {
+
+			let soma = neuron.nodes[0];
+				soma.render_soma(5);
+
+			if (soma.center_bound()) {
+				deferred.resolve();
+				return;
+			}
+		});
+
+		return deferred;
+
+	}
+
+	this.scatter = function() {
+		let deferred = $.Deferred();
 		let ret = false;
 
 		// Once the MST is built...
@@ -67,7 +97,7 @@ function NNN (args = {}) {
 				// soma.meta();
 
 			if (soma.spread_countdown_1 <= 0) {
-				ret = true;
+				deferred.resolve();
 				return;
 			}
 
@@ -82,13 +112,11 @@ function NNN (args = {}) {
 
 		});
 
-		return ret;
+		return deferred;
 
 	}
 
-	this.distribute_2 = function() {
-		let _this = this;
-
+	this.scatter_2 = function() {
 		let ret = false;
 
 		// Once the MST is built...
@@ -107,41 +135,70 @@ function NNN (args = {}) {
 				soma.space(_this.somas, _scale_power_2); // Repel from center
 				ret = true;
 				return;
-			}
+			}	
 
-			// Remove nodes that leave the canvas
-			if ((soma.position.x < 0) || (soma.position.x > p.width)) {
-				_this.remove_neuron(neuron.id);
-				return;
-			}
-			if ((soma.position.y < 0) || (soma.position.y > p.height)) {
-				_this.remove_neuron(neuron.id);
-				return;
-			}
-
-			neuron.network_setup(); // Create seed branching
 			// _this.mst(); 
 			// Update spring positions --> Run through array
 			// _this.springs.forEach(function(s) {
 			// 	// s.update();
 			// 	// s.display();
 			// });
+
 		});
 
 		return ret;
 	}
+
+	// Check if neuron is off the screen
+	this.check_bounds = function(soma) {
+		
+		if ((soma.position.x < 0) || (soma.position.x > p.width)) {
+			return false
+		}
+		if ((soma.position.y < 0) || (soma.position.y > p.height)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	this.activate = Utils.onceify(function() {
+
+		console.log('activate');
+
+		for (let i = 0; i < _this.neurons.length; i++) {
+			let neuron = _this.neurons[i]
+			let soma = neuron.nodes[0];
+
+			// Add only bounded nodes that to our neuron array
+			if (_this.check_bounds(soma)) {
+				_this.active_neurons.push(neuron);
+			}
+
+			if (i == _this.neurons.length) {
+				// Create seed branching
+				_this.active_neurons.forEach(function(active_neuron) {
+					console.log('neuron_setup');
+					active_neuron.network_setup(); 
+				});
+
+				return true;
+			}
+		}
+	});
 	
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
 	this.grow = function() {
-		let _this = this;
-
 		// Space the neurons out again
-		if (_this.distribute_2()) {
+		if (_this.scatter_2()) {
 			return;
 		}
 
-		_this.neurons.forEach(function(neuron) {
+		// Setup Neurons
+		_this.activate();
+
+		_this.active_neurons.forEach(function(neuron) {
 			neuron.render();
 
 			if (_this.done()) {
@@ -156,11 +213,10 @@ function NNN (args = {}) {
 	}
 
 	this.done = function() {
-		let _this = this;
-
 		let n;
-		for (let i = 0; i < _this.neurons.length; i++) {
-			n = _this.neurons[i];
+
+		for (let i = 0; i < _this.active_neurons.length; i++) {
+			n = _this.active_neurons[i];
 			if (!n.done()) {
 				return false;
 			}
@@ -172,7 +228,6 @@ function NNN (args = {}) {
 
 	// Add neuron to the network --> Accepts P5.Vector for Arg
 	this.add_neuron = function(count) {
-		let _this = this;
 		let x, y;
 
 		for (let i = 0; i < count; i++) {
@@ -223,7 +278,6 @@ function NNN (args = {}) {
 
 	// Remove neuron + soma from the network
 	this.remove_neuron = function(id) {
-		let _this = this;
 		for (let i = 0; i < _this.neurons.length; i++) {
 			let neuron = _this.neurons[i];
 			if (neuron.id == id) {
@@ -235,7 +289,6 @@ function NNN (args = {}) {
 
 	// Calculate initial separation forces for NNN
 	this.spread = function() {
-		let _this = this;
 
 		_this.somas.forEach(function (soma) {
 			// Find soma for each neuron
@@ -246,7 +299,6 @@ function NNN (args = {}) {
 	// Create MST --> Kruskal
 	// Additionally create spring connections
 	this.mst = Utils.onceify(function() {
-		let _this = this;
 		let graph = {
 			V: [],
 			E: [],

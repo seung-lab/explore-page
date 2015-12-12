@@ -63,15 +63,21 @@ function Node (args = {}) {
 	this.start_point = false;
 	this.dw = false; // Debugging Vel
 	this.sprung = false;
+	this.bound = false;
 	this.distribute = false;
+
+	let _this = this;
 
 	// Private variables
 	let _radius = 0;
 	let _wandertheta = 0;
 	let _wan_const = 0.5;
 	let _maxspeed = 2.5;       // Default 2
+	let _reboundspeed = 10;       // Default 2
 	// let _maxforce = p.random(0.9, 1.15);    // Default 0.05
 	let _maxforce = 0.85;
+
+	let _center = p.createVector(p.width/2, p.height/2); // Center point
 
 	this.spread_countdown_1 = 30;
 	this.spread_countdown_2 = 10;
@@ -83,26 +89,22 @@ function Node (args = {}) {
 
 	// Ensures that the definition of leaf is fresh
 	this.isLeaf = function () {
-		let _this = this;
 		return _this.children.length === 0;
 	};
 
 	// let n :: Node()
 	this.addChild = function(n) {
-		let _this = this;
 		n.parent = _this;
 		_this.children.push(n);
 	} 
 
 	// let n :: Node()
 	this.addParent = function(n) {
-		let _this = this;
 		n.addChild(_this);
 	}
 
 	// Set curve points
 	this.pt_0 = function() {
-		let _this = this;
 		let p_0 = p.createVector();
 		if (_this.depth == 1 || _this.depth == 2) {
 			p_0 = _this.position; 
@@ -114,7 +116,6 @@ function Node (args = {}) {
 	}
 
 	this.pt_1 = function() {
-		let _this = this;
 			let p_1 = p.createVector();
 		let isAlone =  _this.parent instanceof Node;
 		if (!isAlone) {
@@ -127,13 +128,11 @@ function Node (args = {}) {
 	}
 
 	this.pt_2 = function() {
-		let _this = this;
 			let p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
 	}
 
 	this.pt_3 = function() {
-		let _this = this;
 			let p_3 = p.createVector();
 		if (_this.children.length == 1) {
 			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
@@ -152,7 +151,6 @@ function Node (args = {}) {
 	}
 
 	this.wander = function() {
-		let _this = this;
 		let wanderR = 25;         						// Radius for our "wander circle"
 		let wanderD = 80;         						// Distance for our "wander circle"
 		let change = 0.3;
@@ -204,7 +202,6 @@ function Node (args = {}) {
 	// Accepts P5.Vector for argument
 
 	this.seek = function(target) {
-		let _this = this;
 
 		let _target = target.copy();
 		
@@ -218,13 +215,43 @@ function Node (args = {}) {
 		return _target;
 	}
 
+	// A method that calculates a steering force towards a target
+	// Similar to seek, but this reduces force the end
+	// STEER = DESIRED MINUS VELOCITY
+	this.arrive = function(target) {
+
+		let _target = target.copy();
+		
+		_target.sub(_this.position);  	// A vector pointing from the position to the _target
+		let d = _target.mag();
+
+		_target.normalize();
+
+		if (d < 100) { 					// Scale with arbitrary damping within 100 pixels
+				if ( d < 1) {
+					return true;
+				}
+			let m = p.map(d, 0, 100, 0, 100);
+			_target.mult(m);
+		} else {
+			_target.mult(_maxspeed);
+		}
+
+		// Steering = Desired minus Velocity
+		_target.sub(_this.velocity);
+		_target.limit(4);  // Limit to maximum steering force
+		
+		// Apply force here, so we can return true
+		_this.applyForce(_target);
+
+	}
+
 	// Separation
 	// Method checks for nearby nodes and steers away
 	// Accepts Array as input
 	// If called as spring, accepts neighbor_nodes object
 
 	this.separate = function(nodes, leaf) {
-		let _this = this;
 		let desiredseparation = 25.0;
 		let steer = p.createVector(0,0);
 		let count = 0;
@@ -280,7 +307,6 @@ function Node (args = {}) {
 	// Weight by Distance
 	// Inverse Square
 	this.check_edges = function() {
-		let _this = this;
 		let x,
 			y;
 		let force = p.createVector();
@@ -330,7 +356,6 @@ function Node (args = {}) {
 
 
 	this.reset_pow = Utils.cacheify(function() {
-		let _this = this;
 		_this.pow = 1;
 
 	});
@@ -343,10 +368,7 @@ function Node (args = {}) {
 	 *  distribution of the somas
 	*/
 
-	this.spread = function(somas, rad, multiplier) {
-		let _this = this;
-		let center = p.createVector(p.width/2, p.height/2); // Center point
-		
+	this.spread = function(somas, rad, multiplier) {		
 		_radius = rad;
 
 		_this.pow *= multiplier; // Factor in timer
@@ -357,7 +379,7 @@ function Node (args = {}) {
 		// Test Radius
 		// _this.render_radius();
 		
-		let cen = _this.seek(center).mult(-1); // Simply seek away from center
+		let cen = _this.seek(_center).mult(-1); // Simply seek away from center
 		// let edg = _this.check_edges(); // Move away from edges
 		let sep = _this.separate(somas); // Move away from eachother
 
@@ -390,7 +412,6 @@ function Node (args = {}) {
 	// We accumulate a new acceleration each time based on three rules
 	// Accepts an Array of Node objects
 	this.expand = function(nodes) {
-		let _this = this;
 		let sep = _this.separate(nodes, "leaf");      		// Separation
 		let ini = _this.seek(_this.findRoot(_this)).mult(-1); 	// Root Node (multiply by -1 to repel)
 		let wan = _this.wander();             					// Wander
@@ -409,7 +430,6 @@ function Node (args = {}) {
 	// Simple method to sum forces
 	// Accepts P5.Vector
 	this.applyForce = function(force) {
-		let _this = this;
 		let _force = force;
 		// In spring mode, weight each nodes response by mass
 		// if (_this.sprung) {
@@ -420,11 +440,11 @@ function Node (args = {}) {
 
 	// Method to update position
 	this.update = function() {
-		let _this = this;
+		
 		// Update velocity
 		_this.velocity.add(_this.acceleration);
 		// If we are a spring, at friction (lower energy)
-		if (_this.sprung) {
+		if ((_this.sprung) || (_this.bound)) {
 			_this.velocity.mult(_damping);
 			_maxspeed = 100;
 		}
@@ -440,11 +460,11 @@ function Node (args = {}) {
 		_this.velocity.limit(_maxspeed);
 		_this.position.add(_this.velocity);
 		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
+
 	}
 
 	// Draw a dot at position
 	this.render = function() {
-		let _this = this;
 		// Basic Fractal Lines
 		p.stroke(41,59,73); // dark blue
 		p.strokeWeight(2);
@@ -519,7 +539,6 @@ function Node (args = {}) {
 	}
 
 	this.render_soma = function(rad) {
-		let _this = this;
 		// Draw Soma
 		p.push();
 			p.noStroke();
@@ -530,7 +549,6 @@ function Node (args = {}) {
 	}
 
 	this.render_radius = function() {
-		let _this = this;
 
 		// Render Radius
 		p.push();
@@ -542,7 +560,6 @@ function Node (args = {}) {
 
 	// Accepts an Array of Node Objects
 	this.grow = function(nodes) {
-		let _this = this;
 		if (_this.isGrowing()) {
 			_this.tick();
 			_this.expand(nodes);
@@ -562,16 +579,28 @@ function Node (args = {}) {
 
 	// Accepts an Array of Node Objects
 	this.space = function(nodes, multiplier) {
-		let _this = this;
-			_this.spread(nodes, _this.radius, multiplier);
-			_this.update();
+		_this.spread(nodes, _this.radius, multiplier);
+		_this.update();
+	}
+
+	// Accepts an Array of Node Objects
+	this.center_bound = function() {
+		_this.bound = true;
+		
+		// If we have arrived, stop updating position
+		if (_this.arrive(_center)) {
+			_this.bound = false;
+			return true;
+		}
+
+		_this.update();
+
 	}
 
 	// Recurse through nodes to root
 	// Accepts Node object
 	// Returns p5.Vector object
 	this.findRoot = function(n) {
-		let _this = this;
 		if (n.parent == null) {
 			return n.position;
 		}
@@ -584,7 +613,6 @@ function Node (args = {}) {
 	// Accepts Node object
 	// Returns Node object
 	this.findSoma = function(n) {
-		let _this = this;
 		if (n.parent == null) {
 			return n;
 		}
@@ -602,7 +630,6 @@ function Node (args = {}) {
 	// Did the timer run out?
 	// Returns boolean --> Growing?
 	this.tick = function () {
-		let _this = this;
 		
 		if (_this.depth < 5) {
 			_this.timer -= 20;
@@ -613,7 +640,6 @@ function Node (args = {}) {
 	}
 
 	this.isGrowing = function() {
-		let _this = this;
 		if (_this.timer >= 0) {
 			// Set branch point
 			return true;
@@ -623,7 +649,6 @@ function Node (args = {}) {
 	}
 
 	this.parentIdx = function() {
-		let _this = this;
 
 		if (_this.parent) {
 			let c;
@@ -640,7 +665,6 @@ function Node (args = {}) {
 	}
 
 	this.meta = function() {
-		let _this = this;
 		// Render meta information on vertex
 		// let str_id = String(_this.id + ":" + _this.mass);
 		let str_id = String(_this.neuron_id);
@@ -653,7 +677,6 @@ function Node (args = {}) {
 	// Calculates adjacency list for generating tensive graph between a neighborhood of nodes
 	// comprised of a parent, children and 2 closest non-related nodes
 	this.springify = function(nodes) {
-		let _this = this;
 		let ndist,
 			n;
 		let min1_ref = nodes[0]; 	// Inititial + Arbitrary Min Distance Values
@@ -728,7 +751,6 @@ function Node (args = {}) {
 	// Method to be called on window resize to keep nodes in tension
 	// MousePos for debugging 
 	// this.repel = function() {
-	// 	let _this = this;
 	// 	if (p.mouseIsPressed) {
 	// 		let mousePos = p.createVector(p.mouseX, p.mouseY);
 
@@ -750,9 +772,8 @@ function Node (args = {}) {
 	// Only to be called once growing has completed!
 	// Only to be called once springify has completed!
 	this.relax = function() {
-		let _this = this;
 		_this.repel();
-		_this.update();
+		_this.update(); 
 		_this.meta();
 		// Find position, then stop moving! --> Each resize event
 		// if (_damping > 0.1) _damping *= 0.98;
@@ -761,7 +782,6 @@ function Node (args = {}) {
 	// Create a new dendrite at the current position, but change direction by a given angle
 	// Returns a new Node object
 	this.branch = function(angle, id) {
-		let _this = this;
 		// What is my current heading
 		let theta = _this.velocity.heading();
 

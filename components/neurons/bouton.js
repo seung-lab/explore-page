@@ -6,15 +6,9 @@
 // Contructor: P5.Vector, P5.p
 "use strict";
 
-let _img
-
 function Bouton (args = {}) {
 	// Private arguments from constructor
 	let p = args.p;
-	if (_img === undefined) {
-		// debugger;
-		_img = p.loadImage(GLOBAL.base_url + "/images/test.jpg");
-	}
 
 	// 'this' keyword sets the variable to public visibility
 	this.position = args.position || 0;
@@ -35,8 +29,7 @@ function Bouton (args = {}) {
 			3,
 			3
 		);   
-		// p.image(_img, this.position.x, this.position.y);
-	};
+	}
 }
 
 module.exports = Bouton;

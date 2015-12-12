@@ -18,13 +18,14 @@ function Spring (args = {}) {
 	this.node1 = args.node1 || {};
 	this.node2 = args.node2 || {};
 
+	let _this = this;
+
 	// Spring constant
 	let _k = 0.2;
 
 	// console.log("1: " + this.node1.id + " + 2: " + this.node2.id);
 
 	this.delta_position = function() {
-		let _this = this;
 		return p5.Vector.sub(_this.node1.position, _this.node2.position);
 	} 
 
@@ -33,7 +34,6 @@ function Spring (args = {}) {
 
 	// Calculate spring force between neighbors
 	this.neighbor = function() {
-		let _this = this;
 		// Vector pointing from anchor to bob location
 		let force = _this.delta_position();
 		// Compare our current force with rest_delta	
@@ -51,13 +51,11 @@ function Spring (args = {}) {
 	}
 
 	this.update = function() {
-		let _this = this;
 		// Update springs
 		_this.neighbor();
 	}
 
 	this.display = function() {
-		let _this = this;
 		// some vector magic
 		// create point halfway down line
 		// let midpt = p5.Vector.lerp(_this.node1.position,_this.node2.position, 0.5);

@@ -32,11 +32,12 @@ function Neuron (args) {
 	this.nodes = [];
 	this.boutons = [];
 
+	let _this = this;
+
 	let list = false;
 
 	// Call methods to access outside of class this way!
 	this.neuron_start = function () {
-		let _this = this;
 		let start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
 		// Create a new Node instance
 		let n = new Node ({
@@ -57,8 +58,6 @@ function Neuron (args) {
 	}
 
 	this.network_setup = Utils.onceify(function() {
-		let _this = this;
-		 
 		// Get things moving
 		let v = p.round(-2,2);
 		let n = _this.nodes[0];
@@ -87,7 +86,6 @@ function Neuron (args) {
 
 	// Render the Neurons + Nodes
 	this.render = function() {
-		let _this = this;
 		let n;
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
@@ -105,7 +103,6 @@ function Neuron (args) {
 	}
 
 	this.done = function() {
-		let _this = this;
 		let n;
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
@@ -143,8 +140,6 @@ function Neuron (args) {
 
 	// Following growing, we update
 	this.update = function() {
-		let _this = this;
-		
 		// Once neuron has completed, create adjacency list
 		_this.nodes.forEach(function(n){
 			n.relax();
@@ -153,8 +148,8 @@ function Neuron (args) {
 	}
 
 	this.create_bouton = Utils.onceify(function() {
-		let _this = this;
 		let n;
+		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			// Get the Node object, update and draw it
 			n = _this.nodes[i];
@@ -171,8 +166,9 @@ function Neuron (args) {
 	});
 
 	this.grow = function() {
-		let _this = this;
 		let n;
+
+		console.log('neuron_grow');
 
 		// Let's stop when the neuron gets too deep
 		// For every dendrite in the arraylist

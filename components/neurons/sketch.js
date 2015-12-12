@@ -17,7 +17,9 @@ let _options = {
 };
 
 let _canvas = $.Deferred();
-let _runtime = false;
+let _scatter = false;
+let _grow = false;
+let _rebound = false;
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -51,7 +53,7 @@ let sprout = function (p) {
 		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
 
-		_canvas.resolve(canvas.elt);
+		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
 		// Set font characterists
 		p.push();
@@ -63,19 +65,29 @@ let sprout = function (p) {
 		// _nnn_count = 200;
 
 		nnn_start();
+
+		console.log('starting p5...');
 	};
 
 	p.draw = function() {
 		p.clear();
 
-		if (p.frameCount > 30) {
-			if (_nnn.distribute_1() == true) {	
-				// Run the _nnn if it has finished spreading
-				if (_runtime) {
-					_nnn.grow();
-					return;
-				}
-			}
+		// If the order is proper, we will never have to include more logic
+		if (p.frameCount < 30) {
+			return;
+		}
+		if (_rebound) {
+			_nnn.rebound();
+			return;
+		}
+		if (_grow) {
+			_nnn.grow();
+			console.log('grow');
+			return;
+		}
+		if (_scatter) {
+			_nnn.scatter();
+			console.log('scatter');
 		}
 	}
 
@@ -120,8 +132,16 @@ module.exports.init = function (args = {}) {
 	return new p5(sprout); // Instantiate the entire P5 sketch
 };
 
+module.exports.rebound = function (yes = true) {
+	_rebound = yes; // Enable neuron growth
+};
+
 module.exports.grow = function (yes = true) {
-	_runtime = yes; // Enable neuron growth
+	_grow = yes; // Enable neuron growth
+};
+
+module.exports.scatter = function (yes = true) {
+	_scatter = yes; // Enable neuron growth
 };
 
 
