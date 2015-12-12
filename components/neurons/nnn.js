@@ -175,7 +175,7 @@ function NNN (args = {}) {
 				_this.active_neurons.push(neuron);
 			}
 
-			if (i == _this.neurons.length) {
+			if (i == _this.neurons.length - 1) {
 				// Create seed branching
 				_this.active_neurons.forEach(function(active_neuron) {
 					console.log('neuron_setup');
