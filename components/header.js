@@ -10,11 +10,13 @@ let Login = null;
 var _social_networks = {
 	facebook: { 
 		name: 'Facebook', 
-		url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+		// url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+		url: "https://www.facebook.com/eyewire.org",
 	},
 	twitter: { 
 		name: 'Twitter', 
-		url: 'http://twitter.com/intent/tweet?source=sharethiscom&text=#{DESCRIPTION}&url=#{URL}',
+		// url: 'http://twitter.com/intent/tweet?source=sharethiscom&text=#{DESCRIPTION}&url=#{URL}',
+		url: "https://twitter.com/eye_wire",
 	},
 	tumblr: { 
 		name: 'Tumblr', 
@@ -129,8 +131,8 @@ class Header extends Synapse {
 		_this.view.share.email.ion('click', function () {
 			shareOnSelectedNetwork({
 				network: "email",
-				title: "",
-				description: "",
+				title: "Play Eyewire with me! Let's map the brain together.",
+				description: "Hey there,\n\nCheck out http://eyewire.org\n\nEyewire is a game we can play together that helps brain science!",
 			});
 		});
 
