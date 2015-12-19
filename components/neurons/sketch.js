@@ -6,6 +6,8 @@
 let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
+	NeuronCoordinator = require('./NeuronCoordinator.js'), // neuron coordinator
+	Neurostate = require('./neurostate.js'), // neurostate
 	p5 = require('p5'),
 	GLOBAL = require('../../clientjs/GLOBAL.js'),
 	$ = require('jquery');
@@ -17,9 +19,10 @@ let _options = {
 };
 
 let _canvas = $.Deferred();
-let _scatter = false;
-let _grow = false;
-let _rebound = false;
+let neurostates = [];
+
+let growing = true;
+
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -81,20 +84,26 @@ let sprout = function (p) {
 			return;
 		}
 		if (_grow) {
-			_nnn.grow();
-			console.log('grow');
+			if (growing) {
+				for (let i = 0; i < 150; i++) {
+					_nnn.grow();
+				}
+				console.log('grow');
+				p.clear();
+				growing = false;
+			}
+			_nnn.render();
 			return;
 		}
 		if (_scatter) {
 			_nnn.scatter();
-			console.log('scatter');
 		}
 	}
 
 	function nnn_start () {
 		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
-		_nnn = new NNN({
-			num_neurons: _nnn_count,
+		_nnn = new NNN ({
+			num_neurons: say say say ,
 			complexity: 13,
 			kruskal: Kruskal,
 			p: p,
@@ -115,6 +124,90 @@ let sprout = function (p) {
 		});
 	}
 
+	function set_states () {
+		neurostates = [
+		    {
+		        name: "Scatter",
+				duration: 30,
+				forward: _nnn.scatter(),
+				reverse: _nnn.rebound()
+		    },
+		    {
+		    	name: "Twinkle",
+				duration: 30,
+				loop: true,
+				forward: _nnn.twinkle(),
+				reverse: _nnn.twinkle()
+		    },
+		    {
+		   		name: "Scatter2",
+				duration: 10,
+				forward: _nnn.scatter(),
+				reverse: _nnn.rebound()
+		    },
+		    {
+		    	name: "Grow",
+				duration: 75,
+				forward: _nnn.grow(),
+				reverse: _nnn.fadeOut()
+		    },
+		    {
+		    	name: "Synapse",
+				duration: 60,
+				loop: true,
+				forward: _nnn.synapse(),
+				reverse: _nnn.synapse()
+		    },
+		    {
+		    	name: "Fade",
+				duration: 60,
+				forward: _nnn.fadeOut(),
+				reverse: _nnn.fadeIn()	
+		    },
+		    {
+		    	name: "Center",
+				duration: 30,
+				forward: _nnn.rebound2(),
+				reverse: _nnn.lastPosition()	
+		    },
+		    {
+		    	name: "Stars",
+				duration: 30,
+				forward: _nnn.staryNight(),
+				reverse: _nnn.rebound()
+		    },
+		    {
+		    	name: "Center2",
+				duration: 30,
+				forward: _nnn.rebound(),
+				reverse: _nnn.staryNight()
+		    },
+		    {
+		    	name: "Brain",
+				duration: 30,
+				forward: _nnn.brainiac(),
+				reverse: _nnn.rebound()
+		    },
+		    {
+		    	name: "Connect",
+				duration: 30,
+				forward: _nnn.kruskal(),
+				reverse: _nnn.fadeOut()	
+		    },
+		    {
+		    	name: "Drake",
+				duration: 30,
+				forward: _nnn.plague(),
+				reverse: _nnn.fadeout()
+		    }
+		];
+
+	neurostates = neurostates.map(function (args) {
+	    return new Neurostate(args);
+	});	
+	
+}
+
 	// Deal with resize events
 	window.onresize = function() { 
 		$(canvas).width(window.innerWidth)
@@ -132,18 +225,9 @@ module.exports.init = function (args = {}) {
 	return new p5(sprout); // Instantiate the entire P5 sketch
 };
 
-module.exports.rebound = function (yes = true) {
+module.exports.updateT = function (t) {
 	_rebound = yes; // Enable neuron growth
 };
-
-module.exports.grow = function (yes = true) {
-	_grow = yes; // Enable neuron growth
-};
-
-module.exports.scatter = function (yes = true) {
-	_scatter = yes; // Enable neuron growth
-};
-
 
 module.exports.canvas = function () {
 	return _canvas;

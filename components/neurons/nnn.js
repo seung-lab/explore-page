@@ -42,12 +42,6 @@ function NNN (args = {}) {
 	let _scale_power_1,
 		_scale_power_2;
 
-	// Promises
-	let scatter_promise = $.Deferred();
-	let scatter_2_promise = $.Deferred();
-	let rebound_promise = $.Deferred();
-	let grow_promise = $.Deferred();
-
 	this.initialize = function() {
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
@@ -65,7 +59,6 @@ function NNN (args = {}) {
 	}
 
 	this.rebound = function() {
-		let deferred = $.Deferred();
 		let ret = false;
 
 		// Once the MST is built...
@@ -74,68 +67,23 @@ function NNN (args = {}) {
 			let soma = neuron.nodes[0];
 				soma.render_soma(5);
 
-			if (soma.center_bound()) {
-				deferred.resolve();
-				return;
-			}
 		});
-
-		return deferred;
-
 	}
 
 	this.scatter = function() {
-		let deferred = $.Deferred();
-		let ret = false;
-
-		// Once the MST is built...
 		_this.neurons.forEach(function(neuron) {
-
 			let soma = neuron.nodes[0];
 				soma.render_soma(5);
-				// soma.render_radius();
-				// soma.meta();
-
-			if (soma.spread_countdown_1 <= 0) {
-				deferred.resolve();
-				return;
-			}
-
-			if ((soma.pow <= 0) && (soma.spread_countdown_1 >= 0)) {
-				soma.spread_countdown_1--;
-			}
-
-			if (soma.spread_countdown_1 >= 0) {
 				soma.space(_this.somas, _scale_power_1); // Repel from center
-				return;
-			}
-
 		});
-
-		return deferred;
-
 	}
 
 	this.scatter_2 = function() {
-		let ret = false;
-
-		// Once the MST is built...
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
 				soma.render_soma(5);
 				soma.reset_pow();
-				// soma.render_radius();
-				// soma.meta();
-
-			if ((soma.pow <= 0) && (soma.spread_countdown_2 >= 0)) {
-				soma.spread_countdown_2--;
-			}
-
-			if (soma.spread_countdown_2 >= 0) {
 				soma.space(_this.somas, _scale_power_2); // Repel from center
-				ret = true;
-				return;
-			}	
 
 			// _this.mst(); 
 			// Update spring positions --> Run through array
@@ -145,8 +93,6 @@ function NNN (args = {}) {
 			// });
 
 		});
-
-		return ret;
 	}
 
 	// Check if neuron is off the screen
@@ -190,26 +136,25 @@ function NNN (args = {}) {
 	// Simple method for running the neurons
 	// Call this something like 'renderFrame'
 	this.grow = function() {
-		// Space the neurons out again
-		if (_this.scatter_2()) {
-			return;
-		}
-
 		// Setup Neurons
 		_this.activate();
 
 		_this.active_neurons.forEach(function(neuron) {
-			neuron.render();
-
 			if (_this.done()) {
-				// Physics --> Waggle
-				// neuron.update();
 				return; 
 			}
 			
 			neuron.grow();
 
 		});
+	}
+
+	this.render = function() {
+
+		_this.active_neurons.forEach(function(neuron) {
+			neuron.render();
+		});
+
 	}
 
 	this.done = function() {

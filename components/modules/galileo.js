@@ -299,7 +299,6 @@ class Galileo extends TeaTime {
 		return this;
 	}
 
-
 	renderText (prev_t, t) {
 		let _this = this;
 
@@ -360,22 +359,11 @@ class Galileo extends TeaTime {
 		let _this = this; 
 
 		let slide = this.slideAt(t);
-		let prev_slide = this.slideAt(prev_t);
-		console.log("prev: " + prev_slide.index);
-		console.log("current: " + slide.index);
 
-		/*
-		
-			Here we will add loads of logic to control the P5 sketch
-
-		*/
+		NNNSketch.updateT(slide);
 
 		if (slide.index === 0) {
 
-			if (prev_slide.index === 1) {
-				NNNSketch.rebound();
-				return;
-			}
 
 			_this.removeNeurons();
 
@@ -389,15 +377,6 @@ class Galileo extends TeaTime {
 				_this.view.canvas = $(canvas);
 				_this.view.canvas.addClass('neural-network');
 			});
-		}
-
-		if (slide.index === 1) {
-			console.log("slide 1");
-			NNNSketch.scatter();
-		}
-
-		if (slide.index === 2) {
-			NNNSketch.grow();
 		}
 	}
 

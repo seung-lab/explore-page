@@ -168,8 +168,6 @@ function Neuron (args) {
 	this.grow = function() {
 		let n;
 
-		console.log('neuron_grow');
-
 		// Let's stop when the neuron gets too deep
 		// For every dendrite in the arraylist
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {

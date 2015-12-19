@@ -79,8 +79,6 @@ function Node (args = {}) {
 
 	let _center = p.createVector(p.width/2, p.height/2); // Center point
 
-	this.spread_countdown_1 = 30;
-	this.spread_countdown_2 = 10;
 	this.pow = 1; // Huge starting multipliers!
 	let _damping = 0.85;
 
