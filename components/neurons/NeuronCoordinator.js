@@ -1,21 +1,47 @@
 
-let utils = require('../utils.js'),
+let Utils = require('../../clientjs/utils.js'),
 		$ = require('jquery');
 
 let _t = 0;
+let _prev_t = 0;
+let _slide_count = 0;
+let _animation_count = 0;
+let _current_slide = 0;
 
 let NeuronCoordinator = {
 	neurostates: [],
 	initialized: false,
 };
 
-NeuronCoordinator.initialize = function (neurostates) {
+NeuronCoordinator.initialize = function (neurostates, slide_count) {
 	let NC = NeuronCoordinator;
+	_slide_count = slide_count;
 
 	if (!NC.initialized) {
+
 		NC.setAnimations(neurostates);
 		NC.initialized = true;
 	}
+};
+
+NeuronCoordinator.updateT = function (t) {
+	_current_slide = t;
+	_t = t / _slide_count; 	// Normalized t
+
+	// console.log(_slide_count);
+	// console.log("_t:" + _t + " slide:" + t);
+};
+
+NeuronCoordinator.direction = function (t) {
+
+	let prev = _prev_t;
+	_prev_t = t;
+
+	if (t >= prev) {
+		return "forward";
+	} 
+	
+	return "reverse";
 };
 
 NeuronCoordinator.setAnimations = function (neurostates) {
@@ -27,6 +53,7 @@ NeuronCoordinator.setAnimations = function (neurostates) {
 		neurostate.normed_duration = neurostate.duration / normalization;
 
 		neurostate.begin = begin;
+		counter++;
 		begin += neurostate.normed_duration;
 	});
 };
@@ -71,30 +98,30 @@ NeuronCoordinator.previousAnimation = function () {
 	return prev;
 };
 
-NeuronCoordinator.animationAt = function (t) {
+NeuronCoordinator.animationAt = function (_t) {
 	let neurostates = NeuronCoordinator.neurostates;
 
 	if (!neurostates.length) {
 		throw new Error("No neurostates were defined for this timeline.");
 	}
 
-	if (Math.abs(1 - t) < 0.00001) {
+	if (Math.abs(1 - _t) < 0.00001) {
 		return neurostates[neurostates.length - 1];
 	}
 
 	for (let i = 0; i < neurostates.length; i++) {
 		let current = neurostates[i];
-		if (t >= current.begin && t < current.begin + current.normed_duration) {
+		if (_t >= current.begin && _t < current.begin + current.normed_duration) {
 			return current;
 		}
 	}
 
-	throw new Error(`Something got out of sync. t = ${t}, neurostates: ${neurostates.length}`);
+	throw new Error(`Something got out of sync. _t = ${_t}, neurostates: ${neurostates.length}`);
 };
 
-NeuronCoordinator.toAnimationT = function (neurostate, t) {
-	t = (t - neurostate.begin) / neurostate.normed_duration;
-	return utils.clamp(t, 0, 1);
+NeuronCoordinator.toAnimationT = function (neurostate, _t) {
+	_t = (_t - neurostate.begin) / neurostate.normed_duration;
+	return Utils.clamp(_t, 0, 1);
 }
 
 function computeNormalization (neurostates) {
@@ -104,6 +131,24 @@ function computeNormalization (neurostates) {
 	.reduce(function (a, b) {
 		return a + b;
 	}, 0);
+}
+
+NeuronCoordinator.makeMoves = function (progressions) {
+	let new_actives = [];
+	let moves = progressions[_current_slide];
+	let direction = NeuronCoordinator.direction(t);
+
+	for (let i = 0; i <= moves; i++) {
+		if (direction == "forward") {
+			actives.push(NeuronCoordinator.nextAnimation());
+
+		}
+		if (direction = "reverse") {
+			actives.push(NeuronCoordinator.previousAnimation());
+		}
+	}
+
+	return new_actives;
 }
 
 /*

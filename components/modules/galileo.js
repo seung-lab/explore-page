@@ -350,8 +350,6 @@ class Galileo extends TeaTime {
 			this.sketch.noLoop();
 			this.sketch.noCanvas();
 			this.sketch = null;
-
-			NNNSketch.grow(false);
 		}
 	}
 
@@ -359,8 +357,6 @@ class Galileo extends TeaTime {
 		let _this = this; 
 
 		let slide = this.slideAt(t);
-
-		NNNSketch.updateT(slide);
 
 		if (slide.index === 0) {
 
@@ -371,6 +367,7 @@ class Galileo extends TeaTime {
 				anchor: _this.view.action[0],
 				width: _this.view.action.width(),
 				height: _this.view.action.height(),
+				slide_count: _this.slides.length,
 			});
 
 			NNNSketch.canvas().done(function (canvas) {
@@ -378,6 +375,8 @@ class Galileo extends TeaTime {
 				_this.view.canvas.addClass('neural-network');
 			});
 		}
+
+		NNNSketch.updateState(slide.index);
 	}
 
 	render (t_prev, t) {

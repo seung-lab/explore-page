@@ -171,6 +171,48 @@ function NNN (args = {}) {
 
 	}
 
+	this.twinkle = function() {
+
+	}
+
+	this.fadeIn = function() {
+		
+	}
+
+	this.fadeOut = function() {
+
+	}
+
+	this.synapse = function() {
+
+	}
+
+	this.rebound2 = function() {
+
+	}
+
+	this.lastPosition = function() {
+
+	}
+
+	this.staryNight = function() {
+
+	}
+
+	this.brainiac = function() {
+
+	}
+
+	this.kruskal = function() {
+
+	}
+
+	this.plague = function() {
+		
+	}
+
+
+
 	// Add neuron to the network --> Accepts P5.Vector for Arg
 	this.add_neuron = function(count) {
 		let x, y;

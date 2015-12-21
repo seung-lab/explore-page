@@ -16,10 +16,15 @@ let _options = {
 	width: 100,
 	height: 100,
 	anchor: null,
+	slide_count: null,
 };
 
+let _neurostates = [],
+	_progressions = [],
+	_actives = [], // Animation queue
+	_direction;
+
 let _canvas = $.Deferred();
-let neurostates = [];
 
 let growing = true;
 
@@ -38,16 +43,18 @@ let sprout = function (p) {
 		_all_nodes = 0,
 		_nnn_count = 0,
 
+		_direction = "forward",
+
 	// canvas
 		canvas;
 
 	// Global font reference
-	let _fontRegular;
+	// let _fontRegular;
 
 	// Preload any required assets
 	p.preload = function () {
 		// Load font
-		_fontRegular = p.loadFont(GLOBAL.base_url + "/fonts/WhitneyHTF-Medium.otf");
+		// _fontRegular = p.loadFont(GLOBAL.base_url + "/fonts/WhitneyHTF-Medium.otf");
 	};
 
 	p.setup = function () {
@@ -59,9 +66,7 @@ let sprout = function (p) {
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
 		// Set font characterists
-		p.push();
-			p.textFont(_fontRegular);
-		p.pop();
+		// p.textFont(_fontRegular);
 
 		// Calculate _nnn_count based on width
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
@@ -69,41 +74,26 @@ let sprout = function (p) {
 
 		nnn_start();
 
+		set_states();
+
+		// Setup NeuronCoordinator
+		NeuronCoordinator.initialize(_neurostates, _options.slide_count);
+
 		console.log('starting p5...');
 	};
 
 	p.draw = function() {
 		p.clear();
 
-		// If the order is proper, we will never have to include more logic
-		if (p.frameCount < 30) {
-			return;
-		}
-		if (_rebound) {
-			_nnn.rebound();
-			return;
-		}
-		if (_grow) {
-			if (growing) {
-				for (let i = 0; i < 150; i++) {
-					_nnn.grow();
-				}
-				console.log('grow');
-				p.clear();
-				growing = false;
-			}
-			_nnn.render();
-			return;
-		}
-		if (_scatter) {
-			_nnn.scatter();
-		}
+		// Run the animation loop
+		animate(_direction);
+
 	}
 
 	function nnn_start () {
 		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
 		_nnn = new NNN ({
-			num_neurons: say say say ,
+			num_neurons: _nnn_count,
 			complexity: 13,
 			kruskal: Kruskal,
 			p: p,
@@ -125,7 +115,65 @@ let sprout = function (p) {
 	}
 
 	function set_states () {
-		neurostates = [
+		// _neurostates = [
+		//     {
+		//         name: "Scatter",
+		// 		duration: 30,
+		// 		forward: _nnn.scatter(),
+		// 		reverse: _nnn.rebound()
+		//     },
+		//     {
+		//    		name: "Scatter2",
+		// 		duration: 10,
+		// 		forward: _nnn.scatter_2(),
+		// 		reverse: _nnn.rebound()
+		//     },
+		//     {
+		//     	name: "Grow",
+		// 		duration: 75,
+		// 		forward: _nnn.grow(),
+		// 		reverse: 1
+		//     }
+		// ];
+
+		/*  Given: 9 slides
+			Number of Next() calls to make per slide
+	
+			Symetrical in both directions
+
+		*/
+
+		_progressions = [
+			{
+				0: 0
+			},
+			{
+				1: 2
+			},
+			{
+				2: 2
+			},
+			{
+				3: 1
+			},
+			{
+				4: 1
+			},
+			{
+				5: 2
+			},
+			{
+				6: 2
+			},
+			{
+				7: 1
+			},
+			{
+				8: 1
+			}
+		];
+
+		_neurostates = [
 		    {
 		        name: "Scatter",
 				duration: 30,
@@ -198,15 +246,36 @@ let sprout = function (p) {
 		    	name: "Drake",
 				duration: 30,
 				forward: _nnn.plague(),
-				reverse: _nnn.fadeout()
+				reverse: _nnn.fadeOut()
 		    }
 		];
 
-	neurostates = neurostates.map(function (args) {
-	    return new Neurostate(args);
-	});	
-	
-}
+		_neurostates = _neurostates.map(function (args) {
+		    return new Neurostate(args);
+		});	
+	}
+
+	function animate(_direction) {
+
+		if (!_actives.length) {
+			return;
+		}
+
+		if (_direction == "forward") {
+			// _actives[0].forward_progress();
+			console.log(_actives[0].forward_progress());
+		} 
+
+		if (_direction == "reverse") {
+			// _actives[0].reverse_progress();
+			console.log(_actives[0].reverse_progress());
+		}
+
+		if (_actives[0].done) {
+			_actives[0].shift();
+		}
+
+	}
 
 	// Deal with resize events
 	window.onresize = function() { 
@@ -219,14 +288,33 @@ module.exports.init = function (args = {}) {
 	_options.anchor = args.anchor;
 	_options.width = args.width;
 	_options.height = args.height;
+	_options.slide_count = args.slide_count;
 
 	_canvas = $.Deferred();
 
 	return new p5(sprout); // Instantiate the entire P5 sketch
 };
 
-module.exports.updateT = function (t) {
-	_rebound = yes; // Enable neuron growth
+module.exports.updateState = function (t) {
+	if (!NeuronCoordinator.initialized) {
+		return;
+	}
+	
+	NeuronCoordinator.updateT(t);
+
+	var dir = NeuronCoordinator.direction(t); // Also updates _prev_t
+
+	// Empty animation queue if we change direction
+	if (_direction !== dir) {
+		_actives = [];
+	}
+
+	_direction = dir;
+	
+	_actives.push(
+		NeuronCoordinator.makeMoves(_progressions)
+	);
+	// console.log(_actives);
 };
 
 module.exports.canvas = function () {
