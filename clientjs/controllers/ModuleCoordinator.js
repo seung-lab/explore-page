@@ -85,9 +85,20 @@ ModuleCoordinator.initialize = function (animation) {
 		});
 
 		$(window).ion('swipe', function (e, evt) {
-			if (evt.deltaY < 0) {
+
+			
+			// angle is between [-180, 180]. 
+			let angle = Math.atan2(-evt.deltaY, evt.deltaX) / Math.PI / 2 * 360;
+			
+			let halfangle = 45 / 2;
+
+			let upswipe = angle > halfangle && angle < 180 - halfangle,
+				leftswipe = angle >= 180 - halfangle || angle <= -180 + halfangle;
+			
+			if (upswipe || leftswipe) {
 				MC.next();
-			} else {
+			}
+			else {
 				MC.previous();
 			}
 		});
