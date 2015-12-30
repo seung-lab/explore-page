@@ -30,6 +30,10 @@ var BASEURL = argv.production
 	? 'http://eyewire.org/explore'
 	: '';
 
+if (argv.baseurl) {
+	BASEURL = argv.baseurl;
+}
+
 gulp.task('default', ['make']);
 
 gulp.task('make', [ 'images', 'animations', 'js', 'css', 'fonts' ]);
