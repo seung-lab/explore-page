@@ -144,7 +144,7 @@ class Superheroes extends TeaTime {
 					document.location.href = "https://www.youtube.com/watch?v=bwcuhbj2rSI";
 				}
 				else {
-					document.location.href = 'https://eyewire.org/signup';
+					document.location.href = `https://${GLOBAL.host}/signup`;
 				}
 			});
 		})

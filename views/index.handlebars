@@ -32,6 +32,10 @@
 		window.GLOBAL = { 
 			production: {{production}},
 		};
+
+		window.GLOBAL.host = document.location.hostname === 'localhost'
+			? "eyewire.org"
+			: document.location.host;
 	</script>
 
 	<script type="text/javascript" src="{{ base_url }}/js/intake.min.js"></script>

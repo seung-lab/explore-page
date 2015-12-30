@@ -2,6 +2,7 @@ let $ = require('jquery'),
 	Utils = require('../clientjs/utils.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
  	Easing = require('../clientjs/easing.js'),
+ 	GLOBAL = require('../clientjs/GLOBAL.js'),
  	Synapse = require('./synapse.js');
 
 let Login; // avoid circular reference
@@ -81,11 +82,12 @@ class Gateway extends Synapse { // You can only build within a pylon field
 
 			Utils.UI.curtainFall(function () {
 				$(window).off('unload.track');
+
 				if ($.cookie('visited')) {
-					document.location.href = 'https://eyewire.org/login';
+					document.location.href = `https://${GLOBAL.host}/login`;
 				}
 				else {
-					document.location.href = 'https://eyewire.org/signup';
+					document.location.href = `https://${GLOBAL.host}/signup`;
 				}
 			});
 

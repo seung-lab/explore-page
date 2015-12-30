@@ -2,6 +2,7 @@ let $ = require('jquery'),
 	Utils = require('../clientjs/utils.js'),
 	Easing = require('../clientjs/easing.js'),
 	Synapse = require('./synapse.js'),
+	GLOBAL = require('../clientjs/GLOBAL.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js');
 
 let Login = null;
@@ -152,7 +153,7 @@ class Header extends Synapse {
 			
 			Utils.UI.curtainFall(function () {
 				$(window).off('unload.track');
-				document.location.href = 'https://eyewire.org/signup';
+				document.location.href = `https://${GLOBAL.host}/signup`;
 			})
 		});
 
