@@ -2,11 +2,16 @@
 let Utils = require('../../clientjs/utils.js'),
 		$ = require('jquery');
 
-let _t = 0;
+let _t = 0;	// Current t
+let _tg = 0;  // Queue t
 let _prev_t = 0;
 let _slide_count = 0;
 let _animation_count = 0;
 let _current_slide = 0;
+let _previous_slide = 0;
+let _step = 0;
+
+let _forward = true; // Forward
 
 let NeuronCoordinator = {
 	neurostates: [],
@@ -18,18 +23,37 @@ NeuronCoordinator.initialize = function (neurostates, slide_count) {
 	_slide_count = slide_count;
 
 	if (!NC.initialized) {
-
 		NC.setAnimations(neurostates);
 		NC.initialized = true;
 	}
+
+	console.log(neurostates);
 };
 
 NeuronCoordinator.updateT = function (t) {
+	_previous_slide = _current_slide;
 	_current_slide = t;
-	_t = t / _slide_count; 	// Normalized t
 
-	// console.log(_slide_count);
-	// console.log("_t:" + _t + " slide:" + t);
+	let neurostates = NeuronCoordinator.neurostates;
+
+	_forward = NeuronCoordinator.direction(t); // Boolean 
+
+	// Update global queue
+	// What if slide has more than a single animation?
+	neurostates.forEach(function(neurostate) {
+		if (neurostate.slide == _current_slide) {
+			if (_forward) {
+				_tg += neurostate.normed_duration;
+			} else {
+				_tg -= neurostate.normed_duration;
+			}
+		}
+	});
+
+	console.log("_previous_slide: " + _previous_slide);
+	console.log("_current_slide: " + _current_slide);
+	console.log("queue " + _tg);	
+
 };
 
 NeuronCoordinator.direction = function (t) {
@@ -38,22 +62,22 @@ NeuronCoordinator.direction = function (t) {
 	_prev_t = t;
 
 	if (t >= prev) {
-		return "forward";
+		return true; // Forward
 	} 
 	
-	return "reverse";
+	return false; // Reverse
 };
 
 NeuronCoordinator.setAnimations = function (neurostates) {
 	NeuronCoordinator.neurostates = neurostates || [];
-	let normalization = computeNormalization(neurostates);
+	let normalization = computeNormalization(neurostates); // Total duration of all animations
+		_step = 1 /normalization; // Animation step
 
 	let begin = 0;
 	NeuronCoordinator.neurostates.forEach(function (neurostate) {
 		neurostate.normed_duration = neurostate.duration / normalization;
 
 		neurostate.begin = begin;
-		counter++;
 		begin += neurostate.normed_duration;
 	});
 };
@@ -133,22 +157,19 @@ function computeNormalization (neurostates) {
 	}, 0);
 }
 
-NeuronCoordinator.makeMoves = function (progressions) {
-	let new_actives = [];
-	let moves = progressions[_current_slide];
-	let direction = NeuronCoordinator.direction(t);
+NeuronCoordinator.animate = function () {
+	let animation = NeuronCoordinator.currentAnimation();
 
-	for (let i = 0; i <= moves; i++) {
-		if (direction == "forward") {
-			actives.push(NeuronCoordinator.nextAnimation());
-
-		}
-		if (direction = "reverse") {
-			actives.push(NeuronCoordinator.previousAnimation());
-		}
+	if ((_t < _tg) && (_forward)) { // If some delta (queue) exists
+		console.log("animating " + animation.name);
+		animation.forward();
+		_t += _step;
 	}
-
-	return new_actives;
+	else if ((_t > _tg) && (!_forward)) {
+		console.log("animating " + animation.name);
+		animation.reverse();
+		_t -= _step;
+	}
 }
 
 /*

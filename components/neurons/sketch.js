@@ -84,10 +84,7 @@ let sprout = function (p) {
 
 	p.draw = function() {
 		p.clear();
-
-		// Run the animation loop
-		animate(_direction);
-
+		NeuronCoordinator.animate();
 	}
 
 	function nnn_start () {
@@ -115,166 +112,126 @@ let sprout = function (p) {
 	}
 
 	function set_states () {
-		// _neurostates = [
-		//     {
-		//         name: "Scatter",
-		// 		duration: 30,
-		// 		forward: _nnn.scatter(),
-		// 		reverse: _nnn.rebound()
-		//     },
-		//     {
-		//    		name: "Scatter2",
-		// 		duration: 10,
-		// 		forward: _nnn.scatter_2(),
-		// 		reverse: _nnn.rebound()
-		//     },
-		//     {
-		//     	name: "Grow",
-		// 		duration: 75,
-		// 		forward: _nnn.grow(),
-		// 		reverse: 1
-		//     }
-		// ];
 
 		/*  Given: 9 slides
-			Number of Next() calls to make per slide
+			Neurostate object to load per slide
 	
 			Symetrical in both directions
 
 		*/
 
-		_progressions = [
-			{
-				0: 0
-			},
-			{
-				1: 2
-			},
-			{
-				2: 2
-			},
-			{
-				3: 1
-			},
-			{
-				4: 1
-			},
-			{
-				5: 2
-			},
-			{
-				6: 2
-			},
-			{
-				7: 1
-			},
-			{
-				8: 1
-			}
-		];
-
 		_neurostates = [
+			{
+		        name: "Initialize",
+				duration: 1,
+				forward: _nnn.initialize,
+				reverse: _nnn.initialize,
+				slide: 0,
+				p: p
+		    },
 		    {
 		        name: "Scatter",
-				duration: 30,
-				forward: _nnn.scatter(),
-				reverse: _nnn.rebound()
+				duration: 100,
+				forward: _nnn.scatter,
+				reverse: _nnn.rebound,
+				slide: 1,
+				p: p
 		    },
-		    {
-		    	name: "Twinkle",
-				duration: 30,
-				loop: true,
-				forward: _nnn.twinkle(),
-				reverse: _nnn.twinkle()
-		    },
+		  //   {
+		  //   	name: "Twinkle",
+				// duration: 100,
+				// forward: _nnn.twinkle,
+				// reverse: _nnn.twinkle,
+				// loop: true,
+				// slide: 1,
+				// p: p
+		  //   },
 		    {
 		   		name: "Scatter2",
-				duration: 10,
-				forward: _nnn.scatter(),
-				reverse: _nnn.rebound()
+				duration: 100,
+				forward: _nnn.scatter_2,
+				reverse: _nnn.rebound,
+				slide: 2,
+				p: p
 		    },
 		    {
 		    	name: "Grow",
 				duration: 75,
-				forward: _nnn.grow(),
-				reverse: _nnn.fadeOut()
+				forward: _nnn.grow,
+				reverse: _nnn.fadeOut,
+				slide: 2,
+				p: p
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 60,
+				duration: 100,
+				forward: _nnn.synapse,
+				reverse: _nnn.synapse,
 				loop: true,
-				forward: _nnn.synapse(),
-				reverse: _nnn.synapse()
+				slide: 3,
+				p: p
 		    },
 		    {
 		    	name: "Fade",
-				duration: 60,
-				forward: _nnn.fadeOut(),
-				reverse: _nnn.fadeIn()	
+				duration: 100,
+				forward: _nnn.fadeOut,
+				reverse: _nnn.fadeIn,
+				slide: 4,
+				p: p	
 		    },
 		    {
 		    	name: "Center",
-				duration: 30,
-				forward: _nnn.rebound2(),
-				reverse: _nnn.lastPosition()	
+				duration: 100,
+				forward: _nnn.rebound2,
+				reverse: _nnn.lastPosition,
+				slide: 5,
+				p: p	
 		    },
 		    {
 		    	name: "Stars",
-				duration: 30,
-				forward: _nnn.staryNight(),
-				reverse: _nnn.rebound()
+				duration: 100,
+				forward: _nnn.staryNight,
+				reverse: _nnn.rebound,
+				slide: 5,
+				p: p
 		    },
 		    {
 		    	name: "Center2",
-				duration: 30,
-				forward: _nnn.rebound(),
-				reverse: _nnn.staryNight()
+				duration: 100,
+				forward: _nnn.rebound,
+				reverse: _nnn.staryNight,
+				slide: 6,
+				p: p
 		    },
 		    {
 		    	name: "Brain",
-				duration: 30,
-				forward: _nnn.brainiac(),
-				reverse: _nnn.rebound()
+				duration: 100,
+				forward: _nnn.brainiac,
+				reverse: _nnn.rebound,
+				slide: 6,
+				p: p
 		    },
 		    {
 		    	name: "Connect",
-				duration: 30,
-				forward: _nnn.kruskal(),
-				reverse: _nnn.fadeOut()	
+				duration: 100,
+				forward: _nnn.kruskal,
+				reverse: _nnn.fadeOut,
+				slide: 7,
+				p: p	
 		    },
 		    {
 		    	name: "Drake",
-				duration: 30,
-				forward: _nnn.plague(),
-				reverse: _nnn.fadeOut()
+				duration: 100,
+				forward: _nnn.plague,
+				reverse: _nnn.fadeOut,
+				slide: 8,
+				p: p
 		    }
 		];
 
 		_neurostates = _neurostates.map(function (args) {
 		    return new Neurostate(args);
 		});	
-	}
-
-	function animate(_direction) {
-
-		if (!_actives.length) {
-			return;
-		}
-
-		if (_direction == "forward") {
-			// _actives[0].forward_progress();
-			console.log(_actives[0].forward_progress());
-		} 
-
-		if (_direction == "reverse") {
-			// _actives[0].reverse_progress();
-			console.log(_actives[0].reverse_progress());
-		}
-
-		if (_actives[0].done) {
-			_actives[0].shift();
-		}
-
 	}
 
 	// Deal with resize events
@@ -301,20 +258,6 @@ module.exports.updateState = function (t) {
 	}
 	
 	NeuronCoordinator.updateT(t);
-
-	var dir = NeuronCoordinator.direction(t); // Also updates _prev_t
-
-	// Empty animation queue if we change direction
-	if (_direction !== dir) {
-		_actives = [];
-	}
-
-	_direction = dir;
-	
-	_actives.push(
-		NeuronCoordinator.makeMoves(_progressions)
-	);
-	// console.log(_actives);
 };
 
 module.exports.canvas = function () {

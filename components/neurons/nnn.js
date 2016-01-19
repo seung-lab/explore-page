@@ -139,6 +139,8 @@ function NNN (args = {}) {
 		// Setup Neurons
 		_this.activate();
 
+		_this.render();
+
 		_this.active_neurons.forEach(function(neuron) {
 			if (_this.done()) {
 				return; 
