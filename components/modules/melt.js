@@ -125,7 +125,7 @@ class Melt extends TeaTime {
 	}
 
 	next () { // next slide
-		if (TOTAL_FRAMES - this.currentFrame() < 1) {
+		if (TOTAL_FRAMES - this.currentFrame() <= 1) {
 			this.parent.moduleComplete();
 		} else {
 			this.scrollHandler(true)
