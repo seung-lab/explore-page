@@ -165,6 +165,7 @@ NeuronCoordinator.animate = function () {
 	if (_forward) {
 		if (_t < _tg) { // If some delta (queue) exists
 			console.log("animating " + animation.name);
+			_p.clear();
 			animation.forward();
 			_t += _step;
 
@@ -172,6 +173,7 @@ NeuronCoordinator.animate = function () {
 		}
 		else if (animation.loop) {
 			console.log("looping " + animation.name);
+			_p.clear();
 			animation.forward(); // Loop without incrementing _tg | _t
 
 			return;
@@ -180,6 +182,7 @@ NeuronCoordinator.animate = function () {
 	else {
 		if (_t > _tg) {
 			console.log("animating " + animation.name);
+			_p.clear();
 			animation.reverse();
 			_t -= _step;
 
@@ -187,6 +190,7 @@ NeuronCoordinator.animate = function () {
 		}
 		else if (animation.loop) {
 			console.log("looping " + animation.name);
+			_p.clear();
 			animation.reverse(); // Loop without incrementing _tg | _t
 
 			return;	
@@ -195,7 +199,7 @@ NeuronCoordinator.animate = function () {
 
 	console.log("No Loop");
 	_p.noLoop(); // Shut er' down
-	
+
 }
 
 /*

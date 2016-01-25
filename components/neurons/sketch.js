@@ -86,7 +86,6 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		p.clear();
 		NeuronCoordinator.animate();
 	}
 
