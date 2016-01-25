@@ -11,6 +11,8 @@ let _current_slide = 0;
 let _previous_slide = 0;
 let _step = 0;
 
+let _p; //P5 global
+
 let _forward = true; // Forward
 
 let NeuronCoordinator = {
@@ -18,9 +20,11 @@ let NeuronCoordinator = {
 	initialized: false,
 };
 
-NeuronCoordinator.initialize = function (neurostates, slide_count) {
+NeuronCoordinator.initialize = function (neurostates, slide_count, p) {
 	let NC = NeuronCoordinator;
 	_slide_count = slide_count;
+
+	_p = p;
 
 	if (!NC.initialized) {
 		NC.setAnimations(neurostates);
@@ -39,7 +43,6 @@ NeuronCoordinator.updateT = function (t) {
 	_forward = NeuronCoordinator.direction(t); // Boolean 
 
 	// Update global queue
-	// What if slide has more than a single animation?
 	neurostates.forEach(function(neurostate) {
 		if (neurostate.slide == _current_slide) {
 			if (_forward) {
@@ -52,7 +55,6 @@ NeuronCoordinator.updateT = function (t) {
 
 	console.log("_previous_slide: " + _previous_slide);
 	console.log("_current_slide: " + _current_slide);
-	console.log("queue " + _tg);	
 
 };
 
@@ -160,10 +162,20 @@ function computeNormalization (neurostates) {
 NeuronCoordinator.animate = function () {
 	let animation = NeuronCoordinator.currentAnimation();
 
-	if ((_t < _tg) && (_forward)) { // If some delta (queue) exists
-		console.log("animating " + animation.name);
-		animation.forward();
-		_t += _step;
+	if (_forward) {
+		if (_t < _tg) { // If some delta (queue) exists
+			console.log("animating " + animation.name);
+			animation.forward();
+			_t += _step;
+		}
+		else if (animation.loop) {
+			console.log("looping " + animation.name);
+			animation.forward(); // Loop without incrementing _tg | _t
+		}
+		else if (_t > 0) {
+			console.log("No Loop");
+			_p.noLoop();
+		}
 	}
 	else if ((_t > _tg) && (!_forward)) {
 		console.log("animating " + animation.name);

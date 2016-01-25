@@ -28,6 +28,9 @@ let _canvas = $.Deferred();
 
 let growing = true;
 
+// Global ref to looper()
+let _looper;
+
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -58,7 +61,7 @@ let sprout = function (p) {
 	};
 
 	p.setup = function () {
-		p.frameRate(60);
+		p.frameRate(30);
 
 		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
@@ -77,7 +80,7 @@ let sprout = function (p) {
 		set_states();
 
 		// Setup NeuronCoordinator
-		NeuronCoordinator.initialize(_neurostates, _options.slide_count);
+		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
 
 		console.log('starting p5...');
 	};
@@ -137,15 +140,15 @@ let sprout = function (p) {
 				slide: 1,
 				p: p
 		    },
-		  //   {
-		  //   	name: "Twinkle",
-				// duration: 100,
-				// forward: _nnn.twinkle,
-				// reverse: _nnn.twinkle,
-				// loop: true,
-				// slide: 1,
-				// p: p
-		  //   },
+		    {
+		    	name: "Twinkle",
+				duration: 15,
+				forward: _nnn.twinkle,
+				reverse: _nnn.twinkle,
+				loop: true,
+				slide: 1,
+				p: p
+		    },
 		    {
 		   		name: "Scatter2",
 				duration: 100,
@@ -156,7 +159,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Grow",
-				duration: 75,
+				duration: 100,
 				forward: _nnn.grow,
 				reverse: _nnn.fadeOut,
 				slide: 2,
@@ -164,7 +167,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 100,
+				duration: 15,
 				forward: _nnn.synapse,
 				reverse: _nnn.synapse,
 				loop: true,
@@ -234,6 +237,11 @@ let sprout = function (p) {
 		});	
 	}
 
+	_looper = function () {
+		p.loop();
+		console.log("looping");
+	}
+
 	// Deal with resize events
 	window.onresize = function() { 
 		$(canvas).width(window.innerWidth)
@@ -256,8 +264,11 @@ module.exports.updateState = function (t) {
 	if (!NeuronCoordinator.initialized) {
 		return;
 	}
-	
+
 	NeuronCoordinator.updateT(t);
+
+	// Get things moving again
+	_looper(); 
 };
 
 module.exports.canvas = function () {

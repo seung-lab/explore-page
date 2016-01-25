@@ -20,14 +20,7 @@ function Neurostate (args = {}) {
 	this.begin;
 
 	let _this = this;
-
-	this.forward_progress = function () {
-		_this.forward();		// Call animation
-	}
-
-	this.reverse_progress = function () {
-		_this.reverse();
-	}
+	
 }
 
 module.exports = Neurostate;
