@@ -167,21 +167,35 @@ NeuronCoordinator.animate = function () {
 			console.log("animating " + animation.name);
 			animation.forward();
 			_t += _step;
+
+			return;
 		}
 		else if (animation.loop) {
 			console.log("looping " + animation.name);
 			animation.forward(); // Loop without incrementing _tg | _t
-		}
-		else if (_t > 0) {
-			console.log("No Loop");
-			_p.noLoop();
+
+			return;
 		}
 	}
-	else if ((_t > _tg) && (!_forward)) {
-		console.log("animating " + animation.name);
-		animation.reverse();
-		_t -= _step;
+	else {
+		if (_t > _tg) {
+			console.log("animating " + animation.name);
+			animation.reverse();
+			_t -= _step;
+
+			return;
+		}
+		else if (animation.loop) {
+			console.log("looping " + animation.name);
+			animation.reverse(); // Loop without incrementing _tg | _t
+
+			return;	
+		}
 	}
+
+	console.log("No Loop");
+	_p.noLoop(); // Shut er' down
+	
 }
 
 /*
