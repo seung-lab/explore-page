@@ -174,7 +174,38 @@ function NNN (args = {}) {
 	}
 
 	this.twinkle = function() {
+		let step = p.PI / 30;
+		let twinkle_threshold;
 
+		neuro_loop: // label
+		for (let i = _this.neurons.length -1; i >= 0; i--) {
+			let neuron = _this.neurons[i];
+			let soma = neuron.nodes[0];
+
+				
+			if (soma.neuro_star) {
+				soma.twinkle_angle += step; 
+				let a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-255)
+
+				soma.render_soma(5, a); // Effect Opacity here?
+
+				if (a == 1) {
+					soma.twinkle_angle = 0;      	// Reset angle
+					soma.neuro_star = false;       	// Reset State
+				}
+			} 
+			else {
+				
+				soma.render_soma(5);
+
+			}
+		
+			twinkle_threshold = p.random(1); // Set threshold
+
+			if ((!soma.neuro_star) && (twinkle_threshold > 0.75)) {
+				soma.neuro_star = true;
+			}
+		}
 	}
 
 	this.fadeIn = function() {
@@ -215,7 +246,7 @@ function NNN (args = {}) {
 
 
 
-	// Add neuron to the network --> Accepts P5.Vector for Arg
+	// Add neuron to the network
 	this.add_neuron = function(count) {
 		let x, y;
 

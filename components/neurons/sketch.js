@@ -133,7 +133,7 @@ let sprout = function (p) {
 		    },
 		    {
 		        name: "Scatter",
-				duration: 100,
+				duration: 75,
 				forward: _nnn.scatter,
 				reverse: _nnn.rebound,
 				slide: 1,
@@ -141,7 +141,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Twinkle",
-				duration: 15,
+				duration: 30,
 				forward: _nnn.twinkle,
 				reverse: _nnn.twinkle,
 				loop: true,
@@ -150,7 +150,7 @@ let sprout = function (p) {
 		    },
 		    {
 		   		name: "Scatter2",
-				duration: 100,
+				duration: 75,
 				forward: _nnn.scatter_2,
 				reverse: _nnn.rebound,
 				slide: 2,
@@ -158,7 +158,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Grow",
-				duration: 100,
+				duration: 75,
 				forward: _nnn.grow,
 				reverse: _nnn.fadeOut,
 				slide: 2,

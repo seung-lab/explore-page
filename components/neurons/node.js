@@ -45,6 +45,10 @@ function Node (args = {}) {
 	// Not in constructor
 	this.acceleration = p.createVector(0,0);
 	this.timer = this.neuron_timer;
+
+	// Neuro_star
+	this.twinkle_angle = 0;
+	this.neuro_star = false;
 	
 	// Setup public arrays for children Nodes and Adjacency List
 	this.children = [];
@@ -536,11 +540,12 @@ function Node (args = {}) {
 
 	}
 
-	this.render_soma = function(rad) {
+	this.render_soma = function(rad, a = 1) { // Default a (alpha) to 255
+		a *= 255; // Up normalized value
 		// Draw Soma
 		p.push();
 			p.noStroke();
-			p.fill(115,135,150); // blue
+			p.fill(115,135,150, a); // blue
 			let soma_radius = _this.neuron_timer;
 			p.ellipse(_this.pt_2().x,_this.pt_2().y,rad,rad);
 		p.pop();
