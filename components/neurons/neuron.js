@@ -94,7 +94,7 @@ function Neuron (args) {
 		}
 
 		// Special Case for Soma
-		_this.nodes[0].render_soma(10);
+		_this.nodes[0].render_soma(15);
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
 		_this.boutons.forEach(function (bouton) {

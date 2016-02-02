@@ -370,36 +370,31 @@ function Node (args = {}) {
 	 *  distribution of the somas
 	*/
 
-	this.spread = function(somas, rad, multiplier) {		
+	this.spread = function(somas, rad, multiplier) {
 		_radius = rad;
-
-		_this.pow *= multiplier; // Factor in timer
 
 		// Set distribute to true
 		_this.distribute = true;
-
-		// Test Radius
-		// _this.render_radius();
 		
 		let cen = _this.seek(_center).mult(-1); // Simply seek away from center
-		// let edg = _this.check_edges(); // Move away from edges
-		let sep = _this.separate(somas); // Move away from eachother
+		let sep = _this.separate(somas); 		// Move away from eachother
+		// let edg = _this.check_edges(); 		// Move away from edges
 
-		// Vertical Multiplier
-		let vm = p.height / (p.width * 1.5);
+		// Aspect Ratio
+		let aspect_ratio = p.height / p.width;
 		
-		cen.y = cen.y * vm;
-		// edg.y = edg.y * vm;
-		sep.y = sep.y * vm;
+		cen.y *= aspect_ratio;
+		sep.y *= aspect_ratio;
+		// edg.y = edg.y * aspect_ratio;
 
-		cen.mult(_this.pow * 10 * 2);
+		cen.mult(_this.pow * multiplier);
+		sep.mult(_this.pow * multiplier);
 		// edg.mult(_this.pow * 1.25);
-		sep.mult(_this.pow * 10 * 2);
 
 		// Add the force vectors to acceleration
 		_this.applyForce(cen);
-		// _this.applyForce(edg);
 		_this.applyForce(sep);
+		// _this.applyForce(edg);
 
 		let pm = p.max(p.height, p.width);
 		pm = p.map(pm, 400, 3000, 0.8, 0.95);

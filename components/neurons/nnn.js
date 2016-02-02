@@ -10,7 +10,8 @@
 let $ = require('jquery'),
 	p5 = require('p5'),
 	Spring = require('./spring.js'),
-	Neuron = require('./neuron.js');
+	Neuron = require('./neuron.js'),
+	Easings = require('../../clientjs/easing.js');
 
 function NNN (args = {}) {
 	// Private arguments from constructor
@@ -29,6 +30,8 @@ function NNN (args = {}) {
 	this.somas = [];
 	// Spring system array
 	this.springs = [];
+	// Power Multiplier
+	this.time_power; 
 
 	this.max_depth;
 	this.num_branches;
@@ -39,23 +42,39 @@ function NNN (args = {}) {
 
 	let _this = this;
 
-	let _scale_power_1,
-		_scale_power_2;
+	let _scatter_multiplier_1,
+		_scatter_multiplier_2;
+
+	// Private Methods
+
+
+	// Public Methods
 
 	this.initialize = function() {
-		// Initialize Neuron
-		_this.add_neuron(_this.num_neurons);
-
 		// Calculate power offset
 		// During scatter_2 --> Ensure consistant neuron density
 		// across different displays
 		if (p.width < 500) {
-			_scale_power_1 = 0.95;
-			_scale_power_2 = 1.07;
+			_scatter_multiplier_1 = 0.95;
+			_scatter_multiplier_2 = 1.08; // default 1.07
 		} else {
-			_scale_power_1 = 1.02;
-			_scale_power_2 = p.map(p.width, 3000, 400, 1, 1.1);
+			_scatter_multiplier_1 = 20;
+
+			console.log("p.width" + p.width);
+			_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
+			console.log("_scatter_multiplier_2 width " + _scatter_multiplier_2, Easings.parabolic(1-_scatter_multiplier_2));
+			_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
+			_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
+			_scatter_multiplier_2 *= 500;
+
+			console.log("_scatter_multiplier_2 " + _scatter_multiplier_2);
 		}
+
+		_this.time_power = p.map(window.innerWidth, 500, 2500, 1500, 2000);
+		console.log(_this.time_power);
+
+		// Initialize Neuron
+		_this.add_neuron(_this.num_neurons);
 	}
 
 	this.rebound = function() {
@@ -74,7 +93,7 @@ function NNN (args = {}) {
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
 				soma.render_soma(5);
-				soma.space(_this.somas, _scale_power_1); // Repel from center
+				soma.space(_this.somas, _scatter_multiplier_1); // Repel from center
 		});
 	}
 
@@ -83,7 +102,7 @@ function NNN (args = {}) {
 			let soma = neuron.nodes[0];
 				soma.render_soma(5);
 				soma.reset_pow();
-				soma.space(_this.somas, _scale_power_2); // Repel from center
+				soma.space(_this.somas, _scatter_multiplier_2); // Repel from center
 
 			// _this.mst(); 
 			// Update spring positions --> Run through array
@@ -202,7 +221,7 @@ function NNN (args = {}) {
 		
 			twinkle_threshold = p.random(1); // Set threshold
 
-			if ((!soma.neuro_star) && (twinkle_threshold > 0.75)) {
+			if ((!soma.neuro_star) && (twinkle_threshold > 0.85)) {
 				soma.neuro_star = true;
 			}
 		}
@@ -269,8 +288,9 @@ function NNN (args = {}) {
 			// Grow time is inversely proportional to num_branches
 			if (window.innerWidth < 500) {
 				_this.neuron_timer = 1000 / _this.num_branches;	
-			} else {
-				_this.neuron_timer = 2000 / _this.num_branches;
+			} 
+			else {
+				_this.neuron_timer = this.time_power / _this.num_branches;
 			}
 
 			_this.neurons.push(

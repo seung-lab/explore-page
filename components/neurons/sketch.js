@@ -150,7 +150,7 @@ let sprout = function (p) {
 		    },
 		    {
 		   		name: "Scatter2",
-				duration: 75,
+				duration: 125,
 				forward: _nnn.scatter_2,
 				reverse: _nnn.rebound,
 				slide: 2,
@@ -158,7 +158,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Grow",
-				duration: 75,
+				duration: 100,
 				forward: _nnn.grow,
 				reverse: _nnn.fadeOut,
 				slide: 2,
