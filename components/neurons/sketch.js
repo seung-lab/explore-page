@@ -127,50 +127,56 @@ let sprout = function (p) {
 		        name: "Initialize",
 				duration: 1,
 				forward: _nnn.initialize,
-				reverse: _nnn.initialize,
-				slide: 0,
+				reverse: _nnn.rebound_1,
+				forward_slide: 0,
+				reverse_slide: 0,
 				p: p
 		    },
 		    {
 		        name: "Scatter",
 				duration: 75,
 				forward: _nnn.scatter,
-				reverse: _nnn.rebound,
-				slide: 1,
+				reverse: _nnn.twinkle,
+				forward_slide: 1,
+				reverse_slide: 1,
 				p: p
 		    },
 		    {
 		    	name: "Twinkle",
-				duration: 30,
+				duration: 1,
 				forward: _nnn.twinkle,
-				reverse: _nnn.twinkle,
+				reverse: _nnn.rebound_2,
 				loop: true,
-				slide: 1,
+				forward_slide: 1,
+				reverse_slide: 1,
 				p: p
 		    },
 		    {
 		   		name: "Scatter2",
 				duration: 125,
 				forward: _nnn.scatter_2,
-				reverse: _nnn.rebound,
-				slide: 2,
+				reverse: _nnn.fadeout,
+				forward_slide: 2,
+				reverse_slide: 1,
 				p: p
 		    },
 		    {
 		    	name: "Grow",
 				duration: 100,
 				forward: _nnn.grow,
-				reverse: _nnn.fadeOut,
-				slide: 2,
+				reverse: _nnn.grow, // Will simply render neurons
+				forward_slide: 2,
+				reverse_slide: 2,
 				p: p
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 15,
+				duration: 1,
 				forward: _nnn.synapse,
 				reverse: _nnn.synapse,
 				loop: true,
-				slide: 3,
+				forward_slide: 3,
+				reverse_slide: 3,
 				p: p
 		    },
 		    {
@@ -178,7 +184,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.fadeOut,
 				reverse: _nnn.fadeIn,
-				slide: 4,
+				forward_slide: 4,
+				reverse_slide: 4,
 				p: p	
 		    },
 		    {
@@ -186,7 +193,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.rebound2,
 				reverse: _nnn.lastPosition,
-				slide: 5,
+				forward_slide: 5,
+				reverse_slide: 5,
 				p: p	
 		    },
 		    {
@@ -194,7 +202,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.staryNight,
 				reverse: _nnn.rebound,
-				slide: 5,
+				forward_slide: 5,
+				reverse_slide: 5,
 				p: p
 		    },
 		    {
@@ -202,7 +211,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.rebound,
 				reverse: _nnn.staryNight,
-				slide: 6,
+				forward_slide: 6,
+				reverse_slide: 6,
 				p: p
 		    },
 		    {
@@ -210,7 +220,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.brainiac,
 				reverse: _nnn.rebound,
-				slide: 6,
+				forward_slide: 6,
+				reverse_slide: 6,
 				p: p
 		    },
 		    {
@@ -218,7 +229,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.kruskal,
 				reverse: _nnn.fadeOut,
-				slide: 7,
+				forward_slide: 7,
+				reverse_slide: 7,
 				p: p	
 		    },
 		    {
@@ -226,7 +238,8 @@ let sprout = function (p) {
 				duration: 100,
 				forward: _nnn.plague,
 				reverse: _nnn.fadeOut,
-				slide: 8,
+				forward_slide: 8,
+				reverse_slide: 8,
 				p: p
 		    }
 		];
@@ -238,7 +251,7 @@ let sprout = function (p) {
 
 	_looper = function () {
 		p.loop();
-		console.log("looping");
+		console.log("Sketch is running, looping");
 	}
 
 	// Deal with resize events

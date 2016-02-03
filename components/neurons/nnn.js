@@ -50,32 +50,22 @@ function NNN (args = {}) {
 
 	// Public Methods
 
-	this.initialize = function() {
+	this.initialize = Utils.onceify(function() {
 		// Calculate power offset
 		// During scatter_2 --> Ensure consistant neuron density
 		// across different displays
-		if (p.width < 500) {
-			_scatter_multiplier_1 = 0.95;
-			_scatter_multiplier_2 = 1.08; // default 1.07
-		} else {
-			_scatter_multiplier_1 = 20;
+		_scatter_multiplier_1 = 20;
 
-			console.log("p.width" + p.width);
-			_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
-			console.log("_scatter_multiplier_2 width " + _scatter_multiplier_2, Easings.parabolic(1-_scatter_multiplier_2));
-			_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
-			_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
-			_scatter_multiplier_2 *= 500;
-
-			console.log("_scatter_multiplier_2 " + _scatter_multiplier_2);
-		}
+		_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
+		_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
+		_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
+		_scatter_multiplier_2 *= 500;
 
 		_this.time_power = p.map(window.innerWidth, 500, 2500, 1500, 2000);
-		console.log(_this.time_power);
 
 		// Initialize Neuron
 		_this.add_neuron(_this.num_neurons);
-	}
+	});
 
 	this.rebound = function() {
 		let ret = false;

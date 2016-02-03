@@ -30,8 +30,6 @@ NeuronCoordinator.initialize = function (neurostates, slide_count, p) {
 		NC.setAnimations(neurostates);
 		NC.initialized = true;
 	}
-
-	console.log(neurostates);
 };
 
 NeuronCoordinator.updateT = function (t) {
@@ -43,15 +41,37 @@ NeuronCoordinator.updateT = function (t) {
 	_forward = NeuronCoordinator.direction(t); // Boolean 
 
 	// Update global queue
-	neurostates.forEach(function(neurostate) {
-		if (neurostate.slide == _current_slide) {
-			if (_forward) {
+	// neurostates.forEach(function(neurostate) {
+	// 	if (neurostate.slide == _current_slide) {
+	// 		if (_forward) {
+	// 			_tg += neurostate.normed_duration;
+	// 		} else {
+	// 			_tg -= neurostate.normed_duration;
+	// 		}
+	// 	}
+	// });
+
+	// Update global queue
+	if (_forward) {
+		for (let i = 0; i < neurostates.length; i++) {
+			let neurostate = neurostates[i];
+			
+			if (neurostate.forward_slide == _current_slide) {
 				_tg += neurostate.normed_duration;
-			} else {
-				_tg -= neurostate.normed_duration;
+				console.log("Forwards!");
 			}
 		}
-	});
+	}		
+	else {
+		for (let i = neurostates.length - 1; i >= 0 ; i--) { // Loop backwards through array for reverse
+			let neurostate = neurostates[i];
+
+			if (neurostate.reverse_slide == _current_slide) {
+				_tg -= neurostate.normed_duration;
+				console.log("Reverse!");
+			}
+		}
+	}
 
 	console.log("_previous_slide: " + _previous_slide);
 	console.log("_current_slide: " + _current_slide);
