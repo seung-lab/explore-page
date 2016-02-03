@@ -81,6 +81,7 @@ let sprout = function (p) {
 
 		// Setup NeuronCoordinator
 		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
+		NeuronCoordinator.updateT(0);
 
 		console.log('starting p5...');
 	};
@@ -125,7 +126,7 @@ let sprout = function (p) {
 		_neurostates = [
 			{
 		        name: "Initialize",
-				duration: 1,
+				duration: 75,
 				forward: _nnn.initialize,
 				reverse: _nnn.rebound_1,
 				forward_slide: 0,
@@ -146,9 +147,9 @@ let sprout = function (p) {
 				duration: 1,
 				forward: _nnn.twinkle,
 				reverse: _nnn.rebound_2,
-				loop: true,
 				forward_slide: 1,
 				reverse_slide: 1,
+				loop: true,
 				p: p
 		    },
 		    {
@@ -251,7 +252,7 @@ let sprout = function (p) {
 
 	_looper = function () {
 		p.loop();
-		console.log("Sketch is running, looping");
+		console.log("Sketch is running..");
 	}
 
 	// Deal with resize events

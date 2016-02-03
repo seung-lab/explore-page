@@ -15,6 +15,7 @@ function Neurostate (args = {}) {
 
 	this.forward_slide = args.forward_slide || 0;
 	this.reverse_slide = args.forward_slide || 0;
+	
 	this.loop = args.loop || false;
 
 	this.normed_duration;

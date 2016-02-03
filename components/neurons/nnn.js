@@ -67,7 +67,7 @@ function NNN (args = {}) {
 		_this.add_neuron(_this.num_neurons);
 	});
 
-	this.rebound = function() {
+	this.rebound_1 = function() {
 		let ret = false;
 
 		// Once the MST is built...
@@ -217,6 +217,10 @@ function NNN (args = {}) {
 		}
 	}
 
+	this.blanket = function() {
+		
+	}
+
 	this.fadeIn = function() {
 		
 	}
@@ -229,7 +233,7 @@ function NNN (args = {}) {
 
 	}
 
-	this.rebound2 = function() {
+	this.rebound_2 = function() {
 
 	}
 
