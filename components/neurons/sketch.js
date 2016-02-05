@@ -26,7 +26,7 @@ let _neurostates = [],
 
 let _canvas = $.Deferred();
 
-let growing = true;
+let growing = true; 
 
 // Global ref to looper()
 let _looper;
@@ -139,12 +139,12 @@ let sprout = function (p) {
 				forward: _nnn.scatter,
 				reverse: _nnn.twinkle,
 				forward_slide: 1,
-				reverse_slide: 1,
+				reverse_slide: 0,
 				p: p
 		    },
 		    {
 		    	name: "Twinkle",
-				duration: 1,
+				duration: 15,
 				forward: _nnn.twinkle,
 				reverse: _nnn.rebound_2,
 				forward_slide: 1,
@@ -172,7 +172,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 1,
+				duration: 15,
 				forward: _nnn.synapse,
 				reverse: _nnn.synapse,
 				loop: true,
@@ -186,7 +186,7 @@ let sprout = function (p) {
 				forward: _nnn.fadeOut,
 				reverse: _nnn.fadeIn,
 				forward_slide: 4,
-				reverse_slide: 4,
+				reverse_slide: 3,
 				p: p	
 		    },
 		    {
@@ -195,7 +195,7 @@ let sprout = function (p) {
 				forward: _nnn.rebound2,
 				reverse: _nnn.lastPosition,
 				forward_slide: 5,
-				reverse_slide: 5,
+				reverse_slide: 4,
 				p: p	
 		    },
 		    {
@@ -204,7 +204,7 @@ let sprout = function (p) {
 				forward: _nnn.staryNight,
 				reverse: _nnn.rebound,
 				forward_slide: 5,
-				reverse_slide: 5,
+				reverse_slide: 4,
 				p: p
 		    },
 		    {
@@ -213,7 +213,7 @@ let sprout = function (p) {
 				forward: _nnn.rebound,
 				reverse: _nnn.staryNight,
 				forward_slide: 6,
-				reverse_slide: 6,
+				reverse_slide: 5,
 				p: p
 		    },
 		    {
@@ -222,7 +222,7 @@ let sprout = function (p) {
 				forward: _nnn.brainiac,
 				reverse: _nnn.rebound,
 				forward_slide: 6,
-				reverse_slide: 6,
+				reverse_slide: 5,
 				p: p
 		    },
 		    {
@@ -231,7 +231,7 @@ let sprout = function (p) {
 				forward: _nnn.kruskal,
 				reverse: _nnn.fadeOut,
 				forward_slide: 7,
-				reverse_slide: 7,
+				reverse_slide: 6,
 				p: p	
 		    },
 		    {
@@ -240,7 +240,7 @@ let sprout = function (p) {
 				forward: _nnn.plague,
 				reverse: _nnn.fadeOut,
 				forward_slide: 8,
-				reverse_slide: 8,
+				reverse_slide: 7,
 				p: p
 		    }
 		];

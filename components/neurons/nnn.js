@@ -59,7 +59,7 @@ function NNN (args = {}) {
 		_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
 		_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
 		_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
-		_scatter_multiplier_2 *= 500;
+		_scatter_multiplier_2 *= 250;
 
 		_this.time_power = p.map(window.innerWidth, 500, 2500, 1500, 2000);
 
@@ -119,7 +119,7 @@ function NNN (args = {}) {
 
 	this.activate = Utils.onceify(function() {
 
-		console.log('activate');
+		// console.log('activate');
 
 		for (let i = 0; i < _this.neurons.length; i++) {
 			let neuron = _this.neurons[i]
@@ -133,7 +133,7 @@ function NNN (args = {}) {
 			if (i == _this.neurons.length - 1) {
 				// Create seed branching
 				_this.active_neurons.forEach(function(active_neuron) {
-					console.log('neuron_setup');
+					// console.log('neuron_setup');
 					active_neuron.network_setup(); 
 				});
 
