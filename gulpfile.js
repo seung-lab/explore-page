@@ -108,7 +108,7 @@ gulp.task('css', [ ], function () {
 		stream.pipe(cssnano());
 	}
 		
-	stream.pipe(gulp.dest('dist/public/css/'))
+	return stream.pipe(gulp.dest('dist/public/css/'))
 
 	// del([
 	// 	'assets/css/sprites/**'
