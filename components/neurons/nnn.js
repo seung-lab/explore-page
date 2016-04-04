@@ -184,15 +184,15 @@ function NNN (args = {}) {
 
 	this.twinkle = function() {
 		let step = p.PI / 30;
-		let twinkle_threshold;
+		let threshold;
 
 		neuro_loop: // label
-		for (let i = _this.neurons.length -1; i >= 0; i--) {
+		for (let i = _this.neurons.length - 1; i >= 0; i--) {
 			let neuron = _this.neurons[i];
 			let soma = neuron.nodes[0];
 
 				
-			if (soma.neuro_star) {
+			if (soma.twinkle_bool) {
 				soma.twinkle_angle += step; 
 				let a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-255)
 
@@ -200,7 +200,7 @@ function NNN (args = {}) {
 
 				if (a == 1) {
 					soma.twinkle_angle = 0;      	// Reset angle
-					soma.neuro_star = false;       	// Reset State
+					soma.twinkle_bool = false;       	// Reset State
 				}
 			} 
 			else {
@@ -209,16 +209,34 @@ function NNN (args = {}) {
 
 			}
 		
-			twinkle_threshold = p.random(1); // Set threshold
+			threshold = p.random(1); // Set threshold
 
-			if ((!soma.neuro_star) && (twinkle_threshold > 0.85)) {
-				soma.neuro_star = true;
+			if ((!soma.twinkle_bool) && (threshold > 0.85)) {
+				soma.twinkle_bool = true;
 			}
 		}
 	}
 
-	this.blanket = function() {
-		
+	this.synapse = function() {
+		let threshold; 
+
+		_this.render(); // Render neurons
+
+		for (let i = _this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
+		// for (let i = 0; i >= 0; i--) { // Use active_neurons
+			let neuron = _this.active_neurons[i];
+			let soma = neuron.nodes[0];
+
+			if (neuron.propagate_bool) {
+				neuron.propagate(soma);
+			}
+
+			threshold = p.random(1); // Set threshold
+
+			if ((neuron.propagate_bool == false) && (threshold > 0.5)) {
+				neuron.propagate_bool = true;
+			}
+		}
 	}
 
 	this.fadeIn = function() {
@@ -226,10 +244,6 @@ function NNN (args = {}) {
 	}
 
 	this.fadeOut = function() {
-
-	}
-
-	this.synapse = function() {
 
 	}
 

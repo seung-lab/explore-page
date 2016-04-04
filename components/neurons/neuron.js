@@ -32,6 +32,8 @@ function Neuron (args) {
 	this.nodes = [];
 	this.boutons = [];
 
+	this.propagate_bool = false; // Are we propagating?
+
 	let _this = this;
 
 	let list = false;
@@ -131,16 +133,6 @@ function Neuron (args) {
 
 	}
 
-	// Send impulses down neuron branches
-	this.propagate = function() {
-
-		_this.nodes.forEach(function(node) {
-
-		});
-
-		// let segment = 
-	}
-
 	this.calc_arc_length = function(curve_pts, segments) {
 		let arc_length_1;
 		let arc_length_2;
@@ -148,17 +140,17 @@ function Neuron (args) {
 
 		function get_length(curve_pts, segments) {
 			let points = [];
-			let p1 = curve_pts[1];	// Curve Points
-			let p2 = curve_pts[2];
-			let c1 = curve_pts[0]; // Control Points
-			let c2 = curve_pts[3];
+			let p0 = curve_pts[0];	// Curve Points
+			let p1 = curve_pts[1];
+			let p2 = curve_pts[2]; // Control Points
+			let p3 = curve_pts[3];
 			let arc_length = 0;
 			
 			for (let i = 0; i <= segments; i++) { // Get points on curve
 				let step = 1 / segments;
 					step *= i; 
-				let x = p.curvePoint(p1.x, c1.x, c2.x, p2.x, step); // Find point on curve
-				let y = p.curvePoint(p1.y, c1.y, c2.y, p2.y, step); // Find point on curve
+				let x = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find point on curve
+				let y = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find point on curve
 				points.push(p.createVector(x,y));
 			}
 
@@ -194,7 +186,7 @@ function Neuron (args) {
 	this.calc_alp = function() {
 		let error = 1;
 		let segments = 2;
-		let speed = 15; // Assign constant speed for impulse to move
+		let speed = 2; // Assign constant speed for impulse to move
 
 		_this.nodes.forEach(function(node) {
 
@@ -203,10 +195,86 @@ function Neuron (args) {
 			}
 
 			let arc_length = _this.calc_arc_length(node.curve_pts, 1);
-			node.alp.push(speed/arc_length);
-			console.log("Neuron:" + _this.id +" Node:" + node.id + " Arc Length:" + arc_length + " ALP: " + node.alp);
+			node.alp = speed / arc_length;
+			// console.log("Neuron:" + _this.id +" Node:" + node.id + " Arc Length:" + arc_length + " ALP: " + node.alp);
 
 		});
+	}
+
+	// Send impulses down neuron branches
+	this.propagate = function(node) {
+
+		propagate_recursive(node);
+
+		return propagate_status();
+
+		function propagate_status() {
+			for (let i = _this.nodes.length - 1; i >= 1; i--) { // Start at 1 to avoid soma
+				if (_this.nodes[i].t < 1) {
+						return;
+				}
+			}
+
+			_this.nodes.forEach(function(segment){
+				segment.t = 0;
+			});
+
+			_this.propagate_bool = false; // Reset the propagation
+			return; // We're done
+
+		}
+
+		function propagate_recursive(node) {
+			node.children.forEach(function(child) {
+				if (child.t < 1) {
+					let p0 = child.curve_pts[0];	// Curve Points
+					let p1 = child.curve_pts[1];
+					let p2 = child.curve_pts[2]; // Control Points
+					let p3 = child.curve_pts[3];
+					
+					let x = p.curvePoint(p1.x, p1.x, p2.x, p3.x, child.t); // Find x point on curve
+					let y = p.curvePoint(p1.y, p1.y, p2.y, p3.y, child.t); // Find y point on curve
+
+					propagate_render(x,y); // Render impulse
+
+	 				child.t += child.alp; // Increment t by ALP
+
+					return;
+				}
+
+				propagate_recursive(child); // Recurssively propagate through all children.
+
+			});
+		}
+
+		// Debug impulse
+		function propagate_debug(x,y,p0,p1,p2,p3,id,t) {
+			p.push();
+				p.fill(255,0,0);
+				p.ellipse(x, y, 7.5, 7.5); // Impulse
+				// Render Curves
+				p.stroke(0,255,0); // dark blue
+				p.strokeWeight(2);
+				p.curve(
+					p1.x, p1.y,
+					p1.x, p1.y,
+					p2.x, p2.y,
+					p3.x, p3.y
+				);
+				Text
+				p.fill(0, 250, 0);
+				p.textSize(8);
+				p.text("ID: " + id + " T: " + t, x, y);
+			p.pop();
+		}
+
+		// Render impulse
+		function propagate_render(x,y) {
+			p.push();
+				p.fill(115,135,150);
+				p.ellipse(x, y, 5, 5); // Impulse
+			p.pop();
+		}
 	}
 
 	this.fadeOut = function() {

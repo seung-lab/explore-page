@@ -48,7 +48,7 @@ function Node (args = {}) {
 
 	// Neuro_star
 	this.twinkle_angle = 0;
-	this.neuro_star = false;
+	this.twinkle_bool = false;
 	
 	// Setup public arrays for children Nodes and Adjacency List
 	this.children = [];
@@ -58,8 +58,8 @@ function Node (args = {}) {
 	// Public array of vectors to contain coordinates for Catmull Rom paths
 	this.curve_pts = []; // 4 pts
 
-	// Public array containing Arc Length Parameterization for propagation of impulses
-	this.alp = []
+	this.alp; // Arc Length Parameterization for propagation of impulses
+	this.t = 0 // Distance along segment
 	
 	// Node Object :: Can only ever have a single parent
 	this.parent == null;
@@ -507,34 +507,34 @@ function Node (args = {}) {
 		*/
 
 		// Render Path Home
-		if (_this.size) {
-			p.noStroke();
-			// p.fill(41,59,73); // blue
-			p.fill(200); // white
-			p.ellipse(
-				_this.pt_1().x,
-				_this.pt_1().y,
-				5,
-				5
-			);
-			p.ellipse(
-				_this.position.x,
-				_this.position.y,
-				5,
-				5
-			);
-		}
+		// if (_this.size) {
+		// 	p.noStroke();
+		// 	// p.fill(41,59,73); // blue
+		// 	p.fill(200); // white
+		// 	p.ellipse(
+		// 		_this.pt_1().x,
+		// 		_this.pt_1().y,
+		// 		5,
+		// 		5
+		// 	);
+		// 	p.ellipse(
+		// 		_this.position.x,
+		// 		_this.position.y,
+		// 		5,
+		// 		5
+		// 	);
+		// }
 
-		if (_this.start_point) {
-			p.noStroke();
-			p.fill(200,0,0);
-			p.ellipse(
-				_this.position.x,
-				_this.position.y,
-				5,
-				5
-			);
-		}
+		// if (_this.start_point) {
+		// 	p.noStroke();
+		// 	p.fill(200,0,0);
+		// 	p.ellipse(
+		// 		_this.position.x,
+		// 		_this.position.y,
+		// 		5,
+		// 		5
+		// 	);
+		// }
 
 		// Debug Neighborhood
 		// p.push();
