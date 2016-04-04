@@ -57,6 +57,9 @@ function Node (args = {}) {
 	
 	// Public array of vectors to contain coordinates for Catmull Rom paths
 	this.curve_pts = []; // 4 pts
+
+	// Public array containing Arc Length Parameterization for propagation of impulses
+	this.alp = []
 	
 	// Node Object :: Can only ever have a single parent
 	this.parent == null;
@@ -118,7 +121,7 @@ function Node (args = {}) {
 	}
 
 	this.pt_1 = function() {
-			let p_1 = p.createVector();
+		let p_1 = p.createVector();
 		let isAlone =  _this.parent instanceof Node;
 		if (!isAlone) {
 			p_1 = _this.start.copy(); 
@@ -130,12 +133,12 @@ function Node (args = {}) {
 	}
 
 	this.pt_2 = function() {
-			let p_2 = p.createVector();
+		let p_2 = p.createVector();
 		return p_2.set(_this.position.x, _this.position.y);
 	}
 
 	this.pt_3 = function() {
-			let p_3 = p.createVector();
+		let p_3 = p.createVector();
 		if (_this.children.length == 1) {
 			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
 		} 
@@ -467,7 +470,11 @@ function Node (args = {}) {
 		p.strokeWeight(2);
 		p.noFill();
 			
-		// p.line(_this.start.x, _this.start.y, _this.position.x, _this.position.y);
+		_this.curve_pts[0] = _this.pt_0();
+		_this.curve_pts[1] = _this.pt_1();
+		_this.curve_pts[2] = _this.pt_2();
+		_this.curve_pts[3] = _this.pt_3();
+
 		// Render Curves
 		p.curve(
 			_this.pt_0().x, _this.pt_0().y,
@@ -476,24 +483,28 @@ function Node (args = {}) {
 			_this.pt_3().x, _this.pt_3().y
 		);
 
-		// p.curve(
-		// 	pts[0].x, pts[0].y,
-		// 	pts[1].x, pts[1].y,
-		// 	pts[2].x, pts[2].y,
-		// 	pts[3].x, pts[3].y
-		// );
+		/*
+			// p.curve(
+			// 	pts[0].x, pts[0].y,
+			// 	pts[1].x, pts[1].y,
+			// 	pts[2].x, pts[2].y,
+			// 	pts[3].x, pts[3].y
+			// );
+		*/
 
 		// For fun:
-		// pts = pts
-		// 	.map(function (v) {
-		// 		return [v.x, v.y]
-		// 	})
-		// 	.reduce(function (arr, vec) {
-		// 		arr.push(vec[0], vec[1])
-		// 		return arr;
-		// 	}, [])
+		/*
+			pts = pts
+				.map(function (v) {
+					return [v.x, v.y]
+				})
+				.reduce(function (arr, vec) {
+					arr.push(vec[0], vec[1])
+					return arr;
+				}, [])
 
-		// p.curve.apply(p, pts);
+			p.curve.apply(p, pts);
+		*/
 
 		// Render Path Home
 		if (_this.size) {

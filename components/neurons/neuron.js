@@ -126,8 +126,73 @@ function Neuron (args) {
 
 		}
 
+		debugger;
 		return true;
 
+	}
+
+	// Send impulses down neuron branches
+	this.propagate = function() {
+
+		_this.nodes.forEach(function(node) {
+
+		});
+
+		// let segment = 
+	}
+
+	this.calc_arc_length = function(curve_pts, segments) {
+		let arc_length_1;
+		let arc_length_2;
+		let error;
+
+		function get_length(curve_pts, segments) {
+			let points = [];
+			let p1 = curve_pts[1];	// Curve Points
+			let p2 = curve_pts[2];
+			let c1 = curve_pts[0]; // Control Points
+			let c2 = curve_pts[3];
+			
+			for (let i = 0; i <= segments; i++) { // Get points on curve
+				let step = 1 / segments;
+					step *= i; 
+				let x = p.curvePoint(p1.x, c1.x, c2.x, p2.x, step); // Find point on curve
+				let y = p.curvePoint(p1.y, c1.y, c2.y, p2.y, step); // Find point on curve
+				points.push(p.createVector(x,y));
+			}
+
+			for (let i = 1; i < points.length; i++) { // Apointsroximate arc length
+				arc_length += p.sqrt(p.sq(points[i].x - points[i-1].x) + p.sq(points[i].y - points[i-1].y));
+			}
+
+			return arc_length;
+
+		}
+		
+		arc_length_1 = get_length(curve_pts, segments);
+		arc_length_2 = get_length(curve_pts, segments*2);
+
+		error = arc_length_2 / arc_length_1;
+
+		if (error > 0.05) {
+			segments *= 2;
+			let arc_length_2 = _this.calc_arc_length(curve_pts, segments); // Recussively call until error < 5%
+		}
+
+		return arc_length_2;
+		
+	}
+
+	this.calc_alp = function() {
+		let error = 1;
+		let segments = 2;
+		let speed = 15; // Assign constant speed for impulse to move
+		_this.nodes.forEach(function(node) {
+
+			let arc_length = _this.calc_arc_length(node.curve_pts, 1);
+			node.alp.push(speed/arc_length);
+
+		});
 	}
 
 	this.fadeOut = function() {
