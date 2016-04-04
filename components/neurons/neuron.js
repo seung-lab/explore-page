@@ -122,11 +122,11 @@ function Neuron (args) {
 			// 	// });
 			// });
 
+			_this.calc_alp();
 			list = true;
 
 		}
 
-		debugger;
 		return true;
 
 	}
@@ -152,6 +152,7 @@ function Neuron (args) {
 			let p2 = curve_pts[2];
 			let c1 = curve_pts[0]; // Control Points
 			let c2 = curve_pts[3];
+			let arc_length = 0;
 			
 			for (let i = 0; i <= segments; i++) { // Get points on curve
 				let step = 1 / segments;
@@ -172,25 +173,38 @@ function Neuron (args) {
 		arc_length_1 = get_length(curve_pts, segments);
 		arc_length_2 = get_length(curve_pts, segments*2);
 
-		error = arc_length_2 / arc_length_1;
+		// Calculate percent error
+		function calc_error(less_precise, more_precise) {
+			return p.abs((less_precise - more_precise)/ more_precise) * 100
+		}
 
-		if (error > 0.05) {
+		error = calc_error(arc_length_1, arc_length_2);
+		// console.log("Arc Length 1: " + arc_length_1 + " Arc Length 2: " + arc_length_2 + " Percent Error: " + error + "%");
+
+		if (error > 0.1) {
+			// console.log("Significant Error");
 			segments *= 2;
-			let arc_length_2 = _this.calc_arc_length(curve_pts, segments); // Recussively call until error < 5%
+			arc_length_2 = _this.calc_arc_length(curve_pts, segments); // Recussively call until error < 5%
 		}
 
 		return arc_length_2;
-		
+
 	}
 
 	this.calc_alp = function() {
 		let error = 1;
 		let segments = 2;
 		let speed = 15; // Assign constant speed for impulse to move
+
 		_this.nodes.forEach(function(node) {
+
+			if (node.id == 0) {
+				return;
+			}
 
 			let arc_length = _this.calc_arc_length(node.curve_pts, 1);
 			node.alp.push(speed/arc_length);
+			console.log("Neuron:" + _this.id +" Node:" + node.id + " Arc Length:" + arc_length + " ALP: " + node.alp);
 
 		});
 	}
