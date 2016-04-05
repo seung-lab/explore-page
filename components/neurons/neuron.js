@@ -186,7 +186,7 @@ function Neuron (args) {
 	this.calc_alp = function() {
 		let error = 1;
 		let segments = 2;
-		let speed = 2; // Assign constant speed for impulse to move
+		let speed = 5; // Assign constant speed for impulse to move
 
 		_this.nodes.forEach(function(node) {
 

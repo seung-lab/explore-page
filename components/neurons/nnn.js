@@ -233,7 +233,7 @@ function NNN (args = {}) {
 
 			threshold = p.random(1); // Set threshold
 
-			if ((neuron.propagate_bool == false) && (threshold > 0.5)) {
+			if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
 				neuron.propagate_bool = true;
 			}
 		}
