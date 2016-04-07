@@ -360,7 +360,7 @@ class Galileo extends TeaTime {
 		let prevslide = this.slideAt(prev_t);
 
 		if (_this.sketch) {
-			console.log('Running Sketch!!');
+			console.log('Running Sketch');
 			NNNSketch.updateState(slide.index);
 		}
 

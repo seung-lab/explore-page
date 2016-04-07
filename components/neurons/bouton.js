@@ -21,8 +21,6 @@ function Bouton (args = {}) {
 	// By placing 'this' infront of the function name 'display'  it is now
 	// accessible outside of the scope of the object.
 	this.display = function () {
-		p.noStroke();
-		p.fill(115,135,150);
 		p.ellipse(
 			this.position.x,
 			this.position.y,

@@ -89,14 +89,20 @@ function Neuron (args) {
 	// Render the Neurons + Nodes
 	this.render = function() {
 		let n;
+
+		p.stroke(41,59,73); // dark blue
+		p.strokeWeight(2);
+		p.noFill();
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			n = _this.nodes[i];
 			n.render();
 		}
 
-		// Special Case for Soma
 		_this.nodes[0].render_soma(15);
+
+		p.noStroke();
+		p.fill(115,135,150);
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
 		_this.boutons.forEach(function (bouton) {
@@ -340,7 +346,7 @@ function Neuron (args) {
 				} 
 				else {
 					// Additional method for probabalistic branching
-					// Default rnd = 15% : could be push higher
+					// Default rnd = 15% : could be higher
 					let rnd = p.random(1);
 					if ((rnd < 0.25) && ((n.depth + 1) < _this.max_depth )) {
 						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right

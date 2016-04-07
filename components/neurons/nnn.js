@@ -154,7 +154,7 @@ function NNN (args = {}) {
 			if (_this.done()) {
 				return; 
 			}
-			
+
 			neuron.grow();
 
 		});

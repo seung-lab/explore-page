@@ -57,6 +57,10 @@ function Node (args = {}) {
 	
 	// Public array of vectors to contain coordinates for Catmull Rom paths
 	this.curve_pts = []; // 4 pts
+	this.p_0 = p.createVector();
+	this.p_1 = p.createVector();
+	this.p_2 = p.createVector();
+	this.p_3 = p.createVector();
 
 	this.alp; // Arc Length Parameterization for propagation of impulses
 	this.t = 0 // Distance along segment
@@ -75,6 +79,12 @@ function Node (args = {}) {
 
 	let _this = this;
 
+	// Setup curve array
+	_this.curve_pts[0] = _this.p_0;
+	_this.curve_pts[1] = _this.p_1;
+	_this.curve_pts[2] = _this.p_2;
+	_this.curve_pts[3] = _this.p_3;
+
 	// Private variables
 	let _radius = 0;
 	let _wandertheta = 0;
@@ -82,6 +92,7 @@ function Node (args = {}) {
 	let _maxspeed = 2.5;       // Default 2
 	let _reboundspeed = 10;       // Default 2
 	// let _maxforce = p.random(0.9, 1.15);    // Default 0.05
+
 	let _maxforce = 0.85;
 
 	let _center = p.createVector(p.width/2, p.height/2); // Center point
@@ -108,52 +119,68 @@ function Node (args = {}) {
 		n.addChild(_this);
 	}
 
-	// Set curve points
-	this.pt_0 = function() {
-		let p_0 = p.createVector();
-		if (_this.depth == 1 || _this.depth == 2) {
-			p_0 = _this.position; 
-			return p_0;
-		} 
-		else {
-			return p_0.set(_this.parent.parent.position.x,_this.parent.parent.position.y);
-		}
-	}
-
-	this.pt_1 = function() {
-		let p_1 = p.createVector();
-		let isAlone =  _this.parent instanceof Node;
-		if (!isAlone) {
-			p_1 = _this.start.copy(); 
-			return p_1;
-		} 
-		else {
-			return p_1.set(_this.parent.position.x,_this.parent.position.y);
-		}
-	}
-
-	this.pt_2 = function() {
-		let p_2 = p.createVector();
-		return p_2.set(_this.position.x, _this.position.y);
-	}
-
-	this.pt_3 = function() {
-		let p_3 = p.createVector();
-		if (_this.children.length == 1) {
-			return p_3.set(_this.children[0].position.x,_this.children[0].position.y);
-		} 
-		else if (this.children.length > 1) {
-			for (let i = 0; i < _this.children.length; i++) {
-				p_3.add(_this.children[i].position);
+	this.set_curve_pts = function() {
+		pt_0();
+		pt_1();
+		pt_2();
+		pt_3();
+		
+		// Set curve points
+		function pt_0() {
+			if (_this.depth == 1 || _this.depth == 2) {
+				_this.p_0.x = _this.position.x; // Using p5.Vector.set() is super slow!
+				_this.p_0.y = _this.position.y;
+			} 
+			else {
+				_this.p_0.x = _this.parent.parent.position.x;
+				_this.p_0.y = _this.parent.parent.position.y;
 			}
-			p_3.div(_this.children.length);
-			return p_3;
-		} 
-		else { // While we're growing
-			return p_3.set(_this.position.x,_this.position.y);
+
+			return _this.p_0;
+
 		}
 
-	}
+		function pt_1() {
+			let isAlone =  _this.parent instanceof Node;
+			if (!isAlone) {
+				_this.p_1 = _this.start.copy(); 
+			} 
+			else {
+				_this.p_1.x = _this.parent.position.x;
+				_this.p_1.y = _this.parent.position.y;
+			}
+
+			return _this.p_1;
+
+		}
+
+		function pt_2() {
+			_this.p_2.x = _this.position.x;
+			_this.p_2.y = _this.position.y;
+			return _this.p_2;
+		}
+
+		function pt_3() {
+			if (_this.children.length == 1) {
+				_this.p_3.x = _this.children[0].position.x;
+				_this.p_3.y = _this.children[0].position.y;
+			} 
+			else if (_this.children.length > 1) {
+				for (let i = 0; i < _this.children.length; i++) {
+					_this.p_3.add(_this.children[i].position);
+				}
+
+				_this.p_3.div(_this.children.length);
+
+			} 
+			else { // While we're growing
+				_this.p_3.x = _this.position.x;
+				_this.p_3.y = _this.position.y;	
+			}
+
+			return _this.p_3;
+		}
+	} 
 
 	this.wander = function() {
 		let wanderR = 25;         						// Radius for our "wander circle"
@@ -461,26 +488,18 @@ function Node (args = {}) {
 		_this.position.add(_this.velocity);
 		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
 
+		// Update our curve pts
+		_this.set_curve_pts();
 	}
 
 	// Draw a dot at position
 	this.render = function() {
-		// Basic Fractal Lines
-		p.stroke(41,59,73); // dark blue
-		p.strokeWeight(2);
-		p.noFill();
-			
-		_this.curve_pts[0] = _this.pt_0();
-		_this.curve_pts[1] = _this.pt_1();
-		_this.curve_pts[2] = _this.pt_2();
-		_this.curve_pts[3] = _this.pt_3();
-
 		// Render Curves
 		p.curve(
-			_this.pt_0().x, _this.pt_0().y,
-			_this.pt_1().x, _this.pt_1().y,
-			_this.pt_2().x, _this.pt_2().y,
-			_this.pt_3().x, _this.pt_3().y
+			_this.curve_pts[0].x, _this.curve_pts[0].y,
+			_this.curve_pts[1].x, _this.curve_pts[1].y,
+			_this.curve_pts[2].x, _this.curve_pts[2].y,
+			_this.curve_pts[3].x, _this.curve_pts[3].y
 		);
 
 		/*
@@ -553,7 +572,7 @@ function Node (args = {}) {
 			p.noStroke();
 			p.fill(115,135,150, a); // blue
 			let soma_radius = _this.neuron_timer;
-			p.ellipse(_this.pt_2().x,_this.pt_2().y,rad,rad);
+			p.ellipse(_this.p_2.x,_this.p_2.y,rad,rad);
 		p.pop();
 	}
 

@@ -28,9 +28,6 @@ let _canvas = $.Deferred();
 
 let growing = true; 
 
-// Global ref to looper()
-let _looper;
-
 
 // Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
@@ -61,6 +58,7 @@ let sprout = function (p) {
 	};
 
 	p.setup = function () {
+		console.log('starting p5...');
 		p.frameRate(30);
 
 		canvas = p.createCanvas(_options.width, _options.height);
@@ -82,8 +80,6 @@ let sprout = function (p) {
 		// Setup NeuronCoordinator
 		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
 		NeuronCoordinator.updateT(0);
-
-		console.log('starting p5...');
 	};
 
 	p.draw = function() {
@@ -250,11 +246,6 @@ let sprout = function (p) {
 		});	
 	}
 
-	_looper = function () {
-		p.loop();
-		console.log("Sketch is running..");
-	}
-
 	// Deal with resize events
 	window.onresize = function() { 
 		$(canvas).width(window.innerWidth)
@@ -279,9 +270,6 @@ module.exports.updateState = function (t) {
 	}
 
 	NeuronCoordinator.updateT(t);
-
-	// Get things moving again
-	_looper(); 
 };
 
 module.exports.canvas = function () {
