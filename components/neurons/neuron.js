@@ -30,9 +30,13 @@ function Neuron (args) {
 	this.growing = true;
 	// Setup public arrays and add one dendrite to it
 	this.nodes = [];
+
+	// Position of neuron after scattering finished
+	this.final_position = p.createVector();
 	this.boutons = [];
 
 	this.propagate_bool = false; // Are we propagating?
+	this.alpha = 1; // Opacity
 
 	let _this = this;
 
@@ -90,7 +94,9 @@ function Neuron (args) {
 	this.render = function() {
 		let n;
 
-		p.stroke(41,59,73); // dark blue
+		// Dendrite Style
+		let stroke_val = 'rgba(41,59,73,' + p.str(_this.alpha) + ')';
+		p.stroke(stroke_val);
 		p.strokeWeight(2);
 		p.noFill();
 		
@@ -99,15 +105,42 @@ function Neuron (args) {
 			n.render();
 		}
 
+		// Soma Style
+		p.noStroke();
+		p.fill(115,135,150); // blue
+
 		_this.nodes[0].render_soma(15);
 
+		//  Bouton Style
 		p.noStroke();
-		p.fill(115,135,150);
+		let fill_val = 'rgba(115,135,150,' + p.str(_this.alpha) + ')';
+		p.fill(fill_val);
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
 		_this.boutons.forEach(function (bouton) {
 			bouton.display(); 
 		});
+	}
+
+	// Render only Soma
+	this.render_soma = function() {
+		let fill_val = 'rgba(115,135,150,1)';
+		// Soma Style
+		p.noStroke();
+		p.fill(fill_val); // blue
+
+		_this.nodes[0].render_soma(15);
+	}
+
+	// Render Soma, as particle
+	this.render_particle = function(a) {
+		let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
+
+		// Particle Style
+		p.noStroke();
+		p.fill(fill_val); // blue
+
+		_this.nodes[0].render_soma(5);
 	}
 
 	this.done = function() {
@@ -130,7 +163,9 @@ function Neuron (args) {
 			// 	// });
 			// });
 
-			_this.calc_alp();
+			_this.calc_alp(); // Calculate Arc Length Parameterization
+			_this.final_position = _this.position.copy();
+
 			list = true;
 
 		}
@@ -203,7 +238,6 @@ function Neuron (args) {
 			let arc_length = _this.calc_arc_length(node.curve_pts, 1);
 			node.alp = speed / arc_length;
 			// console.log("Neuron:" + _this.id +" Node:" + node.id + " Arc Length:" + arc_length + " ALP: " + node.alp);
-
 		});
 	}
 
@@ -284,11 +318,20 @@ function Neuron (args) {
 	}
 
 	this.fadeOut = function() {
-		_this.nodes.forEach(function(n){
-			if (!n.id == 0) {
-				n.fill = $;
-			}
-		});	
+		if (_this.alpha > 0) {
+			_this.alpha -= 0.03125; // 1/32 --> Timer
+		}	
+	}
+
+	this.fadeIn = function() {
+		if (_this.alpha < 0.96875) { // Watch that overflow, son
+			_this.alpha += 0.03125; // 1/32 --> Timer
+		}
+	}
+
+	this.rebound = function() {
+		// Send the soma to the center
+		_this.nodes[0].rebound();
 	}
 
 	// Following growing, we update

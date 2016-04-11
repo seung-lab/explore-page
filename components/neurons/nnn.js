@@ -71,26 +71,21 @@ function NNN (args = {}) {
 		let ret = false;
 
 		// Once the MST is built...
-		_this.neurons.forEach(function(neuron) {
-
-			let soma = neuron.nodes[0];
-				soma.render_soma(5);
-
-		});
+		_this.render_particles(1);
 	}
 
 	this.scatter = function() {
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
-				soma.render_soma(5);
 				soma.space(_this.somas, _scatter_multiplier_1); // Repel from center
 		});
+
+		_this.render_particles(1);
 	}
 
 	this.scatter_2 = function() {
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
-				soma.render_soma(5);
 				soma.reset_pow();
 				soma.space(_this.somas, _scatter_multiplier_2); // Repel from center
 
@@ -102,6 +97,8 @@ function NNN (args = {}) {
 			// });
 
 		});
+
+		_this.render_particles(1);
 	}
 
 	// Check if neuron is off the screen
@@ -161,12 +158,23 @@ function NNN (args = {}) {
 	}
 
 	this.render = function() {
-
 		_this.active_neurons.forEach(function(neuron) {
 			neuron.render();
 		});
-
 	}
+
+	this.render_soma = function() {
+		_this.active_neurons.forEach(function(neuron) {
+			neuron.render_soma();
+		});
+	}
+
+	this.render_particles = function(a) {
+		_this.neurons.forEach(function(neuron) {
+			neuron.render_particle(a);
+		});
+	}
+
 
 	this.done = function() {
 		let n;
@@ -196,7 +204,7 @@ function NNN (args = {}) {
 				soma.twinkle_angle += step; 
 				let a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-255)
 
-				soma.render_soma(5, a); // Effect Opacity here?
+				neuron.render_particle(a); // Effect Opacity here?
 
 				if (a == 1) {
 					soma.twinkle_angle = 0;      	// Reset angle
@@ -205,7 +213,7 @@ function NNN (args = {}) {
 			} 
 			else {
 				
-				soma.render_soma(5);
+				neuron.render_particle(1);
 
 			}
 		
@@ -240,15 +248,27 @@ function NNN (args = {}) {
 	}
 
 	this.fadeIn = function() {
-		
+		_this.active_neurons.forEach(function(neuron) { 
+			neuron.fadeIn();
+		});
+
+		_this.render(); // Render neurons	
 	}
 
 	this.fadeOut = function() {
-
+		_this.active_neurons.forEach(function(neuron) {
+			neuron.fadeOut();
+		});
+		
+		_this.render(); // Render neurons	
 	}
 
-	this.rebound_2 = function() {
-
+	this.rebound2 = function() {	
+		_this.active_neurons.forEach(function(neuron) {
+			neuron.rebound();
+		});
+		
+		_this.render_soma(); // Render Soma	
 	}
 
 	this.lastPosition = function() {

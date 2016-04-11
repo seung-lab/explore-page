@@ -271,7 +271,7 @@ function Node (args = {}) {
 
 		// Steering = Desired minus Velocity
 		_target.sub(_this.velocity);
-		_target.limit(4);  // Limit to maximum steering force
+		_target.limit(12);  // Limit to maximum steering force
 		
 		// Apply force here, so we can return true
 		_this.applyForce(_target);
@@ -503,6 +503,9 @@ function Node (args = {}) {
 		);
 
 		/*
+
+			Alternative
+
 			// p.curve(
 			// 	pts[0].x, pts[0].y,
 			// 	pts[1].x, pts[1].y,
@@ -524,56 +527,51 @@ function Node (args = {}) {
 
 			p.curve.apply(p, pts);
 		*/
-
-		// Render Path Home
-		// if (_this.size) {
-		// 	p.noStroke();
-		// 	// p.fill(41,59,73); // blue
-		// 	p.fill(200); // white
-		// 	p.ellipse(
-		// 		_this.pt_1().x,
-		// 		_this.pt_1().y,
-		// 		5,
-		// 		5
-		// 	);
-		// 	p.ellipse(
-		// 		_this.position.x,
-		// 		_this.position.y,
-		// 		5,
-		// 		5
-		// 	);
-		// }
-
-		// if (_this.start_point) {
-		// 	p.noStroke();
-		// 	p.fill(200,0,0);
-		// 	p.ellipse(
-		// 		_this.position.x,
-		// 		_this.position.y,
-		// 		5,
-		// 		5
-		// 	);
-		// }
-
-		// Debug Neighborhood
-		// p.push();
-		// 	// p.noStroke();
-		// 	// p.fill(255,10);
-		// 	// p.ellipse(_this.position.x,_this.position.y,50,50);
-		// 	// p.fill(255,255);
-		// p.pop();
-
 	}
 
-	this.render_soma = function(rad, a = 1) { // Default a (alpha) to 255
-		a *= 255; // Up normalized value
-		// Draw Soma
+	this.debug = function() { 
+		// Render Path Home
+		if (_this.size) {
+			p.noStroke();
+			// p.fill(41,59,73); // blue
+			p.fill(200); // white
+			p.ellipse(
+				_this.pt_1().x,
+				_this.pt_1().y,
+				5,
+				5
+			);
+			p.ellipse(
+				_this.position.x,
+				_this.position.y,
+				5,
+				5
+			);
+		}
+
+		if (_this.start_point) {
+			p.noStroke();
+			p.fill(200,0,0);
+			p.ellipse(
+				_this.position.x,
+				_this.position.y,
+				5,
+				5
+			);
+		}
+
+		// Debug Neighborhood
 		p.push();
 			p.noStroke();
-			p.fill(115,135,150, a); // blue
-			let soma_radius = _this.neuron_timer;
-			p.ellipse(_this.p_2.x,_this.p_2.y,rad,rad);
+			p.fill(255,10);
+			p.ellipse(_this.position.x,_this.position.y,50,50);
+			p.fill(255,255);
 		p.pop();
+	}
+
+	this.render_soma = function(rad) {
+		// Draw Soma;
+		p.ellipse(_this.p_2.x,_this.p_2.y,rad,rad);
 	}
 
 	this.render_radius = function() {
@@ -612,7 +610,7 @@ function Node (args = {}) {
 	}
 
 	// Accepts an Array of Node Objects
-	this.center_bound = function() {
+	this.rebound = function() {
 		_this.bound = true;
 		
 		// If we have arrived, stop updating position

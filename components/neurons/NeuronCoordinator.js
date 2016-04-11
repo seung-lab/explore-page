@@ -205,14 +205,14 @@ NeuronCoordinator.animate = function () {
 		if (_t < _tg - _step) { // If some delta (queue) exists
 			_t += _step;
 			animation = NeuronCoordinator.currentAnimation();
-			// console.log("animating " + animation.name);
+			console.log("animating " + animation.name);
 			_p.clear();
 			animation.forward();
 
 			return;
 		}
 		else if (animation.loop) {
-			// console.log("looping " + animation.name);
+			console.log("looping " + animation.name);
 			_p.clear();
 			animation.forward(); // Loop without incrementing _tg | _t
 
@@ -223,14 +223,14 @@ NeuronCoordinator.animate = function () {
 		if (_t >= _tg + _step) {
 			_t -= _step;
 			animation = NeuronCoordinator.currentAnimation();
-			// console.log("animating " + animation.name);
+			console.log("animating " + animation.name);
 			_p.clear();
 			animation.reverse();
 
 			return;
 		}
 		else if (animation.loop) {
-			// console.log("looping " + animation.name);
+			console.log("looping " + animation.name);
 			_p.clear();
 			animation.reverse(); // Loop without incrementing _tg | _t
 
@@ -238,8 +238,8 @@ NeuronCoordinator.animate = function () {
 		}
 	}
 
-		// console.log("_t:" + _t);
-		// console.log("_tg:" + _tg);
+	console.log("_t:" + _t);
+	console.log("_tg:" + _tg);
 
 	console.log("Sketch is paused..");
 	_p.noLoop(); // Shut er' down

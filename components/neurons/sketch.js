@@ -150,7 +150,7 @@ let sprout = function (p) {
 		    },
 		    {
 		   		name: "Scatter2",
-				duration: 125,
+				duration: 75,
 				forward: _nnn.scatter_2,
 				reverse: _nnn.fadeout,
 				forward_slide: 2,
@@ -168,7 +168,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 15,
+				duration: 30,
 				forward: _nnn.synapse,
 				reverse: _nnn.synapse,
 				loop: true,
@@ -178,7 +178,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Fade",
-				duration: 100,
+				duration: 32,
 				forward: _nnn.fadeOut,
 				reverse: _nnn.fadeIn,
 				forward_slide: 4,
@@ -187,7 +187,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Center",
-				duration: 100,
+				duration: 30,
 				forward: _nnn.rebound2,
 				reverse: _nnn.lastPosition,
 				forward_slide: 5,
@@ -196,7 +196,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Stars",
-				duration: 100,
+				duration: 30,
 				forward: _nnn.staryNight,
 				reverse: _nnn.rebound,
 				forward_slide: 5,
