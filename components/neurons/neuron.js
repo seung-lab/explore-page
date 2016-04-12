@@ -334,6 +334,11 @@ function Neuron (args) {
 		_this.nodes[0].rebound();
 	}
 
+	this.last_position = function() {
+		// Send the soma to the center
+		_this.nodes[0].last_position(_this.final_position);	
+	}
+
 	// Following growing, we update
 	this.update = function() {
 		// Once neuron has completed, create adjacency list

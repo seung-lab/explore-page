@@ -33,6 +33,10 @@ function NNN (args = {}) {
 	// Power Multiplier
 	this.time_power; 
 
+	// Particles for second half of story
+	// Simpler than neurons
+	this.stars;
+
 	this.max_depth;
 	this.num_branches;
 	this.neuron_timer;
@@ -43,7 +47,8 @@ function NNN (args = {}) {
 	let _this = this;
 
 	let _scatter_multiplier_1,
-		_scatter_multiplier_2;
+		_scatter_multiplier_2,
+		_scatter_multiplier_3;
 
 	// Private Methods
 
@@ -55,6 +60,7 @@ function NNN (args = {}) {
 		// During scatter_2 --> Ensure consistant neuron density
 		// across different displays
 		_scatter_multiplier_1 = 20;
+		_scatter_multiplier_3 = 20;
 
 		_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
 		_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
@@ -84,21 +90,23 @@ function NNN (args = {}) {
 	}
 
 	this.scatter_2 = function() {
+
 		_this.neurons.forEach(function(neuron) {
 			let soma = neuron.nodes[0];
-				soma.reset_pow();
+				soma.reset_pow_1();
 				soma.space(_this.somas, _scatter_multiplier_2); // Repel from center
-
-			// _this.mst(); 
-			// Update spring positions --> Run through array
-			// _this.springs.forEach(function(s) {
-			// 	// s.update();
-			// 	// s.display();
-			// });
-
 		});
 
 		_this.render_particles(1);
+
+		function calc_mst() {
+			_this.mst(); 
+			// Update spring positions --> Run through array
+			_this.springs.forEach(function(s) {
+				// s.update();
+				// s.display();
+			});
+		}
 	}
 
 	// Check if neuron is off the screen
@@ -193,16 +201,17 @@ function NNN (args = {}) {
 	this.twinkle = function() {
 		let step = p.PI / 30;
 		let threshold;
+		let a;
 
 		neuro_loop: // label
 		for (let i = _this.neurons.length - 1; i >= 0; i--) {
 			let neuron = _this.neurons[i];
 			let soma = neuron.nodes[0];
-
 				
 			if (soma.twinkle_bool) {
 				soma.twinkle_angle += step; 
-				let a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-255)
+				a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+				a = p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
 
 				neuron.render_particle(a); // Effect Opacity here?
 
@@ -219,7 +228,7 @@ function NNN (args = {}) {
 		
 			threshold = p.random(1); // Set threshold
 
-			if ((!soma.twinkle_bool) && (threshold > 0.85)) {
+			if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
 				soma.twinkle_bool = true;
 			}
 		}
@@ -271,12 +280,22 @@ function NNN (args = {}) {
 		_this.render_soma(); // Render Soma	
 	}
 
-	this.lastPosition = function() {
-
+	this.last_position = function() {
+		_this.active_neurons.forEach(function(neuron) {
+			neuron.last_position();
+		});
+		
+		_this.render_soma(); // Render Soma	
 	}
 
-	this.staryNight = function() {
+	this.stary_night = function() {
+		for (let i = 0; i < _this.neurons.length/2; i++) { // Use 1/2 total neurons
+			let soma = _this.neurons[i].nodes[0];
+				soma.reset_pow_3();
+				soma.space(_this.somas, _scatter_multiplier_3); // Repel from center
+		}
 
+		_this.render_particles(1);
 	}
 
 	this.brainiac = function() {

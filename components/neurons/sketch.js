@@ -189,7 +189,7 @@ let sprout = function (p) {
 		    	name: "Center",
 				duration: 30,
 				forward: _nnn.rebound2,
-				reverse: _nnn.lastPosition,
+				reverse: _nnn.last_position,
 				forward_slide: 5,
 				reverse_slide: 4,
 				p: p	
@@ -197,7 +197,7 @@ let sprout = function (p) {
 		    {
 		    	name: "Stars",
 				duration: 30,
-				forward: _nnn.staryNight,
+				forward: _nnn.stary_night,
 				reverse: _nnn.rebound,
 				forward_slide: 5,
 				reverse_slide: 4,

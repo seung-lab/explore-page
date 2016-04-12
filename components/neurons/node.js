@@ -75,6 +75,7 @@ function Node (args = {}) {
 	this.dw = false; // Debugging Vel
 	this.sprung = false;
 	this.bound = false;
+	this.center = false;
 	this.distribute = false;
 
 	let _this = this;
@@ -271,7 +272,7 @@ function Node (args = {}) {
 
 		// Steering = Desired minus Velocity
 		_target.sub(_this.velocity);
-		_target.limit(12);  // Limit to maximum steering force
+		_target.limit(12	);  // Limit to maximum steering force
 		
 		// Apply force here, so we can return true
 		_this.applyForce(_target);
@@ -387,9 +388,17 @@ function Node (args = {}) {
 	}
 
 
-	this.reset_pow = Utils.cacheify(function() {
+	// This is basically a cop out 
+	this.reset_pow_1 = Utils.cacheify(function() {
 		_this.pow = 1;
+	});
 
+	this.reset_pow_3 = Utils.cacheify(function() {
+		// Reset position to center
+		_this.position.x = p.width / 2 + p.random(-2,2);
+		_this.position.y = p.height / 2 + p.random(-2,2);
+
+		_this.pow = 1;
 	});
 
 	// Calculate initial distribution forces
@@ -571,7 +580,7 @@ function Node (args = {}) {
 
 	this.render_soma = function(rad) {
 		// Draw Soma;
-		p.ellipse(_this.p_2.x,_this.p_2.y,rad,rad);
+		p.ellipse(_this.position.x,_this.position.y,rad,rad);
 	}
 
 	this.render_radius = function() {
@@ -616,6 +625,20 @@ function Node (args = {}) {
 		// If we have arrived, stop updating position
 		if (_this.arrive(_center)) {
 			_this.bound = false;
+			return true;
+		}
+
+		_this.update();
+
+	}
+
+	// Accepts an Array of Node Objects
+	this.last_position = function(position) {
+		_this.center = true;
+		
+		// If we have arrived, stop updating position
+		if (_this.arrive(position)) {
+			_this.center = false;
 			return true;
 		}
 
