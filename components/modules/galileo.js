@@ -51,7 +51,7 @@ class Galileo extends TeaTime {
 				format: "italics",
 			},
 			{
-				text: "We’re calling on gamers to help connect the dots by creating a physical, visual 3D map of the brain.",
+				text: "We’re calling on gamers to help connect the dots by playing a game to map the brain.",
 				format: "italics",
 			},
 			{
