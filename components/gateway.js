@@ -32,7 +32,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  			.text('A Game to Map the Brain');
 
  		opening.append(logintxt);
- 		
+
  		let startplayingbtn = $('<button>')
  			.addClass('primary play-now')
  			.text('Play Now');
@@ -60,41 +60,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	attachEvents () {
  		let _this = this;
 
-  		this.view.startbtn.ion('click', function () {
- 			// $('#explore').hide();
 
-			// let transition = $('#viewport').scrollTo('#intake', {
-			// 	msec: 4000,
-			// 	easing: Easing.springFactory(.9, 1),
-			// });
-
-			// if ($.cookie('visited')) {
-			// 	Login.initLogin(transition);
-			// }
-			// else {
-			// 	Login.initRegistration(transition);
-			// }
-
-			if (Utils.isMobile()) {
-				_this.beginExploring();
-				return;
-			}
-
-			Utils.UI.curtainFall(function () {
-				$(window).off('unload.track');
-
-				if ($.cookie('visited')) {
-					document.location.href = `https://${GLOBAL.host}/login`;
-				}
-				else {
-					document.location.href = `https://${GLOBAL.host}/signup`;
-				}
-			});
-
-			mixpanel.track('play-now', {
-				from: 'gateway',
-			});
- 		});
 
  		$(window).ion('scrollStart.gateway', function (e, up) {
  			if (up) {
@@ -133,6 +99,44 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		$(window).off('scrollStart.gateway swipe.gateway');
  	}
 
+ 	enableButton () {
+ 		this.view.startbtn.ion('click', function () {
+ 			// $('#explore').hide();
+
+			// let transition = $('#viewport').scrollTo('#intake', {
+			// 	msec: 4000,
+			// 	easing: Easing.springFactory(.9, 1),
+			// });
+
+			// if ($.cookie('visited')) {
+			// 	Login.initLogin(transition);
+			// }
+			// else {
+			// 	Login.initRegistration(transition);
+			// }
+
+			if (Utils.isMobile()) {
+				_this.beginExploring();
+				return;
+			}
+
+			Utils.UI.curtainFall(function () {
+				$(window).off('unload.track');
+
+				if ($.cookie('visited')) {
+					document.location.href = `https://${GLOBAL.host}/login`;
+				}
+				else {
+					document.location.href = `https://${GLOBAL.host}/signup`;
+				}
+			});
+
+			mixpanel.track('play-now', {
+				from: 'gateway',
+			});
+ 		});
+ 	}
+
  	afterEnter (transition) {
  		let _this = this;
 
@@ -149,6 +153,8 @@ class Gateway extends Synapse { // You can only build within a pylon field
 				_this.view.explorebtn.show();
 	 		});
 	 	}
+
+  		_this.enableButton();
 
 	 	transition.done(function () {
 	 		_this.attachEvents();
