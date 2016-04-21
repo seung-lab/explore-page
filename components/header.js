@@ -81,7 +81,7 @@ class Header extends Synapse {
 			.addClass('register')
 			.append(
 				d("icon"),
-				d('content').text("Create Account")
+				d('content').text("Join Now")
 			);
 
 		container.append(logo, share, login, register);
