@@ -15,7 +15,6 @@ function SVG_object (args = {}) {
 
 	// SVG
 	let d = "M242.8,105.8c24.6,0,20.1-50.5-10.8-38.2c23.6-14.9-3.1-50.5-24-31.8c8.7-22.9-25.4-38-36.5-16.2c0-22-31.9-27.2-38.9-6.4c-7-19.4-36.4-15.9-38.7,4.7c-15.1-18.2-44.5,2-32.8,22.6c-18-18.2-46.5,9.5-28.6,28C9.1,61.2-3.9,96.2,18.6,106c-25.2,1-24.6,40,0.8,40c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0c19.3,0.4,27.8-25.2,11.9-36.4C272.9,145.3,263.2,105.8,242.8,105.8z";
-	// let d = "M613.6,672l-262-88z";
 	let _pos = p.createVector(); // Think turtle graphics
 	let _start_pos = p.createVector(); // Think turtle graphics
 
@@ -68,6 +67,38 @@ function SVG_object (args = {}) {
 		});
 	}
 
+	this.render = function() {
+		
+		if (_this.bezier_array.length === 0) {
+			return;
+		}
+
+		// Draw Brain SVG
+		p.fill(255,0,0);	
+		p.noFill();
+		p.stroke(255,0,0);
+
+		let b = _svg_object.bezier_array;
+
+		p.push();
+			p.translate(p.width/2, p.height/2);
+			p.beginShape();
+				p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
+				for (let i = 1; i < b.length; i++) {
+					p.bezierVertex(
+						b[i].c1.x, // Control Pt x 1
+						b[i].c1.y, // Control Pt y 1
+						b[i].c2.x, // Control Pt x 2
+						b[i].c2.y, // Control Pt y 2
+						b[i].p1.x, // Pt x
+						b[i].p1.y  // Pt y
+					);
+				}
+			p.endShape();
+
+		p.pop();
+	}
+
 	// Object to contain transform points (2D vector)
 	function Bezier_obj(c1, c2, p1) {
 		this.c1 = c1;
@@ -90,7 +121,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -115,7 +146,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -150,7 +181,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -175,7 +206,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -200,7 +231,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -228,7 +259,7 @@ function SVG_object (args = {}) {
 			c2.add(_pos.x, _pos.y); // Relative Moves
 			p1.add(_pos.x, _pos.y); // Relative Moves
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
@@ -256,7 +287,7 @@ function SVG_object (args = {}) {
 		let c2 = p.createVector(x2,y2);
 		let p1 = p.createVector(x,y);
 
-		_this.bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
