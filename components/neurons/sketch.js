@@ -8,7 +8,8 @@ let Easing = require('../../clientjs/easing.js'),
 	NNN = require('./nnn.js'), // neural network
 	NeuronCoordinator = require('./NeuronCoordinator.js'), // neuron coordinator
 	Neurostate = require('./neurostate.js'), // neurostate
-	p5 = require('p5'),
+	p5 = require('p5'), 
+	SVG_Object = require('./parse-svg.js'),
 	GLOBAL = require('../../clientjs/GLOBAL.js'),
 	$ = require('jquery');
 
@@ -34,7 +35,8 @@ let sprout = function (p) {
 	// Global Variables
 	// 
 	// Nnn Object
-	let _nnn = null, 
+	let _nnn = null,
+		_svg_object = null, 
 	
 	// int
 		_counter = 0,
@@ -68,6 +70,12 @@ let sprout = function (p) {
 
 		// Set font characterists
 		// p.textFont(_fontRegular);
+
+		_svg_object = new SVG_Object({
+			p: p,
+		});
+
+		_svg_object.parseSVG();
 
 		// Calculate _nnn_count based on width
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
