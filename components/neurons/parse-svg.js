@@ -16,8 +16,11 @@ function SVG_object (args = {}) {
 	// SVG
 	let d = "M381.5,251c1.3-11.6-7.4-21.5-18.6-22.2c29.8-3.3,16.8-50.6-10.6-38c-0.1-0.1-0.1-0.1-0.2-0.2c23.6-14.9-3.1-50.5-24-31.8c8.7-22.9-25.4-38-36.5-16.2c0-22-31.9-27.2-38.9-6.4c-7-19.4-36.4-15.9-38.7,4.7c-15.1-18.2-44.5,2-32.8,22.6c-18-18.2-46.5,9.5-28.6,28c-23.4-7.3-36.4,27.7-13.9,37.5c-25.2,1-24.6,40,0.8,40v0c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0l0,0c19.3,0.4,27.8-25.2,11.9-36.4C366.3,272.1,380.1,263.9,381.5,251z";
 	let shape = svg_parse(d);
-	let bezier_array = []; // Array to contain bezier curves
 	let _pos = p.createVector(); // Think turtle graphics
+
+	let _this = this;
+
+	_this.bezier_array = []; // Array to contain bezier curves
 
 	//  Assumes p5 in instance mode ('p' prefix)
 	this.parseSVG = function() {
@@ -60,8 +63,6 @@ function SVG_object (args = {}) {
 			}
 			
 		});
-
-		return bezier_array;
 	}
 
 	// Object to contain transform points (2D vector)
@@ -90,7 +91,7 @@ function SVG_object (args = {}) {
 		let x = curve.x;
 		let y = curve.y;
 
-	bezier_array.push( // Pt1
+	_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				_pos,
 				_pos,
@@ -102,7 +103,7 @@ function SVG_object (args = {}) {
 		_pos.x + x;
 		_pos.y + y;
 
-	bezier_array.push( // Pt2
+	_this.bezier_array.push( // Pt2
 			new Bezier_obj(
 				_pos,
 				_pos,
@@ -114,7 +115,7 @@ function SVG_object (args = {}) {
 	function horzLineTo(curve) {
 		let x = curve.x;
 
-	bezier_array.push( // Pt1
+	_this.bezier_array.push( // Pt1
 			new Bezier_obj(
 				_pos,
 				_pos,
@@ -125,7 +126,7 @@ function SVG_object (args = {}) {
 		// Increment  
 		_pos.x + x;
 
-	bezier_array.push( // Pt2
+	_this.bezier_array.push( // Pt2
 			new Bezier_obj(
 				_pos,
 				_pos,
@@ -137,7 +138,7 @@ function SVG_object (args = {}) {
 	function vertLineTo(curve) {
 		let y = curve.y;
 
-		bezier_array.push( // Pt1
+		_this.bezier_array.push( // Pt1
 				new Bezier_obj(
 					_pos,
 					_pos,
@@ -148,7 +149,7 @@ function SVG_object (args = {}) {
 			// Increment  
 			_pos.y + y;
 
-		bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt2
 				new Bezier_obj(
 					_pos,
 					_pos,
@@ -173,7 +174,7 @@ function SVG_object (args = {}) {
 			c2.add(_pos.x, _pos.y); // Relative Moves
 			p1.add(_pos.x, _pos.y); // Relative Moves
 
-		bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt2
 				new Bezier_obj(
 					c1,
 					c2,
@@ -198,7 +199,7 @@ function SVG_object (args = {}) {
 		let c2 = p.createVector(x2,y2);
 		let p1 = p.createVector(x,y);
 
-		bezier_array.push( // Pt2
+		_this.bezier_array.push( // Pt2
 				new Bezier_obj(
 					c1,
 					c2,
