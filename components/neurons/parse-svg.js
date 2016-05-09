@@ -21,6 +21,7 @@ function SVG_object (args = {}) {
 	let _this = this;
 
 	_this.bezier_array = []; // Array to contain bezier curves
+	_this.vertex_array = []; // Array to contain vertex points 
 
 	//  Assumes p5 in instance mode ('p' prefix)
 	this.parseSVG = function() {
@@ -67,21 +68,26 @@ function SVG_object (args = {}) {
 		});
 	}
 
-	this.render = function() {
+	this.render_lines = function() {
 		
 		if (_this.bezier_array.length === 0) {
 			return;
 		}
 
 		// Draw Brain SVG
-		p.fill(255,0,0);	
+		// p.fill(255,0,0);	
 		p.noFill();
-		p.stroke(255,0,0);
+		p.strokeWeight(2);
+		p.stroke(115,135,150);
 
-		let b = _svg_object.bezier_array;
+		let b = _this.bezier_array;
 
 		p.push();
-			p.translate(p.width/2, p.height/2);
+			let scale_factor = 2.25;
+			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
+				dy = p.height/2 - _start_pos.y * scale_factor; 
+			p.translate(dx, dy);
+			p.scale(scale_factor);
 			p.beginShape();
 				p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
 				for (let i = 1; i < b.length; i++) {
@@ -95,7 +101,30 @@ function SVG_object (args = {}) {
 					);
 				}
 			p.endShape();
+		p.pop();
+	}
 
+	this.render_points = function() {
+		
+		if (_this.vertex_array.length === 0) {
+			return;
+		}
+
+		// Draw Brain SVG Points
+		p.fill(115,135,150);
+		p.noStroke();
+
+		let v = _this.vertex_array;
+
+		p.push();
+			let scale_factor = 2.25;
+			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
+				dy = p.height/2 - _start_pos.y * scale_factor; 
+			p.translate(dx, dy);
+			p.scale(scale_factor);
+			for (let i = 1; i < v.length; i++) {
+				p.ellipse(v[i].x,v[i].y,5,5);
+			}
 		p.pop();
 	}
 
@@ -129,12 +158,18 @@ function SVG_object (args = {}) {
 			)
 		);
 
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
+		);
+
 		console.log('moving');
 	}
 
 	function moveToAbs(curve) {
 		let x = curve.x;
 		let y = curve.y;
+
+		_start_pos.set(x,y);
 
 		let c1 = p.createVector(_pos.x, _pos.y);
 		let c2 = p.createVector(_pos.x, _pos.y);
@@ -152,6 +187,10 @@ function SVG_object (args = {}) {
 				c2,
 				p1
 			)
+		);
+
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('moving');
@@ -189,6 +228,10 @@ function SVG_object (args = {}) {
 			)
 		);
 
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
+		);
+
 		console.log('line drive');
 	}
 
@@ -212,6 +255,10 @@ function SVG_object (args = {}) {
 				c2,
 				p1
 			)
+		);
+
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('horizontal traveler');
@@ -239,13 +286,17 @@ function SVG_object (args = {}) {
 			)
 		);
 
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
+		);
+
 		console.log('vertical traveler');
 
 	}
 
 	function bezierTo(curve) { // dx/dy | relative
-		let x = curve.x,
-			y = curve.y,
+		let x  = curve.x,
+			y  = curve.y,
 			x1 = curve.x1,
 			y1 = curve.y1,
 			x2 = curve.x2,
@@ -270,6 +321,10 @@ function SVG_object (args = {}) {
 		// Increment Global Position
 		_pos.x += x;
 		_pos.y += y;
+
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
+		);
 
 		console.log('bezier maybe');
 
@@ -297,6 +352,10 @@ function SVG_object (args = {}) {
 
 		// Set Global Position
 		_pos.set(x,y);
+
+		_this.vertex_array.push(  // Create Vertex Pt
+			new p5.Vector(p1.x,p1.y)
+		);
 
 		console.log('bezier abs');
 
