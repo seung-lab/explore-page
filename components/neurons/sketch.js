@@ -94,7 +94,9 @@ let sprout = function (p) {
 		NeuronCoordinator.animate();
 
 		// Draw Brain SVG
-		p.fill(255,0,0);	
+		// p.fill(255,0,0);	
+		p.noFill();
+		p.stroke(255,0,0);
 		let b;
 		p.beginShape();
 			b = _svg_object.bezier_array[0];
@@ -104,6 +106,12 @@ let sprout = function (p) {
 				p.bezierVertex(b.c1.x, b.c1.y, b.c2.x, b.c2.y, b.p1.x, b.p1.y);
 			}
 		p.endShape();
+		// p.beginShape();
+		// 	for (let i = 0; i < _svg_object.bezier_array.length; i++) {
+		// 		b = _svg_object.bezier_array[i];
+		// 		p.vertex(b.p1.x, b.p1.y);
+		// 	}
+		// p.endShape(p.CLOSE);
 	}
 
 	function nnn_start () {
