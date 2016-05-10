@@ -21,8 +21,8 @@ function SVG_object (args = {}) {
 
 	let _this = this;
 
-	_this.bezier_array = []; // Array to contain bezier curves
-	_this.vertex_array = []; // Array to contain vertex points 
+	_this.beziers = []; // Array to contain bezier curves
+	_this.vertices = []; // Array to contain vertex points 
 
 	//  Assumes p5 in instance mode ('p' prefix)
 	this.parseSVG = function() {
@@ -71,7 +71,7 @@ function SVG_object (args = {}) {
 
 	this.render_lines = function() {
 		
-		if (_this.bezier_array.length === 0) {
+		if (_this.beziers.length === 0) {
 			return;
 		}
 
@@ -81,7 +81,7 @@ function SVG_object (args = {}) {
 		p.strokeWeight(2);
 		p.stroke(115,135,150);
 
-		let b = _this.bezier_array;
+		let b = _this.beziers;
 
 		p.push();
 			let scale_factor = 2.25;
@@ -107,7 +107,7 @@ function SVG_object (args = {}) {
 
 	this.render_points = function() {
 		
-		if (_this.vertex_array.length === 0) {
+		if (_this.vertices.length === 0) {
 			return;
 		}
 
@@ -115,7 +115,7 @@ function SVG_object (args = {}) {
 		p.fill(115,135,150);
 		p.noStroke();
 
-		let v = _this.vertex_array;
+		let v = _this.vertices;
 
 		p.push();
 			let scale_factor = 2.25;
@@ -151,16 +151,12 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
 				p1
 			)
-		);
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('moving');
@@ -182,16 +178,12 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
 				p1
 			)
-		);
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('moving');
@@ -205,7 +197,7 @@ function SVG_object (args = {}) {
 		let c2 = p.createVector(_pos.x, _pos.y);
 		let p1 = p.createVector(_pos.x, _pos.y);
 
-		// _this.bezier_array.push( // Pt1
+		// _this.beziers.push( // Pt1
 		// 	new Bezier_obj(
 		// 		_pos,
 		// 		_pos,
@@ -221,16 +213,12 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
 				p1
 			)
-		);
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('line drive');
@@ -250,16 +238,12 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
 				p1
 			)
-		);
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('horizontal traveler');
@@ -279,16 +263,12 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
 				p1
 			)
-		);
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
 		);
 
 		console.log('vertical traveler');
@@ -311,7 +291,7 @@ function SVG_object (args = {}) {
 			c2.add(_pos.x, _pos.y); // Relative Moves
 			p1.add(_pos.x, _pos.y); // Relative Moves
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
@@ -322,10 +302,6 @@ function SVG_object (args = {}) {
 		// Increment Global Position
 		_pos.x += x;
 		_pos.y += y;
-
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
-		);
 
 		console.log('bezier maybe');
 
@@ -343,7 +319,7 @@ function SVG_object (args = {}) {
 		let c2 = p.createVector(x2,y2);
 		let p1 = p.createVector(x,y);
 
-		_this.bezier_array.push( // Pt1
+		_this.beziers.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
@@ -354,12 +330,80 @@ function SVG_object (args = {}) {
 		// Set Global Position
 		_pos.set(x,y);
 
-		_this.vertex_array.push(  // Create Vertex Pt
-			new p5.Vector(p1.x,p1.y)
-		);
-
 		console.log('bezier abs');
 
+	}
+
+	function subdivide(bezier_pts) {
+		let p0 = bezier_pts[0],	// Curve Points
+			p1 = bezier_pts[1],
+			p2 = bezier_pts[2], // Control Points
+			p3 = bezier_pts[3],
+
+			segments = 3, // start with 3
+			arc_length = 0;
+
+		function seg_length() {
+			// Calc first Segment
+			let step = 1 / segments; 
+			
+			let x1 = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find 1st point on curve
+			let y1 = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find 1st point on curve
+
+			step *= 2;
+
+			let x2 = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find 2nd point on curve
+			let y2 = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find 2nd point on curve
+
+			arc_length = p.sqrt(p.sq(x2 - x1) + p.sq(y2 - y1)); // Return segment length
+
+			if (arc_length < 2) { // Get rid of points that are too close
+				return;
+			}
+
+			if (arc_length > 25) { // Ahh the recursive dive
+				segments++;
+				seg_length();
+
+				return;
+			}
+
+			addPoints();  // You've made the cut! Welcome to the render
+
+		}
+
+		function addPoints() {
+			for (let i = 0; i <= segments; i++) { // Get points on curve
+				let step = 1 / segments;
+					step *= i; 
+				let x = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find point on curve
+				let y = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find point on curve
+
+				_this.vertices.push(p.createVector(x,y));
+
+			}
+		}
+
+		seg_length();
+	}
+
+
+	// Evenly distribute vertices across Brain svg
+	this.constellation = function() {
+
+		for (let i = 0; i < _this.beziers.length-1; i++) { // Measure up till last point
+			let start = _this.beziers[i],
+				end = _this.beziers[i+1],
+				bezier_pts = []; // Build Cubic Bezier Segment
+				
+				bezier_pts.push(start.c2);
+				bezier_pts.push(start.p1);
+				bezier_pts.push(end.p1);
+				bezier_pts.push(end.c1);
+
+				subdivide(bezier_pts); // Create Evenly distributed vertices
+
+		}
 	}
 
 }

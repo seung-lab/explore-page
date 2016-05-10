@@ -76,6 +76,7 @@ let sprout = function (p) {
 		});
 
 		_svg_object.parseSVG();
+		_svg_object.constellation();
 
 		// Calculate _nnn_count based on width
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
@@ -91,7 +92,7 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		// _svg_object.render_lines();
+		_svg_object.render_lines();
 		_svg_object.render_points();
 		NeuronCoordinator.animate();
 	}

@@ -174,6 +174,7 @@ function Neuron (args) {
 
 	}
 
+	// Adaptive Arc-Subdivision
 	this.calc_arc_length = function(curve_pts, segments) {
 		let arc_length_1;
 		let arc_length_2;
@@ -224,6 +225,7 @@ function Neuron (args) {
 
 	}
 
+	// Calculate Arc-Length Parameterization
 	this.calc_alp = function() {
 		let error = 1;
 		let segments = 2;
