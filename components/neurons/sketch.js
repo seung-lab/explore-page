@@ -92,8 +92,9 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		_svg_object.render_lines();
+		// _svg_object.render_lines();
 		_svg_object.render_points();
+		// _svg_object.control();
 		NeuronCoordinator.animate();
 	}
 

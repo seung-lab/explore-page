@@ -28,6 +28,7 @@ function SVG_object (args = {}) {
 	this.parseSVG = function() {
 		let draw_object;
 		d = svg_parse(d); // Parse the path
+
 		d.forEach(function(curve) {
 			let command = curve.code;
 
@@ -112,7 +113,6 @@ function SVG_object (args = {}) {
 		}
 
 		// Draw Brain SVG Points
-		p.fill(115,135,150);
 		p.noStroke();
 
 		let v = _this.vertices;
@@ -123,10 +123,70 @@ function SVG_object (args = {}) {
 				dy = p.height/2 - _start_pos.y * scale_factor; 
 			p.translate(dx, dy);
 			p.scale(scale_factor);
-			for (let i = 1; i < v.length; i++) {
+			for (let i = 0; i < v.length; i++) {
+				let g = i*2;
+				p.fill(0,g,255);
 				p.ellipse(v[i].x,v[i].y,5,5);
 			}
 		p.pop();
+	}
+
+	this.control = function() {
+
+		// Draw Brain SVG Points
+		p.strokeWeight(1);
+
+		let b = _this.beziers;
+
+		p.push();
+			let scale_factor = 2.25;
+			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
+				dy = p.height/2 - _start_pos.y * scale_factor; 
+			p.translate(dx, dy);
+			p.scale(scale_factor);
+
+			for (let i = 0; i < b.length; i++) { // Measure up till last point
+				let start = b[i],
+					end,
+					bezier_pts = []; // Build Cubic Bezier Segment
+
+				if (i < b.length - 1) {
+					end = b[i+1]; // Lookforward
+				} else {
+					end = b[0];   // Back to beginning
+				}
+
+				p.stroke(255,0,0,100);
+				p.line( // Point to control point 1
+					start.p1.x,
+					start.p1.y,
+					start.c2.x,
+					start.c2.y
+				);
+				p.stroke(255,0,255,100);
+				p.line( // Point to control point 1
+					start.p1.x,
+					start.p1.y,
+					start.c1.x,
+					start.c1.y
+				);
+				p.stroke(0,255,0,100);
+				p.line( // Point to control point 2
+					start.p1.x,
+					start.p1.y,
+					end.c1.x,
+					end.c1.y
+				);
+				p.stroke(255,255,0,100);
+				p.line( // Point to control point 2
+					end.p1.x,
+					end.p1.y,
+					end.c2.x,
+					end.c2.y
+				);
+			}
+		p.pop();
+
 	}
 
 	// Object to contain transform points (2D vector)
@@ -135,6 +195,9 @@ function SVG_object (args = {}) {
 		this.c2 = c2;
 		this.p1 = p1;
 	}
+
+	// ------------------------------------------------
+	// SVG Parsing
 
 	function moveTo(curve) {
 		let x = curve.x;
@@ -158,8 +221,6 @@ function SVG_object (args = {}) {
 				p1
 			)
 		);
-
-		console.log('moving');
 	}
 
 	function moveToAbs(curve) {
@@ -185,8 +246,6 @@ function SVG_object (args = {}) {
 				p1
 			)
 		);
-
-		console.log('moving');
 	}
 
 	function lineTo(curve) {
@@ -196,14 +255,6 @@ function SVG_object (args = {}) {
 		let c1 = p.createVector(_pos.x, _pos.y);
 		let c2 = p.createVector(_pos.x, _pos.y);
 		let p1 = p.createVector(_pos.x, _pos.y);
-
-		// _this.beziers.push( // Pt1
-		// 	new Bezier_obj(
-		// 		_pos,
-		// 		_pos,
-		// 		_pos
-		// 	)
-		// );
 
 		// Increment  
 		_pos.x += x;
@@ -220,8 +271,6 @@ function SVG_object (args = {}) {
 				p1
 			)
 		);
-
-		console.log('line drive');
 	}
 
 	function horzLineTo(curve) {
@@ -245,8 +294,6 @@ function SVG_object (args = {}) {
 				p1
 			)
 		);
-
-		console.log('horizontal traveler');
 	}
 
 	function vertLineTo(curve) {
@@ -270,9 +317,6 @@ function SVG_object (args = {}) {
 				p1
 			)
 		);
-
-		console.log('vertical traveler');
-
 	}
 
 	function bezierTo(curve) { // dx/dy | relative
@@ -303,8 +347,6 @@ function SVG_object (args = {}) {
 		_pos.x += x;
 		_pos.y += y;
 
-		console.log('bezier maybe');
-
 	}
 
 	function bezierToAbs(curve) { // Absolute
@@ -330,8 +372,6 @@ function SVG_object (args = {}) {
 		// Set Global Position
 		_pos.set(x,y);
 
-		console.log('bezier abs');
-
 	}
 
 	function subdivide(bezier_pts) {
@@ -340,26 +380,26 @@ function SVG_object (args = {}) {
 			p2 = bezier_pts[2], // Control Points
 			p3 = bezier_pts[3], // Curve Points
 
-			segments = 5, // start with 3
+			segments = 3, // start with 3
 			arc_length = 0;
 
 		function seg_length() {
 			// Calc first Segment
-			let step = 1 / segments; 
+			let t = 1 / (segments - 1); 
 			
 			let x1 = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, 0); // Find 1st point on curve
 			let y1 = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, 0); // Find 1st point on curve
 
-			let x2 = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, step); // Find 2nd point on curve
-			let y2 = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, step); // Find 2nd point on curve
+			let x2 = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, t); // Find 2nd point on curve
+			let y2 = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, t); // Find 2nd point on curve
 
 			arc_length = p.sqrt(p.sq(x2 - x1) + p.sq(y2 - y1)); // Return segment length
 
-			if (arc_length < 2) { // Get rid of points that are too close
+			if (arc_length < 5) { // Get rid of points that are too close
 				return;
 			}
 
-			if (arc_length > 5) { // Ahh the recursive dive
+			if (arc_length > 10) { // Ahh the recursive dive
 				segments++;
 				seg_length();
 
@@ -374,8 +414,8 @@ function SVG_object (args = {}) {
 			for (let i = 0; i < segments; i++) { // Get points on curve
 				let t = i / (segments - 1);
 
-				let x = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, step); // Find point on curve
-				let y = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, step); // Find point on curve
+				let x = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, t); // Find point on curve
+				let y = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, t); // Find point on curve
 
 				_this.vertices.push(new p5.Vector(x,y));
 
@@ -383,29 +423,39 @@ function SVG_object (args = {}) {
 
 		}
 
-		// seg_length();
-		addPoints();
+		seg_length();
+		// addPoints();
 	}
 
 
 	// Evenly distribute vertices across Brain svg
 	this.constellation = function() {
 
-		for (let i = 17; i < 18; i++) { // Measure up till last point
-			let start = _this.beziers[i],
-				end = _this.beziers[i+1],
+		let b = _this.beziers;
+
+		for (let i = 0; i < b.length-1; i++) { // Measure up till last point
+
+			let start = b[i],
+				end   = b[i+1], // Lookforward
 				bezier_pts = []; // Build Cubic Bezier Segment
 				
-				bezier_pts.push(start.p1);
-				bezier_pts.push(start.c2);
-				bezier_pts.push(end.c1);
-				bezier_pts.push(end.p1);
+			bezier_pts.push(start.p1);
+			bezier_pts.push(end.c1);
+			bezier_pts.push(end.c2);
+			bezier_pts.push(end.p1);
 
-				subdivide(bezier_pts); // Create Evenly distributed vertices
+			console.log("Bezier: " + i);
+			console.log("start.p1 " + start.p1);
+			console.log("start.c1 " + start.c1);
+			console.log("start.c2 " + start.c2);
+			console.log("end.p1 " + end.p1);
+			console.log("end.c1 " + end.c1);
+			console.log("end.c2 " + end.c2);
+
+			subdivide(bezier_pts); // Create Evenly distributed vertices
 
 		}
 	}
-
 }
 
 module.exports = SVG_object;
