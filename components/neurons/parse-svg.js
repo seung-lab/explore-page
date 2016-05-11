@@ -336,24 +336,22 @@ function SVG_object (args = {}) {
 
 	function subdivide(bezier_pts) {
 		let p0 = bezier_pts[0],	// Curve Points
-			p1 = bezier_pts[1],
+			p1 = bezier_pts[1], // Control Points
 			p2 = bezier_pts[2], // Control Points
-			p3 = bezier_pts[3],
+			p3 = bezier_pts[3], // Curve Points
 
-			segments = 3, // start with 3
+			segments = 5, // start with 3
 			arc_length = 0;
 
 		function seg_length() {
 			// Calc first Segment
 			let step = 1 / segments; 
 			
-			let x1 = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find 1st point on curve
-			let y1 = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find 1st point on curve
+			let x1 = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, 0); // Find 1st point on curve
+			let y1 = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, 0); // Find 1st point on curve
 
-			step *= 2;
-
-			let x2 = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find 2nd point on curve
-			let y2 = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find 2nd point on curve
+			let x2 = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, step); // Find 2nd point on curve
+			let y2 = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, step); // Find 2nd point on curve
 
 			arc_length = p.sqrt(p.sq(x2 - x1) + p.sq(y2 - y1)); // Return segment length
 
@@ -361,7 +359,7 @@ function SVG_object (args = {}) {
 				return;
 			}
 
-			if (arc_length > 25) { // Ahh the recursive dive
+			if (arc_length > 5) { // Ahh the recursive dive
 				segments++;
 				seg_length();
 
@@ -373,33 +371,35 @@ function SVG_object (args = {}) {
 		}
 
 		function addPoints() {
-			for (let i = 0; i <= segments; i++) { // Get points on curve
-				let step = 1 / segments;
-					step *= i; 
-				let x = p.curvePoint(p0.x, p1.x, p2.x, p3.x, step); // Find point on curve
-				let y = p.curvePoint(p0.y, p1.y, p2.y, p3.y, step); // Find point on curve
+			for (let i = 0; i < segments; i++) { // Get points on curve
+				let t = i / (segments - 1);
 
-				_this.vertices.push(p.createVector(x,y));
+				let x = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, step); // Find point on curve
+				let y = p.bezierPoint(p0.y, p1.y, p2.y, p3.y, step); // Find point on curve
+
+				_this.vertices.push(new p5.Vector(x,y));
 
 			}
+
 		}
 
-		seg_length();
+		// seg_length();
+		addPoints();
 	}
 
 
 	// Evenly distribute vertices across Brain svg
 	this.constellation = function() {
 
-		for (let i = 0; i < _this.beziers.length-1; i++) { // Measure up till last point
+		for (let i = 17; i < 18; i++) { // Measure up till last point
 			let start = _this.beziers[i],
 				end = _this.beziers[i+1],
 				bezier_pts = []; // Build Cubic Bezier Segment
 				
-				bezier_pts.push(start.c2);
 				bezier_pts.push(start.p1);
-				bezier_pts.push(end.p1);
+				bezier_pts.push(start.c2);
 				bezier_pts.push(end.c1);
+				bezier_pts.push(end.p1);
 
 				subdivide(bezier_pts); // Create Evenly distributed vertices
 
