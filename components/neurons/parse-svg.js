@@ -5,6 +5,10 @@
 // Parse svg and convert to p5js shape object
 // Needs a p5 instance to build on
 
+// Partial SVG parsing support (does not support {Q,S,s,T,t,A,a})
+
+// Maps SVG elements to p5 bezier objects
+
 let $ = require('jquery');
 let p5 = require('p5');
 let svg_parse = require('svg-path-parser');
@@ -13,8 +17,9 @@ function SVG_object (args = {}) {
 	// Private arguments from constructor
 	let p = args.p;
 
+	_this.density = args.density || 10; // 10 default
+
 	// SVG
-	// let d = "M242.8,105.8c24.6,0,20.1-50.5-10.8-38.2c23.6-14.9-3.1-50.5-24-31.8c8.7-22.9-25.4-38-36.5-16.2c0-22-31.9-27.2-38.9-6.4c-7-19.4-36.4-15.9-38.7,4.7c-15.1-18.2-44.5,2-32.8,22.6c-18-18.2-46.5,9.5-28.6,28C9.1,61.2-3.9,96.2,18.6,106c-25.2,1-24.6,40,0.8,40c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0c19.3,0.4,27.8-25.2,11.9-36.4C272.9,145.3,263.2,105.8,242.8,105.8z";
 	let d = "M245.8,107.2c22.6-2.1,18-49.3-11.5-38.4c-0.1,0-0.2-0.1-0.1-0.2c22.2-15.1-3.9-49.6-24.5-31.5c-0.1,0.1-0.2,0-0.1-0.1c8.3-22.6-25.3-37.5-36.5-16.2c0,0.1-0.1,0-0.1,0c-0.3-21.7-31.7-26.8-38.8-6.3c0,0.1-0.1,0.1-0.1,0c-7.1-19.1-36.2-15.6-38.6,4.7c0,0.1-0.1,0.1-0.1,0c-15-17.8-44,1.9-32.9,22.3c0,0.1,0,0.1-0.1,0.1c-18-17.5-45.8,9.8-28.4,28.1c0.1,0.1,0,0.1-0.1,0.1c-23.2-6.9-36,27.6-13.8,37.5c0,0,0,0.1,0,0.1c-25,1.2-24.3,40,1,40c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0c19.2,0.4,23.4-24.6,12-36.3c-0.1-0.1,0-0.1,0.1-0.1c37.7,0.7,29.4-36.6,10.2-38.5C245.7,107.3,245.7,107.2,245.8,107.2z";
 	let _pos = p.createVector(); // Think turtle graphics
 	let _start_pos = p.createVector(); // Think turtle graphics
@@ -24,51 +29,14 @@ function SVG_object (args = {}) {
 	_this.beziers = []; // Array to contain bezier curves
 	_this.vertices = []; // Array to contain vertex points 
 
-	//  Assumes p5 in instance mode ('p' prefix)
-	this.parseSVG = function() {
-		let draw_object;
-		d = svg_parse(d); // Parse the path
+	// ------------------------------------------------
+	// SVG Initialize
 
-		d.forEach(function(curve) {
-			let command = curve.code;
+	initialize();
 
-			// Convert SVG to p5 drawing commands
-			switch (command) {
 
-				case 'm': moveTo(curve);
-				break;
-
-				case 'M': moveToAbs(curve);
-				break;
-
-				case 'l': lineTo(curve);
-				break;
-
-				case 'L': lineTo(curve);
-				break;
-
-				case 'h': horzLineTo(curve);
-				break;
-
-				case 'H': horzLineTo(curve);
-				break;
-
-				case 'v': vertLineTo(curve);
-				break;
-
-				case 'V': vertLineTo(curve);
-				break;
-
-				case 'c': bezierTo(curve);
-				break;
-
-				case 'C': bezierToAbs(curve);
-				break;
-
-			}
-			
-		});
-	}
+	// ------------------------------------------------
+	// SVG Rendering
 
 	this.render_lines = function() {
 		
@@ -124,14 +92,13 @@ function SVG_object (args = {}) {
 			p.translate(dx, dy);
 			p.scale(scale_factor);
 			for (let i = 0; i < v.length; i++) {
-				let g = i*2;
-				p.fill(0,g,255);
-				p.ellipse(v[i].x,v[i].y,5,5);
+				p.fill(115,135,150);
+				p.ellipse(v[i].x,v[i].y,2,2);
 			}
 		p.pop();
 	}
 
-	this.control = function() {
+	this.debug = function() {
 
 		// Draw Brain SVG Points
 		p.strokeWeight(1);
@@ -189,15 +156,66 @@ function SVG_object (args = {}) {
 
 	}
 
+
+	// ------------------------------------------------
+	// SVG Parsing
+
+	function initialize() {
+		parseSVG();
+		scaleSVG();
+	}
+
+	function parseSVG() {
+		let draw_object;
+		d = svg_parse(d); // Parse the path
+
+		d.forEach(function(curve) {
+			let command = curve.code;
+
+			// Convert SVG to p5 drawing commands
+			switch (command) {
+
+				case 'm': moveTo(curve);
+				break;
+
+				case 'M': moveToAbs(curve);
+				break;
+
+				case 'l': lineTo(curve);
+				break;
+
+				case 'L': lineTo(curve);
+				break;
+
+				case 'h': horzLineTo(curve);
+				break;
+
+				case 'H': horzLineTo(curve);
+				break;
+
+				case 'v': vertLineTo(curve);
+				break;
+
+				case 'V': vertLineTo(curve);
+				break;
+
+				case 'c': bezierTo(curve);
+				break;
+
+				case 'C': bezierToAbs(curve);
+				break;
+
+			}
+			
+		});
+	}
+
 	// Object to contain transform points (2D vector)
 	function Bezier_obj(c1, c2, p1) {
 		this.c1 = c1;
 		this.c2 = c2;
 		this.p1 = p1;
 	}
-
-	// ------------------------------------------------
-	// SVG Parsing
 
 	function moveTo(curve) {
 		let x = curve.x;
@@ -374,11 +392,13 @@ function SVG_object (args = {}) {
 
 	}
 
-	function subdivide(bezier_pts) {
+	function subdivide(bezier_pts, _density) {
 		let p0 = bezier_pts[0],	// Curve Points
 			p1 = bezier_pts[1], // Control Points
 			p2 = bezier_pts[2], // Control Points
 			p3 = bezier_pts[3], // Curve Points
+
+			density = _density, // Local copy
 
 			segments = 3, // start with 3
 			arc_length = 0;
@@ -399,7 +419,7 @@ function SVG_object (args = {}) {
 				return;
 			}
 
-			if (arc_length > 10) { // Ahh the recursive dive
+			if (arc_length > density) { // Ahh the recursive dive
 				segments++;
 				seg_length();
 
@@ -427,9 +447,31 @@ function SVG_object (args = {}) {
 		// addPoints();
 	}
 
+	function scaleSVG() {
+		let scale_factor;
+		p.width > p.height ? scale_factor = p.width : scale_factor = p.height; // Scale by smallest dimension
+
+		scale_factor = p.map(scale_factor, 400, 3000, 0.5, 3);
+
+		let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
+			dy = p.height/2 - _start_pos.y * scale_factor; 
+
+		_this.beziers.forEach(function(b) {
+			b.p1.x *= scale_factor += dx; // Scale | Translate
+			b.c1.x *= scale_factor += dx;
+			b.c2.x *= scale_factor += dx;
+			b.p1.y *= scale_factor += dy;
+			b.c1.y *= scale_factor += dy;
+			b.c2.y *= scale_factor += dy;
+		});
+
+		_this.constellation(_this.density);
+
+
+	}
 
 	// Evenly distribute vertices across Brain svg
-	this.constellation = function() {
+	this.constellation = function(density) {
 
 		let b = _this.beziers;
 
@@ -452,10 +494,23 @@ function SVG_object (args = {}) {
 			console.log("end.c1 " + end.c1);
 			console.log("end.c2 " + end.c2);
 
-			subdivide(bezier_pts); // Create Evenly distributed vertices
+			subdivide(bezier_pts, density); // Create Evenly distributed vertices
 
 		}
 	}
+
+
+	// ------------------------------------------------
+	// Event Bindings
+
+	// Deal with resize events
+	window.onresize = function() { 
+
+     	resizeSVG();	
+  
+	}
+
+
 }
 
 module.exports = SVG_object;
