@@ -36,7 +36,7 @@ function SVG_object (args = {}) {
 
 
 	// ------------------------------------------------
-	// SVG Rendering
+	// SVG Rendering | Public
 
 	this.render_lines = function() {
 		
@@ -52,26 +52,19 @@ function SVG_object (args = {}) {
 
 		let b = _this.beziers;
 
-		p.push();
-			let scale_factor = 2.25;
-			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
-				dy = p.height/2 - _start_pos.y * scale_factor; 
-			p.translate(dx, dy);
-			p.scale(scale_factor);
-			p.beginShape();
-				p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
-				for (let i = 1; i < b.length; i++) {
-					p.bezierVertex(
-						b[i].c1.x, // Control Pt x 1
-						b[i].c1.y, // Control Pt y 1
-						b[i].c2.x, // Control Pt x 2
-						b[i].c2.y, // Control Pt y 2
-						b[i].p1.x, // Pt x
-						b[i].p1.y  // Pt y
-					);
-				}
-			p.endShape();
-		p.pop();
+		p.beginShape();
+			p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
+			for (let i = 1; i < b.length; i++) {
+				p.bezierVertex(
+					b[i].c1.x, // Control Pt x 1
+					b[i].c1.y, // Control Pt y 1
+					b[i].c2.x, // Control Pt x 2
+					b[i].c2.y, // Control Pt y 2
+					b[i].p1.x, // Pt x
+					b[i].p1.y  // Pt y
+				);
+			}
+		p.endShape();
 	}
 
 	this.render_points = function() {
@@ -85,17 +78,10 @@ function SVG_object (args = {}) {
 
 		let v = _this.vertices;
 
-		p.push();
-			let scale_factor = 2.25;
-			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
-				dy = p.height/2 - _start_pos.y * scale_factor; 
-			p.translate(dx, dy);
-			p.scale(scale_factor);
-			for (let i = 0; i < v.length; i++) {
-				p.fill(115,135,150);
-				p.ellipse(v[i].x,v[i].y,2,2);
-			}
-		p.pop();
+		for (let i = 0; i < v.length; i++) {
+			p.fill(115,135,150);
+			p.ellipse(v[i].x,v[i].y,5,5);
+		}
 	}
 
 	this.debug = function() {
@@ -105,55 +91,51 @@ function SVG_object (args = {}) {
 
 		let b = _this.beziers;
 
-		p.push();
-			let scale_factor = 2.25;
-			let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
-				dy = p.height/2 - _start_pos.y * scale_factor; 
-			p.translate(dx, dy);
-			p.scale(scale_factor);
+		for (let i = 0; i < b.length; i++) { // Measure up till last point
+			let start = b[i],
+				end,
+				bezier_pts = []; // Build Cubic Bezier Segment
 
-			for (let i = 0; i < b.length; i++) { // Measure up till last point
-				let start = b[i],
-					end,
-					bezier_pts = []; // Build Cubic Bezier Segment
-
-				if (i < b.length - 1) {
-					end = b[i+1]; // Lookforward
-				} else {
-					end = b[0];   // Back to beginning
-				}
-
-				p.stroke(255,0,0,100);
-				p.line( // Point to control point 1
-					start.p1.x,
-					start.p1.y,
-					start.c2.x,
-					start.c2.y
-				);
-				p.stroke(255,0,255,100);
-				p.line( // Point to control point 1
-					start.p1.x,
-					start.p1.y,
-					start.c1.x,
-					start.c1.y
-				);
-				p.stroke(0,255,0,100);
-				p.line( // Point to control point 2
-					start.p1.x,
-					start.p1.y,
-					end.c1.x,
-					end.c1.y
-				);
-				p.stroke(255,255,0,100);
-				p.line( // Point to control point 2
-					end.p1.x,
-					end.p1.y,
-					end.c2.x,
-					end.c2.y
-				);
+			if (i < b.length - 1) {
+				end = b[i+1]; // Lookforward
+			} else {
+				end = b[0];   // Back to beginning
 			}
-		p.pop();
 
+			p.stroke(255,0,0,100);
+			p.line( // Point to control point 1
+				start.p1.x,
+				start.p1.y,
+				start.c2.x,
+				start.c2.y
+			);
+			p.stroke(255,0,255,100);
+			p.line( // Point to control point 1
+				start.p1.x,
+				start.p1.y,
+				start.c1.x,
+				start.c1.y
+			);
+			p.stroke(0,255,0,100);
+			p.line( // Point to control point 2
+				start.p1.x,
+				start.p1.y,
+				end.c1.x,
+				end.c1.y
+			);
+			p.stroke(255,255,0,100);
+			p.line( // Point to control point 2
+				end.p1.x,
+				end.p1.y,
+				end.c2.x,
+				end.c2.y
+			);
+		}
+
+	}
+
+	this.resize = function() {
+		scaleSVG();
 	}
 
 
@@ -477,54 +459,55 @@ function SVG_object (args = {}) {
 	}
 
 	function scaleSVG() {
-		let scale_factor;
+		let scale_factor,
+			min_x = 1000000,
+			min_y = 1000000,
+			max_x = 0,
+			max_y = 0;
 		
 		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
+		scale_factor = p.map(scale_factor, 400, 3000, 1.5, 8);
 
-		 scale_factor = p.map(scale_factor, 400, 3000, 0.5, 3);
-
-		// let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
-		// 	dy = p.height/2 - _start_pos.y * scale_factor; 
-
-		let dx = 0,
-			dy = 0; 
-
-		console.log(p.width, p.height, scale_factor, dx, dy);
+		// console.log(p.width, p.height, scale_factor, dx, dy);
 
 		_this.beziers.length = 0;
+		_this.vertices.length = 0;
 
 		parseSVG(); // Parse SVG
 
-		_this.beziers.forEach(function(b) {
-			b.p1.x = b.p1.x * scale_factor + dx; // Scale | Translate
-			b.c1.x = b.c1.x * scale_factor + dx;
-			b.c2.x = b.c2.x * scale_factor + dx;
-			b.p1.y = b.p1.y * scale_factor + dy;
-			b.c1.y = b.c1.y * scale_factor + dy;
-			b.c2.y = b.c2.y * scale_factor + dy;
+		_this.beziers.forEach(function(b) { // Scale Values
+			b.p1.x *= scale_factor; 
+			b.c1.x *= scale_factor;
+			b.c2.x *= scale_factor;
+			b.p1.y *= scale_factor;
+			b.c1.y *= scale_factor;
+			b.c2.y *= scale_factor;
+		});
+
+		_this.beziers.forEach(function(b) { // How big is this thing?
+			if (b.p1.x < min_x) min_x = b.p1.x;
+			if (b.p1.x > max_x) max_x = b.p1.x;
+			if (b.p1.y < min_y) min_y = b.p1.y;
+			if (b.p1.y > max_y) max_y = b.p1.y;
+		});
+
+		console.log(min_x, max_x, min_y, max_y);
+
+		let dx = p.width/2 - 50 - (max_x - min_x) / 2, // 50 Arbitrary offset
+			dy = p.height/2 - (max_y - min_y) / 2; 
+
+		_this.beziers.forEach(function(b) { // Center Graphic
+			b.p1.x += dx; 
+			b.c1.x += dx;
+			b.c2.x += dx;
+			b.p1.y += dy;
+			b.c1.y += dy;
+			b.c2.y += dy;
 		});
 
 		constellation(_this.density);
 
 	}
-
-
-	// ------------------------------------------------
-	// Event Bindings
-
-	// Deal with resize events
-	window.onresize = function() { 
-		p.resizeCanvas(window.innerWidth, window.innerHeight);
-
-		P.clear();
-
-     	scaleSVG();	
-
-     	_this.render_points();
-  
-	}
-
-
 }
 
 module.exports = SVG_object;

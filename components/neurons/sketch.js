@@ -73,7 +73,7 @@ let sprout = function (p) {
 
 		_svg_object = new SVG_Object({
 			p: p,
-			density: 10,
+			density: 20,
 		});
 
 		// Calculate _nnn_count based on width
@@ -92,7 +92,7 @@ let sprout = function (p) {
 	p.draw = function() {
 		// _svg_object.render_lines();
 		_svg_object.render_points();
-		// _svg_object.control();
+		// _svg_object.debug();
 		NeuronCoordinator.animate();
 	}
 
@@ -256,12 +256,20 @@ let sprout = function (p) {
 		});	
 	}
 
+	// ------------------------------------------------
+	// Event Bindings
+
 	// Deal with resize events
 	window.onresize = function() { 
-		$(canvas).width(window.innerWidth)
-			     .height(window.innerHeight);
+		p.resizeCanvas(window.innerWidth, window.innerHeight);
+
+     	_svg_object.resize();
+
+     	p.draw();
+     	p.draw();
 	}
 }
+
 
 module.exports.init = function (args = {}) {
 	_options.anchor = args.anchor;
