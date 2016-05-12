@@ -17,7 +17,7 @@ function SVG_object (args = {}) {
 	// Private arguments from constructor
 	let p = args.p;
 
-	_this.density = args.density || 10; // 10 default
+	this.density = args.density || 10; // 10 default
 
 	// SVG
 	let d = "M245.8,107.2c22.6-2.1,18-49.3-11.5-38.4c-0.1,0-0.2-0.1-0.1-0.2c22.2-15.1-3.9-49.6-24.5-31.5c-0.1,0.1-0.2,0-0.1-0.1c8.3-22.6-25.3-37.5-36.5-16.2c0,0.1-0.1,0-0.1,0c-0.3-21.7-31.7-26.8-38.8-6.3c0,0.1-0.1,0.1-0.1,0c-7.1-19.1-36.2-15.6-38.6,4.7c0,0.1-0.1,0.1-0.1,0c-15-17.8-44,1.9-32.9,22.3c0,0.1,0,0.1-0.1,0.1c-18-17.5-45.8,9.8-28.4,28.1c0.1,0.1,0,0.1-0.1,0.1c-23.2-6.9-36,27.6-13.8,37.5c0,0,0,0.1,0,0.1c-25,1.2-24.3,40,1,40c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0c19.2,0.4,23.4-24.6,12-36.3c-0.1-0.1,0-0.1,0.1-0.1c37.7,0.7,29.4-36.6,10.2-38.5C245.7,107.3,245.7,107.2,245.8,107.2z";
@@ -161,15 +161,13 @@ function SVG_object (args = {}) {
 	// SVG Parsing
 
 	function initialize() {
-		parseSVG();
 		scaleSVG();
 	}
 
 	function parseSVG() {
-		let draw_object;
-		d = svg_parse(d); // Parse the path
+		let d_parse = svg_parse(d); // Parse the path
 
-		d.forEach(function(curve) {
+		d_parse.forEach(function(curve) {
 			let command = curve.code;
 
 			// Convert SVG to p5 drawing commands
@@ -444,34 +442,11 @@ function SVG_object (args = {}) {
 		}
 
 		seg_length();
-		// addPoints();
-	}
-
-	function scaleSVG() {
-		let scale_factor;
-		p.width > p.height ? scale_factor = p.width : scale_factor = p.height; // Scale by smallest dimension
-
-		scale_factor = p.map(scale_factor, 400, 3000, 0.5, 3);
-
-		let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
-			dy = p.height/2 - _start_pos.y * scale_factor; 
-
-		_this.beziers.forEach(function(b) {
-			b.p1.x *= scale_factor += dx; // Scale | Translate
-			b.c1.x *= scale_factor += dx;
-			b.c2.x *= scale_factor += dx;
-			b.p1.y *= scale_factor += dy;
-			b.c1.y *= scale_factor += dy;
-			b.c2.y *= scale_factor += dy;
-		});
-
-		_this.constellation(_this.density);
-
 
 	}
 
 	// Evenly distribute vertices across Brain svg
-	this.constellation = function(density) {
+	function constellation(density) {
 
 		let b = _this.beziers;
 
@@ -486,17 +461,51 @@ function SVG_object (args = {}) {
 			bezier_pts.push(end.c2);
 			bezier_pts.push(end.p1);
 
-			console.log("Bezier: " + i);
-			console.log("start.p1 " + start.p1);
-			console.log("start.c1 " + start.c1);
-			console.log("start.c2 " + start.c2);
-			console.log("end.p1 " + end.p1);
-			console.log("end.c1 " + end.c1);
-			console.log("end.c2 " + end.c2);
+			function debug() {
+				console.log("Bezier: " + i);
+				console.log("start.p1 " + start.p1);
+				console.log("start.c1 " + start.c1);
+				console.log("start.c2 " + start.c2);
+				console.log("end.p1 " + end.p1);
+				console.log("end.c1 " + end.c1);
+				console.log("end.c2 " + end.c2);
+			}
 
 			subdivide(bezier_pts, density); // Create Evenly distributed vertices
 
 		}
+	}
+
+	function scaleSVG() {
+		let scale_factor;
+		
+		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
+
+		 scale_factor = p.map(scale_factor, 400, 3000, 0.5, 3);
+
+		// let dx = p.width/2 - _start_pos.x / (scale_factor / 2.6),
+		// 	dy = p.height/2 - _start_pos.y * scale_factor; 
+
+		let dx = 0,
+			dy = 0; 
+
+		console.log(p.width, p.height, scale_factor, dx, dy);
+
+		_this.beziers.length = 0;
+
+		parseSVG(); // Parse SVG
+
+		_this.beziers.forEach(function(b) {
+			b.p1.x = b.p1.x * scale_factor + dx; // Scale | Translate
+			b.c1.x = b.c1.x * scale_factor + dx;
+			b.c2.x = b.c2.x * scale_factor + dx;
+			b.p1.y = b.p1.y * scale_factor + dy;
+			b.c1.y = b.c1.y * scale_factor + dy;
+			b.c2.y = b.c2.y * scale_factor + dy;
+		});
+
+		constellation(_this.density);
+
 	}
 
 
@@ -505,8 +514,13 @@ function SVG_object (args = {}) {
 
 	// Deal with resize events
 	window.onresize = function() { 
+		p.resizeCanvas(window.innerWidth, window.innerHeight);
 
-     	resizeSVG();	
+		P.clear();
+
+     	scaleSVG();	
+
+     	_this.render_points();
   
 	}
 
