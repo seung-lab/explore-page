@@ -255,16 +255,18 @@ $.fn.scrambleText = function (args = {}) {
 	 		}
 	 		return firstString;
 	 	}
+
 	 	begVector = copyThroughScramble(begVector, endVector);
 
  		// now got through the bottom string, if there is one
+ 		let text = begVector;
+
  		if (end2) {
  			begVector2 = copyThroughScramble(begVector2, endVector2);
-	 		updatefn(begVector.concat("<br>", begVector2));
+	 		text = begVector.concat("<br>", begVector2);
  		} 
- 		else {
-	 		updatefn(begVector);
-	 	}
+ 		
+	 	updatefn(text);
 
 	 	if (all_solved) {
 	 		deferred.resolve();
