@@ -142,19 +142,13 @@ $.fn.scrambleText = function (args = {}) {
 	let _this = this;
 
 	let begin = args.start || this.html(),
-		end = args.end,
-		end2 = args.end2,
+		end = args.endFirstLine,
+		end2 = args.endSecondLine || "",
 		msec = args.msec || 2000,
-		tick = 50, //args.tick || 50,
+		tick = args.tick || 50,
 		updatefn = args.update || function (txt) {
 			_this.text(txt);
 		};
-
-	if (!end2) {
-		end2 = "";
-	}
-
-	begin = begin.replace(/<br>/g, ' ');
 
 	if (begin.replace(/ /g, '') === end.replace(/ /g, '')) {
 		return $.Deferred().resolve();
@@ -169,15 +163,18 @@ $.fn.scrambleText = function (args = {}) {
 	if (begin2) {
 		begin2 = begin2[1];
 		begin = firsthalf
-	} else {
+	}
+	else {
 		begin2 = "";
 	}
 
-	// begin and end are now split up between their two lines (if there are any)
+	// Begin and end are now split up between their two lines (if there are any)
 
-	let topSize = Math.max(end.length);
-	begin = begin.slice(0, topSize);
+	let topSize = end.length;
 	let botSize = Math.max(begin2.length, end2.length);
+
+	// Set the top line to be only as long as the finished product
+	begin = begin.slice(0, topSize);
 
 	// Pads the strings with spaces so that two all strings have the same length
 	function sizedVector (txt, msize) {
@@ -239,41 +236,29 @@ $.fn.scrambleText = function (args = {}) {
  		// first go through the top string
  		// currently, the top string is begVector -> endVector
  		// the bottom string is begVector2 -> endVector2
- 		for (let i = 0; i < endVector.length; i++) {
- 			if (begVector[i] === endVector[i]) {
- 				continue;
- 			}
-
- 			if (begVector[i] === ' ') {
- 				begVector = Utils.replaceAt(begVector, endVector[i], i);
- 			}
- 			else if (easing(t) >= Math.random()) {
- 				begVector = Utils.replaceAt(begVector, endVector[i], i);
- 			}
- 			else {
- 				begVector = Utils.replaceAt(begVector, Utils.random_choice(alphabet), i);
- 				all_solved = false;
- 			}
- 		}
-
- 		// now got through the bottom string, if there is one
- 		if (end2) {
- 			for (let i = 0; i < endVector2.length; i++) {
-	 			if (begVector2[i] === endVector2[i]) {
+ 		function copyThroughScramble (firstString, secondString) {
+	 		for (let i = 0; i < secondString.length; i++) {
+	 			if (firstString[i] === secondString[i]) {
 	 				continue;
 	 			}
-
-	 			if (begVector[i] === ' ') {
-	 				begVector2 = Utils.replaceAt(begVector2, endVector2[i], i);
+	 			if (firstString[i] === ' ') {
+	 				firstString = Utils.replaceAt(firstString, secondString[i], i);
 	 			}
 	 			else if (easing(t) >= Math.random()) {
-	 				begVector2 = Utils.replaceAt(begVector2, endVector2[i], i);
+	 				firstString = Utils.replaceAt(firstString, secondString[i], i);
 	 			}
 	 			else {
-	 				begVector2 = Utils.replaceAt(begVector2, Utils.random_choice(alphabet), i);
+	 				firstString = Utils.replaceAt(firstString, Utils.random_choice(alphabet), i);
 	 				all_solved = false;
 	 			}
 	 		}
+	 	}
+	 	copyThroughScramble(begVector, endVector);
+
+ 		// now got through the bottom string, if there is one
+ 		if (end2) {
+ 			copyThroughScramble(begVector2, endVector2);
+
 	 		if (all_solved) {
 	 			deferred.resolve();
 	 		} else {

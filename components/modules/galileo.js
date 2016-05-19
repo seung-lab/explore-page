@@ -35,31 +35,31 @@ class Galileo extends TeaTime {
 				},
 			},
 			{
-				text: "Working together these cells make you, you.",
+				firstLine: "Working together these cells make you, you.",
 				format: "italics",
 			},
 			{
-				text: "However, most of their circuits are still uncharted.",
+				firstLine: "However, most of their circuits are still uncharted.",
 				format: "italics",
 			},
 			{
-				text: "When Galileo first peered through his telescope it began",
-				text2: "a revolution in the way we see the world around us.",
+				firstLine: "When Galileo first peered through his telescope it began",
+				secondLine: "a revolution in the way we see the world around us.",
 				format: "italics",
 			},
 			{
-				text: "Today, neuroscience is revolutionizing",
-				text2: "how we see the world within us.",
+				firstLine: "Today, neuroscience is revolutionizing",
+				secondLine: "how we see the world within us.",
 				format: "italics",
 			},
 			{
-				text: "We’re calling on gamers to help connect the dots",
-				text2: "by playing a game to map the brain.",
+				firstLine: "We’re calling on gamers to help connect the dots",
+				secondLine: "by playing a game to map the brain.",
 				format: "italics",
 			},
 			{
-				text: "What began at MIT has grown into a global",
-				text2: "community of hundreds of thousands.",
+				firstLine: "What began at MIT has grown into a global",
+				secondLine: "community of hundreds of thousands.",
 				format: "italics",
 			}
 		];
@@ -293,8 +293,8 @@ class Galileo extends TeaTime {
 		if (elem.text()) {
 			this.animations.text = elem.scrambleText({
 				begin: elem.html(),
-				end: slide.text,
-				end2: slide.text2,
+				endFirstLine: slide.firstLine,
+				endSecondLine: slide.secondLine,
 				msec: 1500,
 				tick: 50,
 				update: function (txt) {
