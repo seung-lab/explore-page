@@ -150,7 +150,7 @@ $.fn.scrambleText = function (args = {}) {
 			_this.text(txt);
 		};
 
-	if (begin.replace(/<br>/g, ' ').replace(/ /g, '') === end.concat(' ', end2).replace(/ /g, '')) {
+	if (begin.replace(/<br>/g, ' ').replace(/ /g, '') === end.concat(end2).replace(/ /g, '')) {
 		return $.Deferred().resolve();
 	}
 
@@ -162,7 +162,7 @@ $.fn.scrambleText = function (args = {}) {
 	let begin2 = begin.match(/<br>(.*)$/);
 	if (begin2) {
 		begin2 = begin2[1];
-		begin = firsthalf
+		begin = firsthalf;
 	}
 	else {
 		begin2 = "";
@@ -263,12 +263,11 @@ $.fn.scrambleText = function (args = {}) {
 	 		updatefn(begVector.concat("<br>", begVector2));
  		} 
  		else {
-	 		if (all_solved) {
-	 			deferred.resolve();
-	 		}
-	 		else {
-	 			updatefn(begVector);
-	 		}
+	 		updatefn(begVector);
+	 	}
+
+	 	if (all_solved) {
+	 		deferred.resolve();
 	 	}
 
  	}, tick);
