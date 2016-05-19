@@ -27,6 +27,7 @@ function Node (args = {}) {
 	// Public P5.Vector objects
 	this.start = args.position.copy() || p.createVector();
 	this.position = args.position.copy() || p.createVector();
+	this.brain_pos = args.brain_pos || p.createVector();
 	this.velocity = args.velocity.copy() || p.createVector();
 	
 	// Public floats
@@ -35,6 +36,8 @@ function Node (args = {}) {
 	this.depth = args.depth || 0;
 	this.mass = args.mass || 5;
 	this.radius = args.radius || 200;
+
+	this.maxspeed = 2.5;       	  // Default 2
 
 	// Node ID
 	this.id = args.id || 0;
@@ -90,7 +93,6 @@ function Node (args = {}) {
 	let _radius = 0;
 	let _wandertheta = 0;
 	let _wan_const = 0.5;
-	let _maxspeed = 2.5;       // Default 2
 	let _reboundspeed = 10;       // Default 2
 	// let _maxforce = p.random(0.9, 1.15);    // Default 0.05
 
@@ -241,7 +243,7 @@ function Node (args = {}) {
 		_target.sub(_this.position);  	// A vector pointing from the position to the _target
 		_target.normalize();			// Normalize _target
 
-		_target.mult(_maxspeed);		// Scale to maximum speed
+		_target.mult(_this.maxspeed);		// Scale to maximum speed
 		_target.sub(_this.velocity);	// Steering = Desired minus Velocity
 		_target.limit(_maxforce);  		// Limit to maximum steering force
 
@@ -264,15 +266,16 @@ function Node (args = {}) {
 				if ( d < 1) {
 					return true;
 				}
-			let m = p.map(d, 0, 100, 0, 100);
+			let m = p.map(d, 0, 100, 0, 25);
+			console.log(m);
 			_target.mult(m);
 		} else {
-			_target.mult(_maxspeed);
+			_target.mult(_this.maxspeed);
 		}
 
 		// Steering = Desired minus Velocity
 		_target.sub(_this.velocity);
-		_target.limit(12	);  // Limit to maximum steering force
+		_target.limit(12);  // Limit to maximum steering force
 		
 		// Apply force here, so we can return true
 		_this.applyForce(_target);
@@ -328,7 +331,7 @@ function Node (args = {}) {
 		if (steer.magSq() > 0) {
 			// Implement Reynolds: Steering = Desired - Velocity
 			steer.normalize();
-			steer.mult(_maxspeed);
+			steer.mult(_this.maxspeed);
 			steer.sub(_this.velocity);
 			steer.limit(_maxforce);
 		}
@@ -482,18 +485,18 @@ function Node (args = {}) {
 		// If we are a spring, at friction (lower energy)
 		if ((_this.sprung) || (_this.bound)) {
 			_this.velocity.mult(_damping);
-			_maxspeed = 100;
+			_this.maxspeed = 100;
 		}
 
 		if (_this.distribute) {
 			_this.velocity.mult(_damping);
-			_maxspeed = p.width / 35;	
+			_this.maxspeed = p.width / 35;	
 		}
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
 
 		// Limit speed
-		_this.velocity.limit(_maxspeed);
+		_this.velocity.limit(_this.maxspeed);
 		_this.position.add(_this.velocity);
 		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
 

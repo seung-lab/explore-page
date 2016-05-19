@@ -90,10 +90,9 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		// _svg_object.render_lines();
-		_svg_object.render_points();
-		// _svg_object.debug();
+
 		NeuronCoordinator.animate();
+
 	}
 
 	function nnn_start () {
@@ -218,7 +217,7 @@ let sprout = function (p) {
 		    	name: "Twinkle2",
 				duration: 15,
 				forward: _nnn.twinkle_2,
-				reverse: _nnn.rebound_2,
+				reverse: _nnn.rebound_3,
 				forward_slide: 5,
 				reverse_slide: 4,
 				loop: true,
@@ -227,7 +226,7 @@ let sprout = function (p) {
 		    {
 		    	name: "Center2",
 				duration: 100,
-				forward: _nnn.rebound,
+				forward: _nnn.rebound_3,
 				reverse: _nnn.staryNight,
 				forward_slide: 6,
 				reverse_slide: 5,
@@ -235,8 +234,8 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Brain",
-				duration: 100,
-				forward: _nnn.brainiac,
+				duration: 200,
+				forward: _nnn.render_brain,
 				reverse: _nnn.rebound,
 				forward_slide: 6,
 				reverse_slide: 5,

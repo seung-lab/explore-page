@@ -11,6 +11,7 @@ let $ = require('jquery'),
 	p5 = require('p5'),
 	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js'),
+	Node = require('./node.js'),
 	Easings = require('../../clientjs/easing.js');
 
 function NNN (args = {}) {
@@ -326,12 +327,16 @@ function NNN (args = {}) {
 		}
 	}
 
-	this.brainiac = function() {
-		let v = _this.brain.vertices;
-		v.forEach(function(vertex) {
+	this.rebound_3 = function() {	
+		for (let i = _this.neurons.length/2 - 1; i >= 0; i--) {
+			let neuron = _this.neurons[i];
+			neuron.rebound();
+			neuron.render_particle(1);
+		}
+	}
 
-		});
-
+	this.render_brain = function() {
+		brainiac.animate();
 	}
 
 	this.kruskal = function() {
@@ -341,6 +346,43 @@ function NNN (args = {}) {
 	this.plague = function() {
 		
 	}
+
+	//-----------------------------------------------------------------------------
+
+	let brainiac = (function() {
+		let center = new p5.Vector(p.width/2, p.height/2);
+		let vertices = _this.brain.vertices;
+		let speed = 100;
+
+		vertices = vertices.map(function(v) { // Make our thot objects
+			return new Node ({
+				position: 	center,
+				brain_pos:  v,
+				velocity: 	p.createVector(1,1),
+				mass: 		1,
+				p: 			p,
+			});
+		});
+
+		console.log('whatever');
+
+		function animate() {
+			if (speed >= 3) speed -= 3;
+			vertices.forEach(function(v) {
+				// let v = vertices[50];
+				v.maxspeed = speed;
+				v.arrive(v.brain_pos);
+				v.update();
+				v.render_soma(5);
+ 			});
+		}
+
+		return { 
+			animate: function() {
+				animate();
+			}
+		};
+	})();
 
 
 

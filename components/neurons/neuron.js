@@ -105,7 +105,7 @@ function Neuron (args) {
 			n.render();
 		}
 
-		// Soma Style
+		// Soma Style 
 		p.noStroke();
 		p.fill(115,135,150); // blue
 
