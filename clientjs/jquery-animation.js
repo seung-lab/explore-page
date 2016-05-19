@@ -142,8 +142,8 @@ $.fn.scrambleText = function (args = {}) {
 	let _this = this;
 
 	let begin = args.start || this.html(),
-		end = args.endFirstLine,
-		end2 = args.endSecondLine || "",
+		end = args.end,
+		end2 = args.end2 || "",
 		msec = args.msec || 2000,
 		tick = args.tick || 50,
 		updatefn = args.update || function (txt) {
@@ -265,7 +265,7 @@ $.fn.scrambleText = function (args = {}) {
  			begVector2 = copyThroughScramble(begVector2, endVector2);
 	 		text = begVector.concat("<br>", begVector2);
  		} 
- 		
+
 	 	updatefn(text);
 
 	 	if (all_solved) {

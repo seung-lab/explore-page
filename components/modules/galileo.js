@@ -293,8 +293,8 @@ class Galileo extends TeaTime {
 		if (elem.text()) {
 			this.animations.text = elem.scrambleText({
 				begin: elem.html(),
-				endFirstLine: slide.firstLine,
-				endSecondLine: slide.secondLine,
+				end: slide.firstLine,
+				end2: slide.secondLine,
 				msec: 1500,
 				tick: 50,
 				update: function (txt) {
