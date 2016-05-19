@@ -139,13 +139,20 @@ $.fn.drop = function (args) {
 };
 
 $.fn.scrambleText = function (args = {}) {
+	let _this = this;
+
 	let begin = args.start || this.html(),
 		end = args.end,
+		end2 = args.end2,
 		msec = args.msec || 2000,
-		tick = args.tick || 50,
+		tick = 50, //args.tick || 50,
 		updatefn = args.update || function (txt) {
 			_this.text(txt);
 		};
+
+	if (!end2) {
+		end2 = "";
+	}
 
 	begin = begin.replace(/<br>/g, ' ');
 
@@ -153,18 +160,34 @@ $.fn.scrambleText = function (args = {}) {
 		return $.Deferred().resolve();
 	}
 
-	let _this = this;
+	let firsthalf = begin.match(/^(.*)<br>/);
+	if (firsthalf) {
+		firsthalf = firsthalf[1];
+	}
 
-	let size = Math.max(begin.length, end.length);
+	let begin2 = begin.match(/<br>(.*)$/);
+	if (begin2) {
+		begin2 = begin2[1];
+		begin = firsthalf
+	} else {
+		begin2 = "";
+	}
 
-	function sizedVector (txt) {
+	// begin and end are now split up between their two lines (if there are any)
+
+	let topSize = Math.max(end.length);
+	begin = begin.slice(0, topSize);
+	let botSize = Math.max(begin2.length, end2.length);
+
+	// Pads the strings with spaces so that two all strings have the same length
+	function sizedVector (txt, msize) {
 		let vector = "";
 
-		for (let i = 0; i < size; i++) {
+		for (let i = 0; i < msize; i++) {
 			vector += " ";
 		}
 
-		let centering = Math.floor((size - txt.length) / 2);
+		let centering = Math.floor((msize - txt.length) / 2);
 
 		for (let i = 0; i < txt.length; i++) {
 			vector = Utils.replaceAt(vector, txt[i], i + centering);
@@ -173,29 +196,23 @@ $.fn.scrambleText = function (args = {}) {
 		return vector;
 	}
 
-	let vector = sizedVector(begin),
-		end_vector = sizedVector(end);
-
-	function genAlphabet (start_letter, num) {
-		let alphabet = [];
-		for (let code = start_letter.charCodeAt(0), i = 0; i < num; i++, code++) {
-			alphabet.push(String.fromCharCode(code));
-		}
-		return alphabet;
-	}
+	let begVector = sizedVector(begin, topSize),
+		begVector2 = sizedVector(begin2, botSize),
+		endVector = sizedVector(end, topSize),
+		endVector2 = sizedVector(end2, botSize);
 
 	let alphabet = []
-		// .concat(genAlphabet('a', 26))
-		// .concat(genAlphabet('A', 26))
-		// .concat(genAlphabet('0', 10));
-
-	alphabet = Utils.unique(alphabet.concat(end.split(""))).filter( x => x !== ' ' )
+	alphabet = Utils.unique(alphabet.concat(end.concat(end2).split(""))).filter( x => x !== ' ' )
 
  	let req;
 
 	let deferred = $.Deferred()
  		.done(function () {
- 			updatefn(end_vector.trim());
+ 			if (end2) {
+ 				updatefn(endVector.concat("<br>", endVector2).trim());
+ 			} else {
+ 				updatefn(endVector.trim());
+ 			}
  		})
  		.always(function () {
  			clearInterval(req);
@@ -203,8 +220,7 @@ $.fn.scrambleText = function (args = {}) {
 
  	let start_time = window.performance.now();
 
- 	updatefn(vector);
-
+ 	// sets the speed at which the scrambler will hurry up and choose correct characters
  	let easing = function (t) {
  		return 1 - Math.pow(t*t - 2*t + 1, 1.5);
  	};
@@ -220,29 +236,57 @@ $.fn.scrambleText = function (args = {}) {
  		}
 
  		let all_solved = true;
- 		for (let i = 0; i < vector.length; i++) {
- 			if (vector[i] === end_vector[i]) {
+ 		// first go through the top string
+ 		// currently, the top string is begVector -> endVector
+ 		// the bottom string is begVector2 -> endVector2
+ 		for (let i = 0; i < endVector.length; i++) {
+ 			if (begVector[i] === endVector[i]) {
  				continue;
  			}
 
- 			if (end_vector[i] === ' ') {
- 				vector = Utils.replaceAt(vector, end_vector[i], i);
+ 			if (begVector[i] === ' ') {
+ 				begVector = Utils.replaceAt(begVector, endVector[i], i);
  			}
  			else if (easing(t) >= Math.random()) {
- 				vector = Utils.replaceAt(vector, end_vector[i], i);
+ 				begVector = Utils.replaceAt(begVector, endVector[i], i);
  			}
  			else {
- 				vector = Utils.replaceAt(vector, Utils.random_choice(alphabet), i);
+ 				begVector = Utils.replaceAt(begVector, Utils.random_choice(alphabet), i);
  				all_solved = false;
  			}
  		}
 
- 		if (all_solved) {
- 			deferred.resolve();
- 		}
- 		else {
- 			updatefn(vector);
- 		}
+ 		// now got through the bottom string, if there is one
+ 		if (end2) {
+ 			for (let i = 0; i < endVector2.length; i++) {
+	 			if (begVector2[i] === endVector2[i]) {
+	 				continue;
+	 			}
+
+	 			if (begVector[i] === ' ') {
+	 				begVector2 = Utils.replaceAt(begVector2, endVector2[i], i);
+	 			}
+	 			else if (easing(t) >= Math.random()) {
+	 				begVector2 = Utils.replaceAt(begVector2, endVector2[i], i);
+	 			}
+	 			else {
+	 				begVector2 = Utils.replaceAt(begVector2, Utils.random_choice(alphabet), i);
+	 				all_solved = false;
+	 			}
+	 		}
+	 		if (all_solved) {
+	 			deferred.resolve();
+	 		} else {
+	 			updatefn(begVector.concat("<br>", begVector2));
+	 		}
+ 		} else {
+	 		if (all_solved) {
+	 			deferred.resolve();
+	 		}
+	 		else {
+	 			updatefn(begVector);
+	 		}
+	 	}
 
  	}, tick);
 

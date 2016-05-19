@@ -43,19 +43,23 @@ class Galileo extends TeaTime {
 				format: "italics",
 			},
 			{
-				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
+				text: "When Galileo first peered through his telescope it began",
+				text2: "a revolution in the way we see the world around us.",
 				format: "italics",
 			},
 			{
-				text: "Today, neuroscience is revolutionizing how we see the world within us.",
+				text: "Today, neuroscience is revolutionizing",
+				text2: "how we see the world within us.",
 				format: "italics",
 			},
 			{
-				text: "We’re calling on gamers to help connect the dots by playing a game to map the brain.",
+				text: "We’re calling on gamers to help connect the dots",
+				text2: "by playing a game to map the brain.",
 				format: "italics",
 			},
 			{
-				text: "What began at MIT has grown into a global community of hundreds of thousands.",
+				text: "What began at MIT has grown into a global",
+				text2: "community of hundreds of thousands.",
 				format: "italics",
 			}
 		];
@@ -290,6 +294,7 @@ class Galileo extends TeaTime {
 			this.animations.text = elem.scrambleText({
 				begin: elem.html(),
 				end: slide.text,
+				end2: slide.text2,
 				msec: 1500,
 				tick: 50,
 				update: function (txt) {
