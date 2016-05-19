@@ -150,7 +150,7 @@ $.fn.scrambleText = function (args = {}) {
 			_this.text(txt);
 		};
 
-	if (begin.replace(/ /g, '') === end.replace(/ /g, '')) {
+	if (begin.replace(/<br>/g, ' ').replace(/ /g, '') === end.concat(' ', end2).replace(/ /g, '')) {
 		return $.Deferred().resolve();
 	}
 
@@ -207,7 +207,8 @@ $.fn.scrambleText = function (args = {}) {
  		.done(function () {
  			if (end2) {
  				updatefn(endVector.concat("<br>", endVector2).trim());
- 			} else {
+ 			} 
+ 			else {
  				updatefn(endVector.trim());
  			}
  		})
@@ -252,19 +253,16 @@ $.fn.scrambleText = function (args = {}) {
 	 				all_solved = false;
 	 			}
 	 		}
+	 		return firstString;
 	 	}
-	 	copyThroughScramble(begVector, endVector);
+	 	begVector = copyThroughScramble(begVector, endVector);
 
  		// now got through the bottom string, if there is one
  		if (end2) {
- 			copyThroughScramble(begVector2, endVector2);
-
-	 		if (all_solved) {
-	 			deferred.resolve();
-	 		} else {
-	 			updatefn(begVector.concat("<br>", begVector2));
-	 		}
- 		} else {
+ 			begVector2 = copyThroughScramble(begVector2, endVector2);
+	 		updatefn(begVector.concat("<br>", begVector2));
+ 		} 
+ 		else {
 	 		if (all_solved) {
 	 			deferred.resolve();
 	 		}
