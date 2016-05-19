@@ -411,7 +411,7 @@ function SVG_object (args = {}) {
 		}
 
 		function addPoints() {
-			for (let i = 0; i < segments; i++) { // Get points on curve
+			for (let i = 0; i < segments - 1; i++) { // Get points on curve
 				let t = i / (segments - 1);
 
 				let x = p.bezierPoint(p0.x, p1.x, p2.x, p3.x, t); // Find point on curve
@@ -432,7 +432,7 @@ function SVG_object (args = {}) {
 
 		let b = _this.beziers;
 
-		for (let i = 0; i < b.length-1; i++) { // Measure up till last point
+		for (let i = 0; i < b.length-2; i++) { // Measure up till last point
 
 			let start = b[i],
 				end   = b[i+1], // Lookforward

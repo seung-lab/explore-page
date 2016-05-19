@@ -19,23 +19,15 @@ function NNN (args = {}) {
 
 	// Public arguments from constructor
 	this.num_neurons = args.num_neurons || 1;
-	this.complexity = args.complexity  || 13;
-	this.kruskal = args.kruskal  || {};
+	this.complexity  = args.complexity  || 13;
+	this.brain 		 = args.brain || {};
+	this.kruskal 	 = args.kruskal  || {};
 
-	// Generic public array letiable : not an argument though
-	this.neurons = [];
-	// Bounded Neurons
-	this.active_neurons = [];
-	// Array of all somas included in the NNN
-	this.somas = [];
-	// Spring system array
-	this.springs = [];
-	// Power Multiplier
-	this.time_power; 
-
-	// Particles for second half of story
-	// Simpler than neurons
-	this.stars;
+	this.neurons = []; 		// Generic public array letiable : not an argument though
+	this.active_neurons = []; 	// Bounded Neurons
+	this.somas = []; 			// Array of all somas included in the NNN
+	this.springs = []; 			// Spring system array
+	this.time_power; 			// Power Multiplier
 
 	this.max_depth;
 	this.num_branches;
@@ -298,7 +290,47 @@ function NNN (args = {}) {
 		_this.render_particles(1);
 	}
 
+	this.twinkle_2 = function() {
+		let step = p.PI / 30;
+		let threshold;
+		let a;
+
+		neuro_loop: // label
+		for (let i = _this.neurons.length/2 - 1; i >= 0; i--) {
+			let neuron = _this.neurons[i];
+			let soma = neuron.nodes[0];
+				
+			if (soma.twinkle_bool) {
+				soma.twinkle_angle += step; 
+				a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+				a = p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
+
+				neuron.render_particle(a); // Effect Opacity here?
+
+				if (a == 1) {
+					soma.twinkle_angle = 0;      	// Reset angle
+					soma.twinkle_bool = false;       	// Reset State
+				}
+			} 
+			else {
+				
+				neuron.render_particle(1);
+
+			}
+		
+			threshold = p.random(1); // Set threshold
+
+			if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+				soma.twinkle_bool = true;
+			}
+		}
+	}
+
 	this.brainiac = function() {
+		let v = _this.brain.vertices;
+		v.forEach(function(vertex) {
+
+		});
 
 	}
 

@@ -102,6 +102,7 @@ let sprout = function (p) {
 			num_neurons: _nnn_count,
 			complexity: 13,
 			kruskal: Kruskal,
+			brain: _svg_object,
 			p: p,
 		});
 
@@ -211,6 +212,16 @@ let sprout = function (p) {
 				reverse: _nnn.rebound,
 				forward_slide: 5,
 				reverse_slide: 4,
+				p: p
+		    },
+		    {
+		    	name: "Twinkle2",
+				duration: 15,
+				forward: _nnn.twinkle_2,
+				reverse: _nnn.rebound_2,
+				forward_slide: 5,
+				reverse_slide: 4,
+				loop: true,
 				p: p
 		    },
 		    {
