@@ -100,7 +100,7 @@ function NNN (args = {}) {
 		function setup_dendrite() { // Dendrite Set Up
 			for (let i = 0; i < vertices.length; i++) {
 
-				if (i % 10 !== 0) continue; // keep things evenly(ish) spaced
+				if (i % 3 !== 0) continue; // keep things evenly(ish) spaced
 
 				let v = _this.brain.vertices[i];
 
@@ -568,7 +568,7 @@ NNN.prototype.add_dendrite = function(pos, heading, velocity) {
 	// Given a constant branching speed, NNN.prototype controls dendrite size
 	// does not effect morphology.
 	// Grow time is inversely proportional to num_branches
-	neuron_timer = 500;
+	neuron_timer = 350;
 
 	this.dendrites.push(
 		new Neuron ({
