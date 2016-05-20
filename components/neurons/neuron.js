@@ -43,8 +43,9 @@ function Neuron (args) {
 	let list = false;
 
 	// Call methods to access outside of class this way!
-	this.neuron_start = function () {
-		let start_velocity = p.createVector(0,0); // Change this value to determine simulation speed
+	this.neuron_start = function () { // Default heading of zero unless defined
+		let start_velocity = p.createVector(); // Change this value to determine simulation speed
+
 		// Create a new Node instance
 		let n = new Node ({
 			neuron_timer: 	_this.neuron_timer,
@@ -75,7 +76,7 @@ function Neuron (args) {
 		let theta_const = p.random(p.TWO_PI); 
 		let start_angle;
 
-		// Create seed dendritees
+		// Create seed dendrites
 		for (let i = 0; i < _this.num_branches; i++) {
 			// Create a unique initial offset velocity heading for each branch with respect to the total
 			// number of seed branches, for additional diversity, add a random rotational offset
@@ -86,6 +87,22 @@ function Neuron (args) {
 			// Branch a bunch of times
 			_this.nodes.push(
 				n.branch(p.degrees(start_angle, _this.nodes.length), i + 1)
+			);
+		}
+	});
+
+	this.dendrite_setup = Utils.onceify(function(heading, velocity) {
+		// Get things moving
+		let n = _this.nodes[0];
+			n.velocity.set(velocity.x,velocity.y);
+			n.size == true;
+
+		// Create seed dendrites
+		for (let i = 0; i < _this.num_branches; i++) {
+			// Create a unique initial offset velocity heading for each branch with respect to the total
+			// number of seed branches, for additional diversity, add a random rotational offset
+			_this.nodes.push(
+				n.branch(0, i + 1)
 			);
 		}
 	});
@@ -146,7 +163,7 @@ function Neuron (args) {
 	this.done = function() {
 		let n;
 		
-		for (let i = _this.nodes.length - 1; i >= 1; i--) {
+		for (let i = _this.nodes.length - 1; i > 0; i--) {
 			n = _this.nodes[i];
 			if (n.isGrowing()) {
 				return false;
@@ -377,6 +394,52 @@ function Neuron (args) {
 			// Get the Node object, update and draw it
 			n = _this.nodes[i];
 			n.grow(_this.nodes);
+
+			if (n.isGrowing()) {
+				continue;
+			}
+
+			if (n.depth >= _this.max_depth) {
+				_this.create_bouton();
+				continue;
+			}
+			
+			if (n.leaf) {
+				// For every other node added: add one or two branches to create natural form
+				// Could definitely have a better way of accessing neuron depth.. that would improve branching
+				if (((n.depth + 1) % 2 == 0) && (n.depth != 2)) {
+					_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
+					_this.nodes.push(n.branch(20,_this.nodes.length));   // Add one going left
+				} 
+				else {
+					// Additional method for probabalistic branching
+					// Default rnd = 15% : could be higher
+					let rnd = p.random(1);
+					if ((rnd < 0.25) && ((n.depth + 1) < _this.max_depth )) {
+						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
+						_this.nodes.push(n.branch(20, _this.nodes.length));   // Add one going left
+					} 
+					else {
+						// Added boutons to end of Neuron --> Can be vastly improved to consider
+						// the entire 'distal' zone of the neuron.
+						_this.nodes.push(
+							n.branch(0, _this.nodes.length)
+						);
+					} 
+				}
+			}
+		}
+	}
+
+	this.grow2 = function() {
+		let n;
+
+		// Let's stop when the neuron gets too deep
+		// For every dendrite in the arraylist
+		for (let i = _this.nodes.length - 1; i >= 1; i--) {
+			// Get the Node object, update and draw it
+			n = _this.nodes[i];
+			n.grow2(_this.nodes);
 
 			if (n.isGrowing()) {
 				continue;

@@ -8,6 +8,7 @@
 "use strict";
 
 let $ = require('jquery'),
+	Utils = require('../../clientjs/utils.js'),
 	p5 = require('p5'),
 	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js'),
@@ -16,6 +17,7 @@ let $ = require('jquery'),
 
 function NNN (args = {}) {
 	// Private arguments from constructor
+	this.p = args.p;
 	let p = args.p;
 
 	// Public arguments from constructor
@@ -34,333 +36,25 @@ function NNN (args = {}) {
 	this.num_branches;
 	this.neuron_timer;
 	this.neuron_id = 0;
+	
+	this.dendrites = [];
+	this.roots = [];
+	this.dendrite_id = 0;
 
 	this.initialized = false;
 
 	let _this = this;
 
-	let _scatter_multiplier_1,
-		_scatter_multiplier_2,
-		_scatter_multiplier_3;
 
-	// Private Methods
-
-
-	// Public Methods
-
-	this.initialize = Utils.onceify(function() {
-		// Calculate power offset
-		// During scatter_2 --> Ensure consistant neuron density
-		// across different displays
-		_scatter_multiplier_1 = 20;
-		_scatter_multiplier_3 = 20;
-
-		_scatter_multiplier_2 = p.map(p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
-		_scatter_multiplier_2 = 1 - p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
-		_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
-		_scatter_multiplier_2 *= 250;
-
-		_this.time_power = p.map(window.innerWidth, 500, 2500, 1500, 2000);
-
-		// Initialize Neuron
-		_this.add_neuron(_this.num_neurons);
-	});
-
-	this.rebound_1 = function() {
-		let ret = false;
-
-		// Once the MST is built...
-		_this.render_particles(1);
-	}
-
-	this.scatter = function() {
-		_this.neurons.forEach(function(neuron) {
-			let soma = neuron.nodes[0];
-				soma.space(_this.somas, _scatter_multiplier_1); // Repel from center
-		});
-
-		_this.render_particles(1);
-	}
-
-	this.scatter_2 = function() {
-
-		_this.neurons.forEach(function(neuron) {
-			let soma = neuron.nodes[0];
-				soma.reset_pow_1();
-				soma.space(_this.somas, _scatter_multiplier_2); // Repel from center
-		});
-
-		_this.render_particles(1);
-
-		function calc_mst() {
-			_this.mst(); 
-			// Update spring positions --> Run through array
-			_this.springs.forEach(function(s) {
-				// s.update();
-				// s.display();
-			});
-		}
-	}
-
-	// Check if neuron is off the screen
-	this.check_bounds = function(soma) {
-		
-		if ((soma.position.x < 0) || (soma.position.x > p.width)) {
-			return false
-		}
-		if ((soma.position.y < 0) || (soma.position.y > p.height)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	this.activate = Utils.onceify(function() {
-
-		// console.log('activate');
-
-		for (let i = 0; i < _this.neurons.length; i++) {
-			let neuron = _this.neurons[i]
-			let soma = neuron.nodes[0];
-
-			// Add only bounded nodes that to our neuron array
-			if (_this.check_bounds(soma)) {
-				_this.active_neurons.push(neuron);
-			}
-
-			if (i == _this.neurons.length - 1) {
-				// Create seed branching
-				_this.active_neurons.forEach(function(active_neuron) {
-					// console.log('neuron_setup');
-					active_neuron.network_setup(); 
-				});
-
-				return true;
-			}
-		}
-	});
-	
-	// Simple method for running the neurons
-	// Call this something like 'renderFrame'
-	this.grow = function() {
-		// Setup Neurons
-		_this.activate();
-
-		_this.render();
-
-		_this.active_neurons.forEach(function(neuron) {
-			if (_this.done()) {
-				return; 
-			}
-
-			neuron.grow();
-
-		});
-	}
-
-	this.render = function() {
-		_this.active_neurons.forEach(function(neuron) {
-			neuron.render();
-		});
-	}
-
-	this.render_soma = function() {
-		_this.active_neurons.forEach(function(neuron) {
-			neuron.render_soma();
-		});
-	}
-
-	this.render_particles = function(a) {
-		_this.neurons.forEach(function(neuron) {
-			neuron.render_particle(a);
-		});
-	}
-
-
-	this.done = function() {
-		let n;
-
-		for (let i = 0; i < _this.active_neurons.length; i++) {
-			n = _this.active_neurons[i];
-			if (!n.done()) {
-				return false;
-			}
-		}
-
-		return true;
-
-	}
-
-	this.twinkle = function() {
-		let step = p.PI / 30;
-		let threshold;
-		let a;
-
-		neuro_loop: // label
-		for (let i = _this.neurons.length - 1; i >= 0; i--) {
-			let neuron = _this.neurons[i];
-			let soma = neuron.nodes[0];
-				
-			if (soma.twinkle_bool) {
-				soma.twinkle_angle += step; 
-				a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-1)
-				a = p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
-
-				neuron.render_particle(a); // Effect Opacity here?
-
-				if (a == 1) {
-					soma.twinkle_angle = 0;      	// Reset angle
-					soma.twinkle_bool = false;       	// Reset State
-				}
-			} 
-			else {
-				
-				neuron.render_particle(1);
-
-			}
-		
-			threshold = p.random(1); // Set threshold
-
-			if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
-				soma.twinkle_bool = true;
-			}
-		}
-	}
-
-	this.synapse = function() {
-		let threshold; 
-
-		_this.render(); // Render neurons
-
-		for (let i = _this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
-		// for (let i = 0; i >= 0; i--) { // Use active_neurons
-			let neuron = _this.active_neurons[i];
-			let soma = neuron.nodes[0];
-
-			if (neuron.propagate_bool) {
-				neuron.propagate(soma);
-			}
-
-			threshold = p.random(1); // Set threshold
-
-			if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
-				neuron.propagate_bool = true;
-			}
-		}
-	}
-
-	this.fadeIn = function() {
-		_this.active_neurons.forEach(function(neuron) { 
-			neuron.fadeIn();
-		});
-
-		_this.render(); // Render neurons	
-	}
-
-	this.fadeOut = function() {
-		_this.active_neurons.forEach(function(neuron) {
-			neuron.fadeOut();
-		});
-		
-		_this.render(); // Render neurons	
-	}
-
-	this.rebound2 = function() {	
-		_this.active_neurons.forEach(function(neuron) {
-			neuron.rebound();
-		});
-		
-		_this.render_soma(); // Render Soma	
-	}
-
-	this.last_position = function() {
-		_this.active_neurons.forEach(function(neuron) {
-			neuron.last_position();
-		});
-		
-		_this.render_soma(); // Render Soma	
-	}
-
-	this.stary_night = function() {
-		for (let i = 0; i < _this.neurons.length/2; i++) { // Use 1/2 total neurons
-			let soma = _this.neurons[i].nodes[0];
-				soma.reset_pow_3();
-				soma.space(_this.somas, _scatter_multiplier_3); // Repel from center
-		}
-
-		_this.render_particles(1);
-	}
-
-	this.twinkle_2 = function() {
-		let step = p.PI / 30;
-		let threshold;
-		let a;
-
-		neuro_loop: // label
-		for (let i = _this.neurons.length/2 - 1; i >= 0; i--) {
-			let neuron = _this.neurons[i];
-			let soma = neuron.nodes[0];
-				
-			if (soma.twinkle_bool) {
-				soma.twinkle_angle += step; 
-				a = p.abs(p.cos(soma.twinkle_angle)); // a == alpha (0-1)
-				a = p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
-
-				neuron.render_particle(a); // Effect Opacity here?
-
-				if (a == 1) {
-					soma.twinkle_angle = 0;      	// Reset angle
-					soma.twinkle_bool = false;       	// Reset State
-				}
-			} 
-			else {
-				
-				neuron.render_particle(1);
-
-			}
-		
-			threshold = p.random(1); // Set threshold
-
-			if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
-				soma.twinkle_bool = true;
-			}
-		}
-	}
-
-	this.rebound_3 = function() {	
-		for (let i = _this.neurons.length/2 - 1; i >= 0; i--) {
-			let neuron = _this.neurons[i];
-			neuron.rebound();
-			neuron.render_particle(1);
-		}
-	}
-
-	this.render_brain = function() {
-		brainiac.animate();
-	}
-
-	this.render_brain_lines = function() {
-		
-		brainiac.animate();
-		brainiac.render_svg();
-	}
-
-	this.kruskal = function() {
-
-	}
-
-	this.plague = function() {
-		
-	}
-
-	//-----------------------------------------------------------------------------
-
-	let brainiac = (function() {
-		let center = new p5.Vector(p.width/2, p.height/2);
-		let vertices = _this.brain.vertices;
-		let stroke_val;
-		let alpha = 0;
-		let speed = 100;
+	this.brainiac = (function() {
+
+		let center = new p5.Vector(p.width/2, p.height/2),
+			vertices = _this.brain.vertices,
+			pos = p.createVector(),
+			probability,
+			stroke_val,
+			alpha = 0,
+			speed = 100;
 
 		vertices = vertices.map(function(v) { // Make our thot objects
 			return new Node ({
@@ -372,18 +66,20 @@ function NNN (args = {}) {
 			});
 		});
 
+		setup_dendrite(); // Call once
+
 		function animate() {
 			p.noStroke()
 			p.fill(115,135,150);
 
 			if (speed > 3) speed -= 3;
 
-			vertices.forEach(function(v) {
+			vertices.forEach((v) => {
 				v.maxspeed = speed;
 				v.arrive(v.brain_pos);
 				v.update();
 				v.render_soma(5);
- 			});
+				});
 		}
 
 		function render_svg() {
@@ -401,146 +97,557 @@ function NNN (args = {}) {
 			_this.brain.render_lines();
 		}
 
+		function setup_dendrite() { // Dendrite Set Up
+			for (let i = 0; i < vertices.length; i++) {
+
+				if (i % 10 !== 0) continue; // keep things evenly(ish) spaced
+
+				let v = _this.brain.vertices[i];
+
+				pos.x = v.x;
+				pos.y = v.y;
+
+				let heading = p5.Vector.sub(pos, center);  // A vector pointing from the center to the vertex 
+					heading.normalize();
+
+				let velocity = p.createVector();
+					velocity.x = heading.x;
+					velocity.y = heading.y;
+
+					heading = p.degrees(heading.heading());
+				
+				// heading.mult(5);
+				// let tan_vec = p5.Vector.add(heading, pos); // translate vector to position
+
+				_this.add_dendrite(pos, heading, velocity); // Create a simplified neuron
+
+			}
+		}
+
+		function done() { // Is dendrite done growing?
+			let d;
+
+			for (let i = 0; i < _this.dendrites.length; i++) {
+				d = _this.dendrites[i];
+				if (!d.done()) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		function grow() { // Grow the dendrites
+
+			_this.dendrites.forEach((dendrite) => {
+				if (done()) {
+					return; 
+				}
+
+				dendrite.grow2();
+
+			});
+		}
+
+		function render_dendrite() { // Render the dendrites
+			_this.dendrites.forEach((dendrite) => {
+				dendrite.render();
+			});
+		}
+
+		//--------------- Closure Exports
+
 		return { 
 			animate: function() {
 				animate();
 			},
 			render_svg: function() {
 				render_svg();
+			},
+			grow: function() {
+				grow();
+			},
+			render_dendrite: function() {
+				render_dendrite();
 			}
 		};
+
 	})();
 
+}
+
+// Private Globals
+
+let _scatter_multiplier_1,
+	_scatter_multiplier_2,
+	_scatter_multiplier_3;
 
 
-	// Add neuron to the network
-	this.add_neuron = function(count) {
+
+// Public Methods
+
+NNN.prototype.initialize = Utils.onceify(function() {
+	// Calculate power offset
+	// During scatter_2 --> Ensure consistant neuron density
+	// across different displays
+	_scatter_multiplier_1 = 20;
+	_scatter_multiplier_3 = 20;
+
+	_scatter_multiplier_2 = this.p.map(this.p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
+	_scatter_multiplier_2 = 1 - this.p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
+	_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
+	_scatter_multiplier_2 *= 250;
+
+	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
+
+	// Initialize Neuron
+	this.add_neuron(this.num_neurons);
+});
+
+NNN.prototype.rebound_1 = function() {
+	let ret = false;
+
+	// Once the MST is built...
+	this.render_particles(1);
+}
+
+NNN.prototype.scatter = function() {
+	this.neurons.forEach((neuron) => {
+		let soma = neuron.nodes[0];
+			soma.space(this.somas, _scatter_multiplier_1); // Repel from center
+	});
+
+	this.render_particles(1);
+}
+
+NNN.prototype.scatter_2 = function() {
+	this.neurons.forEach((neuron) => {
+		let soma = neuron.nodes[0];
+			soma.reset_pow_1();
+			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
+	});
+
+	this.render_particles(1);
+
+	function calc_mst() {
+		this.mst(); 
+		// Update spring positions --> Run through array
+		this.springs.forEach((s) => {
+			// s.update();
+			// s.display();
+		});
+	}
+}
+
+// Check if neuron is off the screen
+NNN.prototype.check_bounds = function(soma) {
+	
+	if ((soma.position.x < 0) || (soma.position.x > this.p.width)) {
+		return false
+	}
+	if ((soma.position.y < 0) || (soma.position.y > this.p.height)) {
+		return false;
+	}
+
+	return true;
+}
+
+NNN.prototype.activate = Utils.onceify(function() {
+
+	// console.log('activate');
+
+	for (let i = 0; i < this.neurons.length; i++) {
+		let neuron = this.neurons[i]
+		let soma = neuron.nodes[0];
+
+		// Add only bounded nodes that to our neuron array
+		if (this.check_bounds(soma)) {
+			this.active_neurons.push(neuron);
+		}
+
+		if (i == this.neurons.length - 1) {
+			// Create seed branching
+			this.active_neurons.forEach((active_neuron) => {
+				// console.log('neuron_setup');
+				active_neuron.network_setup(); 
+			});
+
+			return true;
+		}
+	}
+});
+
+// Simple method for running the neurons
+NNN.prototype.grow = function() {
+	// Setup Neurons
+	this.activate();
+
+	this.render();
+
+	this.active_neurons.forEach((neuron) => {
+		if (this.done()) {
+			return; 
+		}
+
+		neuron.grow();
+		console.log('growing');
+
+	});
+}
+
+NNN.prototype.render = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.render();
+	});
+}
+
+NNN.prototype.render_soma = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.render_soma();
+	});
+}
+
+NNN.prototype.render_particles = function(a) {
+	this.neurons.forEach((neuron) => {
+		neuron.render_particle(a);
+	});
+}
+
+
+NNN.prototype.done = function() {
+	let n;
+
+	for (let i = 0; i < this.active_neurons.length; i++) {
+		n = this.active_neurons[i];
+		if (!n.done()) {
+			return false;
+		}
+	}
+
+	return true;
+
+}
+
+NNN.prototype.twinkle = function() {
+	let step = this.p.PI / 30;
+	let threshold;
+	let a;
+
+	neuro_loop: // label
+	for (let i = this.neurons.length - 1; i >= 0; i--) {
+		let neuron = this.neurons[i];
+		let soma = neuron.nodes[0];
+			
+		if (soma.twinkle_bool) {
+			soma.twinkle_angle += step; 
+			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
+
+			neuron.render_particle(a); // Effect Opacity here?
+
+			if (a == 1) {
+				soma.twinkle_angle = 0;      	// Reset angle
+				soma.twinkle_bool = false;       	// Reset State
+			}
+		} 
+		else {
+			
+			neuron.render_particle(1);
+
+		}
+	
+		threshold = this.p.random(1); // Set threshold
+
+		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+			soma.twinkle_bool = true;
+		}
+	}
+}
+
+NNN.prototype.synapse = function() {
+	let threshold; 
+
+	this.render(); // Render neurons
+
+	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
+	// for (let i = 0; i >= 0; i--) { // Use active_neurons
+		let neuron = this.active_neurons[i];
+		let soma = neuron.nodes[0];
+
+		if (neuron.propagate_bool) {
+			neuron.propagate(soma);
+		}
+
+		threshold = this.p.random(1); // Set threshold
+
+		if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
+			neuron.propagate_bool = true;
+		}
+	}
+}
+
+NNN.prototype.fadeIn = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.fadeIn();
+	});
+
+	this.render(); // Render neurons	
+}
+
+NNN.prototype.fadeOut = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.fadeOut();
+	});
+	
+	this.render(); // Render neurons	
+}
+
+NNN.prototype.rebound_2 = function() {	
+	this.active_neurons.forEach((neuron) => {
+		neuron.rebound();
+	});
+	
+	this.render_soma(); // Render Soma	
+}
+
+NNN.prototype.last_position = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.last_position();
+	});
+	
+	this.render_soma(); // Render Soma	
+}
+
+NNN.prototype.stary_night = function() {
+	for (let i = 0; i < this.neurons.length/2; i++) { // Use 1/2 total neurons
+		let soma = this.neurons[i].nodes[0];
+			soma.reset_pow_3();
+			soma.space(this.somas, _scatter_multiplier_3); // Repel from center
+	}
+
+	this.render_particles(1);
+}
+
+NNN.prototype.twinkle_2 = function() {
+	let step = this.p.PI / 30;
+	let threshold;
+	let a;
+
+	neuro_loop: // label
+	for (let i = this.neurons.length/2 - 1; i >= 0; i--) {
+		let neuron = this.neurons[i];
+		let soma = neuron.nodes[0];
+			
+		if (soma.twinkle_bool) {
+			soma.twinkle_angle += step; 
+			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
+
+			neuron.render_particle(a); // Effect Opacity here?
+
+			if (a == 1) {
+				soma.twinkle_angle = 0;      	// Reset angle
+				soma.twinkle_bool = false;       	// Reset State
+			}
+		} 
+		else {
+			
+			neuron.render_particle(1);
+
+		}
+	
+		threshold = this.p.random(1); // Set threshold
+
+		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+			soma.twinkle_bool = true;
+		}
+	}
+}
+
+NNN.prototype.rebound_3 = function() {	
+	for (let i = this.neurons.length/2 - 1; i >= 0; i--) {
+		let neuron = this.neurons[i];
+		neuron.rebound();
+		neuron.render_particle(1);
+	}
+}
+
+NNN.prototype.render_brain = function() {
+	this.brainiac.animate();
+}
+
+NNN.prototype.render_brain_lines = function() {
+	this.brainiac.animate();
+	this.brainiac.render_svg();
+}
+
+NNN.prototype.plague = function() {
+	this.brainiac.animate();
+	this.brainiac.render_svg();
+	this.brainiac.grow();
+	this.brainiac.render_dendrite();	
+}
+
+
+// Add neuron to the network
+NNN.prototype.add_neuron = function(count) {
 		let x, y;
 
 		for (let i = 0; i < count; i++) {
 			// Set Neuron Soma Position (Root)
 			// For some reason the y value must lean towards less?
-			x = (window.innerWidth / 2) + p.random(-10,10);
-			y = (window.innerHeight / 2) + p.random(-15,0);
+			x = (window.innerWidth / 2) + this.p.random(-10,10);
+			y = (window.innerHeight / 2) + this.p.random(-15,0);
 
-			// Create Neurons with similar general levels of complexity
-			// _this.num_branches = p.round(p.random(6,8));
-			_this.num_branches = 7;
-			// Exception for new idea -->
-			// if (_this.num_neurons > 50) {
-			// 	_this.complexity = 10;
-			// }
-			_this.max_depth = _this.complexity - _this.num_branches;
+			this.num_branches = 7;
+
+			this.max_depth = this.complexity - this.num_branches;
 			// Given a constant branching speed, this controls neuron size
 			// does not effect morphology.
 			// Grow time is inversely proportional to num_branches
 			if (window.innerWidth < 500) {
-				_this.neuron_timer = 1000 / _this.num_branches;	
+				this.neuron_timer = 1000 / this.num_branches;	
 			} 
 			else {
-				_this.neuron_timer = this.time_power / _this.num_branches;
+				this.neuron_timer = this.time_power / this.num_branches;
 			}
 
-			_this.neurons.push(
+			this.neurons.push(
 				new Neuron ({
 					x: 				x,
 					y: 				y,
-					num_branches: 	_this.num_branches,
-					neuron_timer: 	_this.neuron_timer,
-					max_depth: 		_this.max_depth,
-					id:  			_this.neuron_id,
-					p: 				p,
+					num_branches: 	this.num_branches,
+					neuron_timer: 	this.neuron_timer,
+					max_depth: 		this.max_depth,
+					id:  			this.neuron_id,
+					p: 				this.p,
 				})	
 			);
 
 			// Increase the id counter each loop
-			_this.neuron_id++;
+			this.neuron_id++;
 
 			// Get the soma setup
-			let soma = _this.neurons[_this.neurons.length - 1]; // --> 1st soma in [0] position
+			let soma = this.neurons[this.neurons.length - 1]; // --> 1st soma in [0] position
 				soma.neuron_start();
-				_this.somas.push(soma.nodes[0]);
+				this.somas.push(soma.nodes[0]);
 
 		}
 	}
 
-	// Remove neuron + soma from the network
-	this.remove_neuron = function(id) {
-		for (let i = 0; i < _this.neurons.length; i++) {
-			let neuron = _this.neurons[i];
-			if (neuron.id == id) {
-				_this.neurons.splice(i, 1);
-				_this.somas.splice(i, 1);
-			}
+// Remove neuron + soma from the network
+NNN.prototype.remove_neuron = function(id) {
+	for (let i = 0; i < this.neurons.length; i++) {
+		let neuron = this.neurons[i];
+		if (neuron.id == id) {
+			this.neurons.splice(i, 1);
+			this.somas.splice(i, 1);
 		}
 	}
+}
 
-	// Calculate initial separation forces for NNN
-	this.spread = function() {
+// Calculate initial separation forces for NNN
+NNN.prototype.spread = function() {
 
-		_this.somas.forEach(function (soma) {
-			// Find soma for each neuron
-			soma.separate(_this.somas);
-		});
-	}
-
-	// Create MST --> Kruskal
-	// Additionally create spring connections
-	this.mst = Utils.onceify(function() {
-		let graph = {
-			V: [],
-			E: [],
-		};
-
-		// Calculate distance from/to every Soma
-		// Build MST input graph
-		_this.somas.forEach(function(soma) {
-			let soma_pos = soma.position;
-			graph.V.push(
-				soma.neuron_id.toString()
-			);
-			_this.somas.forEach(function(other_soma) {
-				// Check for recurrent connections <cycles>
-				if (soma.neuron_id === other_soma.neuron_id) {
-					return;
-				}
-
-				let other_soma_pos = other_soma.position;
-				let d = soma_pos.dist(other_soma_pos);
-				let edge = [
-					soma.neuron_id.toString(),
-					other_soma.neuron_id.toString(),
-					d
-				];
-
-				graph.E.push(edge);
-			});
-		});
-
-		// Create + Add a Spring object to springs array
-		function getSprung(edge) {
-			let n1 = _this.somas[edge[0]];
-			let n2 = _this.somas[edge[1]];
-			// Make new Spring object
-			let s = new Spring ({
-				node1: n1,
-				node2: n2,
-				p: p,
-			});
-			// Add a new spring 
-			_this.springs.push(s);
-		}
-
-		let mst = _this.kruskal.mst(graph.V, graph.E);
-
-		let vertices = mst[0]; // Array of Edge objects
-		let edges = mst[1]; // Array of Vertex objects
-
-		edges.forEach(function(edge) {
-			getSprung(edge);
-		});
+	this.somas.forEach( (soma) => {
+		// Find soma for each neuron
+		soma.separate(this.somas);
 	});
 }
+
+// Add dendrite to the brain network
+NNN.prototype.add_dendrite = function(pos, heading, velocity) {
+
+	// Set Dendrite Position (Root)
+	let x = pos.x,
+		y = pos.y,
+		num_branches = 1, // We're creating dendrites, so only [1] branch
+		max_depth = 10,
+		neuron_timer;
+
+	// Given a constant branching speed, NNN.prototype controls dendrite size
+	// does not effect morphology.
+	// Grow time is inversely proportional to num_branches
+	neuron_timer = 500;
+
+	this.dendrites.push(
+		new Neuron ({
+			x: 				x,
+			y: 				y,
+			num_branches: 	num_branches,
+			neuron_timer: 	neuron_timer,
+			max_depth: 		max_depth,
+			id:  			this.dendrite_id,
+			p: 				this.p,
+		})	
+	);
+
+	this.dendrite_id++;
+
+	// Get the soma setup
+	let root = this.dendrites[this.dendrites.length - 1]; // --> 1st root in [0] position
+		root.neuron_start();
+		root.dendrite_setup(heading, velocity);
+		this.roots.push(root.nodes[0]);
+
+}
+
+// Create MST --> Kruskal
+// Additionally create spring connections
+NNN.prototype.mst = Utils.onceify(function() {
+	let graph = {
+		V: [],
+		E: [],
+	};
+
+	// Calculate distance from/to every Soma
+	// Build MST input graph
+	this.somas.forEach((soma) => {
+		let soma_pos = soma.position;
+		graph.V.push(
+			soma.neuron_id.toString()
+		);
+		this.somas.forEach((other_soma) => {
+			// Check for recurrent connections <cycles>
+			if (soma.neuron_id === other_soma.neuron_id) {
+				return;
+			}
+
+			let other_soma_pos = other_soma.position;
+			let d = soma_pos.dist(other_soma_pos);
+			let edge = [
+				soma.neuron_id.toString(),
+				other_soma.neuron_id.toString(),
+				d
+			];
+
+			graph.E.push(edge);
+		});
+	});
+
+	// Create + Add a Spring object to springs array
+	function getSprung(edge) {
+		let n1 = this.somas[edge[0]];
+		let n2 = this.somas[edge[1]];
+		// Make new Spring object
+		let s = new Spring ({
+			node1: n1,
+			node2: n2,
+			p: this.p,
+		});
+		// Add a new spring 
+		this.springs.push(s);
+	}
+
+	let mst = this.kruskal.mst(graph.V, graph.E);
+
+	let vertices = mst[0]; // Array of Edge objects
+	let edges = mst[1]; // Array of Vertex objects
+
+	edges.forEach((edge) => {
+		getSprung(edge);
+	});
+});
 
 module.exports = NNN;
 

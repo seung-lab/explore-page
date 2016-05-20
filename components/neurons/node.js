@@ -619,6 +619,26 @@ function Node (args = {}) {
 	}
 
 	// Accepts an Array of Node Objects
+	this.grow2 = function(nodes) {
+		if (_this.isGrowing()) {
+			_this.tick();
+			_this.expand(nodes);
+			_this.update();
+			_this.update_curves();
+			// Display Wandering Debug
+
+			// Make leaves go crazy on final level
+			if ((_this.depth == (_this.max_depth)) || ((_this.depth < 3) && (_this.depth !== 10))) {
+				_wan_const = 0;
+			} else  {
+				_wan_const = 0;
+			}
+		} else  {
+			_this.dw = false;
+		}
+	}
+
+	// Accepts an Array of Node Objects
 	this.space = function(nodes, multiplier) {
 		_this.spread(nodes, _this.radius, multiplier);
 		_this.update();

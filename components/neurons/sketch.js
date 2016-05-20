@@ -133,8 +133,8 @@ let sprout = function (p) {
 			{
 		        name: "Initialize",
 				duration: 75,
-				forward: _nnn.initialize,
-				reverse: _nnn.rebound_1,
+				forward: _nnn.initialize.bind(_nnn),
+				reverse: _nnn.rebound_1.bind(_nnn),
 				forward_slide: 0,
 				reverse_slide: 0,
 				p: p
@@ -142,8 +142,8 @@ let sprout = function (p) {
 		    {
 		        name: "Scatter",
 				duration: 75,
-				forward: _nnn.scatter,
-				reverse: _nnn.twinkle,
+				forward: _nnn.scatter.bind(_nnn),
+				reverse: _nnn.twinkle.bind(_nnn),
 				forward_slide: 1,
 				reverse_slide: 0,
 				p: p
@@ -151,8 +151,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Twinkle",
 				duration: 15,
-				forward: _nnn.twinkle,
-				reverse: _nnn.rebound_2,
+				forward: _nnn.twinkle.bind(_nnn),
+				reverse: _nnn.rebound_2.bind(_nnn),
 				forward_slide: 1,
 				reverse_slide: 1,
 				loop: true,
@@ -161,8 +161,8 @@ let sprout = function (p) {
 		    {
 		   		name: "Scatter2",
 				duration: 75,
-				forward: _nnn.scatter_2,
-				reverse: _nnn.fadeout,
+				forward: _nnn.scatter_2.bind(_nnn),
+				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 2,
 				reverse_slide: 1,
 				p: p
@@ -170,8 +170,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Grow",
 				duration: 100,
-				forward: _nnn.grow,
-				reverse: _nnn.grow, // Will simply render neurons
+				forward: _nnn.grow.bind(_nnn),
+				reverse: _nnn.grow.bind(_nnn), // Will simply render neurons
 				forward_slide: 2,
 				reverse_slide: 2,
 				p: p
@@ -179,8 +179,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Synapse",
 				duration: 30,
-				forward: _nnn.synapse,
-				reverse: _nnn.synapse,
+				forward: _nnn.synapse.bind(_nnn),
+				reverse: _nnn.synapse.bind(_nnn),
 				loop: true,
 				forward_slide: 3,
 				reverse_slide: 3,
@@ -189,8 +189,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Fade",
 				duration: 32,
-				forward: _nnn.fadeOut,
-				reverse: _nnn.fadeIn,
+				forward: _nnn.fadeOut.bind(_nnn),
+				reverse: _nnn.fadeIn.bind(_nnn),
 				forward_slide: 4,
 				reverse_slide: 3,
 				p: p	
@@ -198,8 +198,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Center",
 				duration: 30,
-				forward: _nnn.rebound2,
-				reverse: _nnn.last_position,
+				forward: _nnn.rebound_2.bind(_nnn),
+				reverse: _nnn.last_position.bind(_nnn),
 				forward_slide: 5,
 				reverse_slide: 4,
 				p: p	
@@ -207,8 +207,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Stars",
 				duration: 30,
-				forward: _nnn.stary_night,
-				reverse: _nnn.rebound,
+				forward: _nnn.stary_night.bind(_nnn),
+				reverse: _nnn.rebound_2.bind(_nnn),
 				forward_slide: 5,
 				reverse_slide: 4,
 				p: p
@@ -216,8 +216,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Twinkle2",
 				duration: 15,
-				forward: _nnn.twinkle_2,
-				reverse: _nnn.rebound_3,
+				forward: _nnn.twinkle_2.bind(_nnn),
+				reverse: _nnn.rebound_3.bind(_nnn),
 				forward_slide: 5,
 				reverse_slide: 4,
 				loop: true,
@@ -226,8 +226,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Center2",
 				duration: 50,
-				forward: _nnn.rebound_3,
-				reverse: _nnn.staryNight,
+				forward: _nnn.rebound_3.bind(_nnn),
+				reverse: _nnn.stary_night.bind(_nnn),
 				forward_slide: 6,
 				reverse_slide: 5,
 				p: p
@@ -235,8 +235,8 @@ let sprout = function (p) {
 		    {
 		    	name: "Brain",
 				duration: 100,
-				forward: _nnn.render_brain,
-				reverse: _nnn.rebound,
+				forward: _nnn.render_brain.bind(_nnn),
+				reverse: _nnn.rebound_3.bind(_nnn),
 				forward_slide: 6,
 				reverse_slide: 5,
 				p: p
@@ -244,17 +244,17 @@ let sprout = function (p) {
 		    {
 		    	name: "Connect",
 				duration: 32,
-				forward: _nnn.render_brain_lines,
-				reverse: _nnn.fadeOut,
+				forward: _nnn.render_brain_lines.bind(_nnn),
+				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 7,
 				reverse_slide: 6,
 				p: p	
 		    },
 		    {
 		    	name: "Drake",
-				duration: 100,
-				forward: _nnn.plague,
-				reverse: _nnn.fadeOut,
+				duration: 500,
+				forward: _nnn.plague.bind(_nnn),
+				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 8,
 				reverse_slide: 7,
 				p: p
