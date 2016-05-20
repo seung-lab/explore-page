@@ -339,6 +339,12 @@ function NNN (args = {}) {
 		brainiac.animate();
 	}
 
+	this.render_brain_lines = function() {
+		
+		brainiac.animate();
+		brainiac.render_svg();
+	}
+
 	this.kruskal = function() {
 
 	}
@@ -352,6 +358,8 @@ function NNN (args = {}) {
 	let brainiac = (function() {
 		let center = new p5.Vector(p.width/2, p.height/2);
 		let vertices = _this.brain.vertices;
+		let stroke_val;
+		let alpha = 0;
 		let speed = 100;
 
 		vertices = vertices.map(function(v) { // Make our thot objects
@@ -364,12 +372,13 @@ function NNN (args = {}) {
 			});
 		});
 
-		console.log('whatever');
-
 		function animate() {
-			if (speed >= 3) speed -= 3;
+			p.noStroke()
+			p.fill(115,135,150);
+
+			if (speed > 3) speed -= 3;
+
 			vertices.forEach(function(v) {
-				// let v = vertices[50];
 				v.maxspeed = speed;
 				v.arrive(v.brain_pos);
 				v.update();
@@ -377,9 +386,27 @@ function NNN (args = {}) {
  			});
 		}
 
+		function render_svg() {
+			// Draw Brain SVG	
+			p.noFill();
+			p.strokeWeight(2);
+
+			if (alpha < 0.96875) { // Watch that overflow, son
+				alpha += 0.03125; // 1/32 --> Timer
+			}
+
+			stroke_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+			p.stroke(stroke_val);
+
+			_this.brain.render_lines();
+		}
+
 		return { 
 			animate: function() {
 				animate();
+			},
+			render_svg: function() {
+				render_svg();
 			}
 		};
 	})();

@@ -266,8 +266,8 @@ function Node (args = {}) {
 				if ( d < 1) {
 					return true;
 				}
-			let m = p.map(d, 0, 100, 0, 25);
-			console.log(m);
+			let m = p.map(d, 0, 100, 0, 100);
+			if (m < 2) m = 0.25;
 			_target.mult(m);
 		} else {
 			_target.mult(_this.maxspeed);
@@ -499,7 +499,9 @@ function Node (args = {}) {
 		_this.velocity.limit(_this.maxspeed);
 		_this.position.add(_this.velocity);
 		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
+	}
 
+	this.update_curves = function() {
 		// Update our curve pts
 		_this.set_curve_pts();
 	}
@@ -602,6 +604,7 @@ function Node (args = {}) {
 			_this.tick();
 			_this.expand(nodes);
 			_this.update();
+			_this.update_curves();
 			// Display Wandering Debug
 
 			// Make leaves go crazy on final level
@@ -826,6 +829,7 @@ function Node (args = {}) {
 	this.relax = function() {
 		_this.repel();
 		_this.update(); 
+		_this.update_curves();
 		_this.meta();
 		// Find position, then stop moving! --> Each resize event
 		// if (_damping > 0.1) _damping *= 0.98;

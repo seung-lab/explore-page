@@ -44,12 +44,6 @@ function SVG_object (args = {}) {
 			return;
 		}
 
-		// Draw Brain SVG
-		// p.fill(255,0,0);	
-		p.noFill();
-		p.strokeWeight(2);
-		p.stroke(115,135,150);
-
 		let b = _this.beziers;
 
 		p.beginShape();
@@ -466,7 +460,7 @@ function SVG_object (args = {}) {
 			max_y = 0;
 		
 		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
-		scale_factor = p.map(scale_factor, 400, 3000, 1.5, 8);
+		scale_factor = p.map(scale_factor, 400, 3000, 1.25, 6);
 
 		// console.log(p.width, p.height, scale_factor, dx, dy);
 

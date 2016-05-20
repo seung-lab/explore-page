@@ -73,7 +73,7 @@ let sprout = function (p) {
 
 		_svg_object = new SVG_Object({
 			p: p,
-			density: 20,
+			density: 35,
 		});
 
 		// Calculate _nnn_count based on width
@@ -225,7 +225,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Center2",
-				duration: 100,
+				duration: 50,
 				forward: _nnn.rebound_3,
 				reverse: _nnn.staryNight,
 				forward_slide: 6,
@@ -234,7 +234,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Brain",
-				duration: 200,
+				duration: 100,
 				forward: _nnn.render_brain,
 				reverse: _nnn.rebound,
 				forward_slide: 6,
@@ -243,8 +243,8 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Connect",
-				duration: 100,
-				forward: _nnn.kruskal,
+				duration: 32,
+				forward: _nnn.render_brain_lines,
 				reverse: _nnn.fadeOut,
 				forward_slide: 7,
 				reverse_slide: 6,
