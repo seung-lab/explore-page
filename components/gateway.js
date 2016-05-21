@@ -60,8 +60,6 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	attachEvents () {
  		let _this = this;
 
-
-
  		$(window).ion('scrollStart.gateway', function (e, up) {
  			if (up) {
 	 			_this.beginExploring();
@@ -100,6 +98,8 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	}
 
  	enableButton () {
+ 		let _this = this;
+ 		
  		this.view.startbtn.ion('click', function () {
  			// $('#explore').hide();
 
