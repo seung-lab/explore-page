@@ -38,6 +38,175 @@ function SVG_object (args = {}) {
 	// ------------------------------------------------
 	// SVG Rendering | Public
 
+	this.render = (function() {
+
+		let b = _this.beziers,
+			LUT = [], // Interaction Object for beziers
+			rand;
+
+		b.forEach(function(bezier) {
+			let anchor; // First anchor pt (converting from vertex to stand alone)
+
+			index === 0 ? anchor = b.length : anchor = b[index - 1];
+
+			LUT.push(
+				new Animator_obj (bezier, anchor, index)  // Fill up the compare array
+			);
+		});
+
+		rand = p.random(0, c.length-1); // Look up random index from compare array | Kick-off
+
+		function points() {
+			if (_this.vertices.length === 0) {
+				return;
+			}
+
+			// Draw Brain SVG Points
+			p.noStroke();
+
+			let v = _this.vertices;
+
+			for (let i = 0; i < v.length; i++) {
+				p.fill(115,135,150);
+				p.ellipse(v[i].x,v[i].y,5,5);
+			}
+		}
+
+		function lines() { // Draw Entire SVG
+			if (_this.beziers.length === 0) {
+				return;
+			}
+
+			p.beginShape();
+				p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
+				for (let i = 1; i < b.length; i++) {
+					p.bezierVertex(
+						b[i].c1.x, // Control Pt x 1
+						b[i].c1.y, // Control Pt y 1
+						b[i].c2.x, // Control Pt x 2
+						b[i].c2.y, // Control Pt y 2
+						b[i].p1.x, // Pt x
+						b[i].p1.y  // Pt y
+					);
+				}
+			p.endShape();
+		}
+
+		function beziers() { // Draw Entire SVG
+			if (_this.LUT.length === 0) {
+				return;
+			}
+
+			for (let i = 1; i < LUT.length; i++) {
+				p.bezierVertex(
+					LUT[i].c1.x, // Control Pt x 1
+					LUT[i].c1.y, // Control Pt y 1
+					LUT[i].c2.x, // Control Pt x 2
+					LUT[i].c2.y, // Control Pt y 2
+					LUT[i].p1.x, // Pt x
+					LUT[i].p1.y  // Pt y
+				);
+			}
+
+		}
+
+		function connect() {
+			if (_this.beziers.length === 0) {
+				return;
+			}
+
+			if (c.length === 0) { // If everything has animated, stop tracing
+				return;
+			}
+
+			if (c[rand].progress < 1) {
+				trace_path(c[rand]); // Tracing
+				return;
+			}
+
+			LUT.push(c[rand]); // --> Push the finished animator onto the SVG draw_stack
+
+			rand = p.random(0, c.length-1); // Look up random index from compare array
+			c.splice(rand, 1); // Remove the recent looked up element
+
+		}
+
+		function trace_path() {
+
+		}
+
+		function debug() {
+			p.strokeWeight(1);
+
+			for (let i = 0; i < b.length; i++) { // Measure up till last point
+				let start = b[i],
+					end,
+					bezier_pts = []; // Build Cubic Bezier Segment
+
+				if (i < b.length - 1) {
+					end = b[i+1]; // Lookforward
+				} else {
+					end = b[0];   // Back to beginning
+				}
+
+				p.stroke(255,0,0,100);
+				p.line( // Point to control point 1
+					start.p1.x,
+					start.p1.y,
+					start.c2.x,
+					start.c2.y
+				);
+				p.stroke(255,0,255,100);
+				p.line( // Point to control point 1
+					start.p1.x,
+					start.p1.y,
+					start.c1.x,
+					start.c1.y
+				);
+				p.stroke(0,255,0,100);
+				p.line( // Point to control point 2
+					start.p1.x,
+					start.p1.y,
+					end.c1.x,
+					end.c1.y
+				);
+				p.stroke(255,255,0,100);
+				p.line( // Point to control point 2
+					end.p1.x,
+					end.p1.y,
+					end.c2.x,
+					end.c2.y
+				);
+			}
+		}
+
+		// Object to contain transform points (2D vector)
+		function Animator_obj(b, a, i) {
+			this.p1 = a.p1; 	// Transform Bezier Vertex to Bezier Curve
+			this.p2 = b.p1; 	// Transform Bezier Vertex to Bezier Curve
+			this.c1 = b.c1; 	// Transform Bezier Vertex to Bezier Curve
+			this.c2 = b.c2; 	// Transform Bezier Vertex to Bezier Curve
+
+			this.progress = 0; 	// Animation progress [0,1]
+			this.i = i; 		// LUT Index to Beziers []
+		}
+
+		return {
+			points: function() {
+				points();
+			},
+			lines: function() {
+				lines();
+			},
+			connect: function() {
+				connect();
+			},
+			debug: function() {
+				debug();
+			}
+		}
+	})();
+
 	this.render_lines = function() {
 		
 		if (_this.beziers.length === 0) {
@@ -125,7 +294,6 @@ function SVG_object (args = {}) {
 				end.c2.y
 			);
 		}
-
 	}
 
 	this.resize = function() {

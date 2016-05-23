@@ -94,7 +94,7 @@ function NNN (args = {}) {
 			stroke_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
 			p.stroke(stroke_val);
 
-			_this.brain.render_lines();
+			_this.brain.render.lines();
 		}
 
 		function setup_dendrite() { // Dendrite Set Up
