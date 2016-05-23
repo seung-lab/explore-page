@@ -26,7 +26,7 @@ function SVG_object (args = {}) {
 
 	let _this = this;
 
-	_this.beziers = []; // Array to contain bezier curves
+	_this.beziers_ = []; // Array to contain bezier curves
 	_this.vertices = []; // Array to contain vertex points 
 
 	// ------------------------------------------------
@@ -40,21 +40,21 @@ function SVG_object (args = {}) {
 
 	this.render = (function() {
 
-		let b = _this.beziers,
-			LUT = [], // Interaction Object for beziers
+		let b = _this.beziers_,
+			bezier_curves = [], // Interaction Object
 			rand;
 
-		b.forEach(function(bezier) {
-			let anchor; // First anchor pt (converting from vertex to stand alone)
+		b.forEach(function(bezier, index) {  // Transform Bezier Vertex --> Bezier Curve
+			let anchor;
 
 			index === 0 ? anchor = b.length : anchor = b[index - 1];
 
-			LUT.push(
-				new Animator_obj (bezier, anchor, index)  // Fill up the compare array
+			bezier_curves.push(
+				new bezier_obj (bezier, anchor, index)  // Fill up the compare array
 			);
 		});
 
-		rand = p.random(0, c.length-1); // Look up random index from compare array | Kick-off
+		rand = p.random(0, b.length-1); // Look up random index from compare array | Kick-off
 
 		function points() {
 			if (_this.vertices.length === 0) {
@@ -73,7 +73,7 @@ function SVG_object (args = {}) {
 		}
 
 		function lines() { // Draw Entire SVG
-			if (_this.beziers.length === 0) {
+			if (_this.beziers_.length === 0) {
 				return;
 			}
 
@@ -93,25 +93,26 @@ function SVG_object (args = {}) {
 		}
 
 		function beziers() { // Draw Entire SVG
-			if (_this.LUT.length === 0) {
+			if (bezier_curves.length === 0) {
 				return;
 			}
 
-			for (let i = 1; i < LUT.length; i++) {
-				p.bezierVertex(
-					LUT[i].c1.x, // Control Pt x 1
-					LUT[i].c1.y, // Control Pt y 1
-					LUT[i].c2.x, // Control Pt x 2
-					LUT[i].c2.y, // Control Pt y 2
-					LUT[i].p1.x, // Pt x
-					LUT[i].p1.y  // Pt y
+			for (let i = 1; i < bezier_curves.length; i++) {
+				p.bezier(
+					bezier_curves[i].p1.x, // Anchor  Pt x 1
+					bezier_curves[i].p1.y, // Anchor  Pt y 1
+					bezier_curves[i].c1.x, // Control Pt x 1
+					bezier_curves[i].c1.y, // Control Pt y 1
+					bezier_curves[i].c2.x, // Control Pt x 2
+					bezier_curves[i].c2.y, // Control Pt y 2
+					bezier_curves[i].p2.x, // Anchor  Pt x 2
+					bezier_curves[i].p2.y  // Anchor  Pt y 2
 				);
 			}
-
 		}
 
 		function connect() {
-			if (_this.beziers.length === 0) {
+			if (_this.beziers_.length === 0) {
 				return;
 			}
 
@@ -124,11 +125,10 @@ function SVG_object (args = {}) {
 				return;
 			}
 
-			LUT.push(c[rand]); // --> Push the finished animator onto the SVG draw_stack
+			bezier_curves.push(c[rand]); // --> Push the finished animator onto the SVG draw_stack
 
 			rand = p.random(0, c.length-1); // Look up random index from compare array
 			c.splice(rand, 1); // Remove the recent looked up element
-
 		}
 
 		function trace_path() {
@@ -155,33 +155,33 @@ function SVG_object (args = {}) {
 					start.p1.y,
 					start.c2.x,
 					start.c2.y
-				);
+				)
 				p.stroke(255,0,255,100);
 				p.line( // Point to control point 1
 					start.p1.x,
 					start.p1.y,
 					start.c1.x,
 					start.c1.y
-				);
+				)
 				p.stroke(0,255,0,100);
 				p.line( // Point to control point 2
 					start.p1.x,
 					start.p1.y,
 					end.c1.x,
 					end.c1.y
-				);
+				)
 				p.stroke(255,255,0,100);
 				p.line( // Point to control point 2
 					end.p1.x,
 					end.p1.y,
 					end.c2.x,
 					end.c2.y
-				);
+				)
 			}
 		}
 
 		// Object to contain transform points (2D vector)
-		function Animator_obj(b, a, i) {
+		function bezier_obj(b, a, i) {
 			this.p1 = a.p1; 	// Transform Bezier Vertex to Bezier Curve
 			this.p2 = b.p1; 	// Transform Bezier Vertex to Bezier Curve
 			this.c1 = b.c1; 	// Transform Bezier Vertex to Bezier Curve
@@ -198,6 +198,9 @@ function SVG_object (args = {}) {
 			lines: function() {
 				lines();
 			},
+			beziers: function() {
+				beziers();
+			},
 			connect: function() {
 				connect();
 			},
@@ -209,11 +212,11 @@ function SVG_object (args = {}) {
 
 	this.render_lines = function() {
 		
-		if (_this.beziers.length === 0) {
+		if (_this.beziers_.length === 0) {
 			return;
 		}
 
-		let b = _this.beziers;
+		let b = _this.beziers_;
 
 		p.beginShape();
 			p.vertex(b[0].p1.x, b[0].p1.y); // First point must be norm vertex
@@ -252,7 +255,7 @@ function SVG_object (args = {}) {
 		// Draw Brain SVG Points
 		p.strokeWeight(1);
 
-		let b = _this.beziers;
+		let b = _this.beziers_;
 
 		for (let i = 0; i < b.length; i++) { // Measure up till last point
 			let start = b[i],
@@ -374,7 +377,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -399,7 +402,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -424,7 +427,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -447,7 +450,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -470,7 +473,7 @@ function SVG_object (args = {}) {
 		c2.set(_pos.x, _pos.y);
 		p1.set(_pos.x, _pos.y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 			new Bezier_obj(
 				c1,
 				c2,
@@ -495,7 +498,7 @@ function SVG_object (args = {}) {
 			c2.add(_pos.x, _pos.y); // Relative Moves
 			p1.add(_pos.x, _pos.y); // Relative Moves
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
@@ -521,7 +524,7 @@ function SVG_object (args = {}) {
 		let c2 = p.createVector(x2,y2);
 		let p1 = p.createVector(x,y);
 
-		_this.beziers.push( // Pt1
+		_this.beziers_.push( // Pt1
 				new Bezier_obj(
 					c1,
 					c2,
@@ -592,7 +595,7 @@ function SVG_object (args = {}) {
 	// Evenly distribute vertices across Brain svg
 	function constellation(density) {
 
-		let b = _this.beziers;
+		let b = _this.beziers_;
 
 		for (let i = 0; i < b.length-2; i++) { // Measure up till last point
 
@@ -632,12 +635,12 @@ function SVG_object (args = {}) {
 
 		// console.log(p.width, p.height, scale_factor, dx, dy);
 
-		_this.beziers.length = 0;
+		_this.beziers_.length = 0;
 		_this.vertices.length = 0;
 
 		parseSVG(); // Parse SVG
 
-		_this.beziers.forEach(function(b) { // Scale Values
+		_this.beziers_.forEach(function(b) { // Scale Values
 			b.p1.x *= scale_factor; 
 			b.c1.x *= scale_factor;
 			b.c2.x *= scale_factor;
@@ -646,7 +649,7 @@ function SVG_object (args = {}) {
 			b.c2.y *= scale_factor;
 		});
 
-		_this.beziers.forEach(function(b) { // How big is this thing?
+		_this.beziers_.forEach(function(b) { // How big is this thing?
 			if (b.p1.x < min_x) min_x = b.p1.x;
 			if (b.p1.x > max_x) max_x = b.p1.x;
 			if (b.p1.y < min_y) min_y = b.p1.y;
@@ -658,7 +661,7 @@ function SVG_object (args = {}) {
 		let dx = p.width/2 - 50 - (max_x - min_x) / 2, // 50 Arbitrary offset
 			dy = p.height/2 - (max_y - min_y) / 2; 
 
-		_this.beziers.forEach(function(b) { // Center Graphic
+		_this.beziers_.forEach(function(b) { // Center Graphic
 			b.p1.x += dx; 
 			b.c1.x += dx;
 			b.c2.x += dx;
