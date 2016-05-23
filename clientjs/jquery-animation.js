@@ -138,6 +138,13 @@ $.fn.drop = function (args) {
  	return deferred;
 };
 
+// Scramble text will start with the text from the current slide
+// and shuffle it until it matches the text for the next slide
+// After some time in msec, the text will automatically switch
+// if it hasn't finished scrambling yet
+//
+// You can force line breaks in the source text to prevent words
+// from jumping between lines while scrambling
 $.fn.scrambleText = function (args = {}) {
 	let _this = this;
 
@@ -154,24 +161,42 @@ $.fn.scrambleText = function (args = {}) {
 		return $.Deferred().resolve();
 	}
 
-	let firsthalf = begin.match(/^(.*)<br>/);
-	if (firsthalf) {
-		firsthalf = firsthalf[1];
+	// Split the starting text into two lines:
+	// begin and startSecondHalf (if there is a second line)
+	let startFirstHalf = begin.match(/^(.*)<br>/);
+	if (startFirstHalf) {
+		startFirstHalf = startFirstHalf[1];
 	}
 
-	let begin2 = begin.match(/<br>(.*)$/);
-	if (begin2) {
-		begin2 = begin2[1];
-		begin = firsthalf;
+	let startSecondHalf = begin.match(/<br>(.*)$/);
+	if (startSecondHalf) {
+		startSecondHalf = startSecondHalf[1];
+		begin = startFirstHalf;
 	}
 	else {
-		begin2 = "";
+		startSecondHalf = "";
+	}
+
+	// Split the final text into two lines:
+	// end and finishSecondHalf
+	let finishFirstHalf = end.match(/^(.*)<br>/);
+	if (finishFirstHalf) {
+		finishFirstHalf = finishFirstHalf[1];
+	}
+
+	let finishSecondHalf = end.match(/<br>(.*)$/);
+	if (finishSecondHalf) {
+		finishSecondHalf = finishSecondHalf[1];
+		end = finishFirstHalf;
+	}
+	else {
+		finishSecondHalf = "";
 	}
 
 	// Begin and end are now split up between their two lines (if there are any)
 
-	let topSize = end.length;
-	let botSize = Math.max(begin2.length, end2.length);
+	let topSize = Math.max(begin.length, end.length);
+	let botSize = Math.max(startSecondHalf.length, finishSecondHalf.length);
 
 	// Set the top line to be only as long as the finished product
 	begin = begin.slice(0, topSize);
@@ -193,19 +218,29 @@ $.fn.scrambleText = function (args = {}) {
 		return vector;
 	}
 
-	let begVector = sizedVector(begin, topSize),
-		begVector2 = sizedVector(begin2, botSize),
-		endVector = sizedVector(end, topSize),
-		endVector2 = sizedVector(end2, botSize);
+	// begVector2 is only used if there is an endVector2
+	// if there is no begVector2 but there is an endVector2,
+	// we need to generate some random characters that will scramble
+	let alphabet = [];
+	alphabet = Utils.unique(alphabet.concat(end.split(""))).filter( x => x !== ' ' );
 
-	let alphabet = []
-	alphabet = Utils.unique(alphabet.concat(end.concat(end2).split(""))).filter( x => x !== ' ' )
+	if (startSecondHalf.length < finishSecondHalf.length) {
+		for (let i = startSecondHalf.length; i < finishSecondHalf.length; i++) {
+			startSecondHalf = startSecondHalf.concat(Utils.random_choice(alphabet));
+		}
+	}
+
+
+	let begVector = sizedVector(begin, topSize),
+		begVector2 = sizedVector(startSecondHalf, botSize),
+		endVector = sizedVector(end, topSize),
+		endVector2 = sizedVector(finishSecondHalf, botSize);
 
  	let req;
 
 	let deferred = $.Deferred()
  		.done(function () {
- 			if (end2) {
+ 			if (finishSecondHalf) {
  				updatefn(endVector.concat("<br>", endVector2).trim());
  			} 
  			else {
@@ -261,7 +296,7 @@ $.fn.scrambleText = function (args = {}) {
  		// now got through the bottom string, if there is one
  		let text = begVector;
 
- 		if (end2) {
+ 		if (finishSecondHalf) {
  			begVector2 = copyThroughScramble(begVector2, endVector2);
 	 		text = begVector.concat("<br>", begVector2);
  		} 
