@@ -41,20 +41,54 @@ function SVG_object (args = {}) {
 	this.render = (function() {
 
 		let b = _this.beziers_,
+			c = [], // Comparison array
 			bezier_curves = [], // Interaction Object
 			rand;
 
-		b.forEach(function(bezier, index) {  // Transform Bezier Vertex --> Bezier Curve
-			let anchor;
+		let step = 1/30; // 30 Steps to an animation
 
-			index === 0 ? anchor = b.length : anchor = b[index - 1];
+		setup();
 
-			bezier_curves.push(
-				new bezier_obj (bezier, anchor, index)  // Fill up the compare array
-			);
-		});
+		function setup() {
+			let arc_length;
 
-		rand = p.random(0, b.length-1); // Look up random index from compare array | Kick-off
+			b.forEach(function(bezier, index) {  // Transform Bezier Vertex --> Bezier Curve
+				let anchor;
+
+				index === 0 ? anchor = b[b.length-1] : anchor = b[index - 1];
+
+				c.push(index);
+
+				bezier_curves.push(
+					new bezier_obj (bezier, anchor, index)  // Fill up the compare array
+				);
+
+				let bc = bezier_curves[index];
+
+				let x1 = bc.p1.x,
+					y1 = bc.p1.y,
+					x2 = bc.c1.x,
+					y2 = bc.c1.y,
+					x3 = bc.c2.x,
+					y3 = bc.c2.y,
+					x4 = bc.p2.x,
+					y4 = bc.p2.y;
+				
+				let x = p.bezierPoint(x1, x2, x3, x4, 0), // Find x point on curve
+					y = p.bezierPoint(y1, y2, y3, y4, 0), // Find y point on curve
+					x_end = p.bezierPoint(x1, x2, x3, x4, 1), // Find x end point on curve
+					y_end = p.bezierPoint(y1, y2, y3, y4, 1); // Find y end point on curve
+
+				arc_length = p.sqrt(p.sq(x_end - x) + p.sq(y_end - y)); // Return segment length
+
+				if (arc_length < 5) { // Get rid of points that are too close
+					bc.progress = 1;
+				}
+			});
+
+			rand = p.round(p.random(0, b.length-1)); // Look up random index from compare array | Kick-off
+
+		}
 
 		function points() {
 			if (_this.vertices.length === 0) {
@@ -97,16 +131,31 @@ function SVG_object (args = {}) {
 				return;
 			}
 
+			let stroke_val;
+
 			for (let i = 1; i < bezier_curves.length; i++) {
+				if (bezier_curves[i].progress < 1) {
+					continue;
+				}
+
+				let b = bezier_curves[i];
+
+				if (b.opacity < 0.875) { // Watch that overflow, son
+					b.opacity += 0.125; // 1/8 --> Timer
+				}
+
+				stroke_val = 'rgba(115,135,150,' + p.str(b.opacity) + ')';
+				p.stroke(stroke_val);
+
 				p.bezier(
-					bezier_curves[i].p1.x, // Anchor  Pt x 1
-					bezier_curves[i].p1.y, // Anchor  Pt y 1
-					bezier_curves[i].c1.x, // Control Pt x 1
-					bezier_curves[i].c1.y, // Control Pt y 1
-					bezier_curves[i].c2.x, // Control Pt x 2
-					bezier_curves[i].c2.y, // Control Pt y 2
-					bezier_curves[i].p2.x, // Anchor  Pt x 2
-					bezier_curves[i].p2.y  // Anchor  Pt y 2
+					b.p1.x, // Anchor  Pt x 1
+					b.p1.y, // Anchor  Pt y 1
+					b.c1.x, // Control Pt x 1
+					b.c1.y, // Control Pt y 1
+					b.c2.x, // Control Pt x 2
+					b.c2.y, // Control Pt y 2
+					b.p2.x, // Anchor  Pt x 2
+					b.p2.y  // Anchor  Pt y 2
 				);
 			}
 		}
@@ -116,23 +165,54 @@ function SVG_object (args = {}) {
 				return;
 			}
 
+			beziers(); // Render finished curves
+
+			bezier_curves.forEach(function(bezier) {
+				if ((bezier.progress < 1) && (bezier.progress > 0)) {
+					trace_path(bezier); // Keep the animation moving!
+				}
+			});
+
 			if (c.length === 0) { // If everything has animated, stop tracing
 				return;
 			}
 
-			if (c[rand].progress < 1) {
-				trace_path(c[rand]); // Tracing
+			rand = p.floor(p.random(0, c.length-1)); // Look up random index from compare array
+
+			let lookUp = c[rand];
+
+			if (bezier_curves[lookUp].progress < 1) {
+				trace_path(bezier_curves[lookUp]); // Tracing
 				return;
 			}
 
-			bezier_curves.push(c[rand]); // --> Push the finished animator onto the SVG draw_stack
-
-			rand = p.random(0, c.length-1); // Look up random index from compare array
 			c.splice(rand, 1); // Remove the recent looked up element
+			console.log(c.length);
 		}
 
-		function trace_path() {
+		function trace_path(curve) { // Assume progress < 1
+			let x1 = curve.p1.x,
+				y1 = curve.p1.y,
+				x2 = curve.c1.x,
+				y2 = curve.c1.y,
+				x3 = curve.c2.x,
+				y3 = curve.c2.y,
+				x4 = curve.p2.x,
+				y4 = curve.p2.y;
 
+			curve.progress += step;
+
+			// Calc first Segment
+			let t = curve.progress; 
+			
+			let x = p.bezierPoint(x1, x2, x3, x4, t), // Find x point on curve
+				y = p.bezierPoint(y1, y2, y3, y4, t); // Find y point on curve
+
+			p.push();
+				p.fill(115,135,150);
+				p.noStroke();
+				p.ellipse(x,y,10,10); // Render the shape
+			p.pop();
 		}
 
 		function debug() {
@@ -188,6 +268,7 @@ function SVG_object (args = {}) {
 			this.c2 = b.c2; 	// Transform Bezier Vertex to Bezier Curve
 
 			this.progress = 0; 	// Animation progress [0,1]
+			this.opacity = 0;
 			this.i = i; 		// LUT Index to Beziers []
 		}
 
@@ -631,7 +712,7 @@ function SVG_object (args = {}) {
 			max_y = 0;
 		
 		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
-		scale_factor = p.map(scale_factor, 400, 3000, 1.25, 6);
+		scale_factor = p.map(scale_factor, 400, 3000, 1.5, 7.5);
 
 		// console.log(p.width, p.height, scale_factor, dx, dy);
 
@@ -658,8 +739,8 @@ function SVG_object (args = {}) {
 
 		console.log(min_x, max_x, min_y, max_y);
 
-		let dx = p.width/2 - 50 - (max_x - min_x) / 2, // 50 Arbitrary offset
-			dy = p.height/2 - (max_y - min_y) / 2; 
+		let dx = p.width/2 - 50 - (max_x - min_x) / 2, 		// 50 Arbitrary offset
+			dy = p.height/2 - 15 - (max_y - min_y) / 2; 	// 15 Arbitrary offset
 
 		_this.beziers_.forEach(function(b) { // Center Graphic
 			b.p1.x += dx; 

@@ -87,14 +87,7 @@ function NNN (args = {}) {
 			p.noFill();
 			p.strokeWeight(2);
 
-			if (alpha < 0.96875) { // Watch that overflow, son
-				alpha += 0.03125; // 1/32 --> Timer
-			}
-
-			stroke_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
-			p.stroke(stroke_val);
-
-			_this.brain.render.beziers();
+			_this.brain.render.connect();
 		}
 
 		function setup_dendrite() { // Dendrite Set Up

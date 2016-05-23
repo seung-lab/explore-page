@@ -243,7 +243,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Connect",
-				duration: 32,
+				duration: 350,
 				forward: _nnn.render_brain_lines.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 7,
@@ -252,7 +252,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Drake",
-				duration: 500,
+				duration: 60,
 				forward: _nnn.plague.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 8,
