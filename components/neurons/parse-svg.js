@@ -134,7 +134,7 @@ function SVG_object (args = {}) {
 			let stroke_val;
 
 			for (let i = 1; i < bezier_curves.length; i++) {
-				if (bezier_curves[i].progress < 1) {
+				if (bezier_curves[i].progress < 0.8) {
 					continue;
 				}
 
