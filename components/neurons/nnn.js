@@ -283,7 +283,6 @@ NNN.prototype.grow = function() {
 		}
 
 		neuron.grow();
-		console.log('growing');
 
 	});
 }
@@ -427,7 +426,7 @@ NNN.prototype.twinkle_2 = function() {
 	let a;
 
 	neuro_loop: // label
-	for (let i = this.neurons.length/2 - 1; i >= 0; i--) {
+	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
 		let neuron = this.neurons[i];
 		let soma = neuron.nodes[0];
 			
@@ -458,7 +457,7 @@ NNN.prototype.twinkle_2 = function() {
 }
 
 NNN.prototype.rebound_3 = function() {	
-	for (let i = this.neurons.length/2 - 1; i >= 0; i--) {
+	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
 		let neuron = this.neurons[i];
 		neuron.rebound();
 		neuron.render_particle(1);

@@ -17,6 +17,8 @@ class Galileo extends TeaTime {
 			{
 				text: "This question has puzzled scientists for centuries",
 				format: "caps",
+				enter: "fs-enter",
+				exit: "fs-exit",
 			},
 			{
 				big: {
@@ -25,6 +27,8 @@ class Galileo extends TeaTime {
 					medium: "billion",
 					low: "neurons",
 				},
+				enter: "fs-enter",
+				exit: "fs-exit",
 			},
 			{
 				big: {
@@ -33,10 +37,14 @@ class Galileo extends TeaTime {
 					medium: "trillion",
 					low: "synapses",
 				},
+				enter: "fs-enter",
+				exit: "fs-exit",
 			},
 			{
 				text: "Working together these cells make you, you.",
 				format: "italics",
+				enter: "fs-enter",
+				exit: "fs-exit",
 			},
 			{
 				text: "However, most of their circuits are still uncharted.",
@@ -303,54 +311,129 @@ class Galileo extends TeaTime {
 		let _this = this;
 
 		let slide = this.slideAt(t);
+		let prev_slide = this.slideAt(prev_t);
 
-		_this.view.story.container.hide();
-		_this.view.bignumber.container.hide();
+		let text_container = _this.view.story.container,
+			number_container = _this.view.bignumber.container;
 
-		if (slide.text) {
-			_this.view.story.container.show();
-
-			_this.view.story.text
-				.removeClass('caps italics')
-				.addClass(slide.format);
-
-				if (slide.format === 'italics') {
-					_this.animateTextScamble(slide);
-				}
-				else {
-					_this.view.story.text.html(
-						splitter(slide.text, true)
-					);
-				}
-
-			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
-		}
-		else if (slide.big) {
-			_this.view.bignumber.container.show();
-
-			_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
-
-			if (slide.big.number >= 100) {
-				_this.view.bignumber.number.addClass('hundred');
+			function showMessage(e) {
+				debugger;
 			}
 
-			_this.view.bignumber.high.text(slide.big.high);
-			_this.view.bignumber.medium.text(slide.big.medium);
-			_this.view.bignumber.low.text(slide.big.low);
+			text_container[0].addEventListener("transitionend", showMessage, false);
+			number_container[0].addEventListener("transitionend", showMessage, false);
+
+		if ((slide.text) || (prev_slide.text)) {
+			if ((slide.enter) || (prev_slide.enter)) {
+				text_container.addClass(prev_slide.exit)
+
+				text_container.fadeOut("fast", function() {
+					if (slide.text) {
+						text_container
+							.removeClass(prev_slide.exit)
+							.addClass(slide.enter)
+							.fadeIn();
+		
+						_this.view.story.text
+							.removeClass('caps italics')
+							.addClass(slide.format);
+
+							if ((slide.format === 'italics') && (!slide.enter)) {
+								_this.animateTextScamble(slide);
+							}
+							else {
+								_this.view.story.text.html(
+									splitter(slide.text, true)
+								);
+							}
+					}
+				});
+			} 
+			else {
+				if (slide.text) {
+					text_container
+						.removeClass(prev_slide.exit)
+						.addClass(slide.enter)
+						.fadeIn();
+	
+					_this.view.story.text
+						.removeClass('caps italics')
+						.addClass(slide.format);
+
+						if ((slide.format === 'italics') && (!slide.enter)) {
+							_this.animateTextScamble(slide);
+						}
+						else {
+							_this.view.story.text.html(
+								splitter(slide.text, true)
+							);
+						}
+				}
+			}
+
+			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
+			
+			if (slide.enter) {
+				text_container.removeClass(slide.enter);
+			}
+		}
+		
+		if ((slide.big) || (prev_slide.big)) {
+			if ((slide.enter) || (prev_slide.enter)) {
+				number_container.addClass(prev_slide.exit);
+
+				number_container.fadeOut("fast", function() {
+					if (slide.big) {
+						number_container
+							.removeClass(prev_slide.exit)
+							.addClass(slide.enter)
+							.fadeIn();
+
+						_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
+
+						if (slide.big.number >= 100) {
+							_this.view.bignumber.number.addClass('hundred');
+						}
+
+						_this.view.bignumber.high.text(slide.big.high);
+						_this.view.bignumber.medium.text(slide.big.medium);
+						_this.view.bignumber.low.text(slide.big.low);
+					}
+				});
+			}
+			else {
+				if (slide.text) {
+					text_container
+						.removeClass(prev_slide.exit)
+						.addClass(slide.enter)
+						.fadeIn();
+	
+					_this.view.story.text
+						.removeClass('caps italics')
+						.addClass(slide.format);
+
+						if ((slide.format === 'italics') && (!slide.enter)) {
+							_this.animateTextScamble(slide);
+						}
+						else {
+							_this.view.story.text.html(
+								splitter(slide.text, true)
+							);
+						}
+				}
+			}
 
 			_this.view.bignumber.counter.text(`${slide.index + 1}/${this.slides.length}`);
-		}
-		else {
-			throw new Error("slide did not specify text or big.");
-		}
-	}
 
-	removeNeurons () {
-		if (this.sketch) {
-			this.sketch.noLoop();
-			this.sketch.noCanvas();
-			this.sketch = null;
+			if (slide.enter) {
+				number_container.removeClass(slide.enter);
+			}
 		}
+
+		if (slide.big || slide.text) return; // Hacky, Love Alex
+
+		throw new Error("slide did not specify text or big.");
+
 	}
 
 	renderNeurons (prev_t, t) {

@@ -141,7 +141,7 @@ let sprout = function (p) {
 		    },
 		    {
 		        name: "Scatter",
-				duration: 75,
+				duration: 60,
 				forward: _nnn.scatter.bind(_nnn),
 				reverse: _nnn.twinkle.bind(_nnn),
 				forward_slide: 1,
@@ -160,7 +160,7 @@ let sprout = function (p) {
 		    },
 		    {
 		   		name: "Scatter2",
-				duration: 75,
+				duration: 50,
 				forward: _nnn.scatter_2.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 2,
@@ -206,7 +206,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Stars",
-				duration: 30,
+				duration: 45,
 				forward: _nnn.stary_night.bind(_nnn),
 				reverse: _nnn.rebound_2.bind(_nnn),
 				forward_slide: 5,
@@ -243,7 +243,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Connect",
-				duration: 350,
+				duration: 100,
 				forward: _nnn.render_brain_lines.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
 				forward_slide: 7,

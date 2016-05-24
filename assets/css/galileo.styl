@@ -1,6 +1,7 @@
 @require 'colors.styl'
 @require 'mixins.styl'
 @require 'amazing.styl'
+@require 'animation.styl'
 
 .galileo
 	height 100%
@@ -37,8 +38,12 @@
 	white-space normal
 	color $TEXT_BLUE_LIGHT
 	height 100px
+	margin: 0
 	
 	center()
+	
+	transition: opacity 5000ms ease
+	transition: margin-top $SLOWEST ease-out
 	
 .galileo .story-text .text.italics
 	font-style italic
@@ -54,9 +59,13 @@
 
 	width 700px
 	height 400px
+	margin: 0
 
 	color $TEXT_BLUE_LIGHT
 	center()
+	
+	transition: opacity 5000ms ease
+	transition: margin-top $SLOWEST ease-out
 	
 .big-number.hundred:first-letter
 	letter-spacing -67.5px
@@ -118,8 +127,8 @@
 	height 100%
 	text-align center
 	
-	transition top 250ms ease
-	transition font-size 250ms ease
+	transition top $FAST ease
+	transition font-size $FAST ease
 	
 .galileo .big-number.hundred
 	margin-left -5%	
@@ -134,6 +143,16 @@
 	
 	z-index -1
 	
+
+// ---> Text Transition
+
+.galileo .fs-enter  // Fade + Slide Up
+	margin-top: 35px
+	
+
+
+.galileo .fs-exit  // Fade + Slide Up
+	marign-top: -35px
 
 
 /*
