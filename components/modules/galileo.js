@@ -316,8 +316,8 @@ class Galileo extends TeaTime {
 		let text_container = _this.view.story.container,
 			number_container = _this.view.bignumber.container;
 
-			function showMessage(e) {
-				debugger;
+			function showMessage(e) { // is the event
+				// debugger;
 			}
 
 			text_container[0].addEventListener("transitionend", showMessage, false);
@@ -434,6 +434,14 @@ class Galileo extends TeaTime {
 
 		throw new Error("slide did not specify text or big.");
 
+	}
+
+	removeNeurons () {
+		if (this.sketch) {
+			this.sketch.noLoop();
+			this.sketch.noCanvas();
+			this.sketch = null;
+		}
 	}
 
 	renderNeurons (prev_t, t) {
