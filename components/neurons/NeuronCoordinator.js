@@ -41,7 +41,7 @@ NeuronCoordinator.updateT = function (t) {
 
 	// Update global queue
 	if (_forward) {
-		console.log("Forwards");
+		// console.log("Forwards");
 		for (let i = 0; i < neurostates.length; i++) {
 			let neurostate = neurostates[i];
 
@@ -53,7 +53,7 @@ NeuronCoordinator.updateT = function (t) {
 				for (let j = 0; j < neurostate.duration; j++) {
 					_t += _step; // ReSync
 					_tg += _step;
-					console.log("Syncing " + neurostate.name + "..");
+					// console.log("Syncing " + neurostate.name + "..");
 				}
 
 				return;
@@ -66,7 +66,7 @@ NeuronCoordinator.updateT = function (t) {
 		}
 	}		
 	else {
-		console.log("Reverse");
+		// console.log("Reverse");
 		for (let i = neurostates.length - 1; i >= 0 ; i--) { // Loop backwards through array for reverse
 			let neurostate = neurostates[i];
 
@@ -85,9 +85,10 @@ NeuronCoordinator.updateT = function (t) {
 		}
 	}
 
-	console.log("_previous_slide: " + _previous_slide);
-	console.log("_current_slide: " + _current_slide);
-	console.log("Sketch is running..");
+	// Debugging
+	// console.log("_previous_slide: " + _previous_slide);
+	// console.log("_current_slide: " + _current_slide);
+	// console.log("Sketch is running..");
 
 	_p.loop();
 
@@ -205,14 +206,14 @@ NeuronCoordinator.animate = function () {
 		if (_t < _tg - _step) { // If some delta (queue) exists
 			_t += _step;
 			animation = NeuronCoordinator.currentAnimation();
-			console.log("animating " + animation.name);
+			// console.log("animating " + animation.name);
 			_p.clear();
 			animation.forward();
 
 			return;
 		}
 		else if (animation.loop) {
-			console.log("looping " + animation.name);
+			// console.log("looping " + animation.name);
 			_p.clear();
 			animation.forward(); // Loop without incrementing _tg | _t
 
@@ -223,14 +224,14 @@ NeuronCoordinator.animate = function () {
 		if (_t >= _tg + _step) {
 			_t -= _step;
 			animation = NeuronCoordinator.currentAnimation();
-			console.log("animating " + animation.name);
+			// console.log("animating " + animation.name);
 			_p.clear();
 			animation.reverse();
 
 			return;
 		}
 		else if (animation.loop) {
-			console.log("looping " + animation.name);
+			// console.log("looping " + animation.name);
 			_p.clear();
 			animation.reverse(); // Loop without incrementing _tg | _t
 
@@ -238,10 +239,10 @@ NeuronCoordinator.animate = function () {
 		}
 	}
 
-	console.log("_t:" + _t);
-	console.log("_tg:" + _tg);
+	// console.log("_t:" + _t);
+	// console.log("_tg:" + _tg);
 
-	console.log("Sketch is paused..");
+	// console.log("Sketch is paused..");
 	_p.noLoop(); // Shut er' down
 
 }

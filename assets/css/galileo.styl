@@ -39,11 +39,9 @@
 	color $TEXT_BLUE_LIGHT
 	height 100px
 	margin: 0
+	opacity: 0
 	
 	center()
-	
-	transition: opacity 5000ms ease
-	transition: margin-top $SLOWEST ease-out
 	
 .galileo .story-text .text.italics
 	font-style italic
@@ -60,12 +58,10 @@
 	width 700px
 	height 400px
 	margin: 0
+	opacity: 0
 
 	color $TEXT_BLUE_LIGHT
 	center()
-	
-	transition: opacity 5000ms ease
-	transition: margin-top $SLOWEST ease-out
 	
 .big-number.hundred:first-letter
 	letter-spacing -67.5px
@@ -145,14 +141,21 @@
 	
 
 // ---> Text Transition
+	
+.galileo .transition-none
+	transition: none
+	
+.galileo .transition-state
+	transition: all $SLOWEST ease-out
+	
+.galileo .transition-show
+	opacity: 1
 
 .galileo .fs-enter  // Fade + Slide Up
-	margin-top: 35px
-	
-
+	margin-top: -15px
 
 .galileo .fs-exit  // Fade + Slide Up
-	marign-top: -35px
+	margin-top: -35px
 
 
 /*

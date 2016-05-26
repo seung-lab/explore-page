@@ -187,7 +187,6 @@ function SVG_object (args = {}) {
 			}
 
 			c.splice(rand, 1); // Remove the recent looked up element
-			console.log(c.length);
 		}
 
 		function trace_path(curve) { // Assume progress < 1
@@ -736,8 +735,6 @@ function SVG_object (args = {}) {
 			if (b.p1.y < min_y) min_y = b.p1.y;
 			if (b.p1.y > max_y) max_y = b.p1.y;
 		});
-
-		console.log(min_x, max_x, min_y, max_y);
 
 		let dx = p.width/2 - 50 - (max_x - min_x) / 2, 		// 50 Arbitrary offset
 			dy = p.height/2 - 15 - (max_y - min_y) / 2; 	// 15 Arbitrary offset

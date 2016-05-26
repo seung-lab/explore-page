@@ -13,6 +13,8 @@ class Galileo extends TeaTime {
 		this.allegience = 'dark';
 		this.view = this.generateView();
 
+		let _this = this;
+
 		this.slides = [
 			{
 				text: "This question has puzzled scientists for centuries",
@@ -49,6 +51,7 @@ class Galileo extends TeaTime {
 			{
 				text: "However, most of their circuits are still uncharted.",
 				format: "italics",
+				enter: "fs-enter",
 			},
 			{
 				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
@@ -70,8 +73,10 @@ class Galileo extends TeaTime {
 
 		this.duration = utils.nvl(args.duration, this.slides.length);
 
-		this.view.story.container.hide();
-		this.view.bignumber.container.hide();
+		// this.view.story.container.hide();
+		// this.view.bignumber.container.hide();
+		this.view.story.container.addClass('transition-none');
+		this.view.bignumber.container.addClass('transition-none');
 
 		this.animations = {
 			text: $.Deferred().resolve(),
@@ -313,120 +318,92 @@ class Galileo extends TeaTime {
 		let slide = this.slideAt(t);
 		let prev_slide = this.slideAt(prev_t);
 
+		// let transition_end = 'transitionend webkitTransitionEnd oTransitionEnd'; // Browser Prefixes
+
 		let text_container = _this.view.story.container,
 			number_container = _this.view.bignumber.container;
 
-			function showMessage(e) { // is the event
-				// debugger;
-			}
+		// Animate Exit
+		if (prev_slide.exit && slide.index !== 0) {
+			let element;
+			prev_slide.text ? element = text_container : element = number_container;
 
-			text_container[0].addEventListener("transitionend", showMessage, false);
-			number_container[0].addEventListener("transitionend", showMessage, false);
+		   element
+				.addClass(prev_slide.exit)
+				.removeClass('transition-show');
 
-		if ((slide.text) || (prev_slide.text)) {
-			if ((slide.enter) || (prev_slide.enter)) {
-				text_container.addClass(prev_slide.exit)
+		   setTimeout(function() {
+		   		element
+		   			.removeClass('transition-state')
+					.removeClass(prev_slide.exit)
+					.removeClass(prev_slide.enter);
+				
+				setTimeout(function() {
+					updateText();
+				}, 250);
 
-				text_container.fadeOut("fast", function() {
-					if (slide.text) {
-						text_container
-							.removeClass(prev_slide.exit)
-							.addClass(slide.enter)
-							.fadeIn();
-		
-						_this.view.story.text
-							.removeClass('caps italics')
-							.addClass(slide.format);
 
-							if ((slide.format === 'italics') && (!slide.enter)) {
-								_this.animateTextScamble(slide);
-							}
-							else {
-								_this.view.story.text.html(
-									splitter(slide.text, true)
-								);
-							}
-					}
-				});
-			} 
-			else {
-				if (slide.text) {
-					text_container
-						.removeClass(prev_slide.exit)
-						.addClass(slide.enter)
-						.fadeIn();
-	
-					_this.view.story.text
-						.removeClass('caps italics')
-						.addClass(slide.format);
+			}, 1000);
 
-						if ((slide.format === 'italics') && (!slide.enter)) {
-							_this.animateTextScamble(slide);
-						}
-						else {
-							_this.view.story.text.html(
-								splitter(slide.text, true)
-							);
-						}
-				}
-			}
-
-			_this.view.story.counter.text(`${slide.index + 1}/${this.slides.length}`);
-			
-			if (slide.enter) {
-				text_container.removeClass(slide.enter);
-			}
+		} 
+		else if (slide.index === 0) {
+			setTimeout(function() {
+				updateText();
+			}, 1000);
+		} 
+		else {
+			updateText();
 		}
 		
-		if ((slide.big) || (prev_slide.big)) {
-			if ((slide.enter) || (prev_slide.enter)) {
-				number_container.addClass(prev_slide.exit);
+		function updateText() {
+			if (slide.text) {
+				// Update Text Content
+				_this.view.story.text
+					.removeClass('caps italics')
+					.addClass(slide.format);
 
-				number_container.fadeOut("fast", function() {
-					if (slide.big) {
-						number_container
-							.removeClass(prev_slide.exit)
-							.addClass(slide.enter)
-							.fadeIn();
-
-						_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
-
-						if (slide.big.number >= 100) {
-							_this.view.bignumber.number.addClass('hundred');
-						}
-
-						_this.view.bignumber.high.text(slide.big.high);
-						_this.view.bignumber.medium.text(slide.big.medium);
-						_this.view.bignumber.low.text(slide.big.low);
+					if ((slide.format === 'italics') && (!slide.enter)) {
+						_this.animateTextScamble(slide);
 					}
-				});
-			}
-			else {
-				if (slide.text) {
+					else {
+						_this.view.story.text.html(
+							splitter(slide.text, true)
+						);
+					}
+
+				// Animate Entrance
+				if (slide.enter) {
 					text_container
-						.removeClass(prev_slide.exit)
+						.addClass('transition-state')
 						.addClass(slide.enter)
-						.fadeIn();
-	
-					_this.view.story.text
-						.removeClass('caps italics')
-						.addClass(slide.format);
+						.addClass('transition-show');
+				} 
 
-						if ((slide.format === 'italics') && (!slide.enter)) {
-							_this.animateTextScamble(slide);
-						}
-						else {
-							_this.view.story.text.html(
-								splitter(slide.text, true)
-							);
-						}
-				}
+				_this.view.story.counter.text(`${slide.index + 1}/${_this.slides.length}`);
+			
 			}
+			else if (slide.big) {
+				// Update Text Content
+				_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
 
-			_this.view.bignumber.counter.text(`${slide.index + 1}/${this.slides.length}`);
+				if (slide.big.number >= 100) {
+					_this.view.bignumber.number.addClass('hundred');
+				}
 
-			if (slide.enter) {
-				number_container.removeClass(slide.enter);
+				_this.view.bignumber.high.text(slide.big.high);
+				_this.view.bignumber.medium.text(slide.big.medium);
+				_this.view.bignumber.low.text(slide.big.low);
+
+				// Animate Entrance
+				if (slide.enter) {
+					number_container
+						.addClass('transition-state')
+						.addClass(slide.enter)
+						.addClass('transition-show');
+				} 
+
+				_this.view.bignumber.counter.text(`${slide.index + 1}/${_this.slides.length}`);
+
 			}
 		}
 
