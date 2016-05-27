@@ -472,11 +472,6 @@ class Galileo extends TeaTime {
 		let slide = this.slideAt(t);
 		let prevslide = this.slideAt(prev_t);
 
-		if (_this.sketch) {
-			console.log('Running Sketch');
-			NNNSketch.updateState(slide.index);
-		}
-
 		if (prevslide.index === 1 && slide.index === 0) {
 			console.log('already running');
 			return;
@@ -497,6 +492,11 @@ class Galileo extends TeaTime {
 				_this.view.canvas = $(canvas);
 				_this.view.canvas.addClass('neural-network');
 			});
+		}
+
+		if (_this.sketch) {
+			console.log('Running Sketch');
+			NNNSketch.updateState(slide.index);
 		}
 	}
 

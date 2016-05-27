@@ -327,19 +327,9 @@ class Amazing extends TeaTime {
 		let slide = this.slideAt(t);
 		let prev_slide = this.slideAt(prev_t);
 
-		// Replace with update TEXT
-		if (!slide.supertext) {
-			this.view.supertext.hide();
-			this.view.textcontainer.removeClass('visible-supertext');
-		}
-		else {
-			this.view.supertext.text(slide.supertext).show();
-			this.view.textcontainer.addClass('visible-supertext');
-		}
-
 		// Animate Exit
-		if ((prev_t > t) && (prev_slide.exit)) { // Reverse
-			let element = this.view.textcontainerzx;
+		if (((prev_t > t) && (prev_slide.exit)) || ((prev_slide.index === 4) && (slide.index === 4))) { // Reverse
+			let element = this.view.textcontainer;
 
 			element
 				.addClass(prev_slide.exit_reverse)
@@ -353,14 +343,12 @@ class Amazing extends TeaTime {
 					.removeClass(prev_slide.exit_reverse)
 					.removeClass(prev_slide.enter_reverse);
 
-				if (_this.view.text.text()) {
-					_this.view.text.html(splitter(slide.text, slide.ipyramid));
-				}
+				_this.view.text.html(splitter(slide.text, slide.ipyramid));
 
 				setTimeout(function() {
 					updateText("reverse");
 				}, 250);
-			}, 1000);
+			}, 500);
 		}
 		else if (prev_slide.exit && slide.index !== 0) { // Forward
 			let element = this.view.textcontainer;
@@ -377,14 +365,12 @@ class Amazing extends TeaTime {
 					.removeClass(prev_slide.exit_reverse)
 					.removeClass(prev_slide.enter_reverse);
 
-				if (_this.view.text.text()) {
-					_this.view.text.html(splitter(slide.text, slide.ipyramid));
-				}
+				_this.view.text.html(splitter(slide.text, slide.ipyramid));
 				
 				setTimeout(function() {
 					updateText();
 				}, 250);
-			}, 1000);
+			}, 500);
 		} 
 		else if (slide.index === 0) { // Starting
 
@@ -392,7 +378,7 @@ class Amazing extends TeaTime {
 
 			setTimeout(function() {
 				updateText();
-			}, 1000);
+			}, 500);
 		} 
 		else { // No Transition
 			if (_this.view.text.text()) {
@@ -403,6 +389,16 @@ class Amazing extends TeaTime {
 
 		function updateText(direction = "forward") {
 			if (_this.view.text.text()) {
+
+						// Replace with update TEXT
+				if (!slide.supertext) {
+					_this.view.supertext.hide();
+					_this.view.textcontainer.removeClass('visible-supertext');
+				}
+				else {
+					_this.view.supertext.text(slide.supertext).show();
+					_this.view.textcontainer.addClass('visible-supertext');
+				}
 
 				// Animate Entrance
 				if (slide.enter) {

@@ -253,15 +253,6 @@ let sprout = function (p) {
 				forward_slide: 7,
 				reverse_slide: 6,
 				p: p	
-		    },
-		    {
-		    	name: "Drake",
-				duration: 60,
-				forward: _nnn.plague.bind(_nnn),
-				reverse: _nnn.fadeOut.bind(_nnn),
-				forward_slide: 8,
-				reverse_slide: 7,
-				p: p
 		    }
 		];
 

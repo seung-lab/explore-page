@@ -31,6 +31,7 @@ NeuronCoordinator.initialize = function (neurostates, slide_count, p) {
 };
 
 NeuronCoordinator.updateT = function (t) {
+	let NC = NeuronCoordinator;
 	_previous_slide = _current_slide;
 	_current_slide = t;
 
@@ -40,9 +41,48 @@ NeuronCoordinator.updateT = function (t) {
 
 	// Update global queue
 	if (_forward) {
-		// console.log("Forwards");
+
+		if (_current_slide - _previous_slide > 1) {
+			console.log('fastforward');
+			let diff = _current_slide - _previous_slide;
+
+			for (let i = diff; i > 0; i--) {
+				step_forward(i);
+			}
+
+			while (_t < (_tg - _step)) {
+				console.log('tracing time');
+				console.log('_t ' + _t + " | _tg " + _tg);
+				NC.animate();
+			}
+
+			return;
+
+		}
+
+		step_forward();
+
+	}		
+	else {
+		
+		if (_previous_slide - _current_slide > 1) {
+			console.log('rapidreverse');
+			while (_tg > _t) {
+				step_backward();
+				NC.animate();
+			}
+			_p.loop();
+			return;
+		}
+
+		step_backward();
+
+	}
+
+	function step_forward(skip = 0) {
 		for (let i = 0; i < neurostates.length; i++) {
 			let neurostate = neurostates[i];
+			let look_up;
 
 			// Special Cases
 			if ((neurostate.name === "Initialize") && (_current_slide === 0)) {
@@ -58,14 +98,18 @@ NeuronCoordinator.updateT = function (t) {
 				return;
 
 			}
-			
-			if (neurostate.forward_slide == _current_slide) {
+
+			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide
+
+			console.log(look_up);
+
+			if (neurostate.forward_slide == (look_up)) {
 				_tg += neurostate.normed_duration;
-			}
+			}			
 		}
-	}		
-	else {
-		// console.log("Reverse");
+	}
+
+	function step_backward() {
 		for (let i = neurostates.length - 1; i >= 0 ; i--) { // Loop backwards through array for reverse
 			let neurostate = neurostates[i];
 
@@ -245,27 +289,5 @@ NeuronCoordinator.animate = function () {
 	_p.noLoop(); // Shut er' down
 
 }
-
-/*
-
-NeuronCoordinator.sub_t_update = function (module_name, sub_t) {
-	var current = NeuronCoordinator.currentAnimation();
-
-	if (module_name == current.name) {
-		_t = (current.begin + (sub_t * current.normed_duration));
-	}
-
-	NeuronCoordinator.timeline.seek(_t);
-};
-
-NeuronCoordinator.t = function (tee) {
-	if (tee !== undefined) {
-		NeuronCoordinator.seek(_t);
-	}
-
-	return _t;
-};
-
-*/
 
 module.exports = NeuronCoordinator;
