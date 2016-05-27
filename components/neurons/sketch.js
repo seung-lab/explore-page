@@ -35,8 +35,8 @@ let sprout = function (p) {
 	// Global Variables
 	// 
 	// Nnn Object
-	let _nnn = null,
-		_svg_object = null, 
+	let _nnn,
+		_svg_object, 
 	
 	// int
 		_counter = 0,
@@ -53,6 +53,14 @@ let sprout = function (p) {
 	// Global font reference
 	// let _fontRegular;
 
+	// Reset Globals
+	_neurostates = [],
+	_progressions = [],
+	_actives = [], // Animation queue
+	_direction = undefined;
+
+	growing = true; 
+
 	// Preload any required assets
 	p.preload = function () {
 		// Load font
@@ -68,9 +76,6 @@ let sprout = function (p) {
 
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
-		// Set font characterists
-		// p.textFont(_fontRegular);
-
 		_svg_object = new SVG_Object({
 			p: p,
 			density: 35,
@@ -78,7 +83,6 @@ let sprout = function (p) {
 
 		// Calculate _nnn_count based on width
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
-		// _nnn_count = 200;
 
 		nnn_start();
 
@@ -92,6 +96,8 @@ let sprout = function (p) {
 	p.draw = function() {
 
 		NeuronCoordinator.animate();
+		// p.fill(255,0,0);
+		// p.rect(p.width/2, p.height/2, 100,100);
 
 	}
 
@@ -106,6 +112,8 @@ let sprout = function (p) {
 		});
 
 		_nnn.initialize();
+
+		console.log("STARTING");
 	}
 
 	function recurse () {
@@ -133,7 +141,7 @@ let sprout = function (p) {
 			{
 		        name: "Initialize",
 				duration: 75,
-				forward: _nnn.initialize.bind(_nnn),
+				forward: _nnn.empty_fn.bind(_nnn),
 				reverse: _nnn.rebound_1.bind(_nnn),
 				forward_slide: 0,
 				reverse_slide: 0,

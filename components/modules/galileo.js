@@ -21,6 +21,8 @@ class Galileo extends TeaTime {
 				format: "caps",
 				enter: "fs-enter",
 				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				big: {
@@ -31,6 +33,8 @@ class Galileo extends TeaTime {
 				},
 				enter: "fs-enter",
 				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				big: {
@@ -41,17 +45,22 @@ class Galileo extends TeaTime {
 				},
 				enter: "fs-enter",
 				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "Working together these cells make you, you.",
 				format: "italics",
 				enter: "fs-enter",
 				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "However, most of their circuits are still uncharted.",
 				format: "italics",
 				enter: "fs-enter",
+				enter_reverse: "fs-enter-reverse",
 			},
 			{
 				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
@@ -63,10 +72,6 @@ class Galileo extends TeaTime {
 			},
 			{
 				text: "We’re calling on gamers to help connect the dots by creating a physical, visual 3D map of the brain.",
-				format: "italics",
-			},
-			{
-				text: "What began at MIT has grown into a global community of hundreds of thousands.",
 				format: "italics",
 			}
 		];
@@ -324,7 +329,30 @@ class Galileo extends TeaTime {
 			number_container = _this.view.bignumber.container;
 
 		// Animate Exit
-		if (prev_slide.exit && slide.index !== 0) {
+		if ((prev_t > t) && (prev_slide.exit)) { // Reverse
+			let element;
+			prev_slide.text ? element = text_container : element = number_container;
+
+		   element
+				.addClass(prev_slide.exit_reverse)
+				.removeClass('transition-show');
+
+		   setTimeout(function() {
+		   		element
+		   			.removeClass('transition-state')
+					.removeClass(prev_slide.exit)
+					.removeClass(prev_slide.enter)
+					.removeClass(prev_slide.exit_reverse)
+					.removeClass(prev_slide.enter_reverse);
+				
+				setTimeout(function() {
+					updateText("reverse");
+				}, 250);
+
+
+			}, 1000);
+		}
+		else if (prev_slide.exit && slide.index !== 0) { // Forward
 			let element;
 			prev_slide.text ? element = text_container : element = number_container;
 
@@ -336,7 +364,9 @@ class Galileo extends TeaTime {
 		   		element
 		   			.removeClass('transition-state')
 					.removeClass(prev_slide.exit)
-					.removeClass(prev_slide.enter);
+					.removeClass(prev_slide.enter)
+					.removeClass(prev_slide.exit_reverse)
+					.removeClass(prev_slide.enter_reverse);
 				
 				setTimeout(function() {
 					updateText();
@@ -346,16 +376,16 @@ class Galileo extends TeaTime {
 			}, 1000);
 
 		} 
-		else if (slide.index === 0) {
+		else if (slide.index === 0) { // Starting
 			setTimeout(function() {
 				updateText();
 			}, 1000);
 		} 
-		else {
+		else { // No Transition
 			updateText();
 		}
 		
-		function updateText() {
+		function updateText(direction = "forward") {
 			if (slide.text) {
 				// Update Text Content
 				_this.view.story.text
@@ -373,9 +403,13 @@ class Galileo extends TeaTime {
 
 				// Animate Entrance
 				if (slide.enter) {
+					let transition;
+					direction === "forward"
+						? transition = slide.enter 
+						: transition = slide.enter_reverse;
 					text_container
 						.addClass('transition-state')
-						.addClass(slide.enter)
+						.addClass(transition)
 						.addClass('transition-show');
 				} 
 
@@ -396,9 +430,13 @@ class Galileo extends TeaTime {
 
 				// Animate Entrance
 				if (slide.enter) {
+					let transition;
+					direction === "forward"
+						? transition = slide.enter 
+						: transition = slide.enter_reverse;
 					number_container
 						.addClass('transition-state')
-						.addClass(slide.enter)
+						.addClass(transition)
 						.addClass('transition-show');
 				} 
 

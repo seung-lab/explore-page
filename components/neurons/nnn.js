@@ -7,8 +7,9 @@
 // A class for controlling the interactions across the enire network
 "use strict";
 
+window.NNNCount = 0;
+
 let $ = require('jquery'),
-	Utils = require('../../clientjs/utils.js'),
 	p5 = require('p5'),
 	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js'),
@@ -16,6 +17,9 @@ let $ = require('jquery'),
 	Easings = require('../../clientjs/easing.js');
 
 function NNN (args = {}) {
+	window.NNNCount++;
+	this.id = window.NNNCount;
+
 	// Private arguments from constructor
 	this.p = args.p;
 	let p = args.p;
@@ -167,6 +171,34 @@ function NNN (args = {}) {
 
 	})();
 
+	// Run => Neurons
+	this.grow = (function() {
+		let active = false;
+		function grow() {
+
+			console.log(this.id);
+
+			if (!active) {
+				this.activate();
+				active = true;
+				console.log('activate');
+			}
+			this.render();
+
+			this.active_neurons.forEach((neuron) => {
+				if (this.done()) {
+					return; 
+				}
+
+				neuron.grow();
+
+			});
+		}
+
+		return grow;
+
+	})();
+
 }
 
 // Private Globals
@@ -178,8 +210,12 @@ let _scatter_multiplier_1,
 
 
 // Public Methods
+NNN.prototype.empty_fn = function() {
 
-NNN.prototype.initialize = Utils.onceify(function() {
+}
+
+
+NNN.prototype.initialize = function() {
 	// Calculate power offset
 	// During scatter_2 --> Ensure consistant neuron density
 	// across different displays
@@ -195,7 +231,7 @@ NNN.prototype.initialize = Utils.onceify(function() {
 
 	// Initialize Neuron
 	this.add_neuron(this.num_neurons);
-});
+}
 
 NNN.prototype.rebound_1 = function() {
 	let ret = false;
@@ -234,7 +270,6 @@ NNN.prototype.scatter_2 = function() {
 
 // Check if neuron is off the screen
 NNN.prototype.check_bounds = function(soma) {
-	
 	if ((soma.position.x < 0) || (soma.position.x > this.p.width)) {
 		return false
 	}
@@ -245,10 +280,7 @@ NNN.prototype.check_bounds = function(soma) {
 	return true;
 }
 
-NNN.prototype.activate = Utils.onceify(function() {
-
-	// console.log('activate');
-
+NNN.prototype.activate = function() {
 	for (let i = 0; i < this.neurons.length; i++) {
 		let neuron = this.neurons[i]
 		let soma = neuron.nodes[0];
@@ -268,23 +300,6 @@ NNN.prototype.activate = Utils.onceify(function() {
 			return true;
 		}
 	}
-});
-
-// Simple method for running the neurons
-NNN.prototype.grow = function() {
-	// Setup Neurons
-	this.activate();
-
-	this.render();
-
-	this.active_neurons.forEach((neuron) => {
-		if (this.done()) {
-			return; 
-		}
-
-		neuron.grow();
-
-	});
 }
 
 NNN.prototype.render = function() {
@@ -586,7 +601,8 @@ NNN.prototype.add_dendrite = function(pos, heading, velocity) {
 
 // Create MST --> Kruskal
 // Additionally create spring connections
-NNN.prototype.mst = Utils.onceify(function() {
+// Use closure to onceify()
+NNN.prototype.mst = function() {
 	let graph = {
 		V: [],
 		E: [],
@@ -639,7 +655,14 @@ NNN.prototype.mst = Utils.onceify(function() {
 	edges.forEach((edge) => {
 		getSprung(edge);
 	});
-});
+
+	function empty_fn() {
+
+	}
+
+	return empty_fn();
+
+}
 
 module.exports = NNN;
 

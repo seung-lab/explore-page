@@ -25,10 +25,9 @@ NeuronCoordinator.initialize = function (neurostates, slide_count, p) {
 
 	_p = p;
 
-	if (!NC.initialized) {
-		NC.setAnimations(neurostates);
-		NC.initialized = true;
-	}
+	NC.setAnimations(neurostates);
+	NC.initialized = true;
+
 };
 
 NeuronCoordinator.updateT = function (t) {
@@ -206,14 +205,14 @@ NeuronCoordinator.animate = function () {
 		if (_t < _tg - _step) { // If some delta (queue) exists
 			_t += _step;
 			animation = NeuronCoordinator.currentAnimation();
-			// console.log("animating " + animation.name);
+			console.log("animating " + animation.name);
 			_p.clear();
 			animation.forward();
 
 			return;
 		}
 		else if (animation.loop) {
-			// console.log("looping " + animation.name);
+			console.log("looping " + animation.name);
 			_p.clear();
 			animation.forward(); // Loop without incrementing _tg | _t
 
