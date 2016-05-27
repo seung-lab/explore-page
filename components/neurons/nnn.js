@@ -17,9 +17,6 @@ let $ = require('jquery'),
 	Easings = require('../../clientjs/easing.js');
 
 function NNN (args = {}) {
-	window.NNNCount++;
-	this.id = window.NNNCount;
-
 	// Private arguments from constructor
 	this.p = args.p;
 	let p = args.p;
@@ -175,8 +172,6 @@ function NNN (args = {}) {
 	this.grow = (function() {
 		let active = false;
 		function grow() {
-
-			console.log(this.id);
 
 			if (!active) {
 				this.activate();

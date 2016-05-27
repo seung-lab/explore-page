@@ -60,26 +60,38 @@ class Galileo extends TeaTime {
 				text: "However, most of their circuits are still uncharted.",
 				format: "italics",
 				enter: "fs-enter",
+				exit: "fs-exit",
 				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
 				format: "italics",
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "Today, neuroscience is revolutionizing how we see the world within us.",
 				format: "italics",
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "We’re calling on gamers to help connect the dots by creating a physical, visual 3D map of the brain.",
 				format: "italics",
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			}
 		];
 
 		this.duration = utils.nvl(args.duration, this.slides.length);
 
-		// this.view.story.container.hide();
-		// this.view.bignumber.container.hide();
 		this.view.story.container.addClass('transition-none');
 		this.view.bignumber.container.addClass('transition-none');
 
@@ -323,8 +335,6 @@ class Galileo extends TeaTime {
 		let slide = this.slideAt(t);
 		let prev_slide = this.slideAt(prev_t);
 
-		// let transition_end = 'transitionend webkitTransitionEnd oTransitionEnd'; // Browser Prefixes
-
 		let text_container = _this.view.story.container,
 			number_container = _this.view.bignumber.container;
 
@@ -371,10 +381,7 @@ class Galileo extends TeaTime {
 				setTimeout(function() {
 					updateText();
 				}, 250);
-
-
 			}, 1000);
-
 		} 
 		else if (slide.index === 0) { // Starting
 			setTimeout(function() {

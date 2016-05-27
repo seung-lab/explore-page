@@ -94,11 +94,7 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-
 		NeuronCoordinator.animate();
-		// p.fill(255,0,0);
-		// p.rect(p.width/2, p.height/2, 100,100);
-
 	}
 
 	function nnn_start () {

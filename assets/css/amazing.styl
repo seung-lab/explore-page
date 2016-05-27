@@ -1,5 +1,6 @@
 @require 'colors.styl'
 @require 'mixins.styl'
+@require 'animation.styl'
 
 .module-font 
 	font-family 'Roboto Condensed', 'Lucidia Grande', sans-serif
@@ -38,6 +39,7 @@ $amazing_z = 1
 	line-height 1.25em
 	text-align center
 	white-space nowrap
+	opacity: 0
 	
 	width 666px
 	height auto
@@ -122,6 +124,31 @@ $amazing_z = 1
 	margin auto
 	visibility hidden
 	height 75%
+	
+
+
+// ---> Text Transition
+	
+.amazing .transition-none
+	transition: none
+	
+.amazing .transition-state
+	transition: all $SLOWEST ease-out
+	
+.amazing .transition-show
+	opacity: 1
+
+.amazing .fs-enter  // Fade + Slide Up
+	margin-bottom: 15px
+
+.amazing .fs-exit  // Fade + Slide Up
+	margin-bottom: 35px
+	
+.amazing .fs-enter-reverse  // Fade + Slide Up
+	margin-bottom: -15px
+
+.amazing .fs-exit-reverse  // Fade + Slide Up
+	margin-bottom: -35px
 	
 
 /*

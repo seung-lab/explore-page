@@ -20,6 +20,10 @@ class Amazing extends TeaTime {
 				ipyramid: true,
 				lastFrame: 14,
 				lastRepeatFrame: 18,
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				supertext: "it allows you to:",
@@ -27,28 +31,46 @@ class Amazing extends TeaTime {
 				ipyramid: true,
 				lastFrame: 46,
 				lastRepeatFrame: 62,
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "Dream fantastic dreams",
 				ipyramid: true,
 				lastFrame: 87,
 				lastRepeatFrame: 94,
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "Even laugh at goofy cat videos",
 				ipyramid: false,
 				lastFrame: 112,
 				lastRepeatFrame: 116,
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 			{
 				text: "But how?",
 				ipyramid: true,
 				lastFrame: 144,
 				lastRepeatFrame: 148,
+				enter: "fs-enter",
+				exit: "fs-exit",
+				enter_reverse: "fs-enter-reverse",
+				exit_reverse: "fs-exit-reverse",
 			},
 		];
 
 		this.duration = utils.nvl(args.duration, this.slides.length);
+
+		$('story-text').addClass('transition-none');
 
 		this.animations = {
 			text: $.Deferred().resolve(),
@@ -299,11 +321,13 @@ class Amazing extends TeaTime {
 		}
 	}
 
-	render (t_prev, t) {
+	render (prev_t, t) {
 		let _this = this; 
 
 		let slide = this.slideAt(t);
+		let prev_slide = this.slideAt(prev_t);
 
+		// Replace with update TEXT
 		if (!slide.supertext) {
 			this.view.supertext.hide();
 			this.view.textcontainer.removeClass('visible-supertext');
@@ -313,22 +337,91 @@ class Amazing extends TeaTime {
 			this.view.textcontainer.addClass('visible-supertext');
 		}
 
-		this.animations.text.reject();
+		// Animate Exit
+		if ((prev_t > t) && (prev_slide.exit)) { // Reverse
+			let element = this.view.textcontainerzx;
 
-		if (_this.view.text.text()) {
-			this.animations.text = _this.view.text.scrambleText({
-				begin: _this.view.text.html(),
-				end: slide.text,
-				msec: 1500,
-				tick: 50,
-				update: function (txt) {
-					_this.view.text.html(splitter(txt, slide.ipyramid))
+			element
+				.addClass(prev_slide.exit_reverse)
+				.removeClass('transition-show');
+
+			setTimeout(function() {
+				element
+					.removeClass('transition-state')
+					.removeClass(prev_slide.exit)
+					.removeClass(prev_slide.enter)
+					.removeClass(prev_slide.exit_reverse)
+					.removeClass(prev_slide.enter_reverse);
+
+				if (_this.view.text.text()) {
+					_this.view.text.html(splitter(slide.text, slide.ipyramid));
 				}
-			});
+
+				setTimeout(function() {
+					updateText("reverse");
+				}, 250);
+			}, 1000);
 		}
-		else {
-			_this.view.text.html(splitter(slide.text, slide.ipyramid));
+		else if (prev_slide.exit && slide.index !== 0) { // Forward
+			let element = this.view.textcontainer;
+
+			element
+				.addClass(prev_slide.exit)
+				.removeClass('transition-show');
+
+			setTimeout(function() {
+				element
+					.removeClass('transition-state')
+					.removeClass(prev_slide.exit)
+					.removeClass(prev_slide.enter)
+					.removeClass(prev_slide.exit_reverse)
+					.removeClass(prev_slide.enter_reverse);
+
+				if (_this.view.text.text()) {
+					_this.view.text.html(splitter(slide.text, slide.ipyramid));
+				}
+				
+				setTimeout(function() {
+					updateText();
+				}, 250);
+			}, 1000);
+		} 
+		else if (slide.index === 0) { // Starting
+
+				_this.view.text.html(splitter(slide.text, slide.ipyramid));
+
+			setTimeout(function() {
+				updateText();
+			}, 1000);
+		} 
+		else { // No Transition
+			if (_this.view.text.text()) {
+				_this.view.text.html(splitter(slide.text, slide.ipyramid));
+			}
+			updateText();
 		}
+
+		function updateText(direction = "forward") {
+			if (_this.view.text.text()) {
+
+				// Animate Entrance
+				if (slide.enter) {
+					let transition;
+					direction === "forward"
+						? transition = slide.enter 
+						: transition = slide.enter_reverse;
+					_this.view.textcontainer
+						.addClass('transition-state')
+						.addClass(transition)
+						.addClass('transition-show');
+				} 
+			}
+		}
+
+		// else {
+		// 	_this.view.text.html(splitter(slide.text, slide.ipyramid));
+		// 	debugger;
+		// }
 
 		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
 
