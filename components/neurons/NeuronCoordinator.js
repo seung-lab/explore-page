@@ -67,12 +67,20 @@ NeuronCoordinator.updateT = function (t) {
 		
 		if (_previous_slide - _current_slide > 1) {
 			console.log('rapidreverse');
-			while (_tg > _t) {
-				step_backward();
+			let diff = _previous_slide - _current_slide;
+
+			for (let i = diff; i > 0; i--) {
+				step_backward(i);
+			}
+			
+			while ((_tg - _step) < _t) {
+				console.log('tracing time');
+				console.log('_t ' + _t + " | _tg " + _tg);
 				NC.animate();
 			}
-			_p.loop();
+
 			return;
+
 		}
 
 		step_backward();
@@ -99,7 +107,7 @@ NeuronCoordinator.updateT = function (t) {
 
 			}
 
-			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide
+			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide;
 
 			console.log(look_up);
 
@@ -109,13 +117,10 @@ NeuronCoordinator.updateT = function (t) {
 		}
 	}
 
-	function step_backward() {
+	function step_backward(skip = 0) {
 		for (let i = neurostates.length - 1; i >= 0 ; i--) { // Loop backwards through array for reverse
 			let neurostate = neurostates[i];
-
-			if (neurostate.reverse_slide == _current_slide) {
-				_tg -= neurostate.normed_duration;
-			}
+			let look_up;
 
 			// Special Cases
 			if ((neurostate.name === "Scatter2") && (_current_slide === 1)) {
@@ -125,6 +130,12 @@ NeuronCoordinator.updateT = function (t) {
 					console.log("Syncing " + neurostate.name + "..");
 				}
 			}
+
+			skip > 0 ? look_up = _previous_slide - skip : look_up = _current_slide;
+
+			if (neurostate.forward_slide == (look_up)) {
+				_tg -= neurostate.normed_duration;
+			}	
 		}
 	}
 
