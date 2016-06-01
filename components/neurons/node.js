@@ -106,6 +106,54 @@ function Node (args = {}) {
 	// Increment for each instantiation at a branch event
 	this.depth++;
 
+
+	// --------------------------------------------
+	// Closure-Man
+
+	this.reset_prop = (function() { // Call Immediately to est. then
+		let now = Date.now(),
+			then = 0;
+
+		function check(fn) {
+			now = Date.now();
+
+			if (now - then > 2000) { // When 2s have elapsed..
+				fn(); // Call function
+			}
+
+			then = now;
+		}
+
+		function reset_power() {
+			// Reset power 
+			_this.pow = 1;
+
+		}
+
+		function reset_pow_center() {
+			// Reset power 
+			_this.pow = 1;
+
+			// Reset position to center
+			_this.position.x = p.width / 2 + p.random(-2,2);
+			_this.position.y = p.height / 2 + p.random(-2,2);
+		}
+
+		return {
+			pow: function() {
+				check(reset_power);
+			},
+			pow_center: function() {
+				check(reset_pow_center);
+			}
+		};
+		
+	})();
+
+
+	// --------------------------------------------
+	// Method-Man
+
 	// Ensures that the definition of leaf is fresh
 	this.isLeaf = function () {
 		return _this.children.length === 0;
@@ -664,6 +712,8 @@ function Node (args = {}) {
 		
 		// If we have arrived, stop updating position
 		if (_this.arrive(position)) {
+			console.log(position);
+			_this.max_speed = 100;
 			_this.center = false;
 			return true;
 		}

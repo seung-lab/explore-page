@@ -45,12 +45,16 @@ function SVG_object (args = {}) {
 			bezier_curves = [], // Interaction Object
 			rand;
 
-		let step = 1/30; // 30 Steps to an animation
+		let step = 1/30; // 30 Steps to animation
 
 		setup();
 
 		function setup() {
 			let arc_length;
+
+			// This works as both setup & reset
+			c.length = 0;
+			bezier_curves.length = 0;
 
 			b.forEach(function(bezier, index) {  // Transform Bezier Vertex --> Bezier Curve
 				let anchor;
@@ -126,7 +130,7 @@ function SVG_object (args = {}) {
 			p.endShape();
 		}
 
-		function beziers() { // Draw Entire SVG
+		function beziers(direction = "forward") { // Draw Entire SVG
 			if (bezier_curves.length === 0) {
 				return;
 			}
@@ -134,14 +138,26 @@ function SVG_object (args = {}) {
 			let stroke_val;
 
 			for (let i = 1; i < bezier_curves.length; i++) {
-				if (bezier_curves[i].progress < 0.8) {
-					continue;
-				}
 
 				let b = bezier_curves[i];
 
-				if (b.opacity < 0.875) { // Watch that overflow, son
-					b.opacity += 0.125; // 1/8 --> Timer
+				if (direction === "forward") {
+					if (bezier_curves[i].progress < 0.8) {
+						continue;
+					} 
+					else if (b.opacity < 0.875) { // Watch that overflow, son
+						b.opacity += 0.125; // 1/8 --> Timer
+					}
+				} 
+				else if (direction === "reverse") {
+					if (b.opacity > 0.125) { // Watch that overflow, son
+						b.opacity -= 0.125; // 1/8 --> Timer
+					} 
+					else {
+						b.progress = 0;
+						
+						if (i === bezier_curves.length - 1) setup();
+					}
 				}
 
 				stroke_val = 'rgba(115,135,150,' + p.str(b.opacity) + ')';
@@ -214,6 +230,10 @@ function SVG_object (args = {}) {
 			p.pop();
 		}
 
+		function fade_beziers() {
+			beziers("reverse");
+		}
+
 		function debug() {
 			p.strokeWeight(1);
 
@@ -283,6 +303,9 @@ function SVG_object (args = {}) {
 			},
 			connect: function() {
 				connect();
+			},
+			fade_beziers: function() {
+				fade_beziers();
 			},
 			debug: function() {
 				debug();

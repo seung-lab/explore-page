@@ -181,7 +181,7 @@ function Neuron (args) {
 			// });
 
 			_this.calc_alp(); // Calculate Arc Length Parameterization
-			_this.final_position = _this.position.copy();
+			_this.final_position = _this.nodes[0].position.copy();
 
 			list = true;
 

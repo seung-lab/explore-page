@@ -109,7 +109,6 @@ let sprout = function (p) {
 
 		_nnn.initialize();
 
-		console.log("STARTING");
 	}
 
 	function recurse () {
@@ -148,18 +147,19 @@ let sprout = function (p) {
 				duration: 60,
 				forward: _nnn.scatter.bind(_nnn),
 				reverse: _nnn.twinkle.bind(_nnn),
+				reverse_loop: true,
 				forward_slide: 1,
-				reverse_slide: 0,
+				reverse_slide: 1,
 				p: p
 		    },
 		    {
 		    	name: "Twinkle",
-				duration: 15,
+				duration: 50,
 				forward: _nnn.twinkle.bind(_nnn),
 				reverse: _nnn.rebound_2.bind(_nnn),
 				forward_slide: 1,
 				reverse_slide: 1,
-				loop: true,
+				forward_loop: true,
 				p: p
 		    },
 		    {
@@ -185,7 +185,8 @@ let sprout = function (p) {
 				duration: 30,
 				forward: _nnn.synapse.bind(_nnn),
 				reverse: _nnn.synapse.bind(_nnn),
-				loop: true,
+				forward_loop: true,
+				reverse_loop: true,
 				forward_slide: 3,
 				reverse_slide: 3,
 				p: p
@@ -212,7 +213,7 @@ let sprout = function (p) {
 		    	name: "Stars",
 				duration: 45,
 				forward: _nnn.stary_night.bind(_nnn),
-				reverse: _nnn.rebound_2.bind(_nnn),
+				reverse: _nnn.rebound_3.bind(_nnn),
 				forward_slide: 5,
 				reverse_slide: 4,
 				p: p
@@ -221,10 +222,11 @@ let sprout = function (p) {
 		    	name: "Twinkle2",
 				duration: 15,
 				forward: _nnn.twinkle_2.bind(_nnn),
-				reverse: _nnn.rebound_3.bind(_nnn),
+				reverse: _nnn.twinkle_2.bind(_nnn),
 				forward_slide: 5,
-				reverse_slide: 4,
-				loop: true,
+				reverse_slide: 5,
+				forward_loop: true,
+				forward_loop: true,
 				p: p
 		    },
 		    {
@@ -240,7 +242,7 @@ let sprout = function (p) {
 		    	name: "Brain",
 				duration: 100,
 				forward: _nnn.render_brain.bind(_nnn),
-				reverse: _nnn.rebound_3.bind(_nnn),
+				reverse: _nnn.rebound_4.bind(_nnn),
 				forward_slide: 6,
 				reverse_slide: 5,
 				p: p
@@ -249,7 +251,7 @@ let sprout = function (p) {
 		    	name: "Connect",
 				duration: 100,
 				forward: _nnn.render_brain_lines.bind(_nnn),
-				reverse: _nnn.fadeOut.bind(_nnn),
+				reverse: _nnn.fadeOut_brain_lines.bind(_nnn),
 				forward_slide: 7,
 				reverse_slide: 6,
 				p: p	
@@ -269,6 +271,8 @@ let sprout = function (p) {
 		p.resizeCanvas(window.innerWidth, window.innerHeight);
 
      	_svg_object.resize();
+
+     	NeuronCoordinator.resize_sync(); // Let's begin at the beginning..
 
      	p.draw();
      	p.draw();

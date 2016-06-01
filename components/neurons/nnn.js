@@ -80,7 +80,21 @@ function NNN (args = {}) {
 				v.arrive(v.brain_pos);
 				v.update();
 				v.render_soma(5);
-				});
+			});
+		}
+
+		function rebound_brain() {
+			p.noStroke()
+			p.fill(115,135,150);
+
+			speed = 100;
+
+			vertices.forEach((v) => {
+				v.maxspeed = speed;
+				v.arrive(center);
+				v.update();
+				v.render_soma(5);
+			});
 		}
 
 		function render_svg() {
@@ -89,6 +103,15 @@ function NNN (args = {}) {
 			p.strokeWeight(2);
 
 			_this.brain.render.connect();
+		}
+
+		function fade_svg_lines() {
+			// Fade Brain SVG	
+			p.noFill();
+			p.strokeWeight(2);
+
+			_this.brain.render.fade_beziers();
+			_this.brain.render.points();
 		}
 
 		function setup_dendrite() { // Dendrite Set Up
@@ -157,6 +180,12 @@ function NNN (args = {}) {
 			},
 			render_svg: function() {
 				render_svg();
+			},
+			fade_svg_lines: function() {
+				fade_svg_lines();
+			},
+			rebound_brain: function() {
+				rebound_brain();
 			},
 			grow: function() {
 				grow();
@@ -247,7 +276,7 @@ NNN.prototype.scatter = function() {
 NNN.prototype.scatter_2 = function() {
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
-			soma.reset_pow_1();
+			soma.reset_prop.pow();
 			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
 	});
 
@@ -423,7 +452,7 @@ NNN.prototype.last_position = function() {
 NNN.prototype.stary_night = function() {
 	for (let i = 0; i < this.neurons.length/2; i++) { // Use 1/2 total neurons
 		let soma = this.neurons[i].nodes[0];
-			soma.reset_pow_3();
+			soma.reset_prop.pow_center();
 			soma.space(this.somas, _scatter_multiplier_3); // Repel from center
 	}
 
@@ -474,6 +503,10 @@ NNN.prototype.rebound_3 = function() {
 	}
 }
 
+NNN.prototype.rebound_4 = function() {	
+	this.brainiac.rebound_brain();
+}
+
 NNN.prototype.render_brain = function() {
 	this.brainiac.animate();
 }
@@ -488,6 +521,10 @@ NNN.prototype.plague = function() {
 	this.brainiac.render_svg();
 	this.brainiac.grow();
 	this.brainiac.render_dendrite();	
+}
+
+NNN.prototype.fadeOut_brain_lines = function() {
+	this.brainiac.fade_svg_lines();
 }
 
 
