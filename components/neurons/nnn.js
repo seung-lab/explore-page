@@ -42,6 +42,8 @@ function NNN (args = {}) {
 	this.roots = [];
 	this.dendrite_id = 0;
 
+	this.growing = true;
+
 	this.initialized = false;
 
 	let _this = this;
@@ -218,10 +220,45 @@ function NNN (args = {}) {
 			});
 		}
 
-		return grow;
+		return grow; // Closure Stuffs
 
 	})();
 
+	// Setup => Image Buffer
+	this.drawBuffer = (function() {
+
+		let canvas = this.p.canvas;
+		let imageData;
+
+		let ctx = canvas.getContext('2d');
+		let w = canvas.width,
+			h = canvas.height;
+
+		function createBuffer() {
+
+			imageData = ctx.getImageData(0,0,w,h);
+
+		}
+
+		function drawBuffer() {
+
+			ctx.putImageData(imageData, 0, 0);
+
+		}
+
+		return {
+			createBuffer: function() {
+				createBuffer(); // Closure Stuffs
+			},
+			drawBuffer: function() {
+				drawBuffer(); // Closure Stuffs
+			}
+		}
+
+	});	
+
+	this.drawMan = this.drawBuffer();
+ 
 }
 
 // Private Globals
@@ -323,6 +360,13 @@ NNN.prototype.render = function() {
 	this.active_neurons.forEach((neuron) => {
 		neuron.render();
 	});
+
+	if (!this.growing) {
+		this.drawMan.createBuffer();
+	}
+
+	return;
+
 }
 
 NNN.prototype.render_soma = function() {
@@ -348,6 +392,7 @@ NNN.prototype.done = function() {
 		}
 	}
 
+	this.growing = false;
 	return true;
 
 }
@@ -391,7 +436,8 @@ NNN.prototype.twinkle = function() {
 NNN.prototype.synapse = function() {
 	let threshold; 
 
-	this.render(); // Render neurons
+	// this.render(); // Render neurons
+	this.drawMan.drawBuffer();
 
 	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
 	// for (let i = 0; i >= 0; i--) { // Use active_neurons

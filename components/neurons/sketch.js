@@ -177,7 +177,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Grow",
-				duration: 100,
+				duration: 125,
 				forward: _nnn.grow.bind(_nnn),
 				reverse: _nnn.grow.bind(_nnn), // Will simply render neurons
 				forward_slide: 2,
@@ -206,7 +206,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Center",
-				duration: 30,
+				duration: 45,
 				forward: _nnn.rebound_2.bind(_nnn),
 				reverse: _nnn.last_position.bind(_nnn),
 				forward_slide: 5,
