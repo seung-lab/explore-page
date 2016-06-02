@@ -32,6 +32,7 @@ function Neuron (args) {
 	this.nodes = [];
 
 	// Position of neuron after scattering finished
+	this.first_position = p.createVector();
 	this.final_position = p.createVector();
 	this.boutons = [];
 
@@ -356,6 +357,11 @@ function Neuron (args) {
 	this.last_position = function() {
 		// Send the soma to the center
 		_this.nodes[0].last_position(_this.final_position);	
+	}
+
+	this.start_position = function() {
+		// Send the soma to the center
+		_this.nodes[0].start_position(_this.first_position);	
 	}
 
 	// Following growing, we update

@@ -46,6 +46,8 @@ let sprout = function (p) {
 		_nnn_count = 0,
 
 		_direction = "forward",
+		_startSize = p.createVector(0,0),
+		_reSize = p.createVector(0,0),
 
 	// canvas
 		canvas;
@@ -74,6 +76,8 @@ let sprout = function (p) {
 		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
 
+		_startSize.set(_options.width, _options.height);
+
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
 		_svg_object = new SVG_Object({
@@ -94,7 +98,7 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		NeuronCoordinator.animate();
+			NeuronCoordinator.animate();
 	}
 
 	function nnn_start () {
@@ -156,7 +160,7 @@ let sprout = function (p) {
 		    	name: "Twinkle",
 				duration: 50,
 				forward: _nnn.twinkle.bind(_nnn),
-				reverse: _nnn.rebound_2.bind(_nnn),
+				reverse: _nnn.start_position.bind(_nnn),
 				forward_slide: 1,
 				reverse_slide: 1,
 				forward_loop: true,
@@ -226,7 +230,7 @@ let sprout = function (p) {
 				forward_slide: 5,
 				reverse_slide: 5,
 				forward_loop: true,
-				forward_loop: true,
+				reverse_loop: true,
 				p: p
 		    },
 		    {
@@ -268,14 +272,38 @@ let sprout = function (p) {
 
 	// Deal with resize events
 	window.onresize = function() { 
-		p.resizeCanvas(window.innerWidth, window.innerHeight);
+		// p.resizeCanvas(window.innerWidth, window.innerHeight);
 
-     	_svg_object.resize();
+     	// _svg_object.resize();
 
-     	NeuronCoordinator.resize_sync(); // Let's begin at the beginning..
+     	// NeuronCoordinator.resize_sync(); // Let's begin at the beginning..
 
-     	p.draw();
-     	p.draw();
+     	function abs_pos() {
+     		let nn = $('.neural-network');
+     			nn.addClass('absolute-pos')
+     			  .css('left', _reSize.x + 'px')
+     			  .css('top', _reSize.y + 'px');
+     	}
+
+     	function rel_pos() {
+     		let nn = $('.neural-network');
+     			nn.removeClass('absolute-pos')
+     			  .css('left', 'auto')
+     			  .css('top', 'auto');
+     	}
+
+     	if ((_startSize.x > window.innerWidth) || (_startSize.y > window.innterHeight)) {
+     		_reSize.x = (window.innerWidth - _startSize.x) / 2;
+     		_reSize.y = (window.innterHeight - _startSize.y) / 2;
+     		abs_pos();
+     		return;
+     	}
+
+     	rel_pos();
+
+
+     	// p.draw();
+     	// p.draw();
 	}
 }
 

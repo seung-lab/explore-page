@@ -707,12 +707,26 @@ function Node (args = {}) {
 	}
 
 	// Accepts an Array of Node Objects
-	this.last_position = function(position) {
+	this.last_position = function(loc) {
 		_this.center = true;
 		
-		// If we have arrived, stop updating position
-		if (_this.arrive(position)) {
-			console.log(position);
+		// If we have arrived, stop updating loc
+		if (_this.arrive(loc)) {
+			_this.max_speed = 100;
+			_this.center = false;
+			return true;
+		}
+
+		_this.update();
+
+	}
+
+	// Accepts an Array of Node Objects
+	this.start_position = function(loc) {
+		_this.center = true;
+		
+		// If we have arrived, stop updating loc
+		if (_this.arrive(loc)) {
 			_this.max_speed = 100;
 			_this.center = false;
 			return true;

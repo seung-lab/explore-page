@@ -205,7 +205,6 @@ function NNN (args = {}) {
 			if (!active) {
 				this.activate();
 				active = true;
-				console.log('activate');
 			}
 			this.render();
 
@@ -257,17 +256,11 @@ NNN.prototype.initialize = function() {
 	this.add_neuron(this.num_neurons);
 }
 
-NNN.prototype.rebound_1 = function() {
-	let ret = false;
-
-	// Once the MST is built...
-	this.render_particles(1);
-}
-
 NNN.prototype.scatter = function() {
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
 			soma.space(this.somas, _scatter_multiplier_1); // Repel from center
+			neuron.first_position.set(soma.position); // Continously set starting position
 	});
 
 	this.render_particles(1);
@@ -282,14 +275,14 @@ NNN.prototype.scatter_2 = function() {
 
 	this.render_particles(1);
 
-	function calc_mst() {
-		this.mst(); 
-		// Update spring positions --> Run through array
-		this.springs.forEach((s) => {
-			// s.update();
-			// s.display();
-		});
-	}
+	// function calc_mst() {
+	// 	this.mst(); 
+	// 	// Update spring positions --> Run through array
+	// 	this.springs.forEach((s) => {
+	// 		// s.update();
+	// 		// s.display();
+	// 	});
+	// }
 }
 
 // Check if neuron is off the screen
@@ -433,6 +426,14 @@ NNN.prototype.fadeOut = function() {
 	this.render(); // Render neurons	
 }
 
+NNN.prototype.rebound_1 = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.rebound();
+	});
+	
+	this.render_particles(1);
+}
+
 NNN.prototype.rebound_2 = function() {	
 	this.active_neurons.forEach((neuron) => {
 		neuron.rebound();
@@ -447,6 +448,14 @@ NNN.prototype.last_position = function() {
 	});
 	
 	this.render_soma(); // Render Soma	
+}
+
+NNN.prototype.start_position = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.start_position();
+	});
+	
+	this.render_particles(1);	
 }
 
 NNN.prototype.stary_night = function() {

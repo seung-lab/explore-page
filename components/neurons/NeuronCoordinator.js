@@ -43,7 +43,7 @@ NeuronCoordinator.updateT = function (t) {
 	if (_forward) {
 
 		if (_current_slide - _previous_slide > 1) {
-			console.log('fastforward');
+			// console.log('fastforward');
 			let diff = _current_slide - _previous_slide;
 
 			for (let i = diff; i > 0; i--) {
@@ -51,8 +51,8 @@ NeuronCoordinator.updateT = function (t) {
 			}
 
 			while (_t < (_tg - _step)) {
-				console.log('tracing time');
-				console.log('_t ' + _t + " | _tg " + _tg);
+				// console.log('tracing time');
+				// console.log('_t ' + _t + " | _tg " + _tg);
 				NC.animate();
 			}
 
@@ -66,7 +66,7 @@ NeuronCoordinator.updateT = function (t) {
 	else {
 		
 		if (_previous_slide - _current_slide > 1) {
-			console.log('rapidreverse');
+			// console.log('rapidreverse');
 			let diff = _previous_slide - _current_slide;
 
 			for (let i = diff; i > 0; i--) {
@@ -74,8 +74,8 @@ NeuronCoordinator.updateT = function (t) {
 			}
 			
 			while ((_tg - _step) < _t) {
-				console.log('tracing time');
-				console.log('_t ' + _t + " | _tg " + _tg);
+				// console.log('tracing time');
+				// console.log('_t ' + _t + " | _tg " + _tg);
 				NC.animate();
 			}
 
@@ -109,31 +109,32 @@ NeuronCoordinator.updateT = function (t) {
 
 			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide;
 
-			console.log(look_up);
-
-			if (neurostate.forward_slide == (look_up)) {
+			if (neurostate.forward_slide === (look_up)) {
 				_tg += neurostate.normed_duration;
 			}			
 		}
 	}
 
 	function step_backward(skip = 0) {
+
 		for (let i = neurostates.length - 1; i >= 0 ; i--) { // Loop backwards through array for reverse
 			let neurostate = neurostates[i];
 			let look_up;
 
 			// Special Cases
-			if ((neurostate.name === "Scatter2") && (_current_slide === 1)) {
-				// Run internal loop to fix difference 
-				for (let j = 0; j < neurostate.duration - 28; j++) {
-					_t -= _step; // ReSync
-					console.log("Syncing " + neurostate.name + "..");
+			if ((_previous_slide === 2) && (_current_slide === 1)) {
+				// Fix Grow difference? 
+				if (neurostate.name === "Grow") {
+					_tg -= neurostate.normed_duration;
+					_t -= neurostate.normed_duration;
 				}
 			}
 
 			skip > 0 ? look_up = _previous_slide - skip : look_up = _current_slide;
 
-			if (neurostate.reverse_slide == (look_up)) {
+			if (neurostate.reverse_slide === (look_up)) {
+				console.log('adding ' + neurostate.name);
+				console.log('subtracting ' + neurostate.normed_duration);
 				_tg -= neurostate.normed_duration;
 			}	
 		}
@@ -163,7 +164,7 @@ NeuronCoordinator.resize_sync = function () {
 	if (_forward) {
 
 		if (_current_slide - _previous_slide > 1) {
-			console.log('fastforward');
+			// console.log('fastforward');
 			let diff = _current_slide - _previous_slide;
 
 			for (let i = diff; i > 0; i--) {
@@ -171,8 +172,8 @@ NeuronCoordinator.resize_sync = function () {
 			}
 
 			while (_t < (_tg - _step)) {
-				console.log('tracing time');
-				console.log('_t ' + _t + " | _tg " + _tg);
+				// console.log('tracing time');
+				// console.log('_t ' + _t + " | _tg " + _tg);
 				NC.animate();
 			}
 
@@ -366,6 +367,9 @@ NeuronCoordinator.animate = function () {
 			return;	
 		}
 	}
+
+	console.log("start: " +  animation.begin);
+	console.log("end: " + (animation.begin + animation.normed_duration));
 
 	console.log("_t:" + _t);
 	console.log("_tg:" + _tg);

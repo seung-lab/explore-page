@@ -473,7 +473,7 @@ class Galileo extends TeaTime {
 		let prevslide = this.slideAt(prev_t);
 
 		if (prevslide.index === 1 && slide.index === 0) {
-			console.log('already running');
+			NNNSketch.updateState(slide.index);
 			return;
 		}
 
@@ -495,7 +495,6 @@ class Galileo extends TeaTime {
 		}
 
 		if (_this.sketch) {
-			console.log('Running Sketch');
 			NNNSketch.updateState(slide.index);
 		}
 	}
