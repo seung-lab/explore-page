@@ -43,6 +43,7 @@ function NNN (args = {}) {
 	this.dendrite_id = 0;
 
 	this.growing = true;
+	this.buffer = false;
 
 	this.initialized = false;
 
@@ -228,22 +229,46 @@ function NNN (args = {}) {
 	this.drawBuffer = (function() {
 
 		let canvas = this.p.canvas;
-		let imageData;
+		let image,
+			imageData,
+			alpha;
 
 		let ctx = canvas.getContext('2d');
 		let w = canvas.width,
 			h = canvas.height;
 
 		function createBuffer() {
-
-			imageData = ctx.getImageData(0,0,w,h);
-
+			image = ctx.getImageData(0,0,w,h);
+			imageData = image.data;
+			alpha = 255;
 		}
 
 		function drawBuffer() {
+			ctx.putImageData(image, 0, 0);
+		}
 
-			ctx.putImageData(imageData, 0, 0);
+		function fadeIn() {
+			while (alpha < 255) {
+				// set every fourth value -> alpha to new value
+				for (let i = 3; i < imageData.length; i += 4) {  
+				    imageData[i] = alpha;
+				    image.data[i] = imageData[i];	
+				}
+			
+				alpha++;
+			}
+		}
 
+		function fadeOut() {
+			while (alpha > 0) {
+				// set every fourth value -> alpha to new value
+				for (let i = 3; i < imageData.length; i += 4) {  
+				    imageData[i] = alpha;
+				    image.data[i] = imageData[i];	
+				}
+				
+				alpha--;
+			}
 		}
 
 		return {
@@ -252,6 +277,12 @@ function NNN (args = {}) {
 			},
 			drawBuffer: function() {
 				drawBuffer(); // Closure Stuffs
+			},
+			fadeIn: function() {
+				fadeIn();
+			},
+			fadeOut: function() {
+				fadeOut();
 			}
 		}
 
@@ -357,16 +388,24 @@ NNN.prototype.activate = function() {
 }
 
 NNN.prototype.render = function() {
+	
+	if (!this.growing) {
+		if (!this.buffer) {
+			this.active_neurons.forEach((neuron) => {
+				neuron.render();
+			});
+
+			this.drawMan.createBuffer();
+			this.buffer = true;
+		}
+
+		this.drawMan.drawBuffer();
+		return;
+	}
+
 	this.active_neurons.forEach((neuron) => {
 		neuron.render();
 	});
-
-	if (!this.growing) {
-		this.drawMan.createBuffer();
-	}
-
-	return;
-
 }
 
 NNN.prototype.render_soma = function() {
@@ -457,19 +496,14 @@ NNN.prototype.synapse = function() {
 }
 
 NNN.prototype.fadeIn = function() {
-	this.active_neurons.forEach((neuron) => {
-		neuron.fadeIn();
-	});
+	this.drawMan.drawBuffer();
+	this.drawMan.fadeIn();
 
-	this.render(); // Render neurons	
 }
 
 NNN.prototype.fadeOut = function() {
-	this.active_neurons.forEach((neuron) => {
-		neuron.fadeOut();
-	});
-	
-	this.render(); // Render neurons	
+	this.drawMan.drawBuffer();
+	this.drawMan.fadeOut();
 }
 
 NNN.prototype.rebound_1 = function() {
