@@ -226,11 +226,13 @@ function NNN (args = {}) {
 	})();
 
 	// Setup => Image Buffer
-	this.drawBuffer = (function() {
+	this.drawMan = (function() {
 
-		let canvas = this.p.canvas;
+		let canvas = _this.p.canvas;
 		let image,
 			imageData,
+			imageNorm,
+			alphaData,
 			alpha;
 
 		let ctx = canvas.getContext('2d');
@@ -240,35 +242,45 @@ function NNN (args = {}) {
 		function createBuffer() {
 			image = ctx.getImageData(0,0,w,h);
 			imageData = image.data;
-			alpha = 255;
-		}
 
-		function drawBuffer() {
-			ctx.putImageData(image, 0, 0);
+			alphaData = new Uint8ClampedArray(imageData.length);
+
+			// set every fourth value -> alpha to new value
+			for (let i = imageData.length - 1; i >= 3; i -= 4) {
+			    alphaData[i] = imageData[i];
+			}
+
+			alpha = 1;
 		}
 
 		function fadeIn() {
-			while (alpha < 255) {
-				// set every fourth value -> alpha to new value
-				for (let i = 3; i < imageData.length; i += 4) {  
-				    imageData[i] = alpha;
-				    image.data[i] = imageData[i];	
-				}
-			
-				alpha++;
+			// set every fourth value -> alpha to new value
+			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
+				imageData[i] = Math.trunc(imageData[i] * (1 - alpha));
 			}
+
+			alpha *= 0.975; // experimentally determined
+
+			if (alpha < 0.0001) {
+				alpha = 0;
+			}
+
+			alpha = Math.max(alpha, 0);
 		}
 
 		function fadeOut() {
-			while (alpha > 0) {
-				// set every fourth value -> alpha to new value
-				for (let i = 3; i < imageData.length; i += 4) {  
-				    imageData[i] = alpha;
-				    image.data[i] = imageData[i];	
-				}
-				
-				alpha--;
+			// set every fourth value -> alpha to new value
+			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
+				imageData[i] = Math.trunc(imageData[i] * alpha);
 			}
+
+			alpha *= 0.975; // experimentally determined
+
+			if (alpha < 0.0001) {
+				alpha = 0;
+			}
+
+			alpha = Math.max(alpha, 0);
 		}
 
 		return {
@@ -276,7 +288,8 @@ function NNN (args = {}) {
 				createBuffer(); // Closure Stuffs
 			},
 			drawBuffer: function() {
-				drawBuffer(); // Closure Stuffs
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.putImageData(image, 0, 0);
 			},
 			fadeIn: function() {
 				fadeIn();
@@ -286,10 +299,7 @@ function NNN (args = {}) {
 			}
 		}
 
-	});	
-
-	this.drawMan = this.drawBuffer();
- 
+	})();	 
 }
 
 // Private Globals
@@ -475,7 +485,6 @@ NNN.prototype.twinkle = function() {
 NNN.prototype.synapse = function() {
 	let threshold; 
 
-	// this.render(); // Render neurons
 	this.drawMan.drawBuffer();
 
 	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
@@ -496,14 +505,18 @@ NNN.prototype.synapse = function() {
 }
 
 NNN.prototype.fadeIn = function() {
-	this.drawMan.drawBuffer();
 	this.drawMan.fadeIn();
+	this.drawMan.drawBuffer();
+	
+	this.render_soma();
 
 }
 
 NNN.prototype.fadeOut = function() {
-	this.drawMan.drawBuffer();
 	this.drawMan.fadeOut();
+	this.drawMan.drawBuffer();
+
+	this.render_soma();
 }
 
 NNN.prototype.rebound_1 = function() {

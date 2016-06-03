@@ -200,6 +200,8 @@ let sprout = function (p) {
 				duration: 32,
 				forward: _nnn.fadeOut.bind(_nnn),
 				reverse: _nnn.fadeIn.bind(_nnn),
+				forward_init: _nnn.forward_fade_init.bind(_nnn),
+				reverse_init: _nnn.reverse_fade_init.bind(_nnn),
 				forward_slide: 4,
 				reverse_slide: 3,
 				p: p	
