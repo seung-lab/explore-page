@@ -90,20 +90,20 @@ function NNN (args = {}) {
 			// Soma Style
 			p.noStroke();
 
-			let center = this.p.createVector(this.p.width/2, this.p.height/2),
+			let center = p.createVector(p.width/2, p.height/2),
 				dist_sq,
 				alpha;
 
 			vertices.forEach((v) => {
-				dist_sq = this.distance_sq(center, neuron.nodes[0].position);
+				dist_sq = _this.distance_sq(center, v.position);
 				
 				if (dist_sq < 10000) {
-					alpha = this.p.map(dist_sq, 0, 10000, 0, 1);
+					alpha = p.map(dist_sq, 0, 10000, 0, 1);
 				} else {
 					alpha = 1;
 				}
 
-				let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
+				let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
 				p.fill(fill_val);
 
 				v.rebound();
@@ -337,7 +337,6 @@ NNN.prototype.distance_sq = function(v1, v2) {
 
 	return x + y;
 }
-
 
 NNN.prototype.initialize = function() {
 	// Calculate power offset
