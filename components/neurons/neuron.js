@@ -141,8 +141,8 @@ function Neuron (args) {
 	}
 
 	// Render only Soma
-	this.render_soma = function() {
-		let fill_val = 'rgba(115,135,150,1)';
+	this.render_soma = function(a = 1) {
+		let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
 		// Soma Style
 		p.noStroke();
 		p.fill(fill_val); // blue
@@ -151,7 +151,7 @@ function Neuron (args) {
 	}
 
 	// Render Soma, as particle
-	this.render_particle = function(a) {
+	this.render_particle = function(a = 1) {
 		let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
 
 		// Particle Style

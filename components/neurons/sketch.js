@@ -70,7 +70,6 @@ let sprout = function (p) {
 	};
 
 	p.setup = function () {
-		console.log('starting p5...');
 		p.frameRate(30);
 
 		canvas = p.createCanvas(_options.width, _options.height);
@@ -98,7 +97,7 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-			NeuronCoordinator.animate();
+		NeuronCoordinator.animate();
 	}
 
 	function nnn_start () {
@@ -171,6 +170,7 @@ let sprout = function (p) {
 				duration: 50,
 				forward: _nnn.scatter_2.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
+				reverse_init: _nnn.reverse_fade_init.bind(_nnn),
 				forward_slide: 2,
 				reverse_slide: 1,
 				p: p
@@ -179,7 +179,7 @@ let sprout = function (p) {
 		    	name: "Grow",
 				duration: 125,
 				forward: _nnn.grow.bind(_nnn),
-				reverse: _nnn.grow.bind(_nnn), // Will simply render neurons
+				reverse: _nnn.grow.bind(_nnn),
 				forward_slide: 2,
 				reverse_slide: 2,
 				p: p

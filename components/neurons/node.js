@@ -533,7 +533,7 @@ function Node (args = {}) {
 		// If we are a spring, at friction (lower energy)
 		if ((_this.sprung) || (_this.bound)) {
 			_this.velocity.mult(_damping);
-			_this.maxspeed = 100;
+			_this.maxspeed = 150;
 		}
 
 		if (_this.distribute) {

@@ -112,6 +112,7 @@ NeuronCoordinator.updateT = function (t) {
 			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide;
 
 			if (neurostate.forward_slide === (look_up)) {
+				neurostate.forward_init(); // Reset Neurostate
 				_tg += neurostate.normed_duration;
 			}			
 		}
@@ -123,7 +124,7 @@ NeuronCoordinator.updateT = function (t) {
 			let neurostate = neurostates[i];
 			let look_up;
 
-			// // Sync to beginning of slide
+			// Sync to beginning of slide
 			if (_previous_prev_slide === _current_slide) {
 				if (neurostate.reverse_slide === _previous_slide) {
 					if ((neurostate.name === "Synapse") || (neurostate.name === "Grow")) {
@@ -135,17 +136,26 @@ NeuronCoordinator.updateT = function (t) {
 						console.log('syncing _t ' + neurostate.name + " " + neurostate.normed_duration);
 					}
 				}
-			}	
-
-
+			}
 
 			skip > 0 ? look_up = _previous_slide - skip : look_up = _current_slide;
 
 			if (neurostate.reverse_slide === (look_up)) {
-				console.log('adding ' + neurostate.name);
-				console.log('subtracting ' + neurostate.normed_duration);
-				console.log('new _t ' + _t);
-				console.log('new _tg ' + _tg);
+				// Debugging
+				// console.log('adding ' + neurostate.name);
+				// console.log('subtracting ' + neurostate.normed_duration);
+				// console.log('new _t ' + _t);
+				// console.log('new _tg ' + _tg);
+				
+				neurostate.reverse_init(); // Reset Neurostate
+
+				//  Restart the simulation
+				if (neurostate.name === "Initialize") {
+					_tg = 0; // Reset goal
+					console.log(_tg);
+					return;
+				}
+
 				_tg -= neurostate.normed_duration; 
 			}	
 		}
