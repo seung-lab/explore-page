@@ -87,13 +87,28 @@ function NNN (args = {}) {
 		}
 
 		function rebound_brain() {
-			p.noStroke()
-			p.fill(115,135,150);
+			// Soma Style
+			p.noStroke();
+
+			let center = this.p.createVector(this.p.width/2, this.p.height/2),
+				dist_sq,
+				alpha;
 
 			vertices.forEach((v) => {
+				dist_sq = this.distance_sq(center, neuron.nodes[0].position);
+				
+				if (dist_sq < 10000) {
+					alpha = this.p.map(dist_sq, 0, 10000, 0, 1);
+				} else {
+					alpha = 1;
+				}
+
+				let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
+				p.fill(fill_val);
+
 				v.rebound();
 				v.render_soma(5);
-			});
+			});				
 		}
 
 		function render_svg() {
@@ -429,40 +444,14 @@ NNN.prototype.render = function() {
 }
 
 NNN.prototype.render_soma = function() {
-	let dist_sq;
-	let center = this.p.createVector(this.p.width/2, this.p.height/2);
-	let alpha;
-
 	this.active_neurons.forEach((neuron) => {
-		dist_sq = this.distance_sq(center, neuron.nodes[0].position);
-		
-		if (dist_sq < 10000) {
-			alpha = this.p.map(dist_sq, 0, 10000, 0, 1);
-		} else {
-			alpha = 1;
-		}
-		
-		neuron.render_soma(alpha);
-		
+		neuron.render_soma();
 	});
 }
 
 NNN.prototype.render_particles = function() {
-	let dist_sq;
-	let center = this.p.createVector(this.p.width/2, this.p.height/2);
-	let alpha;
-
 	this.neurons.forEach((neuron) => {
-		dist_sq = this.distance_sq(center, neuron.nodes[0].position);
-		
-		if (dist_sq < 10000) {
-			alpha = this.p.map(dist_sq, 0, 10000, 0, 1);
-		} else {
-			alpha = 1;
-		}
-		
-		neuron.render_particle(alpha);
-
+		neuron.render_particle();
 	});
 }
 
@@ -585,7 +574,7 @@ NNN.prototype.rebound_3 = function() {
 	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
 		let neuron = this.neurons[i];
 		neuron.rebound();
-		neuron.render_particle(1);
+		neuron.render_particle();
 	}
 }
 

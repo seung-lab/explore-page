@@ -141,22 +141,51 @@ function Neuron (args) {
 	}
 
 	// Render only Soma
-	this.render_soma = function(a = 1) {
-		let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
-		// Soma Style
+	this.render_soma = function(a = 0) {
+		let center = p.createVector(p.width/2, p.height/2),
+			alpha;		
+
+		if (a === 0) {
+			let	dist_sq = _this.distance_sq(center, _this.nodes[0].position);
+
+			if (dist_sq < 10000) {
+				alpha = p.map(dist_sq, 0, 10000, 0, 1);
+			} else {
+				alpha = 1;
+			}
+		} else {
+			alpha = a;
+		}
+
+		let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+		
 		p.noStroke();
-		p.fill(fill_val); // blue
+		p.fill(fill_val);
 
 		_this.nodes[0].render_soma(15);
 	}
 
 	// Render Soma, as particle
-	this.render_particle = function(a = 1) {
-		let fill_val = 'rgba(115,135,150,' + p.str(a) + ')';
+	this.render_particle = function(a = 0) {
+		let center = p.createVector(p.width/2, p.height/2),
+			alpha;		
 
-		// Particle Style
+		if (a === 0) {
+			let	dist_sq = _this.distance_sq(center, _this.nodes[0].position);
+
+			if (dist_sq < 10000) {
+				alpha = p.map(dist_sq, 0, 10000, 0, 1);
+			} else {
+				alpha = 1;
+			}
+		} else {
+			alpha = a;
+		}
+
+		let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+		
 		p.noStroke();
-		p.fill(fill_val); // blue
+		p.fill(fill_val);
 
 		_this.nodes[0].render_soma(5);
 	}
@@ -509,6 +538,15 @@ function Neuron (args) {
 		return this.num_branches * 40;
 	});
 
+	// Pass in 2D Vector
+	this.distance_sq = function(v1, v2) {
+		let x = Math.abs(v1.x-v2.x);
+			x = Math.pow(x,2);
+		let y = Math.abs(v1.y-v2.y);
+			y = Math.pow(y,2);
+
+		return x + y;
+	}
 }
 
 module.exports = Neuron;
