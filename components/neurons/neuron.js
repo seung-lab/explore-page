@@ -175,6 +175,10 @@ function Neuron (args) {
 
 			if (dist_sq < 10000) {
 				alpha = p.map(dist_sq, 0, 10000, 0, 1);
+
+				if (alpha < 0.05) {
+					alpha = 0;
+				}
 			} else {
 				alpha = 1;
 			}
