@@ -150,6 +150,7 @@ let sprout = function (p) {
 				duration: 60,
 				forward: _nnn.scatter.bind(_nnn),
 				reverse: _nnn.twinkle.bind(_nnn),
+				forward_init: _nnn.forward_scatter_init.bind(_nnn),
 				reverse_loop: true,
 				forward_slide: 1,
 				reverse_slide: 1,
@@ -170,6 +171,7 @@ let sprout = function (p) {
 				duration: 50,
 				forward: _nnn.scatter_2.bind(_nnn),
 				reverse: _nnn.fadeOut.bind(_nnn),
+				forward_init: _nnn.forward_scatter_init.bind(_nnn),
 				reverse_init: _nnn.reverse_fade_init.bind(_nnn),
 				forward_slide: 2,
 				reverse_slide: 1,
@@ -220,6 +222,7 @@ let sprout = function (p) {
 				duration: 45,
 				forward: _nnn.stary_night.bind(_nnn),
 				reverse: _nnn.rebound_3.bind(_nnn),
+				forward_init: _nnn.stars_init.bind(_nnn),
 				forward_slide: 5,
 				reverse_slide: 4,
 				p: p
@@ -240,6 +243,7 @@ let sprout = function (p) {
 				duration: 50,
 				forward: _nnn.rebound_3.bind(_nnn),
 				reverse: _nnn.stary_night.bind(_nnn),
+				reverse_init: _nnn.stars_init.bind(_nnn),
 				forward_slide: 6,
 				reverse_slide: 5,
 				p: p

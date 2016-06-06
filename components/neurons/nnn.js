@@ -27,7 +27,7 @@ function NNN (args = {}) {
 	this.brain 		 = args.brain || {};
 	this.kruskal 	 = args.kruskal  || {};
 
-	this.neurons = []; 		// Generic public array letiable : not an argument though
+	this.neurons = []; 			// Generic public array letiable : not an argument though
 	this.active_neurons = []; 	// Bounded Neurons
 	this.somas = []; 			// Array of all somas included in the NNN
 	this.springs = []; 			// Spring system array
@@ -269,7 +269,7 @@ function NNN (args = {}) {
 				imageData[i] = Math.trunc(alphaData[i] * (1 - alpha));
 			}
 
-			alpha *= 0.925; // experimentally determined
+			alpha *= 0.75; // experimentally determined
 
 			if (alpha < 0.0001) {
 				alpha = 0;
@@ -369,7 +369,6 @@ NNN.prototype.scatter = function() {
 NNN.prototype.scatter_2 = function() {
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
-			soma.reset_prop.pow();
 			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
 	});
 
@@ -385,6 +384,13 @@ NNN.prototype.scatter_2 = function() {
 			});
 		}
 	*/
+}
+
+// Reset Soma power multiplier for Scatter methods
+NNN.prototype.forward_scatter_init = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+	});
 }
 
 // Check if neuron is off the screen
@@ -600,11 +606,18 @@ NNN.prototype.start_position = function() {
 NNN.prototype.stary_night = function() {
 	for (let i = 0; i < this.neurons.length/2; i++) { // Use 1/2 total neurons
 		let soma = this.neurons[i].nodes[0];
-			soma.reset_prop.pow_center();
 			soma.space(this.somas, _scatter_multiplier_3); // Repel from center
 	}
 
 	this.render_particles();
+}
+
+// Reset Soma power & center multiplier for Stary_Night method
+NNN.prototype.stars_init = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+		neuron.nodes[0].reset_pow_center();
+	});
 }
 
 NNN.prototype.twinkle_2 = function() {

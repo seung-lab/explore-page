@@ -108,51 +108,18 @@ function Node (args = {}) {
 
 
 	// --------------------------------------------
-	// Closure-Man
-
-	this.reset_prop = (function() { // Call Immediately to est. then
-		let now = Date.now(),
-			then = 0;
-
-		function check(fn) {
-			now = Date.now();
-
-			if (now - then > 2000) { // When 2s have elapsed..
-				fn(); // Call function
-			}
-
-			then = now;
-		}
-
-		function reset_power() {
-			// Reset power 
-			_this.pow = 1;
-
-		}
-
-		function reset_pow_center() {
-			// Reset power 
-			_this.pow = 1;
-
-			// Reset position to center
-			_this.position.x = p.width / 2 + p.random(-2,2);
-			_this.position.y = p.height / 2 + p.random(-2,2);
-		}
-
-		return {
-			pow: function() {
-				check(reset_power);
-			},
-			pow_center: function() {
-				check(reset_pow_center);
-			}
-		};
-		
-	})();
-
-
-	// --------------------------------------------
 	// Method-Man
+
+	// Reset power for Scatter methods
+	this.reset_power = function() {
+			_this.pow = 1;
+	}
+
+	// Reset position to center in case resize
+	this.reset_pow_center = function() {
+		_this.position.x = p.width / 2 + p.random(-2,2);
+		_this.position.y = p.height / 2 + p.random(-2,2);
+	}
 
 	// Ensures that the definition of leaf is fresh
 	this.isLeaf = function () {
@@ -487,7 +454,7 @@ function Node (args = {}) {
 		// _this.applyForce(edg);
 
 		let pm = p.max(p.height, p.width);
-		pm = p.map(pm, 400, 3000, 0.8, 0.95);
+			pm = p.map(pm, 400, 3000, 0.8, 0.95);
 
 		_this.pow *= pm;
 
