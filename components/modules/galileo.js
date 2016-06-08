@@ -492,6 +492,7 @@ class Galileo extends TeaTime {
 				_this.view.canvas = $(canvas);
 				_this.view.canvas.addClass('neural-network');
 			});
+
 		}
 
 		if (_this.sketch) {

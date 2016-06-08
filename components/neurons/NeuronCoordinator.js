@@ -1,19 +1,19 @@
 let Utils = require('../../clientjs/utils.js'),
 		$ = require('jquery');
 
-let _t = 0,	// Current t
-	_tg = 0,  // Queue t
-	_prev_t = 0,
-	_slide_count = 0,
-	_animation_count = 0,
-	_current_slide = 0,
-	_previous_slide = 0,
+let _t,	// Current t
+	_tg,  // Queue t
+	_prev_t,
+	_slide_count,
+	_animation_count,
+	_current_slide,
+	_previous_slide,
 	_previous_prev_slide,
-	_step = 0;
+	_step;
 
 let _p; //P5 global
 
-let _forward = true; // Forward
+let _forward;
 
 let NeuronCoordinator = {
 	neurostates: [],
@@ -25,6 +25,20 @@ NeuronCoordinator.initialize = function (neurostates, slide_count, p) {
 	_slide_count = slide_count;
 
 	_p = p;
+
+	// Reset Globals
+
+	_t = 0;
+	_tg = 0;
+	_prev_t = 0;
+	_slide_count = 0;
+	_animation_count = 0;
+	_current_slide = 0;
+	_previous_slide = 0;
+	_previous_prev_slide;
+	_step = 0;
+
+	_forward = true; // Forward
 
 	NC.setAnimations(neurostates);
 	NC.initialized = true;
@@ -90,6 +104,7 @@ NeuronCoordinator.updateT = function (t) {
 	}
 
 	function step_forward(skip = 0) {
+		// console.log('step forward');
 		for (let i = 0; i < neurostates.length; i++) {
 			let neurostate = neurostates[i];
 			let look_up;
@@ -105,23 +120,27 @@ NeuronCoordinator.updateT = function (t) {
 
 		//  Special case syncing initialize
 		if ((_current_slide === 1) && (_previous_slide === 0) && (_previous_prev_slide === 1)) {
-			console.log('restart syncing..');
+			// console.log('restart syncing..');
 			
 			_t = 0;
 			_t += neurostates[0].normed_duration; 
 			_tg += neurostates[0].normed_duration;
 
-			console.log(_tg);
-			console.log(_t);
+			// console.log(_tg);
+			// console.log(_t);
 		}
 
 		if (_current_slide === 0 && _previous_slide !== 1) {
-			console.log('begin syncing..');
+			// console.log('begin syncing..');
+
+			_t = 0;
+			_tg = 0;
 
 			_t += neurostates[0].normed_duration;
+			_tg += neurostates[0].normed_duration;
 
-			console.log(_tg);
-			console.log(_t);
+			// console.log(_tg);
+			// console.log(_t);
 		}
 	}
 
@@ -138,9 +157,9 @@ NeuronCoordinator.updateT = function (t) {
 						// Fix Grow difference? 
 						_t -= neurostate.normed_duration;
 						_tg -= neurostate.normed_duration;
-						console.log('new _t ' + _t);
-						console.log('new _tg ' + _tg);
-						console.log('syncing _t ' + neurostate.name + " " + neurostate.normed_duration);
+						// console.log('new _t ' + _t);
+						// console.log('new _tg ' + _tg);
+						// console.log('syncing _t ' + neurostate.name + " " + neurostate.normed_duration);
 					}
 				}
 			}
@@ -234,7 +253,7 @@ NeuronCoordinator.resize_sync = function () {
 
 			skip > 0 ? look_up = _previous_slide + skip : look_up = _current_slide;
 
-			console.log(look_up);
+			// console.log(look_up);
 
 			if (neurostate.forward_slide == (look_up)) {
 				_tg += neurostate.normed_duration;
@@ -279,9 +298,9 @@ NeuronCoordinator.transition = function (delta) {
 	let previous = NeuronCoordinator.animationAt(_t - delta);
 
 	if (current.name !== previous.name) {
-		console.log(current.name);
-		console.log(current.begin);
-		console.log(current.normed_duration);
+		// console.log(current.name);
+		// console.log(current.begin);
+		// console.log(current.normed_duration);
 		let fn = delta > 0 
 			? current.forward_init
 			: current.reverse_init;
@@ -390,6 +409,8 @@ NeuronCoordinator.animate = function () {
 			_p.clear();
 			animation.forward(); // Loop without incrementing _tg | _t
 
+			// console.log("tg " + _tg + " _t " + _t);
+
 			return;
 		}
 	}
@@ -409,14 +430,16 @@ NeuronCoordinator.animate = function () {
 			_p.clear();
 			animation.reverse(); // Loop without incrementing _tg | _t
 
+			// console.log("tg " + _tg + " _t " + _t);
+
 			return;	
 		}
 	}
 
-	console.log("_t:" + _t);
-	console.log("_tg:" + _tg);
+	// console.log("_t:" + _t);
+	// console.log("_tg:" + _tg);
 
-	console.log("Sketch is paused..");
+	// console.log("Sketch is paused..");
 	_p.noLoop(); // Shut er' down
 
 }

@@ -494,11 +494,10 @@ function Node (args = {}) {
 
 	// Method to update position
 	this.update = function() {
+	
+		_this.velocity.add(_this.acceleration); // Update velocity
 		
-		// Update velocity
-		_this.velocity.add(_this.acceleration);
-		// If we are a spring, at friction (lower energy)
-		if ((_this.sprung) || (_this.bound)) {
+		if ((_this.sprung) || (_this.bound)) { // If we are a spring, at friction (lower energy)
 			_this.velocity.mult(_damping);
 			_this.maxspeed = 150;
 		}
@@ -510,8 +509,7 @@ function Node (args = {}) {
 
 		if (_this.velocity.magSq() < 0.1)  _this.velocity.mult(0); 
 
-		// Limit speed
-		_this.velocity.limit(_this.maxspeed);
+		_this.velocity.limit(_this.maxspeed); // Limit speed
 		_this.position.add(_this.velocity);
 		_this.acceleration.mult(0);	// Reset accelertion to 0 each cycle
 	}
@@ -746,7 +744,7 @@ function Node (args = {}) {
 	}
 
 	this.isGrowing = function() {
-		if (_this.timer >= 0) {
+		if (_this.timer >= 0) {	
 			// Set branch point
 			return true;
 		} 

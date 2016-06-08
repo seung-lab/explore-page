@@ -34,6 +34,7 @@ function Neuron (args) {
 	// Position of neuron after scattering finished
 	this.first_position = p.createVector();
 	this.final_position = p.createVector();
+	this.has_boutons = false;
 	this.boutons = [];
 
 	this.propagate_bool = false; // Are we propagating?
@@ -41,10 +42,7 @@ function Neuron (args) {
 
 	let _this = this;
 
-	let list = false;
-
-	// Call methods to access outside of class this way!
-	this.neuron_start = function () { // Default heading of zero unless defined
+	this.neuron_start = function () {
 		let start_velocity = p.createVector(); // Change this value to determine simulation speed
 
 		// Create a new Node instance
@@ -65,12 +63,12 @@ function Neuron (args) {
 		_this.nodes.push(n); 
 	}
 
-	this.network_setup = Utils.onceify(function() {
+	this.network_setup = function() {
 		// Get things moving
 		let v = p.round(-2,2);
-		let n = _this.nodes[0];
-			n.velocity.set(v,v);
-			n.size == true;
+		let node = _this.nodes[0];
+			node.velocity.set(v,v);
+			node.size == true;
 
 		let theta = p.TWO_PI / _this.num_branches;  
 		// Random rotational offset constant
@@ -87,30 +85,30 @@ function Neuron (args) {
 			// let y = p.sin(start_angle);
 			// Branch a bunch of times
 			_this.nodes.push(
-				n.branch(p.degrees(start_angle, _this.nodes.length), i + 1)
+				node.branch(p.degrees(start_angle, _this.nodes.length), i + 1)
 			);
 		}
-	});
+	}
 
-	this.dendrite_setup = Utils.onceify(function(heading, velocity) {
+	this.dendrite_setup = function(heading, velocity) {
 		// Get things moving
-		let n = _this.nodes[0];
-			n.velocity.set(velocity.x,velocity.y);
-			n.size == true;
+		let node = _this.nodes[0];
+			node.velocity.set(velocity.x,velocity.y);
+			node.size == true;
 
 		// Create seed dendrites
 		for (let i = 0; i < _this.num_branches; i++) {
 			// Create a unique initial offset velocity heading for each branch with respect to the total
 			// number of seed branches, for additional diversity, add a random rotational offset
 			_this.nodes.push(
-				n.branch(0, i + 1)
+				node.branch(0, i + 1)
 			);
 		}
-	});
+	}
 
 	// Render the Neurons + Nodes
 	this.render = function() {
-		let n;
+		let node;
 
 		// Dendrite Style
 		let stroke_val = 'rgba(41,59,73,' + p.str(_this.alpha) + ')';
@@ -119,8 +117,8 @@ function Neuron (args) {
 		p.noFill();
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
-			n = _this.nodes[i];
-			n.render();
+			node = _this.nodes[i];
+			node.render();
 		}
 
 		// Soma Style 
@@ -130,9 +128,9 @@ function Neuron (args) {
 		_this.nodes[0].render_soma(15);
 
 		//  Bouton Style
-		p.noStroke();
 		let fill_val = 'rgba(115,135,150,' + p.str(_this.alpha) + ')';
 		p.fill(fill_val);
+		p.noStroke();
 
 		// Add boutons --> Synapses to boutons of neuron :: Could definitely be improved
 		_this.boutons.forEach(function (bouton) {
@@ -199,34 +197,34 @@ function Neuron (args) {
 	}
 
 	this.done = function() {
-		let n;
+		let node;
 		
 		for (let i = _this.nodes.length - 1; i > 0; i--) {
-			n = _this.nodes[i];
-			if (n.isGrowing()) {
+			node = _this.nodes[i];
+			if (node.isGrowing()) {
 				return false;
 			}
 		}
 
-		// When we're finished growing, springify all the nodes
-		if (!list) {
+			// When we're finished growing, springify all the nodes
 			// Once neuron has completed, create adjacency list
-			// _this.nodes.forEach(function(n){
-			// 	n.springify(_this.nodes);
-			// 	// n.neighbor_nodes.forEach(function(neighbor) {
-			// 	// 	console.log("Node #" + n.id + " : Neighbor : " + neighbor.node + " ID : " + neighbor.id + " Distance From : " +neighbor.distance);
-			// 	// });
-			// });
-
-			_this.calc_alp(); // Calculate Arc Length Parameterization
-			_this.final_position = _this.nodes[0].position.copy();
-
-			list = true;
-
-		}
+			/*
+			_this.nodes.forEach(function(n){
+				n.springify(_this.nodes);
+				n.neighbor_nodes.forEach(function(neighbor) {
+					console.log("Node #" + n.id + " : Neighbor : " + neighbor.node + " ID : " + neighbor.id + " Distance From : " +neighbor.distance);
+				});
+			});
+			*/
 
 		return true;
 
+	}
+
+	// Move this code to NNN?
+	this.calculate_paths = function() {
+			_this.calc_alp(); // Calculate Arc Length Parameterization
+			_this.final_position = _this.nodes[0].position.copy();
 	}
 
 	// Adaptive Arc-Subdivision
@@ -410,23 +408,30 @@ function Neuron (args) {
 
 	}
 
-	this.create_bouton = Utils.onceify(function() {
-		let n;
+	this.create_bouton = function() {
+
+		if (_this.has_boutons) {
+			return;
+		}
+
+		// console.log('making boutons');
+
+		let node;
 		
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
-			// Get the Node object, update and draw it
-			n = _this.nodes[i];
-			if (!n.leaf) {
-				return;
+			node = _this.nodes[i]; // Get the Node object, update and draw it
+			if (node.leaf) {
+				_this.boutons.push(
+					new Bouton ({
+						position: node.position,
+						p: p,
+					})
+				);
 			}
-			_this.boutons.push(
-				new Bouton ({
-					position: n.position,
-					p: p,
-				})
-			);
 		};
-	});
+
+		_this.has_boutons = true;
+	}
 
 	this.grow = function() {
 		let n;

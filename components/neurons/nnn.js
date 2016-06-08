@@ -7,8 +7,6 @@
 // A class for controlling the interactions across the enire network
 "use strict";
 
-window.NNNCount = 0;
-
 let $ = require('jquery'),
 	p5 = require('p5'),
 	Spring = require('./spring.js'),
@@ -48,7 +46,6 @@ function NNN (args = {}) {
 	this.initialized = false;
 
 	let _this = this;
-
 
 	this.brainiac = (function() {
 
@@ -211,31 +208,6 @@ function NNN (args = {}) {
 
 	})();
 
-	// Run => Neurons
-	this.grow = (function() {
-		let active = false;
-		function grow() {
-
-			if (!active) {
-				this.activate();
-				active = true;
-			}
-			this.render();
-
-			this.active_neurons.forEach((neuron) => {
-				if (this.done()) {
-					return; 
-				}
-
-				neuron.grow();
-
-			});
-		}
-
-		return grow; // Closure Stuffs
-
-	})();
-
 	// Setup => Image Buffer
 	this.drawMan = (function() {
 
@@ -264,6 +236,9 @@ function NNN (args = {}) {
 		}
 
 		function fadeIn() {
+			if (typeof image === "undefined") {
+			    return; // Be aware this needs to be defined
+			}
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
 				imageData[i] = Math.trunc(alphaData[i] * (1 - alpha));
@@ -279,6 +254,10 @@ function NNN (args = {}) {
 		}
 
 		function fadeOut() {
+			if (typeof image === "undefined") {
+			    return; // Be aware this needs to be defined
+			}
+
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
 				imageData[i] = Math.trunc(imageData[i] * alpha);
@@ -298,8 +277,15 @@ function NNN (args = {}) {
 				createBuffer(); // Closure Stuffs
 			},
 			drawBuffer: function() {
+				if (typeof image === "undefined") {
+				    return; // Be aware this needs to be defined
+				}
+
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				ctx.putImageData(image, 0, 0);
+			},
+			clearBuffer: function() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
 			},
 			fadeIn: function() {
 				fadeIn();
@@ -390,6 +376,50 @@ NNN.prototype.scatter_2 = function() {
 NNN.prototype.forward_scatter_init = function() {
 	this.neurons.forEach((neuron) => {
 		neuron.nodes[0].reset_power();
+		
+		let x = this.p.width / 2 + this.p.random(-2,2);
+		let y = this.p.height / 2 + this.p.random(-2,2); 
+
+		neuron.nodes[0].position.set(x,y); 	// Align neuron + soma
+		neuron.position.set(x,y); 			// Tightly pack neurons for better spread
+	});
+}
+
+// Reset Soma power multiplier for Scatter methods
+NNN.prototype.forward_scatter2_init = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+	});
+}
+
+// Reset Soma power multiplier for Scatter methods
+NNN.prototype.forward_grow_init = function() {
+
+	this.activate(); // Set up Neurons
+
+	// Reset Active states
+	this.active_neurons.forEach((neuron) => {
+		neuron.has_boutons = false;
+		neuron.boutons.length = 0;
+	});
+
+	this.drawMan.clearBuffer();
+	this.buffer = false; // Reset Canvas buffer
+	this.growing = true; // Here we go again
+}
+
+// Run => Neurons
+NNN.prototype.grow = function() {
+	
+	this.render();
+	
+	this.active_neurons.forEach((neuron) => {
+		if (this.done()) {
+			return; 
+		}
+
+		neuron.grow();
+
 	});
 }
 
@@ -406,16 +436,20 @@ NNN.prototype.check_bounds = function(soma) {
 }
 
 NNN.prototype.activate = function() {
+	this.active_neurons.length = 0; // Wipe out previous simulation
+
 	for (let i = 0; i < this.neurons.length; i++) {
-		let neuron = this.neurons[i]
+
+		let neuron = this.neurons[i];
+			neuron.nodes.length = 1; // Wipe out previous simulation
 		let soma = neuron.nodes[0];
 
-		// Add only bounded nodes that to our neuron array
+		// Add only bounded nodes to our neuron array
 		if (this.check_bounds(soma)) {
 			this.active_neurons.push(neuron);
 		}
 
-		if (i == this.neurons.length - 1) {
+		if (i === this.neurons.length - 1) {
 			// Create seed branching
 			this.active_neurons.forEach((active_neuron) => {
 				// console.log('neuron_setup');
@@ -431,7 +465,7 @@ NNN.prototype.render = function() {
 	
 	if (!this.growing) {
 		if (!this.buffer) {
-			this.active_neurons.forEach((neuron) => {
+			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
 				neuron.render();
 			});
 
@@ -462,11 +496,11 @@ NNN.prototype.render_particles = function() {
 
 
 NNN.prototype.done = function() {
-	let n;
+	let neuron;
 
 	for (let i = 0; i < this.active_neurons.length; i++) {
-		n = this.active_neurons[i];
-		if (!n.done()) {
+		neuron = this.active_neurons[i];
+		if (!neuron.done()) {
 			return false;
 		}
 	}
@@ -510,6 +544,14 @@ NNN.prototype.twinkle = function() {
 			soma.twinkle_bool = true;
 		}
 	}
+}
+
+// Calculate ALP for Neurons
+NNN.prototype.forward_synapse_init = function() {
+	// Reset Active states
+	this.active_neurons.forEach((neuron) => {
+		neuron.calculate_paths();
+	});
 }
 
 NNN.prototype.synapse = function() {
@@ -716,9 +758,9 @@ NNN.prototype.add_neuron = function(count) {
 			this.neuron_id++;
 
 			// Get the soma setup
-			let soma = this.neurons[this.neurons.length - 1]; // --> 1st soma in [0] position
+			let soma = this.neurons[this.neurons.length - 1]; // --> Set up most recent neuron created
 				soma.neuron_start();
-				this.somas.push(soma.nodes[0]);
+				this.somas.push(soma.nodes[0]); // --> 1st soma in [0] position
 
 		}
 	}
