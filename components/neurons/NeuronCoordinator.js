@@ -76,6 +76,12 @@ NeuronCoordinator.updateT = function (t) {
 					console.log('tracing time');
 					console.log('_t ' + _t + " | _tg " + _tg);
 				*/
+
+				if (_t > (_tg - _step*2)) {
+					console.log(_t + " " + _tg);
+					_p.loop();
+					NC.render(); // If we're once step away from the end, render the frame
+				}
 			}
 
 			return;
@@ -405,6 +411,7 @@ NeuronCoordinator.step = function () {
 // Update position, state, etc
 NeuronCoordinator.update = function () {	
 	let animation = NeuronCoordinator.currentAnimation();
+	console.log(animation.name);
 	
 	if (_forward) {
 		NeuronCoordinator.transition(_step); // Check for transition

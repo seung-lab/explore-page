@@ -485,7 +485,6 @@ NNN.prototype.fadeIn_render = function() {
 
 NNN.prototype.forward_fade_init = function() {
 	this.drawMan.fade_reset();
-	console.log('call-fade-reset');
 }
 
 // ------------------------------------------------
@@ -690,11 +689,11 @@ NNN.prototype.plague_render = function() {
 // Animation | Fade Out Brain Lines
 
 NNN.prototype.fadeOut_brain_lines_update = function() {
-	this.brainiac.fade_svg_lines(); // In this case update is render ? need more separation
+	// ?
 }
 
 NNN.prototype.fadeOut_brain_lines_render = function() {
-	// ?
+	this.brainiac.fade_svg_lines(); // In this case update is render ? need more separation
 }
 
 // ------------------------------------------------
