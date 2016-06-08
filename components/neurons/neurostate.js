@@ -10,8 +10,11 @@ function Neurostate (args = {}) {
 
 	this.duration = args.duration || 30;
 
-	this.forward = args.forward || function () {};
-	this.reverse = args.reverse || function () {};
+	this.forward_update = args.forward_update || function () {};
+	this.reverse_update = args.reverse_update || function () {};
+
+	this.forward_render = args.forward_render || function () {};
+	this.reverse_render = args.reverse_render || function () {};
 
 	this.forward_init = args.forward_init || function() {};
 	this.reverse_init = args.reverse_init || function() {};

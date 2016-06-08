@@ -302,16 +302,457 @@ function NNN (args = {}) {
 }
 
 // Private Globals
-
 let _scatter_multiplier_1,
 	_scatter_multiplier_2,
 	_scatter_multiplier_3;
 
+// ------------------------------------------------
+// Animation | Scatter
 
+NNN.prototype.scatter_update = function() {
+	this.neurons.forEach((neuron) => {
+		let soma = neuron.nodes[0];
+			soma.space(this.somas, _scatter_multiplier_1); // Repel from center
+			neuron.first_position.set(soma.position); // Continously set starting position
+	});
+}
 
-// Public Methods
+NNN.prototype.scatter_render = function() {
+	this.render_particles();
+}
+
+NNN.prototype.forward_scatter_init = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+		
+		let x = this.p.width / 2 + this.p.random(-2,2);
+		let y = this.p.height / 2 + this.p.random(-2,2); 
+
+		neuron.nodes[0].position.set(x,y); 	// Align neuron + soma
+		neuron.position.set(x,y); 			// Tightly pack neurons for better spread
+	});
+}
+
+// ------------------------------------------------
+// Animation | Scatter_2
+
+NNN.prototype.scatter_2_update = function() {
+	this.neurons.forEach((neuron) => {
+		let soma = neuron.nodes[0];
+			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
+	});
+}
+
+NNN.prototype.scatter_2_render = function() {
+	this.render_particles();
+}
+
+NNN.prototype.forward_scatter2_init = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+	});
+}
+
+/* 
+	Minimum Spanning Tree for Spring Physics
+	function calc_mst() {
+		this.mst(); 
+		// Update spring positions --> Run through array
+		this.springs.forEach((s) => {
+			// s.update();
+			// s.display();
+		});
+	}
+*/
+
+// ------------------------------------------------
+// Animation | Grow
+
+NNN.prototype.grow_update = function() {	
+	this.active_neurons.forEach((neuron) => {
+		if (this.done()) {
+			return; 
+		}
+
+		neuron.grow(); // Run => Neurons
+
+	});
+}
+
+NNN.prototype.grow_render = function() {
+	this.render();
+}
+
+NNN.prototype.forward_grow_init = function() {
+
+	this.activate(); // Set up Neurons
+
+	// Reset Active states
+	this.active_neurons.forEach((neuron) => {
+		neuron.has_boutons = false;
+		neuron.boutons.length = 0;
+	});
+
+	this.drawMan.clearBuffer();
+
+	this.buffer = false; // Reset Canvas buffer
+	this.growing = true; // Here we go again
+}
+
+// ------------------------------------------------
+// Animation | Twinkle
+
+NNN.prototype.twinkle_update = function() {
+	// ?
+}
+
+NNN.prototype.twinkle_render = function() {
+	let step = this.p.PI / 30;
+	let threshold;
+	let a;
+
+	neuro_loop: // label
+	for (let i = this.neurons.length - 1; i >= 0; i--) {
+		let neuron = this.neurons[i];
+		let soma = neuron.nodes[0];
+			
+		if (soma.twinkle_bool) {
+			soma.twinkle_angle += step; 
+			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
+
+			neuron.render_particle(a); // Effect Opacity here?
+
+			if (a == 1) {
+				soma.twinkle_angle = 0;      	// Reset angle
+				soma.twinkle_bool = false;       	// Reset State
+			}
+		} 
+		else {
+			
+			neuron.render_particle(1);
+
+		}
+	
+		threshold = this.p.random(1); // Set threshold
+
+		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+			soma.twinkle_bool = true;
+		}
+	}
+}
+
+// ------------------------------------------------
+// Animation | Synapse
+
+NNN.prototype.synapse_update = function() {
+	// ?
+}
+
+NNN.prototype.synapse_render = function() {
+	let threshold; 
+
+	this.drawMan.drawBuffer();
+
+	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
+	// for (let i = 0; i >= 0; i--) { // Use active_neurons
+		let neuron = this.active_neurons[i];
+		let soma = neuron.nodes[0];
+
+		if (neuron.propagate_bool) {
+			neuron.propagate(soma);
+		}
+
+		threshold = this.p.random(1); // Set threshold
+
+		if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
+			neuron.propagate_bool = true;
+		}
+	}
+}
+
+// ------------------------------------------------
+// Animation | Fade In
+
+NNN.prototype.fadeIn_update = function() {
+	this.drawMan.fadeIn();
+}
+
+NNN.prototype.fadeIn_render = function() {
+	this.drawMan.drawBuffer();
+	this.render_soma();
+}
+
+NNN.prototype.forward_fade_init = function() {
+	this.drawMan.fade_reset();
+	console.log('call-fade-reset');
+}
+
+// ------------------------------------------------
+// Animation | Fade Out
+
+NNN.prototype.fadeOut_update = function() {
+	this.drawMan.fadeOut();
+}
+
+NNN.prototype.fadeOut_render = function() {
+	this.drawMan.drawBuffer();
+	this.render_soma();
+}
+
+NNN.prototype.reverse_fade_init = function() {
+	this.drawMan.fade_reset();
+	console.log('call-fade-reset');
+}
+
+// ------------------------------------------------
+// Animation | Rebound_1
+
+NNN.prototype.rebound_1_update = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.rebound();
+	});
+}
+
+NNN.prototype.rebound_1_render = function() {	
+	this.render_particles();
+}
+
+// ------------------------------------------------
+// Animation | Rebound_2
+
+NNN.prototype.rebound_2_update = function() {	
+	this.active_neurons.forEach((neuron) => {
+		neuron.rebound();
+	});
+}
+
+NNN.prototype.rebound_2_render = function() {	
+	this.render_soma(); // Render Soma	
+}
+
+// ------------------------------------------------
+// Animation | Rebound_3
+
+NNN.prototype.rebound_3_update = function() {	
+	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
+		let neuron = this.neurons[i];
+		neuron.rebound();
+	}
+}
+
+NNN.prototype.rebound_3_render = function() {	
+	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
+		let neuron = this.neurons[i];
+		neuron.render_particle();
+	}
+}
+
+// ------------------------------------------------
+// Animation | Rebound_4
+
+NNN.prototype.rebound_4_update = function() {	
+	// ?
+}
+
+NNN.prototype.rebound_4_render = function() {	
+	this.brainiac.rebound_brain();
+}
+
+// ------------------------------------------------
+// Animation | Last Position
+
+NNN.prototype.last_position_update = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.last_position();
+	});
+}
+
+NNN.prototype.last_position_render = function() {
+	this.render_soma(); // Render Soma	
+}
+
+// ------------------------------------------------
+// Animation | Start Position
+
+NNN.prototype.start_position_update = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.start_position();
+	});
+}
+
+NNN.prototype.start_position_render = function() {
+	this.render_particles();	
+}
+
+// ------------------------------------------------
+// Animation | Stary Night
+
+NNN.prototype.stary_night_update = function() {
+	for (let i = 0; i < this.neurons.length/2; i++) { // Use 1/2 total neurons
+		let soma = this.neurons[i].nodes[0];
+			soma.space(this.somas, _scatter_multiplier_3); // Repel from center
+	}
+}
+
+NNN.prototype.stary_night_render = function() {
+	this.render_particles();
+}
+
+NNN.prototype.stars_init = function() {
+	// Reset Soma power & center multiplier for Stary_Night method
+	this.neurons.forEach((neuron) => {
+		neuron.nodes[0].reset_power();
+		neuron.nodes[0].reset_pow_center();
+	});
+}
+
+// ------------------------------------------------
+// Animation | Twinkle 2
+
+NNN.prototype.twinkle_2_update = function() {
+	// ?
+}
+
+NNN.prototype.twinkle_2_render = function() {
+	let step = this.p.PI / 30;
+	let threshold;
+	let a;
+
+	neuro_loop: // label
+	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
+		let neuron = this.neurons[i];
+		let soma = neuron.nodes[0];
+			
+		if (soma.twinkle_bool) {
+			soma.twinkle_angle += step; 
+			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
+			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
+
+			neuron.render_particle(a); // Effect Opacity here?
+
+			if (a == 1) {
+				soma.twinkle_angle = 0;      	// Reset angle
+				soma.twinkle_bool = false;       	// Reset State
+			}
+		} 
+		else {
+			
+			neuron.render_particle(1);
+
+		}
+	
+		threshold = this.p.random(1); // Set threshold
+
+		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+			soma.twinkle_bool = true;
+		}
+	}
+}
+
+// ------------------------------------------------
+// Animation | Render Brain
+
+NNN.prototype.render_brain_update = function() {
+	// ?
+}
+
+NNN.prototype.render_brain_render = function() {
+	this.brainiac.animate();
+}
+
+// ------------------------------------------------
+// Animation | Render Brain Lines
+
+NNN.prototype.render_brain_lines_update = function() {
+	// ?
+}
+
+NNN.prototype.render_brain_lines_render = function() {
+	this.brainiac.render_svg();
+	this.brainiac.animate();
+}
+
+// ------------------------------------------------
+// Animation | Plague
+
+NNN.prototype.plague_update = function() {
+	this.brainiac.animate();
+	this.brainiac.grow();
+}
+
+NNN.prototype.plague_render = function() {
+	this.brainiac.render_svg();
+	this.brainiac.render_dendrite();	
+}
+
+// ------------------------------------------------
+// Animation | Fade Out Brain Lines
+
+NNN.prototype.fadeOut_brain_lines_update = function() {
+	this.brainiac.fade_svg_lines(); // In this case update is render ? need more separation
+}
+
+NNN.prototype.fadeOut_brain_lines_render = function() {
+	// ?
+}
+
+// ------------------------------------------------
+// Rendering
+
+NNN.prototype.render = function() {
+	
+	if (!this.growing) {
+		if (!this.buffer) {
+			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
+				neuron.render();
+			});
+
+			this.drawMan.createBuffer();
+			this.buffer = true;
+		}
+
+		this.drawMan.drawBuffer();
+		return;
+	}
+
+	this.active_neurons.forEach((neuron) => {
+		neuron.render();
+	});
+}
+
+NNN.prototype.render_soma = function() {
+	this.active_neurons.forEach((neuron) => {
+		neuron.render_soma();
+	});
+}
+
+NNN.prototype.render_particles = function() {
+	this.neurons.forEach((neuron) => {
+		neuron.render_particle();
+	});
+}
+
+NNN.prototype.done = function() {
+	let neuron;
+
+	for (let i = 0; i < this.active_neurons.length; i++) {
+		neuron = this.active_neurons[i];
+		if (!neuron.done()) {
+			return false;
+		}
+	}
+
+	this.growing = false;
+	return true;
+
+}
+
+// ------------------------------------------------
+// Methods | Utilies
+
 NNN.prototype.empty_fn = function() {
-
+	// ? 
 }
 
 // Pass in 2D Vector
@@ -340,87 +781,6 @@ NNN.prototype.initialize = function() {
 
 	// Initialize Neuron
 	this.add_neuron(this.num_neurons);
-}
-
-NNN.prototype.scatter = function() {
-	this.neurons.forEach((neuron) => {
-		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_1); // Repel from center
-			neuron.first_position.set(soma.position); // Continously set starting position
-	});
-
-	this.render_particles();
-}
-
-NNN.prototype.scatter_2 = function() {
-	this.neurons.forEach((neuron) => {
-		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
-	});
-
-	this.render_particles();
-
-	/*
-		function calc_mst() {
-			this.mst(); 
-			// Update spring positions --> Run through array
-			this.springs.forEach((s) => {
-				// s.update();
-				// s.display();
-			});
-		}
-	*/
-}
-
-// Reset Soma power multiplier for Scatter methods
-NNN.prototype.forward_scatter_init = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
-		
-		let x = this.p.width / 2 + this.p.random(-2,2);
-		let y = this.p.height / 2 + this.p.random(-2,2); 
-
-		neuron.nodes[0].position.set(x,y); 	// Align neuron + soma
-		neuron.position.set(x,y); 			// Tightly pack neurons for better spread
-	});
-}
-
-// Reset Soma power multiplier for Scatter methods
-NNN.prototype.forward_scatter2_init = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
-	});
-}
-
-// Reset Soma power multiplier for Scatter methods
-NNN.prototype.forward_grow_init = function() {
-
-	this.activate(); // Set up Neurons
-
-	// Reset Active states
-	this.active_neurons.forEach((neuron) => {
-		neuron.has_boutons = false;
-		neuron.boutons.length = 0;
-	});
-
-	this.drawMan.clearBuffer();
-	this.buffer = false; // Reset Canvas buffer
-	this.growing = true; // Here we go again
-}
-
-// Run => Neurons
-NNN.prototype.grow = function() {
-	
-	this.render();
-	
-	this.active_neurons.forEach((neuron) => {
-		if (this.done()) {
-			return; 
-		}
-
-		neuron.grow();
-
-	});
 }
 
 // Check if neuron is off the screen
@@ -461,91 +821,6 @@ NNN.prototype.activate = function() {
 	}
 }
 
-NNN.prototype.render = function() {
-	
-	if (!this.growing) {
-		if (!this.buffer) {
-			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
-				neuron.render();
-			});
-
-			this.drawMan.createBuffer();
-			this.buffer = true;
-		}
-
-		this.drawMan.drawBuffer();
-		return;
-	}
-
-	this.active_neurons.forEach((neuron) => {
-		neuron.render();
-	});
-}
-
-NNN.prototype.render_soma = function() {
-	this.active_neurons.forEach((neuron) => {
-		neuron.render_soma();
-	});
-}
-
-NNN.prototype.render_particles = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.render_particle();
-	});
-}
-
-
-NNN.prototype.done = function() {
-	let neuron;
-
-	for (let i = 0; i < this.active_neurons.length; i++) {
-		neuron = this.active_neurons[i];
-		if (!neuron.done()) {
-			return false;
-		}
-	}
-
-	this.growing = false;
-	return true;
-
-}
-
-NNN.prototype.twinkle = function() {
-	let step = this.p.PI / 30;
-	let threshold;
-	let a;
-
-	neuro_loop: // label
-	for (let i = this.neurons.length - 1; i >= 0; i--) {
-		let neuron = this.neurons[i];
-		let soma = neuron.nodes[0];
-			
-		if (soma.twinkle_bool) {
-			soma.twinkle_angle += step; 
-			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
-			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
-
-			neuron.render_particle(a); // Effect Opacity here?
-
-			if (a == 1) {
-				soma.twinkle_angle = 0;      	// Reset angle
-				soma.twinkle_bool = false;       	// Reset State
-			}
-		} 
-		else {
-			
-			neuron.render_particle(1);
-
-		}
-	
-		threshold = this.p.random(1); // Set threshold
-
-		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
-			soma.twinkle_bool = true;
-		}
-	}
-}
-
 // Calculate ALP for Neurons
 NNN.prototype.forward_synapse_init = function() {
 	// Reset Active states
@@ -553,171 +828,6 @@ NNN.prototype.forward_synapse_init = function() {
 		neuron.calculate_paths();
 	});
 }
-
-NNN.prototype.synapse = function() {
-	let threshold; 
-
-	this.drawMan.drawBuffer();
-
-	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
-	// for (let i = 0; i >= 0; i--) { // Use active_neurons
-		let neuron = this.active_neurons[i];
-		let soma = neuron.nodes[0];
-
-		if (neuron.propagate_bool) {
-			neuron.propagate(soma);
-		}
-
-		threshold = this.p.random(1); // Set threshold
-
-		if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
-			neuron.propagate_bool = true;
-		}
-	}
-}
-
-NNN.prototype.fadeIn = function() {
-	this.drawMan.fadeIn();
-	this.drawMan.drawBuffer();
-	
-	this.render_soma();
-
-}
-
-NNN.prototype.fadeOut = function() {
-	this.drawMan.fadeOut();
-	this.drawMan.drawBuffer();
-
-	this.render_soma();
-}
-
-NNN.prototype.forward_fade_init = function() {
-	this.drawMan.fade_reset();
-	console.log('call-fade-reset');
-}
-
-NNN.prototype.reverse_fade_init = function() {
-	this.drawMan.fade_reset();
-	console.log('call-fade-reset');
-}
-
-NNN.prototype.rebound_1 = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.rebound();
-	});
-	
-	this.render_particles();
-}
-
-NNN.prototype.rebound_2 = function() {	
-	this.active_neurons.forEach((neuron) => {
-		neuron.rebound();
-	});
-	
-	this.render_soma(); // Render Soma	
-}
-
-NNN.prototype.rebound_3 = function() {	
-	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
-		let neuron = this.neurons[i];
-		neuron.rebound();
-		neuron.render_particle();
-	}
-}
-
-NNN.prototype.rebound_4 = function() {	
-	this.brainiac.rebound_brain();
-}
-
-NNN.prototype.last_position = function() {
-	this.active_neurons.forEach((neuron) => {
-		neuron.last_position();
-	});
-	
-	this.render_soma(); // Render Soma	
-}
-
-NNN.prototype.start_position = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.start_position();
-	});
-	
-	this.render_particles();	
-}
-
-NNN.prototype.stary_night = function() {
-	for (let i = 0; i < this.neurons.length/2; i++) { // Use 1/2 total neurons
-		let soma = this.neurons[i].nodes[0];
-			soma.space(this.somas, _scatter_multiplier_3); // Repel from center
-	}
-
-	this.render_particles();
-}
-
-// Reset Soma power & center multiplier for Stary_Night method
-NNN.prototype.stars_init = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
-		neuron.nodes[0].reset_pow_center();
-	});
-}
-
-NNN.prototype.twinkle_2 = function() {
-	let step = this.p.PI / 30;
-	let threshold;
-	let a;
-
-	neuro_loop: // label
-	for (let i = this.p.floor(this.neurons.length / 2 - 1); i >= 0; i--) {
-		let neuron = this.neurons[i];
-		let soma = neuron.nodes[0];
-			
-		if (soma.twinkle_bool) {
-			soma.twinkle_angle += step; 
-			a = this.p.abs(this.p.cos(soma.twinkle_angle)); // a == alpha (0-1)
-			a = this.p.constrain(a, 0.01, 1); // P5 doesn't like opacity ~= 0
-
-			neuron.render_particle(a); // Effect Opacity here?
-
-			if (a == 1) {
-				soma.twinkle_angle = 0;      	// Reset angle
-				soma.twinkle_bool = false;       	// Reset State
-			}
-		} 
-		else {
-			
-			neuron.render_particle(1);
-
-		}
-	
-		threshold = this.p.random(1); // Set threshold
-
-		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
-			soma.twinkle_bool = true;
-		}
-	}
-}
-
-NNN.prototype.render_brain = function() {
-	this.brainiac.animate();
-}
-
-NNN.prototype.render_brain_lines = function() {
-	this.brainiac.animate();
-	this.brainiac.render_svg();
-}
-
-NNN.prototype.plague = function() {
-	this.brainiac.animate();
-	this.brainiac.render_svg();
-	this.brainiac.grow();
-	this.brainiac.render_dendrite();	
-}
-
-NNN.prototype.fadeOut_brain_lines = function() {
-	this.brainiac.fade_svg_lines();
-}
-
 
 // Add neuron to the network
 NNN.prototype.add_neuron = function(count) {

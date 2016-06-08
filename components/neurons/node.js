@@ -320,8 +320,7 @@ function Node (args = {}) {
 			// }
 
 		  	if (_this.distribute) {
-		  		// If we're in spring mode, desired separation = distance from this to other
-		  		desiredseparation = _radius;
+		  		desiredseparation = _radius; // If we're in spring mode, desired separation = distance from this to other
 		  	}
 	  		
 	  		// Calc distance from growing nodes
@@ -332,7 +331,8 @@ function Node (args = {}) {
 				// Calculate vector pointing away from neighbor
 				let diff = p5.Vector.sub(_this.position,other.position);
 					diff.normalize();
-					diff.div(d*d);        				// Weight by distance (inverse square)
+					diff.div(d*d);      				// Weight by distance (inverse square)
+
 				steer.add(diff);
 				count++;             					// Keep track of how many
 			}
@@ -404,20 +404,6 @@ function Node (args = {}) {
 
 		return force;
 	}
-
-
-	// This is basically a cop out 
-	this.reset_pow_1 = Utils.cacheify(function() {
-		_this.pow = 1;
-	});
-
-	this.reset_pow_3 = Utils.cacheify(function() {
-		// Reset position to center
-		_this.position.x = p.width / 2 + p.random(-2,2);
-		_this.position.y = p.height / 2 + p.random(-2,2);
-
-		_this.pow = 1;
-	});
 
 	// Calculate initial distribution forces
 	// !Important --> Must be called outside of node 

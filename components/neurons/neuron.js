@@ -300,7 +300,6 @@ function Neuron (args) {
 	this.propagate = function(node) {
 
 		propagate_recursive(node);
-
 		return propagate_status();
 
 		function propagate_status() {
@@ -356,7 +355,7 @@ function Neuron (args) {
 					p2.x, p2.y,
 					p3.x, p3.y
 				);
-				Text
+				// Text
 				p.fill(0, 250, 0);
 				p.textSize(8);
 				p.text("ID: " + id + " T: " + t, x, y);
