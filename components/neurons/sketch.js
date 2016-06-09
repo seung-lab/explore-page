@@ -274,7 +274,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Brain",
-				duration: 100,
+				duration: 75,
 				forward_update: _nnn.render_brain_update.bind(_nnn),
 				forward_render: _nnn.render_brain_render.bind(_nnn),
 				reverse_update: _nnn.rebound_4_update.bind(_nnn),

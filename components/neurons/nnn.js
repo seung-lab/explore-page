@@ -1,3 +1,4 @@
+
 // Growing Neurons
 // Alex Norton :: 2015
 // https://github.com/alexnortn/Explore.Eye
@@ -70,50 +71,75 @@ function NNN (args = {}) {
 		setup_dendrite(); // Call once
 
 		function animate() {
-			p.noStroke()
-			p.fill(115,135,150);
-
 			if (speed > 3) speed -= 3;
 
 			vertices.forEach((v) => {
 				v.maxspeed = speed;
 				v.arrive(v.brain_pos);
 				v.update();
-				v.render_soma(5);
 			});
 		}
 
-		function rebound_brain() {
-			// Soma Style
-			p.noStroke();
+		function points() {
+			p.push();
+				p.noStroke();
+				p.fill(115,135,150);
 
+				vertices.forEach((v) => {
+					v.render_soma(5);
+				});
+			p.pop();
+		}
+
+		function lines() {
+			p.push();
+				p.noFill();
+				p.strokeWeight(2);
+				p.stroke(115,135,150);
+
+				_this.brain.render.lines();
+			p.pop();
+		}
+
+		function connect() {
+			p.push();
+				p.noFill();
+				p.strokeWeight(2);
+
+				_this.brain.render.connect();
+			p.pop();
+		}
+
+		function rebound_brain_update() {
+			vertices.forEach((v) => {
+				v.rebound();
+			});				
+		}
+
+		function rebound_brain_render() {
 			let center = p.createVector(p.width/2, p.height/2),
 				dist_sq,
 				alpha;
 
-			vertices.forEach((v) => {
-				dist_sq = _this.distance_sq(center, v.position);
-				
-				if (dist_sq < 10000) {
-					alpha = p.map(dist_sq, 0, 10000, 0, 1);
-				} else {
-					alpha = 1;
-				}
+			p.push();
+				p.noStroke(); // Soma Style
 
-				let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
-				p.fill(fill_val);
+				vertices.forEach((v) => {
+					dist_sq = _this.distance_sq(center, v.position);
+					
+					if (dist_sq < 10000) {
+						alpha = p.map(dist_sq, 0, 10000, 0, 1);
+					} else {
+						alpha = 1;
+					}
 
-				v.rebound();
-				v.render_soma(5);
-			});				
-		}
+					let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+					p.fill(fill_val);
 
-		function render_svg() {
-			// Draw Brain SVG	
-			p.noFill();
-			p.strokeWeight(2);
+					v.render_soma(5);
+				});				
 
-			_this.brain.render.connect();
+			p.pop();
 		}
 
 		function fade_svg_lines() {
@@ -189,14 +215,23 @@ function NNN (args = {}) {
 			animate: function() {
 				animate();
 			},
-			render_svg: function() {
-				render_svg();
+			connect: function() {
+				connect();
+			},
+			points: function() {
+				points();
+			},
+			lines: function() {
+				lines();
 			},
 			fade_svg_lines: function() {
 				fade_svg_lines();
 			},
-			rebound_brain: function() {
-				rebound_brain();
+			rebound_brain_update: function() {
+				rebound_brain_update();
+			},
+			rebound_brain_render: function() {
+				rebound_brain_render();
 			},
 			grow: function() {
 				grow();
@@ -231,6 +266,8 @@ function NNN (args = {}) {
 			for (let i = imageData.length - 1; i >= 3; i -= 4) {
 			    alphaData[i] = imageData[i]; // Reference original value
 			}
+
+			console.log(imageData.length);
 
 			alpha = 1;
 		}
@@ -295,6 +332,23 @@ function NNN (args = {}) {
 			},
 			fade_reset: function() {
 				alpha = 1;
+			},
+			zero_alpha: function() {
+				if (typeof image === "undefined") {
+				    return; // Be aware this needs to be defined
+				}
+				// set every fourth value -> alpha to 0
+				for (let i = imageData.length - 1; i >= 3; i -= 4) { 
+					imageData[i] = 0;
+				}
+			},
+			isEmpty: function() {
+				if (typeof image === "undefined") {
+				    return true;
+				}
+				else {
+					return false;
+				}
 			}
 		}
 
@@ -450,7 +504,11 @@ NNN.prototype.synapse_update = function() {
 }
 
 NNN.prototype.synapse_render = function() {
-	let threshold; 
+	let threshold;
+
+	if (this.drawMan.isEmpty()) {
+		this.render();
+	}
 
 	this.drawMan.drawBuffer();
 
@@ -501,6 +559,7 @@ NNN.prototype.fadeOut_render = function() {
 
 NNN.prototype.reverse_fade_init = function() {
 	this.drawMan.fade_reset();
+	this.drawMan.zero_alpha();
 	console.log('call-fade-reset');
 }
 
@@ -551,11 +610,11 @@ NNN.prototype.rebound_3_render = function() {
 // Animation | Rebound_4
 
 NNN.prototype.rebound_4_update = function() {	
-	// ?
+	this.brainiac.rebound_brain_update();
 }
 
 NNN.prototype.rebound_4_render = function() {	
-	this.brainiac.rebound_brain();
+	this.brainiac.rebound_brain_render();
 }
 
 // ------------------------------------------------
@@ -653,23 +712,22 @@ NNN.prototype.twinkle_2_render = function() {
 // Animation | Render Brain
 
 NNN.prototype.render_brain_update = function() {
-	// ?
+	this.brainiac.animate();
 }
 
 NNN.prototype.render_brain_render = function() {
-	this.brainiac.animate();
+	this.brainiac.points();
 }
 
 // ------------------------------------------------
 // Animation | Render Brain Lines
 
 NNN.prototype.render_brain_lines_update = function() {
-	// ?
+	this.brainiac.connect();
 }
 
 NNN.prototype.render_brain_lines_render = function() {
-	this.brainiac.render_svg();
-	this.brainiac.animate();
+	this.brainiac.points();
 }
 
 // ------------------------------------------------
@@ -681,7 +739,7 @@ NNN.prototype.plague_update = function() {
 }
 
 NNN.prototype.plague_render = function() {
-	this.brainiac.render_svg();
+	this.brainiac.connect();
 	this.brainiac.render_dendrite();	
 }
 
@@ -706,6 +764,8 @@ NNN.prototype.render = function() {
 			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
 				neuron.render();
 			});
+
+			console.log('creating buffer');
 
 			this.drawMan.createBuffer();
 			this.buffer = true;
