@@ -212,6 +212,10 @@ function NNN (args = {}) {
 		//--------------- Closure Exports
 
 		return { 
+			reset: function() {
+				alpha = 0,
+				speed = 100;
+			},
 			animate: function() {
 				animate();
 			},
@@ -266,8 +270,6 @@ function NNN (args = {}) {
 			for (let i = imageData.length - 1; i >= 3; i -= 4) {
 			    alphaData[i] = imageData[i]; // Reference original value
 			}
-
-			console.log(imageData.length);
 
 			alpha = 1;
 		}
@@ -719,6 +721,10 @@ NNN.prototype.render_brain_render = function() {
 	this.brainiac.points();
 }
 
+NNN.prototype.forward_render_brain_init = function() {
+	this.brainiac.reset();
+}
+
 // ------------------------------------------------
 // Animation | Render Brain Lines
 
@@ -764,8 +770,6 @@ NNN.prototype.render = function() {
 			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
 				neuron.render();
 			});
-
-			console.log('creating buffer');
 
 			this.drawMan.createBuffer();
 			this.buffer = true;

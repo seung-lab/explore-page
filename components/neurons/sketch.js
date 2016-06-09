@@ -279,6 +279,7 @@ let sprout = function (p) {
 				forward_render: _nnn.render_brain_render.bind(_nnn),
 				reverse_update: _nnn.rebound_4_update.bind(_nnn),
 				reverse_render: _nnn.rebound_4_render.bind(_nnn),
+				forward_init: _nnn.forward_render_brain_init.bind(_nnn),
 				forward_slide: 6,
 				reverse_slide: 5,
 				p: p
