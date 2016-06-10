@@ -473,10 +473,16 @@ Utils.numberToText = function (number) {
 Utils.compose = function () {
 	var fns = Utils.flatten(arguments);
 
+	var thus = this;
+
 	return function () {
+		var result = null;
+		
 		for (var i = 0; i < fns.length; i++) {
-			fns[i].apply(this, arguments);
+			result = fns[i].apply(thus, arguments);
 		}
+
+		return result;
 	};
 };
 

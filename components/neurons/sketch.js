@@ -79,9 +79,11 @@ let sprout = function (p) {
 
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
+		let density = p.map(p.width, 350, 3000, 20, 50); // Set brain svg spacing
+
 		_svg_object = new SVG_Object({
 			p: p,
-			density: 35,
+			density: density,
 		});
 
 		// Calculate _nnn_count based on width

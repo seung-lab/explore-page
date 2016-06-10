@@ -96,11 +96,35 @@ class Galileo extends TeaTime {
 		this.view.bignumber.container.addClass('transition-none');
 
 		this.animations = {
-			text: $.Deferred().resolve(),
-			count: $.Deferred().resolve(),
+			text: {
+				current: $.Deferred().resolve(),
+				next: null,
+			},
 		};
 
 		this.sketch = null; // p5 sketch for neurons
+	}
+
+	enqueueTextAnimation (fn) {
+		let _this = this;
+
+		//fn = utils.compose.call(this, _this.clearText, fn);
+
+		if (_this.animations.text.current.state() !== 'pending') {
+			_this.animations.text.current = fn()
+				.always(function () {
+					if (_this.animations.text.next) {
+						_this.animations.text.current = _this.animations.text.next();
+					}
+
+					_this.animations.text.next = null;
+				});
+
+			_this.animations.text.next = null;
+		}
+		else {
+			_this.animations.text.next = fn;
+		}
 	}
 
 	generateView () {
@@ -124,7 +148,6 @@ class Galileo extends TeaTime {
 
 		let textcontainer = d('story-text');
 		let text = d('text');
-		let counter = d('counter');
 
 		textcontainer.append(text);  // --> Trying no Counter
 
@@ -135,8 +158,7 @@ class Galileo extends TeaTime {
 			bignumber = d('big-number'),
 			hightext = d('high-text'),
 			medtext = d('medium-text'),
-			lowtext = d('low-text'),
-			counter2 = d('counter');
+			lowtext = d('low-text');
 
 		innercontainer.append(
 			hightext, 
@@ -165,7 +187,6 @@ class Galileo extends TeaTime {
 			story: {
 				container: textcontainer,
 				text: text,
-				counter: counter,
 			},
 			bignumber: {
 				container: container2,
@@ -173,7 +194,6 @@ class Galileo extends TeaTime {
 				high: hightext,
 				medium: medtext,
 				low: lowtext,
-				counter: counter2,
 			},
 			canvas: null,
 		};
@@ -227,235 +247,149 @@ class Galileo extends TeaTime {
 		this.removeNeurons();
 	}
 
-	// Reenable if we decide to go for the ticking animation
-
-	// next () {
-	// 	let slide = this.slideAt(this.t);
-	// 	let next_slide = this.slides[slide.index + 1];
-
-	// 	if (next_slide && next_slide.big) {
-	// 		this.animateNumberCount(slide, next_slide);
-	// 	}
-
-	// 	super.next()
-	// }
-
-	// previous () {
-	// 	let slide = this.slideAt(this.t);
-	// 	let prev_slide = this.slides[slide.index + 1];
-
-	// 	if (prev_slide && prev_slide.big) {
-	// 		this.animateNumberCount(prev_slide, slide);
-	// 	}
-
-	// 	super.previous()
-	// }
-
-	animateNumberCount (slide_from, slide_to) {
-		let _this = this;
-
-		_this.animations.count.reject();
-
-		if (!slide_from.big || !slide_to.big) {
-			return;
-		}
-
-		let begin = slide_from.big.number,
-			end = slide_to.big.number;
-
-		let delta = (end - begin);
-
-		let deferred = $.Deferred();
-
-		let start_time = window.performance.now();
-
-		let msec = 1000,
-			tick = 50;
-
-		let timeout = setInterval(function () {
-			let now = window.performance.now();
-
-			let t = (now - start_time) / msec;
-
-			if (t >= 1) {
-				deferred.resolve();
-				return;
-			}
-
-			let proportion = Easing.parabolic(t);
-			let ct = begin + Math.floor(proportion * delta);
-
-			_this.view.bignumber.number.text(ct);
-		}, tick);
-
-		deferred
-			.done(function () {
-				_this.view.bignumber.number.text(end);
-			})
-			.always(function () {
-				clearInterval(timeout);
-			});
-
-		_this.animations.count = deferred;
-
-		return this;
-	}
-
-	animateTextScamble (slide) {
-		let _this = this;
-		let elem = _this.view.story.text;
-
-		this.animations.text.reject();
-
-		if (elem.text()) {
-			this.animations.text = elem.scrambleText({
-				begin: elem.html(),
-				end: slide.text,
-				msec: 1500,
-				tick: 50,
-				update: function (txt) {
-					elem.html(
-						splitter(txt, true)
-					)
-				}
-			});
-		}
-		else {
-			elem.html(
-				splitter(slide.text, true)
-			);
-		}
-
-		return this;
-	}
-
 	renderText (prev_t, t) {
 		let _this = this;
 
 		let slide = this.slideAt(t);
 		let prev_slide = this.slideAt(prev_t);
 
-		let text_container = _this.view.story.container,
-			number_container = _this.view.bignumber.container;
-
-		// Animate Exit
-		if ((prev_t > t) && (prev_slide.exit)) { // Reverse
-			let element;
-			prev_slide.text ? element = text_container : element = number_container;
-
-		   element
-				.addClass(prev_slide.exit_reverse)
-				.removeClass('transition-show');
-
-		   setTimeout(function() {
-		   		element
-		   			.removeClass('transition-state')
-					.removeClass(prev_slide.exit)
-					.removeClass(prev_slide.enter)
-					.removeClass(prev_slide.exit_reverse)
-					.removeClass(prev_slide.enter_reverse);
-				
-				setTimeout(function() {
-					updateText("reverse");
-				}, 250);
-
-
-			}, 1000);
-		}
-		else if (prev_slide.exit && slide.index !== 0) { // Forward
-			let element;
-			prev_slide.text ? element = text_container : element = number_container;
-
-		   element
-				.addClass(prev_slide.exit)
-				.removeClass('transition-show');
-
-		   setTimeout(function() {
-		   		element
-		   			.removeClass('transition-state')
-					.removeClass(prev_slide.exit)
-					.removeClass(prev_slide.enter)
-					.removeClass(prev_slide.exit_reverse)
-					.removeClass(prev_slide.enter_reverse);
-				
-				setTimeout(function() {
-					updateText();
-				}, 250);
-			}, 1000);
-		} 
-		else if (slide.index === 0) { // Starting
-			setTimeout(function() {
-				updateText();
-			}, 1000);
-		} 
-		else { // No Transition
-			updateText();
+		if (!slide.big && !slide.text) {
+			throw new Error("slide did not specify text or big.");
 		}
 		
-		function updateText(direction = "forward") {
-			if (slide.text) {
-				// Update Text Content
-				_this.view.story.text
-					.removeClass('caps italics')
-					.addClass(slide.format);
+		if (prev_t > t) { // Reverse,  Animate Exit
+			_this.animateText(prev_slide, slide, 'reverse');
+			console.log('exit');
+		}
+		else if (slide.index === _this.slides.length - 1 && prev_slide.index !== _this.slides.length - 2) { // Rear Entry
+			_this.setText(slide);			
+			_this.animateTextEnter(slide, 'reverse');
+			console.log('rear-entry');
+		}
+		else if (slide.index !== 0) { // Forward
+			_this.animateText(prev_slide, slide, 'forward');
+			console.log('enter');
+		} 
+		else { // Entering from previous section
+			_this.setText(slide);			
+			_this.animateTextEnter(slide, 'forward');
+			console.log('starting');
+		}
+	}
 
-					if ((slide.format === 'italics') && (!slide.enter)) {
-						_this.animateTextScamble(slide);
-					}
-					else {
-						_this.view.story.text.html(
-							splitter(slide.text, true)
-						);
-					}
+	animateText (prev_slide, slide, direction) {
+		let _this = this;
 
-				// Animate Entrance
-				if (slide.enter) {
-					let transition;
-					direction === "forward"
-						? transition = slide.enter 
-						: transition = slide.enter_reverse;
-					text_container
-						.addClass('transition-state')
-						.addClass(transition)
-						.addClass('transition-show');
-				} 
+		this.enqueueTextAnimation(function () {
+			return _this.animateTextExit(prev_slide, direction)
+				.then(function () {
+					_this.setText(slide);
+					
+					return _this.animateTextEnter(slide, direction);
+				});
+		})
+	}
+	
+	animateTextEnter (slide, direction) {
+		let _this = this;
+		
+		let element = slide.text 
+			? _this.view.story.container 
+			: _this.view.bignumber.container;
 
-				_this.view.story.counter.text(`${slide.index + 1}/${_this.slides.length}`);
-			
-			}
-			else if (slide.big) {
-				// Update Text Content
-				_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
+		let transition = direction === "forward"
+			? slide.enter 
+			: slide.enter_reverse;
 
-				if (slide.big.number >= 100) {
-					_this.view.bignumber.number.addClass('hundred');
-				}
-
-				_this.view.bignumber.high.text(slide.big.high);
-				_this.view.bignumber.medium.text(slide.big.medium);
-				_this.view.bignumber.low.text(slide.big.low);
-
-				// Animate Entrance
-				if (slide.enter) {
-					let transition;
-					direction === "forward"
-						? transition = slide.enter 
-						: transition = slide.enter_reverse;
-					number_container
-						.addClass('transition-state')
-						.addClass(transition)
-						.addClass('transition-show');
-				} 
-
-				_this.view.bignumber.counter.text(`${slide.index + 1}/${_this.slides.length}`);
-
-			}
+		if (!transition) {
+			return $.Deferred().resolve();
 		}
 
-		if (slide.big || slide.text) return; // Hacky, Love Alex
+		let deferred = $.Deferred();
 
-		throw new Error("slide did not specify text or big.");
+		element
+			.addClass('transition-state')
+			.addClass(transition)
+			.addClass('transition-show')
+			.transitionend(utils.onceify(function (transition) {
+				setTimeout(function () {
+					deferred.resolve();
+				}, 0);
+			}));
 
+		return deferred;
+	}
+
+	animateTextExit (slide, direction) {
+		let _this = this;
+		let counter = 0;
+
+		let element = slide.text 
+			? _this.view.story.container 
+			: _this.view.bignumber.container;
+
+		let exit_direction = direction === 'forward'
+			? slide.exit
+			: slide.exit_reverse;
+
+		let deferred = $.Deferred();
+
+	    element
+	    	.addClass('transition-state')
+			.addClass(exit_direction)
+			.removeClass('transition-show')
+			.transitionend(function () {
+				if (counter > 0) {
+					return;
+				}
+				element
+		   			.removeClass('transition-state')
+					.removeClass(slide.exit)
+					.removeClass(slide.enter)
+					.removeClass(slide.exit_reverse)
+					.removeClass(slide.enter_reverse)
+						
+				setTimeout(function () {
+					deferred.resolve();
+				}, 0);
+
+				counter++;
+
+			});
+
+		return deferred;
+	}
+
+	setText (slide) {
+		let _this = this;
+
+		if (slide.text) {
+			// Update Text Content
+			_this.view.story.text
+				.removeClass('caps italics')
+				.addClass(slide.format)
+				.html(slide.text);
+		}
+		else if (slide.big) {
+			// Update Text Content
+			_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
+
+			if (slide.big.number >= 100) {
+				_this.view.bignumber.number.addClass('hundred');
+			}
+
+			_this.view.bignumber.high.text(slide.big.high);
+			_this.view.bignumber.medium.text(slide.big.medium);
+			_this.view.bignumber.low.text(slide.big.low);
+		}
+	}
+
+	clearText () {
+		this.view.story.text.text('');
+		this.view.bignumber.number.text('');
+		this.view.bignumber.high.text('');
+		this.view.bignumber.medium.text('');
+		this.view.bignumber.low.text('');
 	}
 
 	removeNeurons () {
@@ -506,19 +440,6 @@ class Galileo extends TeaTime {
 		_this.renderText(t_prev, t);
 		_this.renderNeurons(t_prev, t);
 	}
-}
-
-function splitter (txt, inverted = false) {
-	return txt; // Remove this line to enable splitter
-	if (Utils.isMobile()) {
-		return txt;
-	}
-
-	if (inverted) {
-		return utils.invertedPyramidLineBreak(txt);
-	}
-
-	return utils.pyramidLineBreak(txt);
 }
 
 module.exports = Galileo;

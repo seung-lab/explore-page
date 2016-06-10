@@ -78,9 +78,9 @@ NeuronCoordinator.updateT = function (t) {
 				*/
 
 				if (_t > (_tg - _step * 2)) {
-					// console.log(_t + " " + _tg);
+					console.log(_t + " " + _tg);
 					_p.loop();
-					NC.render(); // If we're once step away from the end, render the frame
+					NC.render(); // If we're once step away from the end, render one frame
 				}
 			}
 
@@ -109,7 +109,7 @@ NeuronCoordinator.updateT = function (t) {
 					console.log('_t ' + _t + " | _tg " + _tg);
 				*/
 
-				if (_t < (_tg + _step*2)) {
+				if (_t < (_tg + _step * 2)) {
 					console.log(_t + " " + _tg);
 					_p.loop();
 					NC.render(); // If we're once step away from the end, render the frame
@@ -377,7 +377,7 @@ NeuronCoordinator.animate_deprecated = function () {
 // Simulation Router
 NeuronCoordinator.animate = function () {
 	_p.clear();
-	
+
 	NeuronCoordinator.step();
 	NeuronCoordinator.update();
 	

@@ -663,7 +663,7 @@ function SVG_object (args = {}) {
 
 			arc_length = p.sqrt(p.sq(x2 - x1) + p.sq(y2 - y1)); // Return segment length
 
-			if (arc_length < 5) { // Get rid of points that are too close
+			if (arc_length < 3) { // Get rid of points that are too close
 				return;
 			}
 
