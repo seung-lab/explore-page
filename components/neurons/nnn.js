@@ -26,10 +26,9 @@ function NNN (args = {}) {
 	this.brain 		 = args.brain || {};
 	this.kruskal 	 = args.kruskal  || {};
 
-	this.neurons = []; 			// Generic public array letiable : not an argument though
+	this.neurons = [];
 	this.active_neurons = []; 	// Bounded Neurons
 	this.somas = []; 			// Array of all somas included in the NNN
-	this.springs = []; 			// Spring system array
 	this.time_power; 			// Power Multiplier
 
 	this.max_depth;
@@ -53,7 +52,6 @@ function NNN (args = {}) {
 		let center = new p5.Vector(p.width/2, p.height/2),
 			vertices = _this.brain.vertices,
 			pos = p.createVector(),
-			probability,
 			stroke_val,
 			alpha = 0,
 			speed = 100;
@@ -67,8 +65,6 @@ function NNN (args = {}) {
 				p: 			p,
 			});
 		});
-
-		setup_dendrite(); // Call once
 
 		function animate() {
 			if (speed > 3) speed -= 3;
@@ -84,7 +80,6 @@ function NNN (args = {}) {
 			p.push();
 				p.noStroke();
 				p.fill(115,135,150);
-
 				vertices.forEach((v) => {
 					v.render_soma(5);
 				});
@@ -96,7 +91,6 @@ function NNN (args = {}) {
 				p.noFill();
 				p.strokeWeight(2);
 				p.stroke(115,135,150);
-
 				_this.brain.render.lines();
 			p.pop();
 		}
@@ -105,7 +99,6 @@ function NNN (args = {}) {
 			p.push();
 				p.noFill();
 				p.strokeWeight(2);
-
 				_this.brain.render.connect();
 			p.pop();
 		}
@@ -123,7 +116,6 @@ function NNN (args = {}) {
 
 			p.push();
 				p.noStroke(); // Soma Style
-
 				vertices.forEach((v) => {
 					dist_sq = _this.distance_sq(center, v.position);
 					
@@ -138,7 +130,6 @@ function NNN (args = {}) {
 
 					v.render_soma(5);
 				});				
-
 			p.pop();
 		}
 
@@ -146,67 +137,8 @@ function NNN (args = {}) {
 			// Fade Brain SVG	
 			p.noFill();
 			p.strokeWeight(2);
-
 			_this.brain.render.fade_beziers();
 			_this.brain.render.points();
-		}
-
-		function setup_dendrite() { // Dendrite Set Up
-			for (let i = 0; i < vertices.length; i++) {
-
-				if (i % 3 !== 0) continue; // keep things evenly(ish) spaced
-
-				let v = _this.brain.vertices[i];
-
-				pos.x = v.x;
-				pos.y = v.y;
-
-				let heading = p5.Vector.sub(pos, center);  // A vector pointing from the center to the vertex 
-					heading.normalize();
-
-				let velocity = p.createVector();
-					velocity.x = heading.x;
-					velocity.y = heading.y;
-
-					heading = p.degrees(heading.heading());
-				
-				// heading.mult(5);
-				// let tan_vec = p5.Vector.add(heading, pos); // translate vector to position
-
-				_this.add_dendrite(pos, heading, velocity); // Create a simplified neuron
-
-			}
-		}
-
-		function done() { // Is dendrite done growing?
-			let d;
-
-			for (let i = 0; i < _this.dendrites.length; i++) {
-				d = _this.dendrites[i];
-				if (!d.done()) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		function grow() { // Grow the dendrites
-
-			_this.dendrites.forEach((dendrite) => {
-				if (done()) {
-					return; 
-				}
-
-				dendrite.grow2();
-
-			});
-		}
-
-		function render_dendrite() { // Render the dendrites
-			_this.dendrites.forEach((dendrite) => {
-				dendrite.render();
-			});
 		}
 
 		//--------------- Closure Exports
@@ -237,12 +169,6 @@ function NNN (args = {}) {
 			rebound_brain_render: function() {
 				rebound_brain_render();
 			},
-			grow: function() {
-				grow();
-			},
-			render_dendrite: function() {
-				render_dendrite();
-			}
 		};
 
 	})();
@@ -377,7 +303,7 @@ NNN.prototype.scatter_render = function() {
 	this.render_particles();
 }
 
-NNN.prototype.forward_scatter_init = function() {
+NNN.prototype.scatter_init = function() {
 	this.neurons.forEach((neuron) => {
 		neuron.nodes[0].reset_power();
 		
@@ -403,23 +329,11 @@ NNN.prototype.scatter_2_render = function() {
 	this.render_particles();
 }
 
-NNN.prototype.forward_scatter2_init = function() {
+NNN.prototype.scatter2_init = function() {
 	this.neurons.forEach((neuron) => {
 		neuron.nodes[0].reset_power();
 	});
 }
-
-/* 
-	Minimum Spanning Tree for Spring Physics
-	function calc_mst() {
-		this.mst(); 
-		// Update spring positions --> Run through array
-		this.springs.forEach((s) => {
-			// s.update();
-			// s.display();
-		});
-	}
-*/
 
 // ------------------------------------------------
 // Animation | Grow
@@ -439,7 +353,7 @@ NNN.prototype.grow_render = function() {
 	this.render();
 }
 
-NNN.prototype.forward_grow_init = function() {
+NNN.prototype.grow_init = function() {
 
 	this.activate(); // Set up Neurons
 
@@ -515,7 +429,6 @@ NNN.prototype.synapse_render = function() {
 	this.drawMan.drawBuffer();
 
 	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
-	// for (let i = 0; i >= 0; i--) { // Use active_neurons
 		let neuron = this.active_neurons[i];
 		let soma = neuron.nodes[0];
 
@@ -531,6 +444,14 @@ NNN.prototype.synapse_render = function() {
 	}
 }
 
+// Calculate ALP for Neurons
+NNN.prototype.synapse_init = function() {
+	// Reset Active states
+	this.active_neurons.forEach((neuron) => {
+		neuron.calculate_paths();
+	});
+}
+
 // ------------------------------------------------
 // Animation | Fade In
 
@@ -543,7 +464,7 @@ NNN.prototype.fadeIn_render = function() {
 	this.render_soma();
 }
 
-NNN.prototype.forward_fade_init = function() {
+NNN.prototype.fade_init = function() {
 	this.drawMan.fade_reset();
 }
 
@@ -562,7 +483,6 @@ NNN.prototype.fadeOut_render = function() {
 NNN.prototype.reverse_fade_init = function() {
 	this.drawMan.fade_reset();
 	this.drawMan.zero_alpha();
-	console.log('call-fade-reset');
 }
 
 // ------------------------------------------------
@@ -721,7 +641,7 @@ NNN.prototype.render_brain_render = function() {
 	this.brainiac.points();
 }
 
-NNN.prototype.forward_render_brain_init = function() {
+NNN.prototype.render_brain_init = function() {
 	this.brainiac.reset();
 }
 
@@ -796,27 +716,8 @@ NNN.prototype.render_particles = function() {
 	});
 }
 
-NNN.prototype.done = function() {
-	let neuron;
-
-	for (let i = 0; i < this.active_neurons.length; i++) {
-		neuron = this.active_neurons[i];
-		if (!neuron.done()) {
-			return false;
-		}
-	}
-
-	this.growing = false;
-	return true;
-
-}
-
 // ------------------------------------------------
 // Methods | Utilies
-
-NNN.prototype.empty_fn = function() {
-	// ? 
-}
 
 // Pass in 2D Vector
 NNN.prototype.distance_sq = function(v1, v2) {
@@ -830,8 +731,6 @@ NNN.prototype.distance_sq = function(v1, v2) {
 
 NNN.prototype.initialize = function() {
 	// Calculate power offset
-	// During scatter_2 --> Ensure consistant neuron density
-	// across different displays
 	_scatter_multiplier_1 = 20;
 	_scatter_multiplier_3 = 20;
 
@@ -884,180 +783,64 @@ NNN.prototype.activate = function() {
 	}
 }
 
-// Calculate ALP for Neurons
-NNN.prototype.forward_synapse_init = function() {
-	// Reset Active states
-	this.active_neurons.forEach((neuron) => {
-		neuron.calculate_paths();
-	});
+NNN.prototype.done = function() {
+	let neuron;
+
+	for (let i = 0; i < this.active_neurons.length; i++) {
+		neuron = this.active_neurons[i];
+		if (!neuron.done()) {
+			return false;
+		}
+	}
+
+	this.growing = false;
+	return true;
+
 }
 
 // Add neuron to the network
 NNN.prototype.add_neuron = function(count) {
-		let x, y;
+	let x, y;
 
-		for (let i = 0; i < count; i++) {
-			// Set Neuron Soma Position (Root)
-			// For some reason the y value must lean towards less?
-			x = (window.innerWidth / 2) + this.p.random(-10,10);
-			y = (window.innerHeight / 2) + this.p.random(-15,0);
+	for (let i = 0; i < count; i++) {
+		// Set Neuron Soma Position (Root)
+		// For some reason the y value must lean towards less?
+		x = (window.innerWidth / 2) + this.p.random(-10,10);
+		y = (window.innerHeight / 2) + this.p.random(-15,0);
 
-			this.num_branches = 7;
+		this.num_branches = 7;
 
-			this.max_depth = this.complexity - this.num_branches;
-			// Given a constant branching speed, this controls neuron size
-			// does not effect morphology.
-			// Grow time is inversely proportional to num_branches
-			if (window.innerWidth < 500) {
-				this.neuron_timer = 1000 / this.num_branches;	
-			} 
-			else {
-				this.neuron_timer = this.time_power / this.num_branches;
-			}
-
-			this.neurons.push(
-				new Neuron ({
-					x: 				x,
-					y: 				y,
-					num_branches: 	this.num_branches,
-					neuron_timer: 	this.neuron_timer,
-					max_depth: 		this.max_depth,
-					id:  			this.neuron_id,
-					p: 				this.p,
-				})	
-			);
-
-			// Increase the id counter each loop
-			this.neuron_id++;
-
-			// Get the soma setup
-			let soma = this.neurons[this.neurons.length - 1]; // --> Set up most recent neuron created
-				soma.neuron_start();
-				this.somas.push(soma.nodes[0]); // --> 1st soma in [0] position
-
+		this.max_depth = this.complexity - this.num_branches;
+		// Given a constant branching speed, this controls neuron size
+		// does not effect morphology.
+		if (window.innerWidth < 500) {
+			this.neuron_timer = 1000 / this.num_branches;	
+		} 
+		else {
+			this.neuron_timer = this.time_power / this.num_branches;
 		}
-	}
 
-// Remove neuron + soma from the network
-NNN.prototype.remove_neuron = function(id) {
-	for (let i = 0; i < this.neurons.length; i++) {
-		let neuron = this.neurons[i];
-		if (neuron.id == id) {
-			this.neurons.splice(i, 1);
-			this.somas.splice(i, 1);
-		}
-	}
-}
-
-// Calculate initial separation forces for NNN
-NNN.prototype.spread = function() {
-
-	this.somas.forEach( (soma) => {
-		// Find soma for each neuron
-		soma.separate(this.somas);
-	});
-}
-
-// Add dendrite to the brain network
-NNN.prototype.add_dendrite = function(pos, heading, velocity) {
-
-	// Set Dendrite Position (Root)
-	let x = pos.x,
-		y = pos.y,
-		num_branches = 1, // We're creating dendrites, so only [1] branch
-		max_depth = 10,
-		neuron_timer;
-
-	// Given a constant branching speed, NNN.prototype controls dendrite size
-	// does not effect morphology.
-	// Grow time is inversely proportional to num_branches
-	neuron_timer = 350;
-
-	this.dendrites.push(
-		new Neuron ({
-			x: 				x,
-			y: 				y,
-			num_branches: 	num_branches,
-			neuron_timer: 	neuron_timer,
-			max_depth: 		max_depth,
-			id:  			this.dendrite_id,
-			p: 				this.p,
-		})	
-	);
-
-	this.dendrite_id++;
-
-	// Get the soma setup
-	let root = this.dendrites[this.dendrites.length - 1]; // --> 1st root in [0] position
-		root.neuron_start();
-		root.dendrite_setup(heading, velocity);
-		this.roots.push(root.nodes[0]);
-
-}
-
-// Create MST --> Kruskal
-// Additionally create spring connections
-// Use closure to onceify()
-NNN.prototype.mst = function() {
-	let graph = {
-		V: [],
-		E: [],
-	};
-
-	// Calculate distance from/to every Soma
-	// Build MST input graph
-	this.somas.forEach((soma) => {
-		let soma_pos = soma.position;
-		graph.V.push(
-			soma.neuron_id.toString()
+		this.neurons.push(
+			new Neuron ({
+				x: 				x,
+				y: 				y,
+				num_branches: 	this.num_branches,
+				neuron_timer: 	this.neuron_timer,
+				max_depth: 		this.max_depth,
+				id:  			this.neuron_id,
+				p: 				this.p,
+			})	
 		);
-		this.somas.forEach((other_soma) => {
-			// Check for recurrent connections <cycles>
-			if (soma.neuron_id === other_soma.neuron_id) {
-				return;
-			}
 
-			let other_soma_pos = other_soma.position;
-			let d = soma_pos.dist(other_soma_pos);
-			let edge = [
-				soma.neuron_id.toString(),
-				other_soma.neuron_id.toString(),
-				d
-			];
+		// Increase the id counter each loop
+		this.neuron_id++;
 
-			graph.E.push(edge);
-		});
-	});
-
-	// Create + Add a Spring object to springs array
-	function getSprung(edge) {
-		let n1 = this.somas[edge[0]];
-		let n2 = this.somas[edge[1]];
-		// Make new Spring object
-		let s = new Spring ({
-			node1: n1,
-			node2: n2,
-			p: this.p,
-		});
-		// Add a new spring 
-		this.springs.push(s);
-	}
-
-	let mst = this.kruskal.mst(graph.V, graph.E);
-
-	let vertices = mst[0]; // Array of Edge objects
-	let edges = mst[1]; // Array of Vertex objects
-
-	edges.forEach((edge) => {
-		getSprung(edge);
-	});
-
-	function empty_fn() {
+		// Get the soma setup
+		let soma = this.neurons[this.neurons.length - 1]; // --> Set up most recent neuron created
+			soma.neuron_start();
+			this.somas.push(soma.nodes[0]); // --> 1st soma in [0] position
 
 	}
-
-	return empty_fn();
-
 }
 
 module.exports = NNN;

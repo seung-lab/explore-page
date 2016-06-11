@@ -21,25 +21,16 @@ let _options = {
 	slide_count: null,
 };
 
-let _neurostates = [],
-	_animations = [],
-	_progressions = [];
-
 let _canvas = $.Deferred();
 
 let sprout = function (p) {
-	let _nnn,
-		_svg_object, 
-		_counter = 0,
-		_mxn = 0,
-		_avg = 0,
-		_all_nodes = 0,
+	let	canvas,
+		_nnn,
 		_nnn_count = 0,
 		_startSize = p.createVector(0,0),
 		_reSize = p.createVector(0,0),
 		_neurostates = [],
-		_progressions = [],
-		canvas;
+		_animations = [];
 
 	p.setup = function () {
 		p.frameRate(30);
@@ -53,7 +44,7 @@ let sprout = function (p) {
 		_startSize.set(_options.width, _options.height);
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
 
-		_svg_object = new SVG_Object({
+		let _svg_object = new SVG_Object({
 			p: p,
 			density: density,
 		});
@@ -64,7 +55,15 @@ let sprout = function (p) {
 		let density = p.map(p.width, 350, 3000, 20, 50); // Brain svg spacing
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
 		
-		nnn_start();
+		_nnn = new NNN ({
+			num_neurons: _nnn_count,
+			complexity: 13,
+			kruskal: Kruskal,
+			brain: _svg_object,
+			p: p,
+		});
+
+		_nnn.initialize();
 
 		// ------------------------------------------------
 		// Setup NeuroCoordinator
@@ -79,18 +78,6 @@ let sprout = function (p) {
 
 	p.draw = function() {
 		NeuronCoordinator.animate();
-	}
-
-	function nnn_start () {
-		_nnn = new NNN ({
-			num_neurons: _nnn_count,
-			complexity: 13,
-			kruskal: Kruskal,
-			brain: _svg_object,
-			p: p,
-		});
-
-		_nnn.initialize();
 	}
 
 	function set_animations () {
