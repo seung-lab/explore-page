@@ -140,7 +140,7 @@ let sprout = function (p) {
 		_neurostates = [
 			{
 		        name: "Initialize",
-				duration: 75,
+				duration: 50,
 				forward_update: _nnn.empty_fn.bind(_nnn),
 				forward_render: _nnn.empty_fn.bind(_nnn),
 				reverse_update: _nnn.rebound_1_update.bind(_nnn),
@@ -164,7 +164,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Twinkle",
-				duration: 50,
+				duration: 30,
 				forward_update: _nnn.twinkle_update.bind(_nnn),
 				forward_render: _nnn.twinkle_render.bind(_nnn),
 				reverse_update: _nnn.start_position_update.bind(_nnn),
@@ -189,7 +189,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Grow",
-				duration: 125,
+				duration: 100,
 				forward_update: _nnn.grow_update.bind(_nnn),
 				forward_render: _nnn.grow_render.bind(_nnn),
 				reverse_update: _nnn.grow_update.bind(_nnn),
@@ -201,7 +201,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Synapse",
-				duration: 30,
+				duration: 32,
 				forward_update: _nnn.synapse_update.bind(_nnn),
 				forward_render: _nnn.synapse_render.bind(_nnn),
 				reverse_update: _nnn.synapse_update.bind(_nnn),
@@ -251,7 +251,7 @@ let sprout = function (p) {
 		    },
 		    {
 		    	name: "Twinkle2",
-				duration: 15,
+				duration: 30,
 				forward_update: _nnn.twinkle_2_update.bind(_nnn),
 				forward_render: _nnn.twinkle_2_render.bind(_nnn),
 				reverse_update: _nnn.twinkle_2_update.bind(_nnn),

@@ -98,6 +98,7 @@ class Galileo extends TeaTime {
 		this.animations = {
 			text: {
 				current: $.Deferred().resolve(),
+				exit_slide: this.slides[0],
 				next: null,
 			},
 		};
@@ -110,9 +111,9 @@ class Galileo extends TeaTime {
 
 		//fn = utils.compose.call(this, _this.clearText, fn);
 
-		if (_this.animations.text.current.state() !== 'pending') {
+		if (_this.animations.text.current.state() !== 'pending') { // If the current animation is complete
 			_this.animations.text.current = fn()
-				.always(function () {
+				.always(function () { // Call this once the Deferred resolves
 					if (_this.animations.text.next) {
 						_this.animations.text.current = _this.animations.text.next();
 					}
@@ -120,10 +121,11 @@ class Galileo extends TeaTime {
 					_this.animations.text.next = null;
 				});
 
-			_this.animations.text.next = null;
+			_this.animations.text.next = null; 
 		}
 		else {
-			_this.animations.text.next = fn;
+			_this.animations.text.next = fn; // If we're still working on current animation, set up next.
+			console.log(_this.animations.text.next);
 		}
 	}
 
@@ -259,21 +261,17 @@ class Galileo extends TeaTime {
 		
 		if (prev_t > t) { // Reverse,  Animate Exit
 			_this.animateText(prev_slide, slide, 'reverse');
-			console.log('exit');
 		}
 		else if (slide.index === _this.slides.length - 1 && prev_slide.index !== _this.slides.length - 2) { // Rear Entry
 			_this.setText(slide);			
 			_this.animateTextEnter(slide, 'reverse');
-			console.log('rear-entry');
 		}
 		else if (slide.index !== 0) { // Forward
 			_this.animateText(prev_slide, slide, 'forward');
-			console.log('enter');
 		} 
 		else { // Entering from previous section
 			_this.setText(slide);			
 			_this.animateTextEnter(slide, 'forward');
-			console.log('starting');
 		}
 	}
 
@@ -281,10 +279,11 @@ class Galileo extends TeaTime {
 		let _this = this;
 
 		this.enqueueTextAnimation(function () {
-			return _this.animateTextExit(prev_slide, direction)
+			return _this.animateTextExit(_this.animations.text.exit_slide, direction) 
 				.then(function () {
 					_this.setText(slide);
 					
+					_this.animations.text.exit_slide = slide;
 					return _this.animateTextEnter(slide, direction);
 				});
 		})
@@ -320,7 +319,7 @@ class Galileo extends TeaTime {
 		return deferred;
 	}
 
-	animateTextExit (slide, direction) {
+	animateTextExit (slide, direction) { // Needs to accept the slide index of the most recently completed animation
 		let _this = this;
 		let counter = 0;
 
