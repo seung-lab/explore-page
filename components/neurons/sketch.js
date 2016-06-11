@@ -23,8 +23,7 @@ let _options = {
 
 let _neurostates = [],
 	_animations = [],
-	_progressions = [],
-	_direction;
+	_progressions = [];
 
 let _canvas = $.Deferred();
 
@@ -36,36 +35,42 @@ let sprout = function (p) {
 		_avg = 0,
 		_all_nodes = 0,
 		_nnn_count = 0,
-		_direction = "forward",
 		_startSize = p.createVector(0,0),
 		_reSize = p.createVector(0,0),
 		_neurostates = [],
 		_progressions = [],
-		_direction;
 		canvas;
 
 	p.setup = function () {
 		p.frameRate(30);
 
+		// ------------------------------------------------
+		// Setup Canvas
+
 		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
-
+		
 		_startSize.set(_options.width, _options.height);
-
 		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
-
-		let density = p.map(p.width, 350, 3000, 20, 50); // Set brain svg spacing
 
 		_svg_object = new SVG_Object({
 			p: p,
 			density: density,
 		});
 
-		// Calculate _nnn_count based on width
-		_nnn_count = p.ceil(p.min((p.width / 10), 200));
+		// ------------------------------------------------
+		// Start NNN
 
+		let density = p.map(p.width, 350, 3000, 20, 50); // Brain svg spacing
+		_nnn_count = p.ceil(p.min((p.width / 10), 200));
+		
 		nnn_start();
-		set_states();
+
+		// ------------------------------------------------
+		// Setup NeuroCoordinator
+
+		set_animations();
+		set_neurostates(this.animations);
 
 		// Setup NeuronCoordinator
 		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
@@ -86,174 +91,6 @@ let sprout = function (p) {
 		});
 
 		_nnn.initialize();
-	}
-
-	function set_states () {
-		_neurostates = [
-			{
-		        name: "Initialize",
-				duration: 50,
-				forward_update: _nnn.empty_fn.bind(_nnn),
-				forward_render: _nnn.empty_fn.bind(_nnn),
-				reverse_update: _nnn.rebound_1_update.bind(_nnn),
-				reverse_render: _nnn.rebound_1_render.bind(_nnn),
-				forward_slide: 0,
-				reverse_slide: 0,
-				p: p
-		    },
-		    {
-		        name: "Scatter",
-				duration: 60,
-				forward_update: _nnn.scatter_update.bind(_nnn),
-				forward_render: _nnn.scatter_render.bind(_nnn),
-				reverse_update: _nnn.twinkle_update.bind(_nnn),
-				reverse_render: _nnn.twinkle_render.bind(_nnn),
-				forward_init: _nnn.forward_scatter_init.bind(_nnn),
-				reverse_loop: true,
-				forward_slide: 1,
-				reverse_slide: 1,
-				p: p
-		    },
-		    {
-		    	name: "Twinkle",
-				duration: 30,
-				forward_update: _nnn.twinkle_update.bind(_nnn),
-				forward_render: _nnn.twinkle_render.bind(_nnn),
-				reverse_update: _nnn.start_position_update.bind(_nnn),
-				reverse_render: _nnn.start_position_render.bind(_nnn),
-				forward_slide: 1,
-				reverse_slide: 1,
-				forward_loop: true,
-				p: p
-		    },
-		    {
-		   		name: "Scatter2",
-				duration: 50,
-				forward_update: _nnn.scatter_2_update.bind(_nnn),
-				forward_render: _nnn.scatter_2_render.bind(_nnn),
-				reverse_update: _nnn.fadeOut_update.bind(_nnn),
-				reverse_render: _nnn.fadeOut_render.bind(_nnn),
-				forward_init: _nnn.forward_scatter2_init.bind(_nnn),
-				reverse_init: _nnn.reverse_fade_init.bind(_nnn),
-				forward_slide: 2,
-				reverse_slide: 1,
-				p: p
-		    },
-		    {
-		    	name: "Grow",
-				duration: 100,
-				forward_update: _nnn.grow_update.bind(_nnn),
-				forward_render: _nnn.grow_render.bind(_nnn),
-				reverse_update: _nnn.grow_update.bind(_nnn),
-				reverse_render: _nnn.grow_render.bind(_nnn),
-				forward_init: _nnn.forward_grow_init.bind(_nnn),
-				forward_slide: 2,
-				reverse_slide: 2,
-				p: p
-		    },
-		    {
-		    	name: "Synapse",
-				duration: 32,
-				forward_update: _nnn.synapse_update.bind(_nnn),
-				forward_render: _nnn.synapse_render.bind(_nnn),
-				reverse_update: _nnn.synapse_update.bind(_nnn),
-				reverse_render: _nnn.synapse_render.bind(_nnn),
-				forward_init: _nnn.forward_synapse_init.bind(_nnn),
-				forward_loop: true,
-				reverse_loop: true,
-				forward_slide: 3,
-				reverse_slide: 3,
-				p: p
-		    },
-		    {
-		    	name: "Fade",
-				duration: 32,
-				forward_update: _nnn.fadeOut_update.bind(_nnn),
-				forward_render: _nnn.fadeOut_render.bind(_nnn),
-				reverse_update: _nnn.fadeIn_update.bind(_nnn),
-				reverse_render: _nnn.fadeIn_render.bind(_nnn),
-				forward_init: _nnn.forward_fade_init.bind(_nnn),
-				reverse_init: _nnn.reverse_fade_init.bind(_nnn),
-				forward_slide: 4,
-				reverse_slide: 3,
-				p: p	
-		    },
-		    {
-		    	name: "Center",
-				duration: 45,
-				forward_update: _nnn.rebound_2_update.bind(_nnn),
-				forward_render: _nnn.rebound_2_render.bind(_nnn),
-				reverse_update: _nnn.last_position_update.bind(_nnn),
-				reverse_render: _nnn.last_position_render.bind(_nnn),
-				forward_slide: 5,
-				reverse_slide: 4,
-				p: p	
-		    },
-		    {
-		    	name: "Stars",
-				duration: 45,
-				forward_update: _nnn.stary_night_update.bind(_nnn),
-				forward_render: _nnn.stary_night_render.bind(_nnn),
-				reverse_update: _nnn.rebound_3_update.bind(_nnn),
-				reverse_render: _nnn.rebound_3_render.bind(_nnn),
-				forward_init: _nnn.stars_init.bind(_nnn),
-				forward_slide: 5,
-				reverse_slide: 4,
-				p: p
-		    },
-		    {
-		    	name: "Twinkle2",
-				duration: 30,
-				forward_update: _nnn.twinkle_2_update.bind(_nnn),
-				forward_render: _nnn.twinkle_2_render.bind(_nnn),
-				reverse_update: _nnn.twinkle_2_update.bind(_nnn),
-				reverse_render: _nnn.twinkle_2_render.bind(_nnn),
-				forward_slide: 5,
-				reverse_slide: 5,
-				forward_loop: true,
-				reverse_loop: true,
-				p: p
-		    },
-		    {
-		    	name: "Center2",
-				duration: 50,
-				forward_update: _nnn.rebound_3_update.bind(_nnn),
-				forward_render: _nnn.rebound_3_render.bind(_nnn),
-				reverse_update: _nnn.stary_night_update.bind(_nnn),
-				reverse_render: _nnn.stary_night_render.bind(_nnn),
-				reverse_init: _nnn.stars_init.bind(_nnn),
-				forward_slide: 6,
-				reverse_slide: 5,
-				p: p
-		    },
-		    {
-		    	name: "Brain",
-				duration: 75,
-				forward_update: _nnn.render_brain_update.bind(_nnn),
-				forward_render: _nnn.render_brain_render.bind(_nnn),
-				reverse_update: _nnn.rebound_4_update.bind(_nnn),
-				reverse_render: _nnn.rebound_4_render.bind(_nnn),
-				forward_init: _nnn.forward_render_brain_init.bind(_nnn),
-				forward_slide: 6,
-				reverse_slide: 5,
-				p: p
-		    },
-		    {
-		    	name: "Connect",
-				duration: 100,
-				forward_update: _nnn.render_brain_lines_update.bind(_nnn),
-				forward_render: _nnn.render_brain_lines_render.bind(_nnn),
-				reverse_update: _nnn.fadeOut_brain_lines_update.bind(_nnn),
-				reverse_render: _nnn.fadeOut_brain_lines_render.bind(_nnn),
-				forward_slide: 7,
-				reverse_slide: 6,
-				p: p	
-		    }
-		];
-
-		_neurostates = _neurostates.map(function (args) {
-		    return new Neurostate(args);
-		});	
 	}
 
 	function set_animations () {
