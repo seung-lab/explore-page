@@ -659,7 +659,7 @@ NNN.prototype.stary_night_render = function() {
 	this.render_particles();
 }
 
-NNN.prototype.stars_init = function() {
+NNN.prototype.stary_night_init = function() {
 	// Reset Soma power & center multiplier for Stary_Night method
 	this.neurons.forEach((neuron) => {
 		neuron.nodes[0].reset_power();

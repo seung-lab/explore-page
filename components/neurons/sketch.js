@@ -7,6 +7,7 @@ let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
 	NeuronCoordinator = require('./NeuronCoordinator.js'), // neuron coordinator
+	Animation = require('./animation.js'), // animation
 	Neurostate = require('./neurostate.js'), // neurostate
 	p5 = require('p5'), 
 	SVG_Object = require('./parse-svg.js'),
@@ -21,53 +22,27 @@ let _options = {
 };
 
 let _neurostates = [],
+	_animations = [],
 	_progressions = [],
-	_actives = [], // Animation queue
 	_direction;
 
 let _canvas = $.Deferred();
 
-let growing = true; 
-
-
-// Running the sketch in instance mode, don't forget to preface all P5 methods with { p }
 let sprout = function (p) {
-	// Global Variables
-	// 
-	// Nnn Object
 	let _nnn,
 		_svg_object, 
-	
-	// int
 		_counter = 0,
 		_mxn = 0,
 		_avg = 0,
 		_all_nodes = 0,
 		_nnn_count = 0,
-
 		_direction = "forward",
 		_startSize = p.createVector(0,0),
 		_reSize = p.createVector(0,0),
-
-	// canvas
+		_neurostates = [],
+		_progressions = [],
+		_direction;
 		canvas;
-
-	// Global font reference
-	// let _fontRegular;
-
-	// Reset Globals
-	_neurostates = [],
-	_progressions = [],
-	_actives = [], // Animation queue
-	_direction = undefined;
-
-	growing = true; 
-
-	// Preload any required assets
-	p.preload = function () {
-		// Load font
-		// _fontRegular = p.loadFont(GLOBAL.base_url + "/fonts/WhitneyHTF-Medium.otf");
-	};
 
 	p.setup = function () {
 		p.frameRate(30);
@@ -90,7 +65,6 @@ let sprout = function (p) {
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
 
 		nnn_start();
-
 		set_states();
 
 		// Setup NeuronCoordinator
@@ -99,11 +73,10 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		// NeuronCoordinator.animate();
+		NeuronCoordinator.animate();
 	}
 
 	function nnn_start () {
-		// Initialize the _nnn with args[0] = neuron amount, args[1] = general complexity, args[2] = 'p' instance
 		_nnn = new NNN ({
 			num_neurons: _nnn_count,
 			complexity: 13,
@@ -113,30 +86,9 @@ let sprout = function (p) {
 		});
 
 		_nnn.initialize();
-
-	}
-
-	function recurse () {
-		_nnn.neurons.forEach(function(neuron){
-			neuron.nodes.forEach(function(n) {
-				if (n.leaf) {
-					neuron.adj(n).forEach(function(nn) {
-						nn.size = true;
-					});
-				}
-			});
-		});
 	}
 
 	function set_states () {
-
-		/*  Given: 9 slides
-			Neurostate object to load per slide
-	
-			Symetrical in both directions
-
-		*/
-
 		_neurostates = [
 			{
 		        name: "Initialize",
@@ -304,17 +256,206 @@ let sprout = function (p) {
 		});	
 	}
 
+	function set_animations () {
+		this.animations = {
+			Brain: {
+				duration: 75,
+				update: _nnn.render_brain_update.bind(_nnn),
+				render: _nnn.render_brain_render.bind(_nnn),
+				init: _nnn.forward_render_brain_init.bind(_nnn),
+	    	},
+	    	Connect: {
+				duration: 100,
+				forward_update: _nnn.render_brain_lines_update.bind(_nnn),
+				forward_render: _nnn.render_brain_lines_render.bind(_nnn),
+	    	},
+	    	Disconnect: {
+				duration: 100,
+				forward_update: _nnn.fadeOut_brain_lines_update.bind(_nnn),
+				forward_render: _nnn.fadeOut_brain_lines_render.bind(_nnn),
+	    	},
+	    	Fade_In: {
+				duration: 32,
+				update: _nnn.fadeIn_update.bind(_nnn),
+				render: _nnn.fadeIn_render.bind(_nnn),
+				init: _nnn.fade_init.bind(_nnn),
+	    	},
+	    	Fade_Out: {
+				duration: 32,
+				update: _nnn.fadeOut_update.bind(_nnn),
+				render: _nnn.fadeOut_render.bind(_nnn),
+				init: _nnn.fade_init.bind(_nnn),
+	    	},
+	    	Grow: {
+				duration: 100,
+				update: _nnn.grow_update.bind(_nnn),
+				render: _nnn.grow_render.bind(_nnn),
+				init: _nnn.forward_grow_init.bind(_nnn),
+	    	},
+	    	Last_Position: {
+				duration: 45,
+				update: _nnn.last_position_update.bind(_nnn),
+				render: _nnn.last_position_render.bind(_nnn),
+	    	},
+	        Rebound_1: {
+	        	duration: 50,
+				update: _nnn.rebound_1_update.bind(_nnn),
+				render: _nnn.rebound_1_render.bind(_nnn),
+	        },
+	        Rebound_2: {
+				duration: 45,
+				update: _nnn.rebound_2_update.bind(_nnn),
+				render: _nnn.rebound_2_render.bind(_nnn),
+	    	},
+	    	Rebound_3: {
+				duration: 45,
+				update: _nnn.rebound_3_update.bind(_nnn),
+				render: _nnn.rebound_3_render.bind(_nnn),
+	    	},
+	    	Rebound_4: {
+				duration: 75,
+				update: _nnn.rebound_4_update.bind(_nnn),
+				render: _nnn.rebound_4_render.bind(_nnn),
+	    	},
+			Scatter: {
+				duration: 60,
+				update: _nnn.scatter_update.bind(_nnn),
+				render: _nnn.scatter_render.bind(_nnn),
+				init: _nnn.scatter_init.bind(_nnn),
+	    	},
+	    	Scatter_2: {
+				duration: 50,
+				update: _nnn.scatter_2_update.bind(_nnn),
+				render: _nnn.scatter_2_render.bind(_nnn),
+				init: _nnn.scatter2_init.bind(_nnn),
+	    	},
+	    	Start_Position: {
+				duration: 30,
+				update: _nnn.start_position_update.bind(_nnn),
+				render: _nnn.start_position_render.bind(_nnn),
+	    	},
+	    	Stary_Night: {
+				duration: 45,
+				update: _nnn.stary_night_update.bind(_nnn),
+				render: _nnn.stary_night_render.bind(_nnn),
+				init: _nnn.stary_night_init.bind(_nnn),
+	    	},
+	    	Synapse: {
+				duration: 32,
+				update: _nnn.synapse_update.bind(_nnn),
+				render: _nnn.synapse_render.bind(_nnn),
+				init: _nnn.synapse_init.bind(_nnn),
+				loop: true,
+	    	},
+	    	Twinkle: {
+				duration: 30,
+				update: _nnn.twinkle_update.bind(_nnn),
+				render: _nnn.twinkle_render.bind(_nnn),
+				loop: true,
+	    	},
+	    	Twinkle_2: {
+				duration: 30,
+				update: _nnn.twinkle_2_update.bind(_nnn),
+				render: _nnn.twinkle_2_render.bind(_nnn),
+				loop: true,
+	    	}
+		};
+
+		this.animations = this.animations.map(function (args) {
+		    return new Animation(args);
+		});	
+	}
+
+	function set_neurostates (animations) {
+		this.neurostates = [ // One Neurostate / Slide
+			{
+				slide: 0,
+				forward_animations: [],
+				reverse_animations: [
+					animations.Rebound_1,
+				],
+	    	},
+	    	{
+				slide: 1,
+				forward_animations: [
+					animations.Scatter,
+					animations.Twinkle,
+				],
+				reverse_animations: [
+					animations.Start_Position,
+					animations.Fade_Out,
+				],
+	    	},
+	    	{
+				slide: 2,
+				forward_animations: [
+					animations.Scatter_2,
+					animations.Grow,
+				],
+				reverse_animations: [
+					animations.Grow,
+				],
+	    	},
+	    	{
+				slide: 3,
+				forward_animations: [
+					animations.Synapse,
+				],
+				reverse_animations: [
+					animations.Synapse,
+				],
+	    	},
+	    	{
+				slide: 4,
+				forward_animations: [
+					animations.Fade_Out,
+				],
+				reverse_animations: [
+					animations.Rebound_3,
+					animations.Last_Position,
+				],
+	    	},
+	    	{
+				slide: 5,
+				forward_animations: [
+					animations.Rebound_2,
+					animations.Stary_Night,
+					animations.Twinkle_2,
+				],
+				reverse_animations: [
+					animations.Rebound_4,
+					animations.Stary_Night,
+					animations.Twinkle_2,
+				],
+	    	},
+	    	{
+				slide: 6,
+				forward_animations: [
+					animations.Rebound_3,
+					animations.Brain,
+				],
+				reverse_animations: [
+					animations.Disconnect,
+				],
+	    	},
+	    	{
+				slide: 7,
+				forward_animations: [
+					animations.Connect,
+				],
+				reverse_animations: [],
+	    	},
+		];
+
+		this.neurostates = this.neurostates.map(function (args) {
+		    return new Neurostate(args);
+		});	
+	}
+
 	// ------------------------------------------------
 	// Event Bindings
 
-	// Deal with resize events
 	window.onresize = function() { 
-		// p.resizeCanvas(window.innerWidth, window.innerHeight);
-
-     	// _svg_object.resize();
-
-     	// NeuronCoordinator.resize_sync(); // Let's begin at the beginning..
-
      	function abs_pos() {
      		let nn = $('.neural-network');
      			nn.addClass('absolute-pos')
@@ -337,10 +478,6 @@ let sprout = function (p) {
      	}
 
      	rel_pos();
-
-
-     	// p.draw();
-     	// p.draw();
 	}
 }
 

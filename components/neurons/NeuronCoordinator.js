@@ -72,11 +72,6 @@ NeuronCoordinator.updateT = function (t) {
 				NC.step();
 				NC.update();
 
-				/* Debug
-					console.log('tracing time');
-					console.log('_t ' + _t + " | _tg " + _tg);
-				*/
-
 				if (_t > (_tg - _step * 2)) {
 					console.log(_t + " " + _tg);
 					_p.loop();
