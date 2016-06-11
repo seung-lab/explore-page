@@ -73,12 +73,36 @@ class Amazing extends TeaTime {
 		$('story-text').addClass('transition-none');
 
 		this.animations = {
-			text: $.Deferred().resolve(),
 			video: $.Deferred().resolve(),
 			load: null,
+			text: {
+				current: $.Deferred().resolve(),
+				exit_slide: this.slides[0],
+				next: null,
+			},
 		};
 
 		this.view = this.generateView();
+	}
+
+	enqueueTextAnimation (fn) {
+		let _this = this;
+
+		if (_this.animations.text.current.state() !== 'pending') {
+			_this.animations.text.current = fn()
+				.always(function () {
+					if (_this.animations.text.next) {
+						_this.animations.text.current = _this.animations.text.next();
+					}
+
+					_this.animations.text.next = null;
+				});
+
+			_this.animations.text.next = null; 
+		}
+		else {
+			_this.animations.text.next = fn;
+		}
 	}
 
 	generateView () {
@@ -321,106 +345,133 @@ class Amazing extends TeaTime {
 		}
 	}
 
-	render (prev_t, t) {
-		let _this = this; 
+	renderText (prev_t, t) {
+		let _this = this;
 
 		let slide = this.slideAt(t);
 		let prev_slide = this.slideAt(prev_t);
 
-		// Animate Exit
-		if (((prev_t > t) && (prev_slide.exit)) || ((prev_slide.index === 4) && (slide.index === 4))) { // Reverse
-			let element = this.view.textcontainer;
-
-			element
-				.addClass(prev_slide.exit_reverse)
-				.removeClass('transition-show');
-
-			setTimeout(function() {
-				element
-					.removeClass('transition-state')
-					.removeClass(prev_slide.exit)
-					.removeClass(prev_slide.enter)
-					.removeClass(prev_slide.exit_reverse)
-					.removeClass(prev_slide.enter_reverse);
-
-				_this.view.text.html(splitter(slide.text, slide.ipyramid));
-
-				setTimeout(function() {
-					updateText("reverse");
-				}, 250);
-			}, 500);
+		if (!slide.big && !slide.text) {
+			throw new Error("slide did not specify text or big.");
 		}
-		else if (prev_slide.exit && slide.index !== 0) { // Forward
-			let element = this.view.textcontainer;
-
-			element
-				.addClass(prev_slide.exit)
-				.removeClass('transition-show');
-
-			setTimeout(function() {
-				element
-					.removeClass('transition-state')
-					.removeClass(prev_slide.exit)
-					.removeClass(prev_slide.enter)
-					.removeClass(prev_slide.exit_reverse)
-					.removeClass(prev_slide.enter_reverse);
-
-				_this.view.text.html(splitter(slide.text, slide.ipyramid));
-				
-				setTimeout(function() {
-					updateText();
-				}, 250);
-			}, 500);
+		
+		if (prev_t > t) { // Reverse,  Animate Exit
+			_this.animateText(prev_slide, slide, 'reverse');
+		}
+		else if (slide.index === _this.slides.length - 1 && prev_slide.index !== _this.slides.length - 2) { // Rear Entry
+			_this.setText(slide);			
+			_this.animateTextEnter(slide, 'reverse');
+		}
+		else if (slide.index !== 0) { // Forward
+			_this.animateText(prev_slide, slide, 'forward');
 		} 
-		else if (slide.index === 0) { // Starting
+		else { // Entering from previous section
+			_this.setText(slide);			
+			_this.animateTextEnter(slide, 'forward');
+		}
+	}
 
-				_this.view.text.html(splitter(slide.text, slide.ipyramid));
+	animateText (prev_slide, slide, direction) {
+		let _this = this;
 
-			setTimeout(function() {
-				updateText();
-			}, 500);
-		} 
-		else { // No Transition
-			if (_this.view.text.text()) {
-				_this.view.text.html(splitter(slide.text, slide.ipyramid));
-			}
-			updateText();
+		this.enqueueTextAnimation(function () {
+			return _this.animateTextExit(_this.animations.text.exit_slide, direction) 
+				.then(function () {
+					_this.setText(slide);
+					
+					_this.animations.text.exit_slide = slide;
+					return _this.animateTextEnter(slide, direction);
+				});
+		})
+	}
+	
+	animateTextEnter (slide, direction) {
+		let _this = this;
+		
+		let element = this.view.textcontainer;
+
+		let transition = direction === "forward"
+			? slide.enter 
+			: slide.enter_reverse;
+
+		if (!transition) {
+			return $.Deferred().resolve();
 		}
 
-		function updateText(direction = "forward") {
-			if (_this.view.text.text()) {
+		let deferred = $.Deferred();
 
-						// Replace with update TEXT
-				if (!slide.supertext) {
-					_this.view.supertext.hide();
-					_this.view.textcontainer.removeClass('visible-supertext');
-				}
-				else {
-					_this.view.supertext.text(slide.supertext).show();
-					_this.view.textcontainer.addClass('visible-supertext');
-				}
+		element
+			.addClass('transition-state')
+			.addClass(transition)
+			.addClass('transition-show')
+			.transitionend(utils.onceify(function (transition) {
+				setTimeout(function () {
+					deferred.resolve();
+				}, 0);
+			}));
 
-				// Animate Entrance
-				if (slide.enter) {
-					let transition;
-					direction === "forward"
-						? transition = slide.enter 
-						: transition = slide.enter_reverse;
-					_this.view.textcontainer
-						.addClass('transition-state')
-						.addClass(transition)
-						.addClass('transition-show');
-				} 
-			}
+		return deferred;
+	}
+
+	animateTextExit (slide, direction) { // Needs to accept the slide index of the most recently completed animation
+		let _this = this;
+		let counter = 0;
+
+		let element = this.view.textcontainer;
+
+		let exit_direction = direction === 'forward'
+			? slide.exit
+			: slide.exit_reverse;
+
+		let deferred = $.Deferred();
+
+	    element
+	    	.addClass('transition-state')
+			.addClass(exit_direction)
+			.removeClass('transition-show')
+			.transitionend(function () {
+				if (counter > 0) {
+					return;
+				}
+				element
+		   			.removeClass('transition-state')
+					.removeClass(slide.exit)
+					.removeClass(slide.enter)
+					.removeClass(slide.exit_reverse)
+					.removeClass(slide.enter_reverse)
+						
+				setTimeout(function () {
+					deferred.resolve();
+				}, 0);
+
+				counter++;
+
+			});
+
+		return deferred;
+	}
+
+	setText (slide) {
+		let _this = this;
+
+		// Replace with update TEXT
+		if (!slide.supertext) {
+			_this.view.supertext.hide();
+			_this.view.textcontainer.removeClass('visible-supertext');
+		}
+		else {
+			_this.view.supertext.text(slide.supertext).show();
+			_this.view.textcontainer.addClass('visible-supertext');
 		}
 
-		// else {
-		// 	_this.view.text.html(splitter(slide.text, slide.ipyramid));
-		// 	debugger;
-		// }
+		_this.view.text.html(splitter(slide.text, slide.ipyramid));
+	}
 
-		this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);
+	render (t_prev, t) {
+		let _this = this; 
 
+		_this.renderText(t_prev, t);
+		
 		if (this.entered) {
 			this.playVideo();
 		}

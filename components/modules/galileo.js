@@ -109,11 +109,9 @@ class Galileo extends TeaTime {
 	enqueueTextAnimation (fn) {
 		let _this = this;
 
-		//fn = utils.compose.call(this, _this.clearText, fn);
-
-		if (_this.animations.text.current.state() !== 'pending') { // If the current animation is complete
+		if (_this.animations.text.current.state() !== 'pending') {
 			_this.animations.text.current = fn()
-				.always(function () { // Call this once the Deferred resolves
+				.always(function () {
 					if (_this.animations.text.next) {
 						_this.animations.text.current = _this.animations.text.next();
 					}
@@ -124,8 +122,7 @@ class Galileo extends TeaTime {
 			_this.animations.text.next = null; 
 		}
 		else {
-			_this.animations.text.next = fn; // If we're still working on current animation, set up next.
-			console.log(_this.animations.text.next);
+			_this.animations.text.next = fn;
 		}
 	}
 

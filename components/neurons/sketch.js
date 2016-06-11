@@ -99,7 +99,7 @@ let sprout = function (p) {
 	};
 
 	p.draw = function() {
-		NeuronCoordinator.animate();
+		// NeuronCoordinator.animate();
 	}
 
 	function nnn_start () {
