@@ -292,7 +292,7 @@ function Node (args = {}) {
 		// If called as spring, accepts neighbor_nodes object
 
 	this.separate = function(nodes, leaf) {
-		let desiredseparation = 25.0;
+		let desiredseparation = 50.0;
 		let steer = p.createVector(0,0);
 		let count = 0;
 		let node;
@@ -301,13 +301,13 @@ function Node (args = {}) {
 		nodes.forEach(function(other) {
 
 		  	if (_this.distribute) {
-		  		desiredseparation = _radius; // If we're in spring mode, desired separation = distance from this to other
+		  		desiredseparation = 50; // If we're in spring mode, desired separation = distance from this to other
 		  	}
 	  		
 	  		// Calc distance from growing nodes
 			let d = p5.Vector.dist(_this.position, other.position);	
 			
-			// If the distance is greater than 0 and less than an arbitrary amount (0 when you are yosurself)
+			// If the distance is greater than 0 and less than an arbitrary amount (0 avoid self)
 			if ((d > 0) && (d < desiredseparation)) {
 				// Calculate vector pointing away from neighbor
 				let diff = p5.Vector.sub(_this.position,other.position);
@@ -387,7 +387,7 @@ function Node (args = {}) {
 		// !Important --> Must be called outside of node 
 		// !Important --> Requires list of nodes
 
-	this.spread = function(somas, rad, multiplier) {
+	this.spread = function(somas, multiplier) {
 		_radius = rad;
 
 		_this.distribute = true;
@@ -575,7 +575,7 @@ function Node (args = {}) {
 
 	// Accepts an Array of Node Objects
 	this.space = function(nodes, multiplier) {
-		_this.spread(nodes, _this.radius, multiplier);
+		_this.spread(nodes, multiplier);
 		_this.update();
 	}
 

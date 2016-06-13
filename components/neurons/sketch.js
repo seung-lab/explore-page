@@ -1,5 +1,5 @@
 // Growing Neurons
-// Alex Norton :: 2015
+// Alex Norton :: 2016
 
 // Recursive Neuron (P5js)
 
@@ -7,7 +7,6 @@ let Easing = require('../../clientjs/easing.js'),
 	Kruskal = require('./kruskal.js'),
 	NNN = require('./nnn.js'), // neural network
 	NeuronCoordinator = require('./NeuronCoordinator.js'), // neuron coordinator
-	Animation = require('./animation.js'), // animation
 	Neurostate = require('./neurostate.js'), // neurostate
 	p5 = require('p5'), 
 	SVG_Object = require('./parse-svg.js'),
@@ -69,7 +68,7 @@ let sprout = function (p) {
 		// Setup NeuroCoordinator
 
 		set_animations();
-		set_neurostates(this.animations);
+		set_neurostates(_animations);
 
 		// Setup NeuronCoordinator
 		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
@@ -90,13 +89,13 @@ let sprout = function (p) {
 	    	},
 	    	Connect: {
 				duration: 100,
-				forward_update: _nnn.render_brain_lines_update.bind(_nnn),
-				forward_render: _nnn.render_brain_lines_render.bind(_nnn),
+				update: _nnn.render_brain_lines_update.bind(_nnn),
+				render: _nnn.render_brain_lines_render.bind(_nnn),
 	    	},
 	    	Disconnect: {
 				duration: 100,
-				forward_update: _nnn.fadeOut_brain_lines_update.bind(_nnn),
-				forward_render: _nnn.fadeOut_brain_lines_render.bind(_nnn),
+				update: _nnn.fadeOut_brain_lines_update.bind(_nnn),
+				render: _nnn.fadeOut_brain_lines_render.bind(_nnn),
 	    	},
 	    	Fade_In: {
 				duration: 32,
@@ -184,14 +183,10 @@ let sprout = function (p) {
 				loop: true,
 	    	}
 		};
-
-		this.animations = this.animations.map(function (args) {
-		    return new Animation(args);
-		});	
 	}
 
 	function set_neurostates (animations) {
-		this.neurostates = [ // One Neurostate / Slide
+		_neurostates = [ // One Neurostate / Slide
 			{
 				slide: 0,
 				forward_animations: [],
@@ -271,7 +266,7 @@ let sprout = function (p) {
 	    	},
 		];
 
-		this.neurostates = this.neurostates.map(function (args) {
+		_neurostates = _neurostates.map(function (args) {
 		    return new Neurostate(args);
 		});	
 	}

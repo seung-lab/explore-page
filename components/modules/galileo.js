@@ -109,11 +109,11 @@ class Galileo extends TeaTime {
 	enqueueTextAnimation (fn) {
 		let _this = this;
 
-		if (_this.animations.text.current.state() !== 'pending') {
+		if (_this.animations.text.current.state() !== 'pending') { // If done or nonexistent
 			_this.animations.text.current = fn()
 				.always(function () {
 					if (_this.animations.text.next) {
-						_this.animations.text.current = _this.animations.text.next();
+						_this.animations.text.current = _this.animations.text.next(); // Queue up next animation
 					}
 
 					_this.animations.text.next = null;
@@ -122,7 +122,7 @@ class Galileo extends TeaTime {
 			_this.animations.text.next = null; 
 		}
 		else {
-			_this.animations.text.next = fn;
+			_this.animations.text.next = fn; // If in progress, queue next animation
 		}
 	}
 
@@ -257,14 +257,14 @@ class Galileo extends TeaTime {
 		}
 		
 		if (prev_t > t) { // Reverse,  Animate Exit
-			_this.animateText(prev_slide, slide, 'reverse');
+			_this.animateText(slide, 'reverse');
 		}
 		else if (slide.index === _this.slides.length - 1 && prev_slide.index !== _this.slides.length - 2) { // Rear Entry
 			_this.setText(slide);			
 			_this.animateTextEnter(slide, 'reverse');
 		}
 		else if (slide.index !== 0) { // Forward
-			_this.animateText(prev_slide, slide, 'forward');
+			_this.animateText(slide, 'forward');
 		} 
 		else { // Entering from previous section
 			_this.setText(slide);			
@@ -272,7 +272,7 @@ class Galileo extends TeaTime {
 		}
 	}
 
-	animateText (prev_slide, slide, direction) {
+	animateText (slide, direction) {
 		let _this = this;
 
 		this.enqueueTextAnimation(function () {
@@ -283,7 +283,7 @@ class Galileo extends TeaTime {
 					_this.animations.text.exit_slide = slide;
 					return _this.animateTextEnter(slide, direction);
 				});
-		})
+		});
 	}
 	
 	animateTextEnter (slide, direction) {
