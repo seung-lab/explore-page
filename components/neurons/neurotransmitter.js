@@ -5,13 +5,15 @@ let $ = require('jquery');
 
 class Neurotransmitter {
 	constructor(args = {}) {
-		this.duration = args.duration 		|| 0;
-		this.initialize  = args.initialize  || function(){};
-		this.update  = args.update  		|| function(){};
-		this.render  = args.render  		|| function(){};
+		this.duration = args.duration 	|| 0;
+		this.update = args.update  		|| function(){};
+		this.render = args.render  		|| function(){};
+		this.initialize = args.init  	|| function(){};
+		this.loop = args.loop 			|| false;
 
 		this.deferred = $.Deferred().resolve();
-		this.counter  = 0; 
+		this.counter  = 0;
+		this.initialized = false; 
 
 		let _this = this;
 	}
@@ -20,7 +22,8 @@ class Neurotransmitter {
 		let _this = this;
 
 		_this.deferred = $.Deferred();
-		_this.counter = 0;	
+		_this.counter = 0;
+		_this.initialized = true;	
 
 		_this.initialize(); // Set up animation
 	}

@@ -39,7 +39,9 @@ class NeuronCoordinator {
 		_this.initialized = true;
 		_this.animations = {
 			neurostate: _this.neurostates[0],
-			current: null,
+			current: {
+				deferred: $.Deferred().resolve(),
+			}
 		};
 
 	};
@@ -76,6 +78,7 @@ class NeuronCoordinator {
 
 	queueNeurostate(direction) {
 		let _this = this;
+
 		if (_this._t_queue.length === 0) {
 			_this.neurostate = null;
 			return;
@@ -97,6 +100,7 @@ class NeuronCoordinator {
 
 			if (animations.length === 0) {
 				_this.animations.neurostate.deferred.resolve();
+				return;
 			}
 				
 			_this.queueAnimation(animations);
@@ -106,37 +110,34 @@ class NeuronCoordinator {
 	// Complete Animations
 	queueAnimation (animations, index = 0) {
 		let _this = this;
+		
 		if (animations.length === 0) {
 			return;
 		}
 
-		if (!_this.animations.current) { // Starting Hack
+		if (_this.animations.current.deferred.state() !== 'pending') {
 			_this.animations.current = animations[index];
-			_this.animations.current = new Neurotransmitter ({
-				duration: _this.animations.current.duration,
-				update: _this.animations.current.update,
-				render: _this.animations.current.render,
-				init: _this.animations.current.init,
-			});
-		}
-
-		if (_this.animations.current.deferred.state() !== 'pending') { // If done or nonexistent
-			_this.animations.current = animations[index]; // Assign new animation
 
 			_this.animations.current = new Neurotransmitter ({
 				duration: _this.animations.current.duration,
 				update: _this.animations.current.update,
 				render: _this.animations.current.render,
 				init: _this.animations.current.init,
+				loop: _this.animations.current.loop,
 			});
 
-			_this.animations.current.init(); // Set up Animation
+			_this.animations.current.init();
 
 			_this.animations.current.deferred.then(function () {
 				index++;
-				if (animations.length < index) {
+
+				if (index < animations.length) {
 					_this.queueAnimation(animations, index);
+					return;
 				}
+
+				_this.animations.neurostate.deferred.resolve();
+
 			});
 		}
 	}
@@ -146,7 +147,7 @@ class NeuronCoordinator {
 		let _this = this,
 			animation = _this.animations.current;
 
-		if (!animation) {
+		if (!animation.initialized) {
 			return;
 		}
 
@@ -174,9 +175,20 @@ class NeuronCoordinator {
 
 		if (counter < duration) {
 			animation.counter++;
+			return;
 		} else {
 			animation.deferred.resolve();
 		}
+
+		if (animation.loop) {
+			return;
+		}
+
+		if (_this._t_queue.length > 0) {
+			return;
+		}
+
+		_this.p.noLoop();
 	}
 
 	// Update position, state, etc
