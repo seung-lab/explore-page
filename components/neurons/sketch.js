@@ -41,11 +41,18 @@ let sprout = function (p) {
 		canvas.parent(_options.anchor);
 		
 		_startSize.set(_options.width, _options.height);
-		_canvas.resolve(canvas.elt); // --> Will's sneaky deferred shenanigans
+		_canvas.resolve(canvas.elt);
 
 		let _svg_object = new SVG_Object({
 			p: p,
 			density: density,
+		});
+
+		// ------------------------------------------------
+		// Start NeuronCoordinator
+
+		NeuronCoordinator = new NeuronCoordinator ({
+			p: p,
 		});
 
 		// ------------------------------------------------
@@ -71,8 +78,8 @@ let sprout = function (p) {
 		set_neurostates(_animations);
 
 		// Setup NeuronCoordinator
-		NeuronCoordinator.initialize(_neurostates, _options.slide_count, p);
-		NeuronCoordinator.updateT(0);
+		NeuronCoordinator.initialize(_neurostates);
+		NeuronCoordinator.updateQueue(0);
 	};
 
 	p.draw = function() {
@@ -80,12 +87,12 @@ let sprout = function (p) {
 	}
 
 	function set_animations () {
-		this.animations = {
+		_animations = {
 			Brain: {
 				duration: 75,
 				update: _nnn.render_brain_update.bind(_nnn),
 				render: _nnn.render_brain_render.bind(_nnn),
-				init: _nnn.forward_render_brain_init.bind(_nnn),
+				init: _nnn.render_brain_init.bind(_nnn),
 	    	},
 	    	Connect: {
 				duration: 100,
@@ -113,7 +120,7 @@ let sprout = function (p) {
 				duration: 100,
 				update: _nnn.grow_update.bind(_nnn),
 				render: _nnn.grow_render.bind(_nnn),
-				init: _nnn.forward_grow_init.bind(_nnn),
+				init: _nnn.grow_init.bind(_nnn),
 	    	},
 	    	Last_Position: {
 				duration: 45,
@@ -188,14 +195,12 @@ let sprout = function (p) {
 	function set_neurostates (animations) {
 		_neurostates = [ // One Neurostate / Slide
 			{
-				slide: 0,
 				forward_animations: [],
 				reverse_animations: [
 					animations.Rebound_1,
 				],
 	    	},
 	    	{
-				slide: 1,
 				forward_animations: [
 					animations.Scatter,
 					animations.Twinkle,
@@ -206,7 +211,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 2,
 				forward_animations: [
 					animations.Scatter_2,
 					animations.Grow,
@@ -216,7 +220,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 3,
 				forward_animations: [
 					animations.Synapse,
 				],
@@ -225,7 +228,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 4,
 				forward_animations: [
 					animations.Fade_Out,
 				],
@@ -235,7 +237,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 5,
 				forward_animations: [
 					animations.Rebound_2,
 					animations.Stary_Night,
@@ -248,7 +249,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 6,
 				forward_animations: [
 					animations.Rebound_3,
 					animations.Brain,
@@ -258,7 +258,6 @@ let sprout = function (p) {
 				],
 	    	},
 	    	{
-				slide: 7,
 				forward_animations: [
 					animations.Connect,
 				],
@@ -317,7 +316,7 @@ module.exports.updateState = function (t) {
 		return;
 	}
 
-	NeuronCoordinator.updateT(t);
+	NeuronCoordinator.updateQueue(t);
 };
 
 module.exports.canvas = function () {

@@ -388,8 +388,6 @@ function Node (args = {}) {
 		// !Important --> Requires list of nodes
 
 	this.spread = function(somas, multiplier) {
-		_radius = rad;
-
 		_this.distribute = true;
 		
 		let cen = _this.seek(_center).mult(-1); // Simply seek away from center

@@ -10,7 +10,7 @@ class Neurotransmitter {
 		this.update  = args.update  		|| function(){};
 		this.render  = args.render  		|| function(){};
 
-		this.deferred = $.Deferred();
+		this.deferred = $.Deferred().resolve();
 		this.counter  = 0; 
 
 		let _this = this;
@@ -35,5 +35,6 @@ class Neurotransmitter {
 		let _this = this;
 		_this.render();
 	}
+}
 
 module.exports = Neurotransmitter;

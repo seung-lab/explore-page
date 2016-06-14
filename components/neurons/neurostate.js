@@ -9,10 +9,11 @@ class Neurostate {
 		this.forward_animations = args.forward_animations || [];
 		this.reverse_animations = args.reverse_animations || [];
 
-		this.deferred = $.Deferred();
+		this.deferred = $.Deferred().resolve();
 		this.counter  = 0; 
 
 		let _this = this;
+
 	}
 
 	init() {
