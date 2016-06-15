@@ -586,10 +586,7 @@ function Node (args = {}) {
 			return true;
 		}
 
-		console.log(_this.bound);
-
 		_this.update();
-
 	}
 
 	// ------------------------------------------------

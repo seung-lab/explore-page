@@ -198,6 +198,8 @@ function NNN (args = {}) {
 			}
 
 			alpha = 1;
+
+			console.log('buffer created');
 		}
 
 		function fadeIn() {
@@ -252,6 +254,12 @@ function NNN (args = {}) {
 			clearBuffer: function() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 			},
+			resetBuffer: function() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				image = {};
+
+				_this.buffer = false;
+			},
 			fadeIn: function() {
 				fadeIn();
 			},
@@ -260,15 +268,6 @@ function NNN (args = {}) {
 			},
 			fade_reset: function() {
 				alpha = 1;
-			},
-			zero_alpha: function() {
-				if (typeof image === "undefined") {
-				    return; // Be aware this needs to be defined
-				}
-				// set every fourth value -> alpha to 0
-				for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-					imageData[i] = 0;
-				}
 			},
 			isEmpty: function() {
 				if (typeof image === "undefined") {
@@ -308,6 +307,7 @@ NNN.prototype.scatter_init = function() {
 		let soma = neuron.nodes[0];
 			soma.reset_power();
 			soma.distribute = true;
+			soma.bound = false;
 		
 		let x = this.p.width / 2 + this.p.random(-2,2);
 		let y = this.p.height / 2 + this.p.random(-2,2); 
@@ -337,6 +337,7 @@ NNN.prototype.scatter2_init = function() {
 		let soma = neuron.nodes[0];
 			soma.reset_power();
 			soma.distribute = true;
+			soma.bound = false;
 	});
 }
 
@@ -370,9 +371,10 @@ NNN.prototype.grow_init = function() {
 			soma.distribute = false;
 	});
 
-	this.drawMan.clearBuffer();
+	if (this.buffer) {
+		this.drawMan.resetBuffer();
+	}
 
-	this.buffer = false; // Reset Canvas buffer
 	this.growing = true; // Here we go again
 }
 
@@ -471,7 +473,7 @@ NNN.prototype.fadeIn_render = function() {
 	this.render_soma();
 }
 
-NNN.prototype.fade_init = function() {
+NNN.prototype.fadeIn_init = function() {
 	this.drawMan.fade_reset();
 }
 
@@ -487,9 +489,18 @@ NNN.prototype.fadeOut_render = function() {
 	this.render_soma();
 }
 
-NNN.prototype.reverse_fade_init = function() {
+NNN.prototype.fadeOut_init = function() {
+	if (!this.buffer) {
+		this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
+			neuron.render(); // Make sure canvas has pixels
+		});
+
+		this.drawMan.createBuffer();
+		this.buffer = true; // If only partial
+		console.log('whip');
+	}
+
 	this.drawMan.fade_reset();
-	this.drawMan.zero_alpha();
 }
 
 // ------------------------------------------------

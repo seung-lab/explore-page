@@ -111,13 +111,13 @@ let sprout = function (p) {
 				duration: 32,
 				update: _nnn.fadeIn_update.bind(_nnn),
 				render: _nnn.fadeIn_render.bind(_nnn),
-				init: _nnn.fade_init.bind(_nnn),
+				init: _nnn.fadeIn_init.bind(_nnn),
 	    	},
 	    	Fade_Out: {
 				duration: 32,
 				update: _nnn.fadeOut_update.bind(_nnn),
 				render: _nnn.fadeOut_render.bind(_nnn),
-				init: _nnn.fade_init.bind(_nnn),
+				init: _nnn.fadeOut_init.bind(_nnn),
 	    	},
 	    	Grow: {
 				duration: 100,
@@ -209,8 +209,9 @@ let sprout = function (p) {
 					animations.Twinkle,
 				],
 				reverse_animations: [
-					animations.Start_Position,
 					animations.Fade_Out,
+					animations.Start_Position,
+					animations.Twinkle,
 				],
 	    	},
 	    	{

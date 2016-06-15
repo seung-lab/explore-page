@@ -59,7 +59,7 @@ function Neuron (args) {
 	}
 
 	this.network_setup = function() {
-		let v = p.round(-2,2);
+		let v = p.random(-2,2);
 		let node = _this.nodes[0];
 			node.velocity.set(v,v);
 			node.size == true;
