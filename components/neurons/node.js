@@ -291,18 +291,13 @@ function Node (args = {}) {
 		// Accepts Array as input
 		// If called as spring, accepts neighbor_nodes object
 
-	this.separate = function(nodes, distribute) {
-		let desiredseparation = 100.0;
+	this.separate = function(nodes, desiredseparation = 100) {
 		let steer = p.createVector(0,0);
 		let count = 0;
 		let node;
 
 		// For every node in the system check if it's too close
 		nodes.forEach(function(other) {
-
-		  	if (distribute) {
-		  		desiredseparation = 250;
-		  	}
 	  		
 	  		// Calc distance from growing nodes
 			let d = p5.Vector.dist(_this.position, other.position);	
@@ -387,11 +382,10 @@ function Node (args = {}) {
 		// !Important --> Must be called outside of node 
 		// !Important --> Requires list of nodes
 
-	this.spread = function(somas, multiplier, distribute) {
-		_this.distribute = true;
+	this.spread = function(somas, multiplier, desiredseparation) {
 		
 		let cen = _this.seek(_center).mult(-1); 		// Simply seek away from center
-		let sep = _this.separate(somas, distribute); 	// Move away from eachother
+		let sep = _this.separate(somas, desiredseparation); 	// Move away from eachother
 		// let edg = _this.check_edges(); 				// Move away from edges
 
 		let aspect_ratio = p.height / p.width;
@@ -426,7 +420,7 @@ function Node (args = {}) {
 		// Accepts an Array of Node objects
 
 	this.expand = function(nodes) {
-		let sep = _this.separate(nodes, "leaf");      			// Separation
+		let sep = _this.separate(nodes);      					// Separation
 		let ini = _this.seek(_this.findRoot(_this)).mult(-1); 	// Root Node (multiply by -1 to repel)
 		let wan = _this.wander();             					// Wander
 
@@ -572,8 +566,8 @@ function Node (args = {}) {
 		// Consolidated list of all explosive forces
 
 	// Accepts an Array of Node Objects
-	this.space = function(nodes, multiplier, distribute = false) {
-		_this.spread(nodes, multiplier, distribute);
+	this.space = function(nodes, multiplier, desiredseparation = 100) {
+		_this.spread(nodes, multiplier, desiredseparation);
 		_this.update();
 	}
 
@@ -591,6 +585,8 @@ function Node (args = {}) {
 			_this.bound = false;
 			return true;
 		}
+
+		console.log(_this.bound);
 
 		_this.update();
 

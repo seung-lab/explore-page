@@ -305,13 +305,15 @@ NNN.prototype.scatter_render = function() {
 
 NNN.prototype.scatter_init = function() {
 	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
+		let soma = neuron.nodes[0];
+			soma.reset_power();
+			soma.distribute = true;
 		
 		let x = this.p.width / 2 + this.p.random(-2,2);
 		let y = this.p.height / 2 + this.p.random(-2,2); 
 
-		neuron.nodes[0].position.set(x,y); 	// Align neuron + soma
-		neuron.position.set(x,y); 			// Tightly pack neurons for better spread
+			neuron.position.set(x,y); 	// Tightly pack neurons for better spread
+			soma.position.set(x,y); 	// Align neuron & soma
 	});
 }
 
@@ -320,8 +322,9 @@ NNN.prototype.scatter_init = function() {
 
 NNN.prototype.scatter_2_update = function() {
 	this.neurons.forEach((neuron) => {
+		let separation = 250; // Experimentally determined
 		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_2, true); // Repel from center, spread more {true}
+			soma.space(this.somas, _scatter_multiplier_2, separation); // Repel from center + eachother
 	});
 }
 
@@ -331,7 +334,9 @@ NNN.prototype.scatter_2_render = function() {
 
 NNN.prototype.scatter2_init = function() {
 	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
+		let soma = neuron.nodes[0];
+			soma.reset_power();
+			soma.distribute = true;
 	});
 }
 
@@ -345,7 +350,6 @@ NNN.prototype.grow_update = function() {
 		}
 
 		neuron.grow(); // Run => Neurons
-
 	});
 }
 
@@ -361,6 +365,9 @@ NNN.prototype.grow_init = function() {
 	this.active_neurons.forEach((neuron) => {
 		neuron.has_boutons = false;
 		neuron.boutons.length = 0;
+
+		let soma = neuron.nodes[0];
+			soma.distribute = false;
 	});
 
 	this.drawMan.clearBuffer();
