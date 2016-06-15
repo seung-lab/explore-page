@@ -438,7 +438,7 @@ NNN.prototype.synapse_render = function() {
 
 		threshold = this.p.random(1); // Set threshold
 
-		if ((neuron.propagate_bool == false) && (threshold > 0.991)) {
+		if ((neuron.propagate_bool == false) && (threshold > 0.991)) { // Experimentally determined
 			neuron.propagate_bool = true;
 		}
 	}
@@ -738,9 +738,6 @@ NNN.prototype.initialize = function() {
 	_scatter_multiplier_2 = 1 - this.p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
 	_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
 	_scatter_multiplier_2 *= 250;
-
-	console.log(_scatter_multiplier_1);
-	console.log(_scatter_multiplier_2);
 
 	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
 

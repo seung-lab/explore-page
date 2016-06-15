@@ -43,6 +43,10 @@ let sprout = function (p) {
 		_startSize.set(_options.width, _options.height);
 		_canvas.resolve(canvas.elt);
 
+		// ------------------------------------------------
+		// Setup Brain SVG
+
+		let density = p.map(p.width, 350, 3000, 20, 50); // Brain svg spacing
 		let _svg_object = new SVG_Object({
 			p: p,
 			density: density,
@@ -58,7 +62,6 @@ let sprout = function (p) {
 		// ------------------------------------------------
 		// Start NNN
 
-		let density = p.map(p.width, 350, 3000, 20, 50); // Brain svg spacing
 		_nnn_count = p.ceil(p.min((p.width / 10), 200));
 		
 		_nnn = new NNN ({

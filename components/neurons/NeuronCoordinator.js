@@ -127,6 +127,7 @@ class NeuronCoordinator {
 			});
 
 			_this.animations.current.init();
+			_this.p.loop();
 
 			_this.animations.current.deferred.then(function () {
 				index++;
