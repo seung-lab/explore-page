@@ -291,8 +291,8 @@ function Node (args = {}) {
 		// Accepts Array as input
 		// If called as spring, accepts neighbor_nodes object
 
-	this.separate = function(nodes, leaf) {
-		let desiredseparation = 50.0;
+	this.separate = function(nodes, distribute) {
+		let desiredseparation = 100.0;
 		let steer = p.createVector(0,0);
 		let count = 0;
 		let node;
@@ -300,8 +300,8 @@ function Node (args = {}) {
 		// For every node in the system check if it's too close
 		nodes.forEach(function(other) {
 
-		  	if (_this.distribute) {
-		  		desiredseparation = 50; // If we're in spring mode, desired separation = distance from this to other
+		  	if (distribute) {
+		  		desiredseparation = 250;
 		  	}
 	  		
 	  		// Calc distance from growing nodes
@@ -387,12 +387,12 @@ function Node (args = {}) {
 		// !Important --> Must be called outside of node 
 		// !Important --> Requires list of nodes
 
-	this.spread = function(somas, multiplier) {
+	this.spread = function(somas, multiplier, distribute) {
 		_this.distribute = true;
 		
-		let cen = _this.seek(_center).mult(-1); // Simply seek away from center
-		let sep = _this.separate(somas); 		// Move away from eachother
-		// let edg = _this.check_edges(); 		// Move away from edges
+		let cen = _this.seek(_center).mult(-1); 		// Simply seek away from center
+		let sep = _this.separate(somas, distribute); 	// Move away from eachother
+		// let edg = _this.check_edges(); 				// Move away from edges
 
 		let aspect_ratio = p.height / p.width;
 		
@@ -572,8 +572,8 @@ function Node (args = {}) {
 		// Consolidated list of all explosive forces
 
 	// Accepts an Array of Node Objects
-	this.space = function(nodes, multiplier) {
-		_this.spread(nodes, multiplier);
+	this.space = function(nodes, multiplier, distribute = false) {
+		_this.spread(nodes, multiplier, distribute);
 		_this.update();
 	}
 
@@ -635,6 +635,22 @@ function Node (args = {}) {
 	}
 
 	// ------------------------------------------------
+	// Find Root
+
+		// Recurse through nodes to root
+		// Accepts Node object
+		// Returns p5.Vector object
+
+	this.findRoot = function(node) {
+		if (node.parent == null) {
+			return node.position;
+		}
+		else {
+			return _this.findRoot(node.parent);
+		}
+	}
+
+	// ------------------------------------------------
 	// Sub_T
 
 	this.sub_t = function (mxd) {
@@ -680,7 +696,7 @@ function Node (args = {}) {
 		let theta = _this.velocity.heading(); // Current Heading
 		let mag = _this.velocity.mag(); // Current speed
 		
-		theta += p.radians(angle); // Angle offset
+		theta += angle; // Angle offset
 		let newvel = p.createVector(mag * p.cos(theta),mag * p.sin(theta));
 
 		let node = new Node ({

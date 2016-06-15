@@ -171,8 +171,6 @@ class NeuronCoordinator {
 			counter = animation.counter,
 			duration = animation.duration;
 
-			console.log(animation.counter);
-
 		if (counter < duration) {
 			animation.counter++;
 			return;

@@ -321,7 +321,7 @@ NNN.prototype.scatter_init = function() {
 NNN.prototype.scatter_2_update = function() {
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_2); // Repel from center
+			soma.space(this.somas, _scatter_multiplier_2, true); // Repel from center, spread more {true}
 	});
 }
 
@@ -738,6 +738,9 @@ NNN.prototype.initialize = function() {
 	_scatter_multiplier_2 = 1 - this.p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
 	_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
 	_scatter_multiplier_2 *= 250;
+
+	console.log(_scatter_multiplier_1);
+	console.log(_scatter_multiplier_2);
 
 	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
 

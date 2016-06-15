@@ -44,7 +44,7 @@ function Neuron (args) {
 		let start_velocity = p.createVector(); // Change this value to determine simulation speed
 
 		// Create Soma
-		let n = new Node ({
+		let node = new Node ({
 			neuron_timer: 	_this.neuron_timer,
 			max_depth: 		_this.max_depth,
 			position: 		_this.position,
@@ -55,11 +55,11 @@ function Neuron (args) {
 			p: 				p,
 		});	
 
-		_this.nodes.push(n); 
+		_this.nodes.push(node); 
 	}
 
 	this.network_setup = function() {
-		let v = p.random(-2,2);
+		let v = p.round(-2,2);
 		let node = _this.nodes[0];
 			node.velocity.set(v,v);
 			node.size == true;
@@ -73,8 +73,10 @@ function Neuron (args) {
 		for (let i = 0; i < _this.num_branches; i++) {
 			start_angle = (theta * i) + p.radians(p.random(-15, 15)) + theta_const;
 			_this.nodes.push( // Branch a bunch of times
-				node.branch(p.degrees(start_angle, _this.nodes.length), i + 1)
+				node.branch(start_angle, i + 1)
 			);
+			
+			// debugger; // Check out latest nueron branch distribution
 		}
 	}
 
