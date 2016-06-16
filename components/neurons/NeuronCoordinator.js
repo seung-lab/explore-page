@@ -74,14 +74,6 @@ class NeuronCoordinator {
 			_this._t_queue.push(_this.neurostates[index]); // Add Neurostate
 		}
 
-		/*
-			Perhaps we only grow neurons if necessary?
-			Given skip amount..
-			Same for coming in reverse
-
-			Rendering is problem, not math || physics
-		*/
-
 		_this.queueNeurostate(_this._direction);
 
 		if (_this._t_queue.length > 2) {			

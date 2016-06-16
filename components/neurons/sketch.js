@@ -36,6 +36,8 @@ let sprout = function (p) {
 	p.setup = function () {
 		p.frameRate(30);
 
+		console.log('setup');
+
 		// ------------------------------------------------
 		// Setup Canvas
 

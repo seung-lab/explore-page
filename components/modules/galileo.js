@@ -407,7 +407,7 @@ class Galileo extends TeaTime {
 			return;
 		}
 
-		if (slide.index === 0) {
+		if (slide.index === 0 || !_this.sketch) {
 
 			_this.removeNeurons();
 
