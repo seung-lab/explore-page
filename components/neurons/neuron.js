@@ -184,7 +184,9 @@ function Neuron (args) {
 
 	this.calculate_paths = function() {
 			_this.calc_alp(); // Calculate Arc Length Parameterization
-			_this.final_position = _this.nodes[0].position.copy();
+			
+			_this.final_position.x = _this.nodes[0].position.x;
+			_this.final_position.y = _this.nodes[0].position.y;
 	}
 
 	// Adaptive Arc-Subdivision
