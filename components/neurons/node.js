@@ -291,7 +291,7 @@ function Node (args = {}) {
 		// Accepts Array as input
 		// If called as spring, accepts neighbor_nodes object
 
-	this.separate = function(nodes, desiredseparation = 100) {
+	this.separate = function(nodes, desiredseparation) {
 		let steer = p.createVector(0,0);
 		let count = 0;
 		let node;
@@ -420,7 +420,7 @@ function Node (args = {}) {
 		// Accepts an Array of Node objects
 
 	this.expand = function(nodes) {
-		let sep = _this.separate(nodes);      					// Separation
+		let sep = _this.separate(nodes, 100);      				// Separation
 		let ini = _this.seek(_this.findRoot(_this)).mult(-1); 	// Root Node (multiply by -1 to repel)
 		let wan = _this.wander();             					// Wander
 

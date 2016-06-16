@@ -370,44 +370,44 @@ function Neuron (args) {
 	}
 
 	this.grow = function() {
-		let n;
+		let node;
 
 		// Let's stop when the neuron gets too deep
 		// For every dendrite in the arraylist
 		for (let i = _this.nodes.length - 1; i >= 1; i--) {
 			// Get the Node object, update and draw it
-			n = _this.nodes[i];
-			n.grow(_this.nodes);
+			node = _this.nodes[i];
+			node.grow(_this.nodes);
 
-			if (n.isGrowing()) {
+			if (node.isGrowing()) {
 				continue;
 			}
 
-			if (n.depth >= _this.max_depth) {
+			if (node.depth >= _this.max_depth) {
 				_this.create_bouton();
 				continue;
 			}
 			
-			if (n.leaf) {
+			if (node.leaf) {
 				// For every other node added: add one or two branches to create natural form
 				// Could definitely have a better way of accessing neuron depth.. that would improve branching
-				if (((n.depth + 1) % 2 == 0) && (n.depth != 2)) {
-					_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
-					_this.nodes.push(n.branch(20,_this.nodes.length));   // Add one going left
+				if (((node.depth + 1) % 2 == 0) && (node.depth != 2)) {
+					_this.nodes.push(node.branch(-20, _this.nodes.length));    // Add one going right
+					_this.nodes.push(node.branch(20,_this.nodes.length));   // Add one going left
 				} 
 				else {
 					// Additional method for probabalistic branching
 					// Default rnd = 15% : could be higher
 					let rnd = p.random(1);
-					if ((rnd < 0.25) && ((n.depth + 1) < _this.max_depth )) {
-						_this.nodes.push(n.branch(-20, _this.nodes.length));    // Add one going right
-						_this.nodes.push(n.branch(20, _this.nodes.length));   // Add one going left
+					if ((rnd < 0.25) && ((node.depth + 1) < _this.max_depth )) {
+						_this.nodes.push(node.branch(-20, _this.nodes.length));    // Add one going right
+						_this.nodes.push(node.branch(20, _this.nodes.length));   // Add one going left
 					} 
 					else {
 						// Added boutons to end of Neuron --> Can be vastly improved to consider
 						// the entire 'distal' zone of the neuron.
 						_this.nodes.push(
-							n.branch(0, _this.nodes.length)
+							node.branch(0, _this.nodes.length)
 						);
 					} 
 				}

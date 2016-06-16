@@ -22,6 +22,8 @@ let _options = {
 
 let _canvas = $.Deferred();
 
+let NeuronController = new NeuronCoordinator ({});
+
 let sprout = function (p) {
 	let	canvas,
 		_nnn,
@@ -55,7 +57,7 @@ let sprout = function (p) {
 		// ------------------------------------------------
 		// Start NeuronCoordinator
 
-		NeuronCoordinator = new NeuronCoordinator ({
+		NeuronController = new NeuronCoordinator ({
 			p: p,
 		});
 
@@ -81,12 +83,12 @@ let sprout = function (p) {
 		set_neurostates(_animations);
 
 		// Setup NeuronCoordinator
-		NeuronCoordinator.initialize(_neurostates);
-		NeuronCoordinator.updateQueue(0);
+		NeuronController.initialize(_neurostates);
+		NeuronController.updateQueue(0);
 	};
 
 	p.draw = function() {
-		NeuronCoordinator.animate();
+		NeuronController.animate();
 	}
 
 	function set_animations () {
@@ -174,20 +176,20 @@ let sprout = function (p) {
 				init: _nnn.stary_night_init.bind(_nnn),
 	    	},
 	    	Synapse: {
-				duration: 32,
+				duration: 1,
 				update: _nnn.synapse_update.bind(_nnn),
 				render: _nnn.synapse_render.bind(_nnn),
 				init: _nnn.synapse_init.bind(_nnn),
 				loop: true,
 	    	},
 	    	Twinkle: {
-				duration: 30,
+				duration: 1,
 				update: _nnn.twinkle_update.bind(_nnn),
 				render: _nnn.twinkle_render.bind(_nnn),
 				loop: true,
 	    	},
 	    	Twinkle_2: {
-				duration: 30,
+				duration: 1,
 				update: _nnn.twinkle_2_update.bind(_nnn),
 				render: _nnn.twinkle_2_render.bind(_nnn),
 				loop: true,
@@ -228,6 +230,7 @@ let sprout = function (p) {
 					animations.Synapse,
 				],
 				reverse_animations: [
+					animations.Fade_In,
 					animations.Synapse,
 				],
 	    	},
@@ -316,11 +319,11 @@ module.exports.init = function (args = {}) {
 };
 
 module.exports.updateState = function (t) {
-	if (!NeuronCoordinator.initialized) {
+	if (!NeuronController.initialized) {
 		return;
 	}
 
-	NeuronCoordinator.updateQueue(t);
+	NeuronController.updateQueue(t);
 };
 
 module.exports.canvas = function () {

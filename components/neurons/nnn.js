@@ -198,8 +198,6 @@ function NNN (args = {}) {
 			}
 
 			alpha = 1;
-
-			console.log('buffer created');
 		}
 
 		function fadeIn() {
@@ -245,7 +243,7 @@ function NNN (args = {}) {
 			},
 			drawBuffer: function() {
 				if (typeof image === "undefined") {
-				    return; // Be aware this needs to be defined
+				    return;
 				}
 
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -339,6 +337,10 @@ NNN.prototype.scatter2_init = function() {
 			soma.distribute = true;
 			soma.bound = false;
 	});
+
+	if (this.buffer) { // If forward, grow neurons
+		this.drawMan.resetBuffer();
+	}
 }
 
 // ------------------------------------------------
@@ -360,6 +362,10 @@ NNN.prototype.grow_render = function() {
 
 NNN.prototype.grow_init = function() {
 
+	if (this.buffer) {
+		return; // Do not initalize if reverse
+	}
+
 	this.activate(); // Set up Neurons
 
 	// Reset Active states
@@ -370,10 +376,6 @@ NNN.prototype.grow_init = function() {
 		let soma = neuron.nodes[0];
 			soma.distribute = false;
 	});
-
-	if (this.buffer) {
-		this.drawMan.resetBuffer();
-	}
 
 	this.growing = true; // Here we go again
 }
@@ -435,7 +437,9 @@ NNN.prototype.synapse_render = function() {
 		this.render();
 	}
 
-	this.drawMan.drawBuffer();
+	if (this.buffer) {
+		this.drawMan.drawBuffer();
+	}
 
 	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
 		let neuron = this.active_neurons[i];
@@ -469,7 +473,10 @@ NNN.prototype.fadeIn_update = function() {
 }
 
 NNN.prototype.fadeIn_render = function() {
-	this.drawMan.drawBuffer();
+	if (this.buffer) {
+		this.drawMan.drawBuffer();
+	}
+
 	this.render_soma();
 }
 
@@ -485,7 +492,10 @@ NNN.prototype.fadeOut_update = function() {
 }
 
 NNN.prototype.fadeOut_render = function() {
-	this.drawMan.drawBuffer();
+	if (this.buffer) {
+		this.drawMan.drawBuffer();
+	}
+
 	this.render_soma();
 }
 
@@ -497,7 +507,6 @@ NNN.prototype.fadeOut_init = function() {
 
 		this.drawMan.createBuffer();
 		this.buffer = true; // If only partial
-		console.log('whip');
 	}
 
 	this.drawMan.fade_reset();
@@ -709,11 +718,20 @@ NNN.prototype.render = function() {
 				neuron.render();
 			});
 
+
+			for (let i = 0; i < this.active_neurons.length /2; i++) {
+				let neuron = this.active_neurons[i];
+				neuron.render();
+			}
+
 			this.drawMan.createBuffer();
 			this.buffer = true;
 		}
 
-		this.drawMan.drawBuffer();
+		if (this.buffer) {
+			this.drawMan.drawBuffer();
+		}
+
 		return;
 	}
 
@@ -792,7 +810,6 @@ NNN.prototype.activate = function() {
 		if (i === this.neurons.length - 1) {
 			// Create seed branching
 			this.active_neurons.forEach((active_neuron) => {
-				// console.log('neuron_setup');
 				active_neuron.network_setup(); 
 			});
 

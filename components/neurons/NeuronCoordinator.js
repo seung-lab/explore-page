@@ -14,6 +14,8 @@ class NeuronCoordinator {
 		this._t = args._t 	|| 0;	// Current t
 		this._t_queue = [];  			// Queue t
 		this._t_prev;
+		
+		this._direction = 'forward';
 
 		this.neurostates = [];
 		this.initialized = false;
@@ -36,6 +38,8 @@ class NeuronCoordinator {
 		_this._t = 0;
 		_this._t_prev = 0;
 
+		this._direction = 'forward';
+
 		_this.initialized = true;
 		_this.animations = {
 			neurostate: _this.neurostates[0],
@@ -52,18 +56,38 @@ class NeuronCoordinator {
 		_this._t_prev = _this._t;
 		_this._t = t;
 
-		let direction = _this.direction(_this._t, _this._t_prev);
+		let direction_prev = _this._direction;
 
-		_this._t_queue.push(_this.neurostates[_this._t]); // Add Neurostate for given slide
+		_this._direction = _this.direction(_this._t, _this._t_prev);
 
-		// Check for direction change
-		// If so, cancel current queue
+		if (_this._direction !== direction_prev) {
+			_this._t_queue.length = 0; // If we change directions empty current queue
+		}
 
-		if (Math.abs(_this.t - _this.t_queue) > 2) {
-			// If user is more than 2 slides ahead
-			// Skip
-		} else {
-			_this.queueNeurostate(direction);
+		let delta = Math.abs(_this._t - _this._t_prev);	// Displacement
+
+		for (let i = 0; i < delta; i++) {
+			let index = _this._direction === 'forward'
+				? _this._t_prev + i + 1
+				: _this._t_prev - i - 1;
+
+			_this._t_queue.push(_this.neurostates[index]); // Add Neurostate
+		}
+
+		/*
+			Perhaps we only grow neurons if necessary?
+			Given skip amount..
+			Same for coming in reverse
+
+			Rendering is problem, not math || physics
+		*/
+
+		_this.queueNeurostate(_this._direction);
+
+		if (_this._t_queue.length > 2) {			
+			while (_this._t_queue.length > 0) {
+				_this.skip(); // Skipping
+			}
 		}
 	}
 
@@ -160,13 +184,19 @@ class NeuronCoordinator {
 	}
 
 	// No Render
-	skip (animation) {
-		let _this = this;
+	skip () {
+		let _this = this,
+		animation = _this.animations.current;
+
+		if (!animation.initialized) {
+			return;
+		}
 
 		_this.step(animation);
 		_this.update(animation);
 	}
 
+	// Increment counter, logic for looping
 	step (animation) {
 		let _this = this,
 			counter = animation.counter,
