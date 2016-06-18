@@ -164,7 +164,9 @@ function Neuron (args) {
 		let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
 		
 		p.noStroke();
-		p.fill(fill_val);
+
+		// Skip the low-performance color interpreter
+		p._renderer.drawingContext.fillStyle = fill_val;
 
 		_this.nodes[0].render_soma(5);
 	}

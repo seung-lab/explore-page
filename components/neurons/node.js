@@ -80,6 +80,12 @@ function Node (args = {}) {
 	let _reboundspeed = 10;       // Default 2
 	let _maxforce = 0.85;
 
+	// Separation | Bin-Lattice Spatial Sub-Division
+	// Should make proper constructor here
+	this.grid_size = 50;
+	this.cols = Math.floor(p.width / this.grid_size);
+	this.rows = Math.floor(p.height / this.grid_size);
+
 	let _center = p.createVector(p.width/2, p.height/2); // Center point
 
 	this.pow = 1;
@@ -93,8 +99,8 @@ function Node (args = {}) {
 	// Method-Man
 
 	// Reset power for Scatter methods
-	this.reset_power = function() {
-			_this.pow = 1;
+	this.reset_power = function(pow = 1) {
+			_this.pow = pow;
 	}
 
 	// Reset position to center in case resize
@@ -143,7 +149,8 @@ function Node (args = {}) {
 		function pt_1() {
 			let isAlone =  _this.parent instanceof Node;
 			if (!isAlone) {
-				_this.p_1 = _this.start.copy(); 
+				_this.p_1.x = _this.start.x;
+				_this.p_1.y = _this.start.y; 
 			} 
 			else {
 				_this.p_1.x = _this.parent.position.x;
@@ -190,10 +197,12 @@ function Node (args = {}) {
 		_wandertheta += p.random(-change,change);   // Randomly change wander theta
 
 		// Now we have to calculate the new position to steer towards on the wander circle
-		let circleloc = _this.velocity.copy();    		// Start with velocity
+		let circleloc = p.createVector();    			// Start with velocity
+			circleloc.x = _this.velocity.x;
+			circleloc.y = _this.velocity.y;
 			circleloc.normalize();            			// Normalize to get heading
 			circleloc.mult(wanderD);          			// Multiply by distance
-			circleloc.add(_this.position);               // Make it relative to boid's position
+			circleloc.add(_this.position);              // Make it relative to boid's position
 
 		let h = _this.velocity.heading();        		// We need to know the heading to offset _wandertheta
 
@@ -238,13 +247,21 @@ function Node (args = {}) {
 
 	this.seek = function(target) {
 
-		let _target = target.copy();
+		let _target = p.createVector();
+			_target.x = target.x;
+			_target.y = target.y;
 		
-		_target.sub(_this.position);  	// A vector pointing from the position to the _target
+	  	// A vector pointing from the position to the _target
+		_target.x -= _this.position.x;
+		_target.y -= _this.position.y;
+
 		_target.normalize();			// Normalize _target
 
 		_target.mult(_this.maxspeed);	// Scale to maximum speed
-		_target.sub(_this.velocity);	// Steering = Desired minus Velocity
+
+		_target.x -= _this.velocity.x;  // Steering = Desired minus Velocity
+		_target.y -= _this.velocity.y;
+
 		_target.limit(_maxforce);  		// Limit to maximum steering force
 
 		return _target;
@@ -259,9 +276,14 @@ function Node (args = {}) {
 
 	this.arrive = function(target) {
 
-		let _target = target.copy();
+		let _target = p.createVector();
+			_target.x = target.x;
+			_target.y = target.y;
 		
-		_target.sub(_this.position);  	// A vector pointing from the position to the _target
+		// A vector pointing from the position to the _target
+		_target.x -= _this.position.x;
+		_target.y -= _this.position.y;
+
 		let distance = _target.mag();
 
 		_target.normalize();
@@ -277,7 +299,9 @@ function Node (args = {}) {
 			_target.mult(_this.maxspeed);
 		}
 
-		_target.sub(_this.velocity);	// Steering = Desired minus Velocity
+		_target.x -= _this.velocity.x;  // Steering = Desired minus Velocity
+		_target.y -= _this.velocity.y;
+
 		_target.limit(12);  			// Limit to maximum steering force
 		
 		_this.applyForce(_target);		// Apply force here, so we can return true
@@ -291,28 +315,62 @@ function Node (args = {}) {
 		// Accepts Array as input
 		// If called as spring, accepts neighbor_nodes object
 
-	this.separate = function(nodes, desiredseparation) {
-		let steer = p.createVector(0,0);
-		let count = 0;
-		let node;
+	this.separate_new = function(nodes, desiredseparation) {
+		let _this = this,
+			steer = p.createVector(0,0),
+			diff = p.createVector(),
+			neighborhood = [],
+			other,
+			x,y,
+			count = 0;
 
-		// For every node in the system check if it's too close
-		nodes.forEach(function(other) {
-	  		
-	  		// Calc distance from growing nodes
-			let d = p5.Vector.dist(_this.position, other.position);	
+		// Find this nodes position relative to LUT
+		let x_grid_loc = Math.floor(_this.position.x / _this.grid_size),
+			y_grid_loc = Math.floor(_this.position.y / _this.grid_size);
+
+		// Search for neighbors
+		neighborhood_watch:
+		for (let i = nodes.length - 1; i >= 0; i--) {
+	  		other = nodes[i];
+
+  			x = Math.floor(other.position.x / _this.grid_size),
+  			y = Math.floor(other.position.y / _this.grid_size);
+
+  			// If other is not a neighbor, return | Moore neighborhood
+  			if (x > x_grid_loc + 1 || x < x_grid_loc - 1) continue neighborhood_watch;
+  			if (y > y_grid_loc + 1 || y < y_grid_loc - 1) continue neighborhood_watch;
+
+	  		neighborhood.push(other); // Assign node to neighborhood
+	  	}
+
+	  	desiredseparation = desiredseparation * desiredseparation; // for distance squared
+
+		// For every node in the neighborhood check if it's too close
+	  	for (let i = neighborhood.length - 1; i >= 0; i--) {
+	  		other = neighborhood[i];
+
+	  		// Calc distance squared from growing nodes
+			let distance_x = _this.position.x - other.position.x;
+				distance_x = distance_x * distance_x;
+
+			let distance_y = _this.position.y - other.position.y;
+				distance_y = distance_y * distance_y;
+
+			let distance = distance_x + distance_y;
 			
 			// If the distance is greater than 0 and less than an arbitrary amount (0 avoid self)
-			if ((d > 0) && (d < desiredseparation)) {
+			if ((distance > 0) && (distance < desiredseparation)) {
 				// Calculate vector pointing away from neighbor
-				let diff = p5.Vector.sub(_this.position,other.position);
-					diff.normalize();
-					diff.div(d*d);      				// Weight by distance (inverse square)
+			 	diff.x = _this.position.x - other.position.x;
+			 	diff.y = _this.position.y - other.position.y;
+
+				diff.normalize();
+				diff.div(distance); // Weight by distance (inverse square)
 
 				steer.add(diff);
-				count++;             					// Keep track of how many
+				count++; // Keep track of how many
 			}
-		});
+		}
 
 		if (count > 0) {
 			steer.div(count);
@@ -321,7 +379,62 @@ function Node (args = {}) {
 		if (steer.magSq() > 0) { 	// Implement Reynolds: Steering = Desired - Velocity
 			steer.normalize();
 			steer.mult(_this.maxspeed);
-			steer.sub(_this.velocity);
+
+			steer.x -= _this.velocity.x;  // Steering = Desired minus Velocity
+			steer.y -= _this.velocity.y;
+
+			steer.limit(_maxforce);
+		}
+
+		return steer;
+	}
+
+	this.separate = function(nodes, desiredseparation) {
+		let steer = p.createVector(0,0),
+			diff = p.createVector(),
+			count = 0;
+
+		desiredseparation = desiredseparation * desiredseparation; // for distance squared
+
+		// For every node in the system check if it's too close
+	  	let other;
+	  	for (let i = nodes.length - 1; i >= 0; i--) {
+	  		other = nodes[i];
+
+	  		// Calc distance squared from growing nodes
+			let distance_x = _this.position.x - other.position.x;
+				distance_x = distance_x * distance_x;
+
+			let distance_y = _this.position.y - other.position.y;
+				distance_y = distance_y * distance_y;
+
+			let distance = distance_x + distance_y;
+			
+			// If the distance is greater than 0 and less than an arbitrary amount (0 avoid self)
+			if ((distance > 0) && (distance < desiredseparation)) {
+				// Calculate vector pointing away from neighbor
+			 	diff.x = _this.position.x - other.position.x;
+			 	diff.y = _this.position.y - other.position.y;
+
+				diff.normalize();
+				diff.div(distance); // Weight by distance (inverse square)
+
+				steer.add(diff);
+				count++; // Keep track of how many
+			}
+		}
+
+		if (count > 0) {
+			steer.div(count);
+		}
+
+		if (steer.magSq() > 0) { 	// Implement Reynolds: Steering = Desired - Velocity
+			steer.normalize();
+			steer.mult(_this.maxspeed);
+
+			steer.x -= _this.velocity.x;  // Steering = Desired minus Velocity
+			steer.y -= _this.velocity.y;
+
 			steer.limit(_maxforce);
 		}
 
@@ -382,11 +495,11 @@ function Node (args = {}) {
 		// !Important --> Must be called outside of node 
 		// !Important --> Requires list of nodes
 
-	this.spread = function(somas, multiplier, desiredseparation) {
+	this.spread = function(somas, multiplier, desiredseparation, cen_multiplier) {
 		
-		let cen = _this.seek(_center).mult(-1); 		// Simply seek away from center
+		let cen = _this.seek(_center).mult(-1); 				// Simply seek away from center
 		let sep = _this.separate(somas, desiredseparation); 	// Move away from eachother
-		// let edg = _this.check_edges(); 				// Move away from edges
+		// let edg = _this.check_edges(); 						// Move away from edges
 
 		let aspect_ratio = p.height / p.width;
 		
@@ -394,7 +507,7 @@ function Node (args = {}) {
 		sep.y *= aspect_ratio;
 		// edg.y = edg.y * aspect_ratio;
 
-		cen.mult(_this.pow * multiplier);
+		cen.mult(_this.pow * multiplier * cen_multiplier);
 		sep.mult(_this.pow * multiplier);
 		// edg.mult(_this.pow * 1.25);
 
@@ -566,8 +679,8 @@ function Node (args = {}) {
 		// Consolidated list of all explosive forces
 
 	// Accepts an Array of Node Objects
-	this.space = function(nodes, multiplier, desiredseparation = 100) {
-		_this.spread(nodes, multiplier, desiredseparation);
+	this.space = function(nodes, multiplier, desiredseparation = 100, cen_multiplier = 1) {
+		_this.spread(nodes, multiplier, desiredseparation, cen_multiplier);
 		_this.update();
 	}
 

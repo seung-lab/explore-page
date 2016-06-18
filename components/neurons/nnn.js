@@ -206,7 +206,7 @@ function NNN (args = {}) {
 			}
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = Math.trunc(alphaData[i] * (1 - alpha));
+				imageData[i] = ~~(alphaData[i] * (1 - alpha)); // Double Bitwise Not | Fast truncation for performance
 			}
 
 			alpha *= 0.75; // experimentally determined
@@ -225,7 +225,7 @@ function NNN (args = {}) {
 
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = Math.trunc(imageData[i] * alpha);
+				imageData[i] = ~~(imageData[i] * alpha); // Double Bitwise Not | Fast truncation for performance
 			}
 
 			alpha *= 0.975; // experimentally determined
@@ -245,8 +245,7 @@ function NNN (args = {}) {
 				if (typeof image === "undefined") {
 				    return;
 				}
-
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				
 				ctx.putImageData(image, 0, 0);
 			},
 			clearBuffer: function() {
@@ -773,7 +772,7 @@ NNN.prototype.initialize = function() {
 	_scatter_multiplier_2 = this.p.map(this.p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
 	_scatter_multiplier_2 = 1 - this.p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
 	_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
-	_scatter_multiplier_2 *= 250;
+	_scatter_multiplier_2 *= 250; // Determined Experimentially
 
 	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
 
