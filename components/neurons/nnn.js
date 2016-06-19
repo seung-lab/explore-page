@@ -13,6 +13,7 @@ let $ = require('jquery'),
 	Spring = require('./spring.js'),
 	Neuron = require('./neuron.js'),
 	Node = require('./node.js'),
+	Poisson = require('./poisson.js'),
 	Easings = require('../../clientjs/easing.js');
 
 function NNN (args = {}) {
@@ -300,6 +301,16 @@ NNN.prototype.scatter_render = function() {
 }
 
 NNN.prototype.scatter_init = function() {
+	// Poisson
+	let poisson_sampler = new Poisson ({
+			height: this.p.height,
+			width: this.p.width,
+			p: this.p,
+	});
+
+	let poisson_set = poisson_sampler.construct();
+	console.log(poisson_set);
+
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
 			soma.reset_power();
