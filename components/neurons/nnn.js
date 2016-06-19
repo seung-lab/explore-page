@@ -22,7 +22,6 @@ function NNN (args = {}) {
 	let p = args.p;
 
 	// Public arguments from constructor
-	this.num_neurons = args.num_neurons || 1;
 	this.complexity  = args.complexity  || 13;
 	this.brain 		 = args.brain || {};
 	this.kruskal 	 = args.kruskal  || {};
@@ -280,19 +279,13 @@ function NNN (args = {}) {
 	})();	 
 }
 
-// Private Globals
-let _scatter_multiplier_1,
-	_scatter_multiplier_2,
-	_scatter_multiplier_3;
-
 // ------------------------------------------------
 // Animation | Scatter
 
 NNN.prototype.scatter_update = function() {
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_1); // Repel from center
-			neuron.first_position.set(soma.position); // Continously set starting position
+			soma.space(neuron.first_position); // Repel from center
 	});
 }
 
@@ -301,19 +294,8 @@ NNN.prototype.scatter_render = function() {
 }
 
 NNN.prototype.scatter_init = function() {
-	// Poisson
-	let poisson_sampler = new Poisson ({
-			height: this.p.height,
-			width: this.p.width,
-			p: this.p,
-	});
-
-	let poisson_set = poisson_sampler.construct();
-	console.log(poisson_set);
-
 	this.neurons.forEach((neuron) => {
 		let soma = neuron.nodes[0];
-			soma.reset_power();
 			soma.distribute = true;
 			soma.bound = false;
 		
@@ -427,7 +409,7 @@ NNN.prototype.twinkle_render = function() {
 	
 		threshold = this.p.random(1); // Set threshold
 
-		if ((soma.twinkle_bool == false) && (threshold > 0.85)) {
+		if ((soma.twinkle_bool == false) && (threshold > 0.95)) {
 			soma.twinkle_bool = true;
 		}
 	}
@@ -776,19 +758,22 @@ NNN.prototype.distance_sq = function(v1, v2) {
 }
 
 NNN.prototype.initialize = function() {
-	// Calculate power offset
-	_scatter_multiplier_1 = 20;
-	_scatter_multiplier_3 = 20;
-
-	_scatter_multiplier_2 = this.p.map(this.p.width, 0, 2000, 0, 1); // 3000px based on max 4K screen resolution (x)
-	_scatter_multiplier_2 = 1 - this.p.pow(Easings.parabolic(_scatter_multiplier_2), 2);
-	_scatter_multiplier_2 = Math.max(_scatter_multiplier_2, 0.1);
-	_scatter_multiplier_2 *= 250; // Determined Experimentially
-
 	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
 
+	// Poisson
+	let poisson_sampler = new Poisson ({
+			height: this.p.height,
+			width: this.p.width,
+			radius: 50,
+			p: this.p,
+	});
+
+	let poisson_set = poisson_sampler.construct();
+
+	console.log(poisson_set);
+
 	// Initialize Neuron
-	this.add_neuron(this.num_neurons);
+	this.add_neuron(poisson_set);
 }
 
 // Check if neuron is off the screen
@@ -844,14 +829,18 @@ NNN.prototype.done = function() {
 }
 
 // Add neuron to the network
-NNN.prototype.add_neuron = function(count) {
+NNN.prototype.add_neuron = function(poisson_set) {
 	let x, y;
+
+	let count = poisson_set.length - 1;
 
 	for (let i = 0; i < count; i++) {
 		// Set Neuron Soma Position (Root)
 		// For some reason the y value must lean towards less?
 		x = (window.innerWidth / 2) + this.p.random(-10,10);
 		y = (window.innerHeight / 2) + this.p.random(-15,0);
+
+		let first_position = poisson_set[i]; // Scatter Position
 
 		this.num_branches = 7;
 
@@ -872,6 +861,7 @@ NNN.prototype.add_neuron = function(count) {
 				num_branches: 	this.num_branches,
 				neuron_timer: 	this.neuron_timer,
 				max_depth: 		this.max_depth,
+				first_position: first_position,
 				id:  			this.neuron_id,
 				p: 				this.p,
 			})	

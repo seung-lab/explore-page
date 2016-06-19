@@ -25,7 +25,7 @@ class Poisson {
 		let _this = this;
 
 		let radius2 = radius * radius,
-			R = 3 * radius2,
+			region = 3 * radius2,
 
 			cellSize = radius * Math.SQRT1_2,
 			gridWidth = Math.ceil(width / cellSize),
@@ -50,14 +50,14 @@ class Poisson {
 
 			while (queueSize) { // Pick a random existing sample and remove it from the queue.
 				let i = Math.random() * queueSize | 0,
-				s = queue[i];
+				sample = queue[i];
 
 				// Make a new candidate between [radius, 2 * radius] from the existing sample.
 				for (let j = 0; j < _this.k; ++j) {
-					let a = 2 * Math.PI * Math.random(),
-					r = Math.sqrt(Math.random() * R + radius2),
-					x = s[0] + r * Math.cos(a),
-					y = s[1] + r * Math.sin(a);
+					let angle = 2 * Math.PI * Math.random(),
+					r = Math.sqrt(Math.random() * region + radius2),
+					x = sample[0] + r * Math.cos(angle), // Polar Coordinates
+					y = sample[1] + r * Math.sin(angle); // Polar Coordinates
 
 					// Reject candidates that are outside the allowed extent,
 					// or closer than 2 * radius to any existing sample.
@@ -78,14 +78,14 @@ class Poisson {
 					i1 = Math.min(i + 3, gridWidth),
 					j1 = Math.min(j + 3, gridHeight);
 
-				let s;
+				let sample;
 
 				for (j = j0; j < j1; ++j) {
 					let o = j * gridWidth;
 					for (i = i0; i < i1; ++i) {
-						if (s = grid[o + i]) {
-							let dx = s[0] - x,
-								dy = s[1] - y;
+						if (sample = grid[o + i]) {
+							let dx = sample[0] - x,
+								dy = sample[1] - y;
 							if (dx * dx + dy * dy < radius2) {
 								return false;
 							}
@@ -98,15 +98,15 @@ class Poisson {
 
 			function makeSample(x, y) {
 				let _this = this;
-				let s = [x, y];
+				let sample = [x, y];
 
-				queue.push(s);
-				grid[gridWidth * (y / cellSize | 0) + (x / cellSize | 0)] = s;
+				queue.push(sample);
+				grid[gridWidth * (y / cellSize | 0) + (x / cellSize | 0)] = sample;
 
 				++sampleSize;
 				++queueSize;
 
-				return s;
+				return sample;
 			}
 		}
 	}

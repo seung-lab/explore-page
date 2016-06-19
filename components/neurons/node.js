@@ -98,11 +98,6 @@ function Node (args = {}) {
 	// --------------------------------------------
 	// Method-Man
 
-	// Reset power for Scatter methods
-	this.reset_power = function(pow = 1) {
-			_this.pow = pow;
-	}
-
 	// Reset position to center in case resize
 	this.reset_pow_center = function() {
 		_this.position.x = p.width / 2 + p.random(-2,2);
@@ -679,8 +674,9 @@ function Node (args = {}) {
 		// Consolidated list of all explosive forces
 
 	// Accepts an Array of Node Objects
-	this.space = function(nodes, multiplier, desiredseparation = 100, cen_multiplier = 1) {
-		_this.spread(nodes, multiplier, desiredseparation, cen_multiplier);
+	this.space = function(new_position) {
+		// _this.spread(nodes, multiplier, desiredseparation, cen_multiplier);
+		_this.arrive(new_position);
 		_this.update();
 	}
 

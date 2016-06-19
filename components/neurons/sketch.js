@@ -27,7 +27,6 @@ let NeuronController = new NeuronCoordinator ({});
 let sprout = function (p) {
 	let	canvas,
 		_nnn,
-		_nnn_count = 0,
 		_startSize = p.createVector(0,0),
 		_reSize = p.createVector(0,0),
 		_neurostates = [],
@@ -65,11 +64,8 @@ let sprout = function (p) {
 
 		// ------------------------------------------------
 		// Start NNN
-
-		_nnn_count = p.ceil(p.min((p.width / 10), 200));
 		
 		_nnn = new NNN ({
-			num_neurons: _nnn_count,
 			complexity: 13,
 			kruskal: Kruskal,
 			brain: _svg_object,

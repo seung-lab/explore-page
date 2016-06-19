@@ -18,11 +18,11 @@ function Neuron (args) {
 	let p = args.p;
 	
 	// Public arguments from constructor
-	this.position = p.createVector(args.x, args.y)    	|| p.createVector(0,0);
-	this.num_branches = args.num_branches 				|| 7;
-	this.neuron_timer = args.neuron_timer 				|| 0;
-	this.max_depth = args.max_depth 	  				|| 6;
-	this.id = args.id 									|| 0;
+	this.position = p.createVector(args.x, args.y)    		|| p.createVector(0,0);
+	this.num_branches = args.num_branches 					|| 7;
+	this.neuron_timer = args.neuron_timer 					|| 0;
+	this.max_depth = args.max_depth 	  					|| 6;
+	this.id = args.id 										|| 0;
 
 	// Generic public array variable : not an argument though
 	this.growing = true;
@@ -30,7 +30,7 @@ function Neuron (args) {
 	this.nodes = [];
 
 	// Position of neuron after scattering finished
-	this.first_position = p.createVector();
+	this.first_position = args.first_position 			|| p.createVector();
 	this.final_position = p.createVector();
 	this.has_boutons = false;
 	this.boutons = [];
