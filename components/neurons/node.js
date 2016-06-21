@@ -269,7 +269,7 @@ function Node (args = {}) {
 		// Similar to seek, but this reduces force the end
 		// STEER = DESIRED MINUS VELOCITY
 
-	this.arrive = function(target) {
+	this.arrive = function(target, max_steer = 3) {
 
 		let _target = p.createVector();
 			_target.x = target.x;
@@ -284,20 +284,24 @@ function Node (args = {}) {
 		_target.normalize();
 
 		if (distance < 100) { 			// Scale with arbitrary damping within 100 pixels
-				if ( distance < 1) {
-					return true;
-				}
-			let m = p.map(distance, 0, 100, 0, 100);
-			if (m < 2) m = 0.25;
+			if ( distance < 1) {
+				return true;
+			}
+
+			let m = distance < 5
+				? m = p.map(distance, 0, 5, 0, 3.25)
+				: p.map(distance, 0, 100, 0, 100);				
+
 			_target.mult(m);
-		} else {
+		} 
+		else {
 			_target.mult(_this.maxspeed);
 		}
 
 		_target.x -= _this.velocity.x;  // Steering = Desired minus Velocity
 		_target.y -= _this.velocity.y;
 
-		_target.limit(12);  			// Limit to maximum steering force
+		_target.limit(max_steer);  			// Limit to maximum steering force
 		
 		_this.applyForce(_target);		// Apply force here, so we can return true
 
@@ -675,8 +679,31 @@ function Node (args = {}) {
 
 	// Accepts an Array of Node Objects
 	this.space = function(new_position) {
-		// _this.spread(nodes, multiplier, desiredseparation, cen_multiplier);
-		_this.arrive(new_position);
+		let max_steer = 3;
+
+		_this.arrive(new_position, max_steer);
+		_this.update();
+	}
+
+	// ------------------------------------------------
+	// Space  II
+
+		// Consolidated list of all explosive forces
+
+	// Accepts an Array of Node Objects
+	this.space2 = function() {		
+		let x = _this.position.x - _center.x,
+			y = _this.position.y - _center.y;
+		
+		let	twist = p.createVector(x,y);
+			twist.normalize();
+			twist = twist.heading();
+			twist -= Math.PI / 5;
+			twist = p5.Vector.fromAngle(twist);
+			twist.mult(5);
+
+		_this.applyForce(twist);
+
 		_this.update();
 	}
 
@@ -690,7 +717,8 @@ function Node (args = {}) {
 		_this.bound = true;
 		
 		// If we have arrived, stop updating position
-		if (_this.arrive(_center)) {
+		let max_steer = 12;
+		if (_this.arrive(_center, max_steer)) {
 			_this.bound = false;
 			return true;
 		}
@@ -703,7 +731,7 @@ function Node (args = {}) {
 
 		// Returns node back to it's original position during Grow
 
-	this.last_position = function(loc) {
+	this.spawn_position = function(loc) {
 		_this.center = true;
 		
 		// If we have arrived, stop updating loc
@@ -726,7 +754,8 @@ function Node (args = {}) {
 		_this.center = true;
 		
 		// If we have arrived, stop updating loc
-		if (_this.arrive(loc)) {
+		let max_steer = 12;
+		if (_this.arrive(loc, max_steer)) {
 			_this.max_speed = 100;
 			_this.center = false;
 			return true;

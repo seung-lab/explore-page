@@ -38,7 +38,7 @@ let sprout = function (p) {
 		console.log('setup');
 
 		// ------------------------------------------------
-		// Setup Canvas
+		// Setup Canvases
 
 		canvas = p.createCanvas(_options.width, _options.height);
 		canvas.parent(_options.anchor);
@@ -127,8 +127,8 @@ let sprout = function (p) {
 	    	},
 	    	Last_Position: {
 				duration: 45,
-				update: _nnn.last_position_update.bind(_nnn),
-				render: _nnn.last_position_render.bind(_nnn),
+				update: _nnn.goto_spawn_position_update.bind(_nnn),
+				render: _nnn.goto_spawn_position_render.bind(_nnn),
 	    	},
 	        Rebound_1: {
 	        	duration: 50,
@@ -151,19 +151,19 @@ let sprout = function (p) {
 				render: _nnn.rebound_4_render.bind(_nnn),
 	    	},
 			Scatter: {
-				duration: 60,
+				duration: 100,
 				update: _nnn.scatter_update.bind(_nnn),
 				render: _nnn.scatter_render.bind(_nnn),
 				init: _nnn.scatter_init.bind(_nnn),
 	    	},
 	    	Scatter_2: {
-				duration: 50,
+				duration: 75,
 				update: _nnn.scatter_2_update.bind(_nnn),
 				render: _nnn.scatter_2_render.bind(_nnn),
 				init: _nnn.scatter2_init.bind(_nnn),
 	    	},
 	    	Start_Position: {
-				duration: 30,
+				duration: 100,
 				update: _nnn.start_position_update.bind(_nnn),
 				render: _nnn.start_position_render.bind(_nnn),
 	    	},

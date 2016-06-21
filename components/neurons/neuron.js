@@ -31,7 +31,7 @@ function Neuron (args) {
 
 	// Position of neuron after scattering finished
 	this.first_position = args.first_position 			|| p.createVector();
-	this.final_position = p.createVector();
+	this.spawn_position = args.spawn_position;
 	this.has_boutons = false;
 	this.boutons = [];
 
@@ -187,8 +187,8 @@ function Neuron (args) {
 	this.calculate_paths = function() {
 			_this.calc_alp(); // Calculate Arc Length Parameterization
 			
-			_this.final_position.x = _this.nodes[0].position.x;
-			_this.final_position.y = _this.nodes[0].position.y;
+			_this.spawn_position.x = _this.nodes[0].position.x;
+			_this.spawn_position.y = _this.nodes[0].position.y;
 	}
 
 	// Adaptive Arc-Subdivision
@@ -340,9 +340,9 @@ function Neuron (args) {
 		_this.nodes[0].rebound();
 	}
 
-	this.last_position = function() {
+	this.goto_spawn_position = function() {
 		// Send the soma to the center
-		_this.nodes[0].last_position(_this.final_position);	
+		_this.nodes[0].spawn_position(_this.spawn_position);	
 	}
 
 	this.start_position = function() {

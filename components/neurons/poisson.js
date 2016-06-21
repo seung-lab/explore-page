@@ -14,8 +14,6 @@ class Poisson {
 		this.rate = args.rate 		|| 10;
 		this.k = args.k 			|| 30;  // maximum number of samples before rejection
 		this.p = args.p 			|| {};  //P5 global
-
-		this.sampler = this.poissonSampler(this.width, this.height, this.radius); // Initialize the PDD
 		
 		let _this = this;
 	}
@@ -111,14 +109,15 @@ class Poisson {
 		}
 	}
 
-	construct() { // Call once construct entire PDD
+	construct(radius) { // Call once construct entire PDD
 		let _this = this;
 
-		let sample = _this.sampler(),
+		let	sampler = this.poissonSampler(_this.width, _this.height, radius), // Initialize the PDD
+			sample = sampler(),
 			samples = [];
 
 		while (sample) { // When done, 's' returns <undefined>
-			sample = _this.sampler(); 
+			sample = sampler(); 
 			if (!sample) {
 				break;
 			}

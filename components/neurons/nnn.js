@@ -176,65 +176,34 @@ function NNN (args = {}) {
 	// Setup => Image Buffer
 	this.drawMan = (function() {
 
-		let canvas = _this.p.canvas;
+		let canvas = _this.p.canvas,
+			canvas_bg = canvas.cloneNode(true);
 		let image,
-			imageData,
-			alphaData,
-			alpha;
+			imageData;
 
-		let ctx = canvas.getContext('2d');
+		let ctx_get = canvas.getContext('2d'),
+			ctx_put;
+
 		let w = canvas.width,
 			h = canvas.height;
 
+		function createCanvasBG() {
+			$(canvas).before(canvas_bg);
+
+			canvas_bg.id = 'canvas_bg';
+			
+			ctx_put = canvas_bg.getContext('2d');
+
+			canvas_bg = $('#canvas_bg');
+			canvas_bg.addClass('neural-network-bg');
+			canvas_bg.css('visibility', 'visible');
+		}
+
 		function createBuffer() {
-			image = ctx.getImageData(0,0,w,h);
+			createCanvasBG();
+
+			image = ctx_get.getImageData(0,0,w,h);
 			imageData = image.data;
-
-			alphaData = new Uint8ClampedArray(imageData.length);
-
-			// set every fourth value -> alpha to new value
-			for (let i = imageData.length - 1; i >= 3; i -= 4) {
-			    alphaData[i] = imageData[i]; // Reference original value
-			}
-
-			alpha = 1;
-		}
-
-		function fadeIn() {
-			if (typeof image === "undefined") {
-			    return; // Be aware this needs to be defined
-			}
-			// set every fourth value -> alpha to new value
-			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = ~~(alphaData[i] * (1 - alpha)); // Double Bitwise Not | Fast truncation for performance
-			}
-
-			alpha *= 0.75; // experimentally determined
-
-			if (alpha < 0.0001) {
-				alpha = 0;
-			}
-
-			alpha = Math.max(alpha, 0);
-		}
-
-		function fadeOut() {
-			if (typeof image === "undefined") {
-			    return; // Be aware this needs to be defined
-			}
-
-			// set every fourth value -> alpha to new value
-			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = ~~(imageData[i] * alpha); // Double Bitwise Not | Fast truncation for performance
-			}
-
-			alpha *= 0.975; // experimentally determined
-
-			if (alpha < 0.0001) {
-				alpha = 0;
-			}
-
-			alpha = Math.max(alpha, 0);
 		}
 
 		return {
@@ -246,25 +215,22 @@ function NNN (args = {}) {
 				    return;
 				}
 				
-				ctx.putImageData(image, 0, 0);
+				ctx_put.putImageData(image, 0, 0);
 			},
 			clearBuffer: function() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx_put.clearRect(0, 0, canvas_bg.width, canvas_bg.height);
 			},
 			resetBuffer: function() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx_put.clearRect(0, 0, canvas_bg.width, canvas_bg.height);
 				image = {};
 
 				_this.buffer = false;
 			},
 			fadeIn: function() {
-				fadeIn();
+				canvas_bg.removeClass('neural-network-fade');
 			},
 			fadeOut: function() {
-				fadeOut();
-			},
-			fade_reset: function() {
-				alpha = 1;
+				canvas_bg.addClass('neural-network-fade');
 			},
 			isEmpty: function() {
 				if (typeof image === "undefined") {
@@ -283,10 +249,14 @@ function NNN (args = {}) {
 // Animation | Scatter
 
 NNN.prototype.scatter_update = function() {
-	this.neurons.forEach((neuron) => {
-		let soma = neuron.nodes[0];
-			soma.space(neuron.first_position); // Repel from center
-	});
+	let soma,
+		neuron;
+
+	for (let i = this.neurons.length-1; i >= 0; i--) {
+		neuron = this.neurons[i];
+		soma = neuron.nodes[0];
+		soma.space(neuron.first_position); // Repel from center
+	}
 }
 
 NNN.prototype.scatter_render = function() {
@@ -311,11 +281,21 @@ NNN.prototype.scatter_init = function() {
 // Animation | Scatter_2
 
 NNN.prototype.scatter_2_update = function() {
-	this.neurons.forEach((neuron) => {
-		let separation = 250; // Experimentally determined
-		let soma = neuron.nodes[0];
-			soma.space(this.somas, _scatter_multiplier_2, separation); // Repel from center + eachother
-	});
+	let soma,
+		neuron;
+		
+	neuro_loop:
+	for (let i = this.neurons.length-1; i >= 0; i--) {
+		neuron = this.neurons[i];
+
+		if (!neuron.spawn_position) {
+			soma = neuron.nodes[0];
+			soma.space2(); // Repel from center + eachother
+			continue neuro_loop;
+		}
+
+		neuron.goto_spawn_position();
+	}
 }
 
 NNN.prototype.scatter_2_render = function() {
@@ -323,13 +303,6 @@ NNN.prototype.scatter_2_render = function() {
 }
 
 NNN.prototype.scatter2_init = function() {
-	this.neurons.forEach((neuron) => {
-		let soma = neuron.nodes[0];
-			soma.reset_power();
-			soma.distribute = true;
-			soma.bound = false;
-	});
-
 	if (this.buffer) { // If forward, grow neurons
 		this.drawMan.resetBuffer();
 	}
@@ -429,10 +402,6 @@ NNN.prototype.synapse_render = function() {
 		this.render();
 	}
 
-	if (this.buffer) {
-		this.drawMan.drawBuffer();
-	}
-
 	for (let i = this.active_neurons.length - 1; i >= 0; i--) { // Use active_neurons
 		let neuron = this.active_neurons[i];
 		let soma = neuron.nodes[0];
@@ -465,15 +434,11 @@ NNN.prototype.fadeIn_update = function() {
 }
 
 NNN.prototype.fadeIn_render = function() {
-	if (this.buffer) {
-		this.drawMan.drawBuffer();
-	}
-
 	this.render_soma();
 }
 
 NNN.prototype.fadeIn_init = function() {
-	this.drawMan.fade_reset();
+	// ?
 }
 
 // ------------------------------------------------
@@ -484,10 +449,6 @@ NNN.prototype.fadeOut_update = function() {
 }
 
 NNN.prototype.fadeOut_render = function() {
-	if (this.buffer) {
-		this.drawMan.drawBuffer();
-	}
-
 	this.render_soma();
 }
 
@@ -497,11 +458,8 @@ NNN.prototype.fadeOut_init = function() {
 			neuron.render(); // Make sure canvas has pixels
 		});
 
-		this.drawMan.createBuffer();
 		this.buffer = true; // If only partial
 	}
-
-	this.drawMan.fade_reset();
 }
 
 // ------------------------------------------------
@@ -561,13 +519,13 @@ NNN.prototype.rebound_4_render = function() {
 // ------------------------------------------------
 // Animation | Last Position
 
-NNN.prototype.last_position_update = function() {
+NNN.prototype.goto_spawn_position_update = function() {
 	this.active_neurons.forEach((neuron) => {
-		neuron.last_position();
+		neuron.goto_spawn_position();
 	});
 }
 
-NNN.prototype.last_position_render = function() {
+NNN.prototype.goto_spawn_position_render = function() {
 	this.render_soma(); // Render Soma	
 }
 
@@ -747,8 +705,7 @@ NNN.prototype.render_particles = function() {
 // ------------------------------------------------
 // Methods | Utilies
 
-// Pass in 2D Vector
-NNN.prototype.distance_sq = function(v1, v2) {
+NNN.prototype.distance_sq = function(v1, v2) { // Pass in 2D Vector
 	let x = Math.abs(v1.x-v2.x);
 		x = Math.pow(x,2);
 	let y = Math.abs(v1.y-v2.y);
@@ -757,23 +714,60 @@ NNN.prototype.distance_sq = function(v1, v2) {
 	return x + y;
 }
 
+// k = Number of points returned
+// target = Target point
+// points = sample array
+NNN.prototype.k_nearest = function(k, points, target) { 
+	let _this = this;
+
+	// swartzarian transform
+	let distpts = points.map(function (point) {
+		return [
+			_this.distance_sq(target, point),
+			point
+		];
+	});
+
+	distpts.sort((a, b) => {
+		return a[0] - b[0];
+	});
+
+	return distpts.map((x) => x[1]).slice(0, k);
+}
+
 NNN.prototype.initialize = function() {
-	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000);
+	this.time_power = this.p.map(window.innerWidth, 500, 2500, 1500, 2000); // Experimentally Determined
 
 	// Poisson
 	let poisson_sampler = new Poisson ({
 			height: this.p.height,
 			width: this.p.width,
-			radius: 50,
 			p: this.p,
 	});
 
-	let poisson_set = poisson_sampler.construct();
+	let poisson_set1 = poisson_sampler.construct(50);
+	let poisson_set2 = poisson_sampler.construct(250);
 
-	console.log(poisson_set);
+	let center = new p5.Vector(this.p.width/2, this.p.height/2),
+		content_radius = this.p.width / 3;
+		content_radius *= content_radius;
+
+	poisson_set2.forEach((sample, index) => { // Remove samples too close to center
+		let dx = (sample.x - center.x);
+			dx *= dx;
+		let dy = (sample.y - center.y);
+			dy *= dy;
+		
+		if (dx + dy < content_radius) {
+			poisson_set2.splice(index, 1); // Remove element to avoid occluding text
+		}
+	});
+
+	// Set closest points to act as active neurons
+	let future_neurons = this.k_nearest(poisson_set2.length, poisson_set1, center);
 
 	// Initialize Neuron
-	this.add_neuron(poisson_set);
+	this.add_neuron(poisson_set1, poisson_set2, future_neurons);
 }
 
 // Check if neuron is off the screen
@@ -829,18 +823,29 @@ NNN.prototype.done = function() {
 }
 
 // Add neuron to the network
-NNN.prototype.add_neuron = function(poisson_set) {
-	let x, y;
+NNN.prototype.add_neuron = function(poisson_set1, poisson_set2, future_neurons) {
+	let x, y,
+		first_position,
+		spawn_position,
+		itr = 0;
 
-	let count = poisson_set.length - 1;
+	let count = poisson_set1.length - 1;
 
 	for (let i = 0; i < count; i++) {
-		// Set Neuron Soma Position (Root)
-		// For some reason the y value must lean towards less?
-		x = (window.innerWidth / 2) + this.p.random(-10,10);
+		x = (window.innerWidth / 2) + this.p.random(-10,10); // Set Neuron Soma Position (Root)
 		y = (window.innerHeight / 2) + this.p.random(-15,0);
 
-		let first_position = poisson_set[i]; // Scatter Position
+		first_position = poisson_set1[i];
+
+		spawn_position = future_neurons.indexOf(first_position);
+
+		if (spawn_position === -1) {
+			spawn_position = null;
+		} else {
+			spawn_position = poisson_set2[itr];
+			itr++;
+		}
+
 
 		this.num_branches = 7;
 
@@ -862,6 +867,7 @@ NNN.prototype.add_neuron = function(poisson_set) {
 				neuron_timer: 	this.neuron_timer,
 				max_depth: 		this.max_depth,
 				first_position: first_position,
+				spawn_position: spawn_position,
 				id:  			this.neuron_id,
 				p: 				this.p,
 			})	
