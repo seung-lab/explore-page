@@ -177,7 +177,8 @@ function NNN (args = {}) {
 	this.drawMan = (function() {
 
 		let canvas = _this.p.canvas,
-			canvas_bg = canvas.cloneNode(true);
+			canvas_bg;
+			
 		let image,
 			imageData;
 
@@ -186,6 +187,11 @@ function NNN (args = {}) {
 
 		let w = canvas.width,
 			h = canvas.height;
+
+		function removeCanvasBG() {
+			$('#canvas_bg').remove();
+			canvas_bg = canvas.cloneNode(true);
+		}
 
 		function createCanvasBG() {
 			$(canvas).before(canvas_bg);
@@ -200,6 +206,7 @@ function NNN (args = {}) {
 		}
 
 		function createBuffer() {
+			removeCanvasBG();
 			createCanvasBG();
 
 			image = ctx_get.getImageData(0,0,w,h);
