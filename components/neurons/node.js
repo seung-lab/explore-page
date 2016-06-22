@@ -731,11 +731,10 @@ function Node (args = {}) {
 
 		// Returns node back to it's original position during Grow
 
-	this.spawn_position = function(loc) {
+	this.spawn_position = function(loc, max_steer = 3) {
 		_this.center = true;
-		
 		// If we have arrived, stop updating loc
-		if (_this.arrive(loc)) {
+		if (_this.arrive(loc, max_steer)) {
 			_this.max_speed = 100;
 			_this.center = false;
 			return true;

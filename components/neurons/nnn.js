@@ -69,9 +69,11 @@ function NNN (args = {}) {
 		function animate() {
 			if (speed > 3) speed -= 3;
 
+			let max_steer = 12;
+
 			vertices.forEach((v) => {
 				v.maxspeed = speed;
-				v.arrive(v.brain_pos);
+				v.arrive(v.brain_pos, max_steer);
 				v.update();
 			});
 		}
@@ -178,7 +180,7 @@ function NNN (args = {}) {
 
 		let canvas = _this.p.canvas,
 			canvas_bg;
-			
+
 		let image,
 			imageData;
 
@@ -527,8 +529,9 @@ NNN.prototype.rebound_4_render = function() {
 // Animation | Last Position
 
 NNN.prototype.goto_spawn_position_update = function() {
+	let max_steer = 12;
 	this.active_neurons.forEach((neuron) => {
-		neuron.goto_spawn_position();
+		neuron.goto_spawn_position(max_steer);
 	});
 }
 
@@ -566,7 +569,6 @@ NNN.prototype.stary_night_render = function() {
 NNN.prototype.stary_night_init = function() {
 	// Reset Soma power & center multiplier for Stary_Night method
 	this.neurons.forEach((neuron) => {
-		neuron.nodes[0].reset_power();
 		neuron.nodes[0].reset_pow_center();
 	});
 }
@@ -668,57 +670,49 @@ NNN.prototype.fadeOut_brain_lines_render = function() {
 // Rendering
 
 NNN.prototype.render = function() {
-	
-	if (!this.growing) {
-		if (!this.buffer) {
-			this.active_neurons.forEach((neuron) => { // Setup Canvas Buffer
-				neuron.render();
-			});
-
-
-			for (let i = 0; i < this.active_neurons.length /2; i++) {
-				let neuron = this.active_neurons[i];
-				neuron.render();
-			}
-
-			this.drawMan.createBuffer();
-			this.buffer = true;
+	if (this.growing) {
+		for (let i = this.active_neurons.length - 1; i >= 0; i--) {
+			this.active_neurons[i].render();
 		}
-
-		if (this.buffer) {
-			this.drawMan.drawBuffer();
-		}
-
 		return;
 	}
 
-	this.active_neurons.forEach((neuron) => {
-		neuron.render();
-	});
+
+	if (this.buffer) {
+		this.drawMan.drawBuffer();
+	}
+	else {
+		for (let i = this.active_neurons.length - 1; i >= 0; i--) {
+			this.active_neurons[i].render();
+		}
+
+		for (let i = ~~(this.active_neurons.length / 2); i >= 0; i--) {
+			let neuron = this.active_neurons[i];
+			neuron.render();
+		}
+
+		this.drawMan.createBuffer();
+		this.buffer = true;
+	}
 }
 
-NNN.prototype.render_soma = function() {
-	this.active_neurons.forEach((neuron) => {
-		neuron.render_soma();
-	});
+NNN.prototype.render_soma = function () {
+	for (let i = this.active_neurons.length - 1; i >= 0; i--) {
+		this.active_neurons[i].render_soma();
+	}
 }
 
-NNN.prototype.render_particles = function() {
-	this.neurons.forEach((neuron) => {
-		neuron.render_particle();
-	});
+NNN.prototype.render_particles = function () {
+	for (let i = this.neurons.length - 1; i >= 0; i--) {
+		this.neurons[i].render_particle();
+	}
 }
 
 // ------------------------------------------------
 // Methods | Utilies
 
-NNN.prototype.distance_sq = function(v1, v2) { // Pass in 2D Vector
-	let x = Math.abs(v1.x-v2.x);
-		x = Math.pow(x,2);
-	let y = Math.abs(v1.y-v2.y);
-		y = Math.pow(y,2);
-
-	return x + y;
+NNN.prototype.distance_sq = function (v1, v2) { // Pass in 2D Vector
+	return (v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y);
 }
 
 // k = Number of points returned

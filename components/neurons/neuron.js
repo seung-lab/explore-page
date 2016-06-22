@@ -340,9 +340,9 @@ function Neuron (args) {
 		_this.nodes[0].rebound();
 	}
 
-	this.goto_spawn_position = function() {
+	this.goto_spawn_position = function(max_steer = 3) {
 		// Send the soma to the center
-		_this.nodes[0].spawn_position(_this.spawn_position);	
+		_this.nodes[0].spawn_position(_this.spawn_position, max_steer);	
 	}
 
 	this.start_position = function() {

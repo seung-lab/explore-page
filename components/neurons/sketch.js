@@ -237,25 +237,25 @@ let sprout = function (p) {
 					animations.Fade_Out,
 				],
 				reverse_animations: [
-					animations.Rebound_3,
+					animations.Rebound_1,
 					animations.Last_Position,
 				],
 	    	},
 	    	{
 				forward_animations: [
 					animations.Rebound_2,
-					animations.Stary_Night,
-					animations.Twinkle_2,
+					animations.Scatter,
+					animations.Twinkle,
 				],
 				reverse_animations: [
 					animations.Rebound_4,
-					animations.Stary_Night,
-					animations.Twinkle_2,
+					animations.Scatter,
+					animations.Twinkle,
 				],
 	    	},
 	    	{
 				forward_animations: [
-					animations.Rebound_3,
+					animations.Rebound_1,
 					animations.Brain,
 				],
 				reverse_animations: [
