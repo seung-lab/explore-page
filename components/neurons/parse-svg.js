@@ -734,7 +734,7 @@ function SVG_object (args = {}) {
 			max_y = 0;
 		
 		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
-		scale_factor = p.map(scale_factor, 400, 3000, 1.5, 7.5);
+		scale_factor = p.map(scale_factor, 400, 3000, 3, 7.5);
 
 		// console.log(p.width, p.height, scale_factor, dx, dy);
 
@@ -759,8 +759,8 @@ function SVG_object (args = {}) {
 			if (b.p1.y > max_y) max_y = b.p1.y;
 		});
 
-		let dx = p.width/2 - 50 - (max_x - min_x) / 2, 		// 50 Arbitrary offset
-			dy = p.height/2 - 15 - (max_y - min_y) / 2; 	// 15 Arbitrary offset
+		let dx = p.width/2 - 100 - (max_x - min_x) / 2, 	// Arbitrary offset
+			dy = p.height/2 - 15 - (max_y - min_y) / 2; 	// Arbitrary offset
 
 		_this.beziers_.forEach(function(b) { // Center Graphic
 			b.p1.x += dx; 

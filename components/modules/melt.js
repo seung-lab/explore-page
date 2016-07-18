@@ -74,7 +74,7 @@ class Melt extends TeaTime {
 
 		// TODO, fade out before cube goes underneath
 
-		let supertext = d('super-text').html("as you solve puzzles");
+		let supertext = d('super-text').html("As you solve puzzles");
 		let textcontainer2 = d('story-text visible-supertext on-white bottom');
 		let text2 = d('text caps').html("You're mapping the brain");
 		let counter2 = d('counter');

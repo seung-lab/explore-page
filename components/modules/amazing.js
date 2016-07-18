@@ -26,7 +26,7 @@ class Amazing extends TeaTime {
 				exit_reverse: "fs-exit-reverse",
 			},
 			{
-				supertext: "it allows you to:",
+				supertext: "It allows you to:",
 				text: "Learn intricate skills",
 				ipyramid: true,
 				lastFrame: 46,

@@ -15,7 +15,7 @@ class Wonderers extends TeaTime {
 
 		this.slides = [
 			{
-				supertext: "gamers * students * teachers * scientists",
+				supertext: "Gamers, Students, Teachers, Scientists",
 				text: "We are Wonderers",
 			},
 		];
