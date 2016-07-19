@@ -21,8 +21,9 @@ function SVG_object (args = {}) {
 
 	// SVG
 	let d = "M245.8,107.2c22.6-2.1,18-49.3-11.5-38.4c-0.1,0-0.2-0.1-0.1-0.2c22.2-15.1-3.9-49.6-24.5-31.5c-0.1,0.1-0.2,0-0.1-0.1c8.3-22.6-25.3-37.5-36.5-16.2c0,0.1-0.1,0-0.1,0c-0.3-21.7-31.7-26.8-38.8-6.3c0,0.1-0.1,0.1-0.1,0c-7.1-19.1-36.2-15.6-38.6,4.7c0,0.1-0.1,0.1-0.1,0c-15-17.8-44,1.9-32.9,22.3c0,0.1,0,0.1-0.1,0.1c-18-17.5-45.8,9.8-28.4,28.1c0.1,0.1,0,0.1-0.1,0.1c-23.2-6.9-36,27.6-13.8,37.5c0,0,0,0.1,0,0.1c-25,1.2-24.3,40,1,40c23.1,0,90.6-0.3,101.2,0c17,0.5,25.3,12.7,25.3,28.6c0,11.8,0,23.6,0,35.4h24c0-16.2,8.7-28.6,25.9-29.2c8.7-0.3,17.5,0,26.3,0c19.2,0.4,23.4-24.6,12-36.3c-0.1-0.1,0-0.1,0.1-0.1c37.7,0.7,29.4-36.6,10.2-38.5C245.7,107.3,245.7,107.2,245.8,107.2z";
-	let _pos = p.createVector(); // Think turtle graphics
-	let _start_pos = p.createVector(); // Think turtle graphics
+	
+	let _pos = p.createVector(), // Think turtle graphics
+		_start_pos = p.createVector(); // Think turtle graphics
 
 	let _this = this;
 
@@ -105,7 +106,7 @@ function SVG_object (args = {}) {
 			let v = _this.vertices;
 
 			for (let i = 0; i < v.length; i++) {
-				p.fill(115,135,150);
+				p.fill(77,91,107);
 				p.ellipse(v[i].x,v[i].y,5,5);
 			}
 		}
@@ -160,7 +161,7 @@ function SVG_object (args = {}) {
 					}
 				}
 
-				stroke_val = 'rgba(115,135,150,' + p.str(b.opacity) + ')';
+				stroke_val = 'rgba(77,91,107,' + p.str(b.opacity) + ')';
 				p.stroke(stroke_val);
 
 				p.bezier(
@@ -224,7 +225,7 @@ function SVG_object (args = {}) {
 				y = p.bezierPoint(y1, y2, y3, y4, t); // Find y point on curve
 
 			p.push();
-				p.fill(115,135,150);
+				p.fill(77,91,107);
 				p.noStroke();
 				p.ellipse(x,y,10,10); // Render the shape
 			p.pop();
@@ -348,7 +349,7 @@ function SVG_object (args = {}) {
 		let v = _this.vertices;
 
 		for (let i = 0; i < v.length; i++) {
-			p.fill(115,135,150);
+			p.fill(77,91,107);
 			p.ellipse(v[i].x,v[i].y,5,5);
 		}
 	}
@@ -734,7 +735,7 @@ function SVG_object (args = {}) {
 			max_y = 0;
 		
 		p.width > p.height ? scale_factor = p.height : scale_factor = p.width; // Scale by smallest dimension
-		scale_factor = p.map(scale_factor, 400, 3000, 3, 7.5);
+		scale_factor = p.map(scale_factor, 400, 3000, 3, 6);
 
 		// console.log(p.width, p.height, scale_factor, dx, dy);
 

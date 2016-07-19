@@ -81,7 +81,7 @@ function NNN (args = {}) {
 		function points() {
 			p.push();
 				p.noStroke();
-				p.fill(115,135,150);
+				p.fill(77,91,107);
 				vertices.forEach((v) => {
 					v.render_soma(5);
 				});
@@ -91,8 +91,8 @@ function NNN (args = {}) {
 		function lines() {
 			p.push();
 				p.noFill();
-				p.strokeWeight(2);
-				p.stroke(115,135,150);
+				p.strokeWeight(5);
+				p.stroke(77,91,107);
 				_this.brain.render.lines();
 			p.pop();
 		}
@@ -100,7 +100,7 @@ function NNN (args = {}) {
 		function connect() {
 			p.push();
 				p.noFill();
-				p.strokeWeight(2);
+				p.strokeWeight(5);
 				_this.brain.render.connect();
 			p.pop();
 		}
@@ -127,7 +127,7 @@ function NNN (args = {}) {
 						alpha = 1;
 					}
 
-					let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+					let fill_val = 'rgba(77,91,107,' + p.str(alpha) + ')';
 					p.fill(fill_val);
 
 					v.render_soma(5);
@@ -138,7 +138,7 @@ function NNN (args = {}) {
 		function fade_svg_lines() {
 			// Fade Brain SVG	
 			p.noFill();
-			p.strokeWeight(2);
+			p.strokeWeight(5);
 			_this.brain.render.fade_beziers();
 			_this.brain.render.points();
 		}
@@ -237,9 +237,11 @@ function NNN (args = {}) {
 			},
 			fadeIn: function() {
 				canvas_bg.removeClass('neural-network-fade');
+				console.log('fade-in');
 			},
 			fadeOut: function() {
 				canvas_bg.addClass('neural-network-fade');
+				console.log('fade-out');
 			},
 			isEmpty: function() {
 				if (typeof image === "undefined") {

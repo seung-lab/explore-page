@@ -96,12 +96,12 @@ function Neuron (args) {
 
 		// Soma Style 
 		p.noStroke();
-		p.fill(115,135,150); // blue
+		p.fill(77,91,107); // blue
 
 		_this.nodes[0].render_soma(15);
 
 		//  Bouton Style
-		let fill_val = 'rgba(115,135,150,' + p.str(_this.alpha) + ')';
+		let fill_val = 'rgba(77,91,107,' + p.str(_this.alpha) + ')';
 		p.fill(fill_val);
 		p.noStroke();
 
@@ -132,7 +132,7 @@ function Neuron (args) {
 			alpha = a;
 		}
 
-		let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+		let fill_val = 'rgba(77,91,107,' + p.str(alpha) + ')';
 		
 		p.noStroke();
 		p.fill(fill_val);
@@ -161,7 +161,7 @@ function Neuron (args) {
 			alpha = a;
 		}
 
-		let fill_val = 'rgba(115,135,150,' + p.str(alpha) + ')';
+		let fill_val = 'rgba(77,91,107,' + p.str(alpha) + ')';
 		
 		p.noStroke();
 
