@@ -321,6 +321,7 @@ NNN.prototype.scatter2_init = function() {
 // Animation | Grow
 
 NNN.prototype.grow_update = function() {	
+
 	this.active_neurons.forEach((neuron) => {
 		if (this.done()) {
 			return; 
@@ -334,7 +335,7 @@ NNN.prototype.grow_render = function() {
 	this.render();
 }
 
-NNN.prototype.grow_init = function() {
+NNN.prototype.grow_init = function()  {
 
 	if (this.buffer) {
 		return; // Do not initalize if reverse

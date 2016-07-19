@@ -26,9 +26,9 @@ class Galileo extends TeaTime {
 			},
 			{
 				big: {
-					number: 80,
 					high: "Your brain contains",
-					medium: "billion",
+					medium: "billions",
+					preposition: "of",
 					low: "neurons",
 				},
 				enter: "fs-enter",
@@ -38,9 +38,9 @@ class Galileo extends TeaTime {
 			},
 			{
 				big: {
-					number: 100,
 					high: "Connected through",
-					medium: "trillion",
+					medium: "trillions",
+					preposition: "of",
 					low: "synapses",
 				},
 				enter: "fs-enter",
@@ -154,19 +154,19 @@ class Galileo extends TeaTime {
 
 		let container2 = d('story-text-big'),
 			innercontainer = d('inner'),
-			bignumber = d('big-number'),
 			hightext = d('high-text'),
 			medtext = d('medium-text'),
+			prepositiontext = d('preposition-text'),
 			lowtext = d('low-text');
 
 		innercontainer.append(
 			hightext, 
-			medtext, 
+			medtext,
+			prepositiontext, 
 			lowtext
 		);
 
 		container2.append(
-			bignumber, 
 			innercontainer
 		);
 
@@ -189,9 +189,9 @@ class Galileo extends TeaTime {
 			},
 			bignumber: {
 				container: container2,
-				number: bignumber,
 				high: hightext,
 				medium: medtext,
+				preposition: prepositiontext,
 				low: lowtext,
 			},
 			canvas: null,
@@ -368,23 +368,18 @@ class Galileo extends TeaTime {
 		}
 		else if (slide.big) {
 			// Update Text Content
-			_this.view.bignumber.number.text(slide.big.number).removeClass('hundred');
-
-			if (slide.big.number >= 100) {
-				_this.view.bignumber.number.addClass('hundred');
-			}
-
 			_this.view.bignumber.high.text(slide.big.high);
 			_this.view.bignumber.medium.text(slide.big.medium);
+			_this.view.bignumber.preposition.text(slide.big.preposition);
 			_this.view.bignumber.low.text(slide.big.low);
 		}
 	}
 
 	clearText () {
 		this.view.story.text.text('');
-		this.view.bignumber.number.text('');
 		this.view.bignumber.high.text('');
 		this.view.bignumber.medium.text('');
+		this.view.bignumber.preposition.text('');
 		this.view.bignumber.low.text('');
 	}
 
