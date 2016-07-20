@@ -4,6 +4,10 @@ if (process.env.NODE_ENV === 'production') {
 	base_url = 'http://eyewire.org/explore'
 }
 
+if (process.env.BASE_URL) {
+	base_url = process.env.BASE_URL;
+}
+
 exports.index = function (req, res) {
 	res.render('index', { 
 		language: 'en',

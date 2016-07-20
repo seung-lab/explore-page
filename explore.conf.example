@@ -1,0 +1,20 @@
+start on startup
+
+# give up if it dies 10 times in 90 seconds
+respawn limit 10 90 
+limit nofile 4096 4096
+
+console log
+
+chdir {{explore_dir}}
+env NODE_ENV={{production_env}}
+env PORT=6666
+
+pre-start script
+    HOME=/root/ npm install --unsafe-perm
+    gulp clean
+    gulp make --production
+end script
+
+# Should be adjusted when we can specify these things with a config file.
+exec node --harmony app.js --production

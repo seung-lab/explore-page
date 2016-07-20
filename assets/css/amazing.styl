@@ -160,7 +160,7 @@ $amazing_z = 1
 // ---> Small Screen
 
 /* ----------- Non-Retina Screens Horizontal ----------- */
-@media screen and (min-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+@media screen and (max-width: 450px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	
 	.amazing .super-text
 		top -25px
@@ -177,7 +177,7 @@ $amazing_z = 1
 
 
 /* ----------- Retina Screens Horizontal ----------- */
-@media screen and (min-width: 450px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+@media screen and (max-width: 450px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 
 	.amazing .super-text
 		top -25px
@@ -282,19 +282,19 @@ $amazing_z = 1
 
 @media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
 		
-		.counter 
-			display none
+	.counter 
+		display none
 
-		.amazing .story-text	
-			font-size 36px
-			width 375px
-			bottom 10%
-			white-space normal
-			center-horizontal()
-			
-		.amazing .super-text
-			top -42px
-			font-size 30px
+	.amazing .story-text	
+		font-size 36px
+		width 375px
+		bottom 10%
+		white-space normal
+		center-horizontal()
+		
+	.amazing .super-text
+		top -42px
+		font-size 30px
 			
 /*
  *	Set to hit an iPhone 6
@@ -302,15 +302,15 @@ $amazing_z = 1
 			
 @media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
 			
-		.amazing .story-text
-			font-size 30px
-			width 325px
-			white-space normal
-			center-horizontal()
-			
-		.amazing .super-text
-			font-size 24px
-			top -35px
+	.amazing .story-text
+		font-size 30px
+		width 325px
+		white-space normal
+		center-horizontal()
+		
+	.amazing .super-text
+		font-size 24px
+		top -35px
 			
 /*
  *	Set to hit an iPhone 5 + 4
@@ -318,15 +318,15 @@ $amazing_z = 1
 			
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
 			
-		.amazing .story-text
-			font-size 24px
-			width 275px
-			white-space normal
-			center-horizontal()
-			
-		.amazing .super-text
-			font-size 18px
-			top -25px
+	.amazing .story-text
+		font-size 24px
+		width 275px
+		white-space normal
+		center-horizontal()
+		
+	.amazing .super-text
+		font-size 18px
+		top -25px
 			
 
 

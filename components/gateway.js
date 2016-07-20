@@ -2,6 +2,7 @@ let $ = require('jquery'),
 	Utils = require('../clientjs/utils.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js'),
  	Easing = require('../clientjs/easing.js'),
+ 	GLOBAL = require('../clientjs/GLOBAL.js'),
  	Synapse = require('./synapse.js');
 
 let Login; // avoid circular reference
@@ -31,7 +32,7 @@ class Gateway extends Synapse { // You can only build within a pylon field
  			.text('A Game to Map the Brain');
 
  		opening.append(logintxt);
- 		
+
  		let startplayingbtn = $('<button>')
  			.addClass('primary play-now')
  			.text('Play Now');
@@ -59,7 +60,47 @@ class Gateway extends Synapse { // You can only build within a pylon field
  	attachEvents () {
  		let _this = this;
 
-  		this.view.startbtn.ion('click', function () {
+ 		$(window).ion('scrollStart.gateway', function (e, up) {
+ 			if (up) {
+	 			_this.beginExploring();
+	 			$(window).off('scrollStart.gateway');
+	 		}
+ 		});
+
+		$(window).ion('swipe.gateway', function (e, evt) {
+			if (evt.deltaY < 0) {
+				_this.beginExploring();
+				$(window).off('swipe.gateway');
+			}
+		});
+
+		$(window).ion('unload.track.gateway', function () {
+			mixpanel.track('unload', {
+				from: 'gateway',
+			});
+		});
+
+ 		this.view.explorebtn.ion('click', function () {
+ 			_this.beginExploring();	
+ 		})
+
+ 		this.view.explorebtn.ion('mouseenter', function () {
+ 			_this.dipReveal(5);
+ 		});
+
+ 		this.view.explorebtn.ion('mouseleave', function () {
+ 			_this.dipReveal(0);
+ 		});
+ 	}
+
+ 	unattachSwipeEvents () {
+ 		$(window).off('scrollStart.gateway swipe.gateway');
+ 	}
+
+ 	enableButton () {
+ 		let _this = this;
+ 		
+ 		this.view.startbtn.ion('click', function () {
  			// $('#explore').hide();
 
 			// let transition = $('#viewport').scrollTo('#intake', {
@@ -80,11 +121,13 @@ class Gateway extends Synapse { // You can only build within a pylon field
 			}
 
 			Utils.UI.curtainFall(function () {
+				$(window).off('unload.track');
+
 				if ($.cookie('visited')) {
-					document.location.href = 'https://eyewire.org/login';
+					document.location.href = `https://${GLOBAL.host}/login`;
 				}
 				else {
-					document.location.href = 'https://eyewire.org/signup';
+					document.location.href = `https://${GLOBAL.host}/signup`;
 				}
 			});
 
@@ -92,36 +135,6 @@ class Gateway extends Synapse { // You can only build within a pylon field
 				from: 'gateway',
 			});
  		});
-
- 		$(window).ion('scrollStart.gateway', function (e, up) {
- 			if (up) {
-	 			_this.beginExploring();
-	 			$(window).off('scrollStart.gateway');
-	 		}
- 		});
-
-		$(window).ion('swipe.gateway', function (e, evt) {
-			if (evt.deltaY < 0) {
-				_this.beginExploring();
-				$(window).off('swipe.gateway');
-			}
-		});
-
- 		this.view.explorebtn.ion('click', function () {
- 			_this.beginExploring();	
- 		})
-
- 		this.view.explorebtn.ion('mouseenter', function () {
- 			_this.dipReveal(5);
- 		});
-
- 		this.view.explorebtn.ion('mouseleave', function () {
- 			_this.dipReveal(0);
- 		});
- 	}
-
- 	unattachSwipeEvents () {
- 		$(window).off('scrollStart.gateway swipe.gateway');
  	}
 
  	afterEnter (transition) {
@@ -130,29 +143,40 @@ class Gateway extends Synapse { // You can only build within a pylon field
  		this.view.explorebtn.hide();
 
  		if (!Utils.isMobile()) {
-	 		setTimeout(function () {
+	 		transition.done(function () {
 	 			_this.view.explorebtn.drop({
 					msec: 2000,
-					easing: Easing.bounceFactory(0.5),
+					easing: Easing.bounceFactory(12),
 					side: 'bottom',
 					displacement: 25,
 				});
 				_this.view.explorebtn.show();
-	 		}, 3500);
+	 		});
 	 	}
+
+  		_this.enableButton();
 
 	 	transition.done(function () {
 	 		_this.attachEvents();
 	 	});
  	}
 
+ 	preloadExplore () {
+ 		ModuleCoordinator.preload('Amazing');
+ 	}
+
  	beginExploring () {
  		let _this = this;
+
+		mixpanel.track('begin-exploring', {
+			delay: Math.round(window.performance.now() / 1000),
+		});
 
  		_this.animations.dip.reject();
 		_this.view.explorebtn.off('mouseenter mouseleave');
 
 		$('#registration').hide();
+		$(window).off('unload.gateway');
 
 		let transition = Login.takeMeTo('explore', {
 			msec: 2000,

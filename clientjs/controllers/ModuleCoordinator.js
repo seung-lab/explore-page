@@ -9,7 +9,8 @@ let utils = require('../utils.js'),
 	Superheroes = require('../../components/modules/superheroes.js'),
 	Melt = require('../../components/modules/melt.js'),
 	MeltMobile = require('../../components/modules/melt-mobile.js'),
-	GLOBAL = require('../GLOBAL.js');
+	GLOBAL = require('../GLOBAL.js'),
+	Keycodes = require('../keycodes.js');
 
 let _t = 0;
 
@@ -18,7 +19,36 @@ let ModuleCoordinator = {
 	timeline: null,
 	container: null,
 	transition: null,
-	initialized: false,
+};
+
+function createModules () {
+	let mobile = utils.isMobile();
+	let MC = ModuleCoordinator;
+	let anchor = $('#explore');
+
+	function moduleFactory(module, duration) {
+		return new module({
+			parent: MC,
+			anchor: anchor,
+			duration: duration,
+			mobile: mobile,
+		})
+	}
+
+	if (!MC.modules.length) {
+		MC.setModules([
+			moduleFactory(Amazing),
+			moduleFactory(Galileo),
+			moduleFactory(Wonderers),
+			moduleFactory(mobile ? MeltMobile : Melt),
+			moduleFactory(Superheroes),
+		]);
+
+		MC.timeline = new Timeline({
+			parent: MC,
+			anchor: anchor,
+		});
+	}
 };
 
 ModuleCoordinator.initialize = function (animation) {
@@ -34,29 +64,7 @@ ModuleCoordinator.initialize = function (animation) {
 		anchor.addClass('mobile');
 	}
 
-	function moduleFactory(module, duration) {
-		return new module({
-			parent: MC,
-			anchor: anchor,
-			duration: duration,
-			mobile: mobile,
-		})
-	}
-
-	if (!MC.initialized) {
-		MC.setModules([
-			moduleFactory(Amazing),
-			moduleFactory(Galileo),
-			moduleFactory(Wonderers),
-			moduleFactory(mobile ? MeltMobile : Melt),
-			moduleFactory(Superheroes),
-		]);
-
-		MC.timeline = new Timeline({
-			parent: MC,
-			anchor: anchor,
-		});
-	}
+	createModules();
 
 	MC.container = anchor;
 
@@ -67,30 +75,76 @@ ModuleCoordinator.initialize = function (animation) {
 	animation.done(function () {
 		MC.timeline.anchorToBody();
 		$(GLOBAL.viewport).addClass('parallax-off'); // GPU performance boost
+		
+		$(window).ion('scrollStart', function (e, down) {
+			if (down) {
+				MC.next();
+			} else {
+				MC.previous();
+			}
+		});
+
+		$(window).ion('swipe', function (e, evt) {
+
+			
+			// angle is between [-180, 180]. 
+			let angle = Math.atan2(-evt.deltaY, evt.deltaX) / Math.PI / 2 * 360;
+			
+			let halfangle = 45 / 2;
+
+			let upswipe = angle > halfangle && angle < 180 - halfangle,
+				leftswipe = angle >= 180 - halfangle || angle <= -180 + halfangle;
+			
+			if (upswipe || leftswipe) {
+				MC.next();
+			}
+			else {
+				MC.previous();
+			}
+		});
 	});
 
-	$(window).ion('scrollStart', function (e, down) {
-		if (down) {
-			MC.next();
-		} else {
-			MC.previous();
+	$(window).ion('unload.track.explore', function () {
+		let module = MC.currentModule();
+
+		mixpanel.track('unload', {
+			from: 'explore',
+			global_t: _t,
+			sub_t: MC.toModuleT(module.name, _t),
+			module: module.name,
+		});
+	});
+
+	$(document).ion('keydown.wow', function () {
+		let last3 = Keycodes.lastKeys(3).join('').toLowerCase();
+		if (last3 === 'wow') {
+			if (anchor.hasClass('wow')) {
+				anchor.removeClass('wow');
+			}
+			else {
+				anchor.addClass('wow')
+			}
 		}
 	});
-
-	$(window).ion('swipe', function (e, evt) {
-		if (evt.deltaY < 0) {
-			MC.next();
-		} else {
-			MC.previous();
-		}
-	});
-
-	MC.initialized = true;
 };
 
+ModuleCoordinator.preload = function (module_name) {
+	createModules();
+
+	let mod = getModuleByName(module_name);
+	if (mod) {
+		mod.preload();
+	}
+};
+
+function getModuleByName (name) {
+	let module_list = ModuleCoordinator.modules.filter( (mod) => mod.name === name );
+	return module_list[0];
+}
+
 ModuleCoordinator.reset = function (animation) {
-	$(window).off('scrollStart swipe');
-	$(document).off('keydown');
+	$(window).off('scrollStart swipe unload.explore');
+	$(document).off('keydown.hotkeys');
 
 	// $(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
 
@@ -119,7 +173,7 @@ ModuleCoordinator.tForName = function (name) {
 
 
 ModuleCoordinator.initHotkeys = function () {
-	$(document).ion('keydown', function (evt) {
+	$(document).ion('keydown.hotkeys', function (evt) {
 		let key = evt.keyCode;
 
 		// right or down key or spacebar or enter
@@ -326,16 +380,12 @@ ModuleCoordinator.t = function (tee) {
 	return _t;
 };
 
-ModuleCoordinator.seek = function (t, transition) {
-	try {
-		mixpanel.track('seek', {
-			global_t: t,
-			module: ModuleCoordinator.moduleAt(t).name,
-		});
-	}
-	catch (e) {
-		console.trace();
-	}
+ModuleCoordinator.seek = function (t, transition) {	
+	mixpanel.track('seek', {
+		global_t: t,
+		module_t: ModuleCoordinator.toModuleT(t),
+		module: ModuleCoordinator.moduleAt(t).name,
+	});
 
 	let prev_t = _t;
 	_t = t;

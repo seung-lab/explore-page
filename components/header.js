@@ -2,6 +2,7 @@ let $ = require('jquery'),
 	Utils = require('../clientjs/utils.js'),
 	Easing = require('../clientjs/easing.js'),
 	Synapse = require('./synapse.js'),
+	GLOBAL = require('../clientjs/GLOBAL.js'),
 	ModuleCoordinator = require('../clientjs/controllers/ModuleCoordinator.js');
 
 let Login = null;
@@ -10,11 +11,13 @@ let Login = null;
 var _social_networks = {
 	facebook: { 
 		name: 'Facebook', 
-		url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+		// url: 'https://www.facebook.com/sharer.php?u=#{URL}&t=#{TITLE}&s=#{DESCRIPTION}',
+		url: "https://www.facebook.com/eyewire.org",
 	},
 	twitter: { 
 		name: 'Twitter', 
-		url: 'http://twitter.com/intent/tweet?source=sharethiscom&text=#{DESCRIPTION}&url=#{URL}',
+		// url: 'http://twitter.com/intent/tweet?source=sharethiscom&text=#{DESCRIPTION}&url=#{URL}',
+		url: "https://twitter.com/eye_wire",
 	},
 	tumblr: { 
 		name: 'Tumblr', 
@@ -129,12 +132,13 @@ class Header extends Synapse {
 		_this.view.share.email.ion('click', function () {
 			shareOnSelectedNetwork({
 				network: "email",
-				title: "",
-				description: "",
+				title: "Play Eyewire with me! Let's map the brain together.",
+				description: "Hey there,\n\nCheck out http://eyewire.org\n\nEyewire is a game we can play together that helps brain science!",
 			});
 		});
 
 		_this.view.logo.ion('click', function () {
+			$(window).off('unload.track');
 			document.location.href = document.location.origin;
 		});
 	}
@@ -148,7 +152,8 @@ class Header extends Synapse {
 			});
 			
 			Utils.UI.curtainFall(function () {
-				document.location.href = 'https://eyewire.org/signup';
+				$(window).off('unload.track');
+				document.location.href = `https://${GLOBAL.host}/signup`;
 			})
 		});
 
@@ -208,8 +213,12 @@ class Header extends Synapse {
 	afterEnter (transition) {
 		let _this = this;
 		
+		_this.hide = true;
+		_this.render();
+
 		transition.done(function () {
-			_this.view.module.removeClass('invisible');
+			_this.hide = false;
+			_this.render();
 		});
 	}
 

@@ -1,16 +1,21 @@
 @require 'mixins.styl'
 @require 'controls.styl'
 @require 'colors.styl'
+@require 'animation.styl'
 
 /* Bumper Animation */
 
 // Variables
-$dot-delay-1 = 250ms
-$dot-delay-2 = 100ms
-$dot-delay-3 = 700ms
+$pop-duration = 750ms
 
 // Dot rotation timer
-$dot-timer = 500ms
+$dot-rotate-duration = 500ms
+$dot-rotate-delay = $pop-duration - 200ms
+
+$e-rotate-delay = $dot-rotate-delay + $dot-rotate-duration
+
+$line-delay = 25ms 
+$line-duration = 1000ms
 
 .bumper 
 	width 200px
@@ -26,7 +31,7 @@ $dot-timer = 500ms
 	opacity 1
 
 	animation-duration 2350ms
-	animation-delay $dot-delay-3
+	animation-delay $e-rotate-delay
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function ease-out
@@ -41,7 +46,7 @@ $dot-timer = 500ms
 	// transform rotate(45deg)
 	
 #bumper.visible .Es
-	animation-duration 350ms
+	animation-duration $pop-duration
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function cubic-bezier(0.64, 0.57, 0.67, 1.53)
@@ -63,7 +68,10 @@ $dot-timer = 500ms
 .bumper .E-right
 	transform rotate(-180deg)
 	// background-position 100px 100px
-		
+
+.edge .bumper .E-right
+	top 52px
+
 .bumper .dots
 	position absolute
 	opacity 0
@@ -72,8 +80,8 @@ $dot-timer = 500ms
 	// transform translateX(0px)
 	
 #bumper.visible  .dots
-	animation-delay $dot-delay-1
-	animation-duration $dot-timer
+	animation-delay $dot-rotate-delay
+	animation-duration $dot-rotate-duration
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function ease-in
@@ -92,25 +100,28 @@ $dot-timer = 500ms
 	background-size 150px 150px
 	background-position center
 	
-#bumper.visible .dot
-	animation-name pop-dots
-	
 #bumper.visible .dot-left
-	animation-duration $dot-timer
-	animation-delay $dot-delay-1
+	animation-duration $dot-rotate-duration
+	animation-delay $dot-rotate-delay
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function ease-in
 	
 	animation-name radius-left-dot 
+	
+.edge .bumper .dot-left
+	left 24px
 
 .bumper .dot-right
 	top 85px
 	left 150px	
 	
+.edge .bumper .dot-right
+	left 151px
+
 #bumper.visible .dot-right
-	animation-duration $dot-timer
-	animation-delay $dot-delay-1
+	animation-duration $dot-rotate-duration
+	animation-delay $dot-rotate-delay
 	animation-fill-mode forwards
 	animation-iteration-count once
 	animation-timing-function ease-in
@@ -129,6 +140,7 @@ $dot-timer = 500ms
 	width 0px
 	height 2px
 	
+	
 	background-color $LOGO_BLUE
 	border none
 	outline none
@@ -138,8 +150,8 @@ $dot-timer = 500ms
 	animation-iteration-count 1
 	animation-timing-function ease-in
 	animation-fill-mode forwards
-	animation-delay 100ms
-	animation-duration 750ms
+	animation-delay $line-delay
+	animation-duration $line-duration
 
 $logo_rule_start_pos = 100%
 
@@ -150,7 +162,11 @@ $logo_rule_start_pos = 100%
 #bumper.visible::before
 	animation-name motion-rule-left
 	right $logo_rule_start_pos
-
+	
+#bumper.no-rule::after,
+#bumper.no-rule::before
+	opacity 0
+	
 
 /* Animation Properties */
 
@@ -207,17 +223,20 @@ over-rotation-fn(0, 45, 1, rotate-bumper)
 
 
 // Pop scale animaton function generator
-pop-fn($start, $scale, $multiplier, $animation-name)
-	$displacement = $scale * $multiplier
+pop-fn($start, $displacement, $animation-name)
 	
-	@keyframes {$animation-name}
-		0%
-			transform scale($start, $start)
-		100%
-			transform scale($displacement, $displacement)
+	$factors = springFactory(0.3, 3, $PI / 2);
+	$count = length($factors)
 			
-pop-fn(0, 1, 1,pop-Es)
-pop-fn(0, 1, 1, pop-dots)
+	@keyframes {$animation-name}
+		for $factor, $i in $factors
+			$percent = unit($i / $count * 100, '%')
+			$scale = $start + -1 * $factor * $displacement
+
+			{$percent}
+				transform scale($scale, $scale)
+			
+pop-fn(1, 1, pop-Es)
 
 
 // Animation for horizontal rules

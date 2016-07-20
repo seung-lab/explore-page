@@ -106,12 +106,12 @@ class Galileo extends TeaTime {
 		this.sketch = null; // p5 sketch for neurons
 	}
 
-	enqueueTextAnimation (wowzie) {
+	enqueueTextAnimation (fn) {
 		let _this = this;
 
 		if (_this.animations.text.current.state() !== 'pending') { // If done or nonexistent
-			_this.animations.text.current = wowzie()
-				.always(function wow2 () {
+			_this.animations.text.current = fn()
+				.always(function () {
 					if (_this.animations.text.next) {
 						_this.animations.text.current = _this.animations.text.next(); // Queue up next animation
 					}

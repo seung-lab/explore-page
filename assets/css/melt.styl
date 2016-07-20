@@ -1,6 +1,9 @@
 @require 'colors.styl'
 @require 'mixins.styl'
 
+.melt .next
+	z-index 5
+
 .melt .story-text
 	@extend .galileo .story-text
 	font-family 'Roboto Condensed'
@@ -11,11 +14,13 @@
 	color $TEXT_BLUE
 
 .melt .story-text.bottom
-	bottom 10%
+	bottom 5%
 	top auto
 	
 .melt .super-text
 	@extend .amazing .super-text
+	
+	top 35px
 
 .melt video
 	margin auto

@@ -13,11 +13,14 @@ class Amazing extends TeaTime {
 
 		this.frameRateMsec = 83;
 
+		this.currentFrame = 0;
+
 		this.slides = [
 			{
 				video: "",
 				text: "Your brain makes you amazing!",
 				ipyramid: true,
+				firstFrame: 0,
 				lastFrame: 14,
 				lastRepeatFrame: 18,
 				enter: "fs-enter",
@@ -29,6 +32,7 @@ class Amazing extends TeaTime {
 				supertext: "It allows you to:",
 				text: "Learn intricate skills",
 				ipyramid: true,
+				firstFrame: 19,
 				lastFrame: 46,
 				lastRepeatFrame: 62,
 				enter: "fs-enter",
@@ -39,6 +43,7 @@ class Amazing extends TeaTime {
 			{
 				text: "Dream fantastic dreams",
 				ipyramid: true,
+				firstFrame: 63,
 				lastFrame: 87,
 				lastRepeatFrame: 94,
 				enter: "fs-enter",
@@ -49,6 +54,7 @@ class Amazing extends TeaTime {
 			{
 				text: "Even laugh at goofy cat videos",
 				ipyramid: false,
+				firstFrame: 95,
 				lastFrame: 112,
 				lastRepeatFrame: 116,
 				enter: "fs-enter",
@@ -59,6 +65,7 @@ class Amazing extends TeaTime {
 			{
 				text: "But how?",
 				ipyramid: true,
+				firstFrame: 117,
 				lastFrame: 144,
 				lastRepeatFrame: 148,
 				enter: "fs-enter",
@@ -83,6 +90,17 @@ class Amazing extends TeaTime {
 		};
 
 		this.view = this.generateView();
+	}
+
+
+    preload () {
+		let _this = this;
+
+		if (!_this.animations.load) {
+			_this.animations.load = $.getJSON(GLOBAL.base_url + '/animations/amazing/sequence.json');
+		}
+
+		return _this.animations.load;
 	}
 
 	enqueueTextAnimation (fn) {
@@ -112,14 +130,24 @@ class Amazing extends TeaTime {
 
 		let bg = $('<div>').addClass('amazing bg-light module');
 
+		if (_this.mobile) {
+			bg.ion('click', function () {
+				_this.next();
+			});
+		}
+
 		let videoContainer = $('<div>');
 
 		let frames = [];
 
+		if (!_this.animations.load) {
+			_this.preload();
+		}
+
 		// opt = optimal, came from these bash commands:
 		// for i in *.jpg; do convert $i pnm:- | mozcjpeg -quality 70 > opt-$i; done
 		// for i in $(seq 1 49); do base64 -in f$i.png | xargs printf "\"%s\"," >> concat.json; done 
-		_this.animations.load = $.getJSON(GLOBAL.base_url + '/animations/amazing/sequence.json', function (json) {
+		_this.animations.load.done(function (json) {
 			var frame = 0;
 
 			for (let i = 0; i < _this.slides.length; i++) {
@@ -138,7 +166,11 @@ class Amazing extends TeaTime {
 
 				videoContainer.append(slideFrameContainer);
 			};
-		});		
+		})
+		.always(function () {
+			// throw away extra copy of data, it's like 2MB
+			_this.animations.load = $.Deferred().resolve();
+		});
 
 		let d = function (classes) { 
 			return $('<div>').addClass(classes);
@@ -183,7 +215,7 @@ class Amazing extends TeaTime {
 		transition.done(function () {
 			_this.view.next.drop({
 				msec: 1500,
-				easing: Easing.bounceFactory(0.5),
+				easing: Easing.bounceFactory(11),
 				side: 'bottom',
 				displacement: 25,
 			});
@@ -192,8 +224,6 @@ class Amazing extends TeaTime {
 			_this.view.textcontainer.removeClass("invisible")
 
 			_this.playVideo();
-
-
 		});
 	}
 
@@ -218,9 +248,7 @@ class Amazing extends TeaTime {
 		var index = 0;
 		var delta = 1;
 
-		_this.view.frames[
-			blink_frames[0]
-		].css('visibility', 'visible');
+		_this.showFrame(blink_frames[0]);
 
 		let interval = setInterval(function () {
 			if (index === 0 && delta < 0) {
@@ -232,9 +260,9 @@ class Amazing extends TeaTime {
 				delta *= -1;
 			}
 
-			_this.view.frames[blink_frames[index]].css('visibility', 'hidden');
+			_this.hideFrame(blink_frames[index]);
 			index += delta;
-			_this.view.frames[blink_frames[index]].css('visibility', 'visible');
+			_this.showFrame(blink_frames[index]);
 
 		}, this.frameRateMsec);
 
@@ -262,10 +290,14 @@ class Amazing extends TeaTime {
 			? beforeSlide.lastRepeatFrame 
 			: 0;
 
+		_this.currentFrame = frame;
+
 		let interval = setInterval(function () {
-			_this.view.frames[frame].css('visibility', 'hidden');
+			_this.hideFrame(frame);
 			frame++;
-			_this.view.frames[frame].css('visibility', 'visible');
+
+			_this.currentFrame = frame;
+			_this.showFrame(frame);
 
 			if (frame === slide.lastFrame + 1) {
 				_this.animations.video.resolve();
@@ -299,7 +331,7 @@ class Amazing extends TeaTime {
 		});
 	}
 
-	playVideo () {
+	playVideo (forward = true) {
 		let _this = this;
 
 		if (!_this.view.frames.length) {
@@ -315,34 +347,57 @@ class Amazing extends TeaTime {
 		// ensure all frames are hidden
 		$('.amazing .frame').css('visibility', 'hidden');
 
-		var beforeSlide = this.slides[slide.index - 1];
-		var frame = beforeSlide 
-			? beforeSlide.lastRepeatFrame 
-			: 0;
+		var jump = Math.abs(slide.lastFrame - _this.currentFrame) > (4000 / _this.frameRateMsec); // experimentally determined
 
-		_this.view.frames[frame].css('visibility', 'visible');
+		var frame = jump
+			? slide.lastFrame
+			: _this.currentFrame;
+
+		_this.currentFrame = frame;
+
+		_this.showFrame(frame);
 
 		_this.animations.video.reject();
+
+		let delta = forward ? 1 : -1;
 
 		if (slide.index === 4) {
 			_this.playCatBlinking();
 		} 
 		else {
 			let interval = setInterval(function () {
-				_this.view.frames[frame].css('visibility', 'hidden');
+				_this.hideFrame(frame);
 
-				frame++;
-				if (frame === slide.lastRepeatFrame + 1) {
+				frame += delta;
+
+				if (frame === slide.lastRepeatFrame + 1 
+					|| (frame <= slide.lastFrame && delta < 0)) { // you shouldn't be able to make the brain go away
+
+					delta = 1;
 					frame = slide.lastFrame + 1;
 				}
 
-				_this.view.frames[frame].css('visibility', 'visible');
-			}, this.frameRateMsec);
+				frame = Utils.clamp(frame, 
+					_this.slides[0].firstFrame, 
+					_this.slides[_this.slides.length - 1].lastRepeatFrame
+				);
+
+				_this.currentFrame = frame;
+				_this.showFrame(frame);
+			}, _this.frameRateMsec);
 
 			_this.animations.video = $.Deferred().fail(function () {
 				clearInterval(interval);
 			});
 		}
+	}
+
+	showFrame (frame) {
+		this.view.frames[frame].css('visibility', 'visible');
+	}
+
+	hideFrame (frame) {
+		this.view.frames[frame].css('visibility', 'hidden');
 	}
 
 	renderText (prev_t, t) {
@@ -473,7 +528,7 @@ class Amazing extends TeaTime {
 		_this.renderText(t_prev, t);
 		
 		if (this.entered) {
-			this.playVideo();
+			this.playVideo(t > t_prev);
 		}
 	}
 }

@@ -18,11 +18,43 @@ let Login = require('./login.js'),
 	ModuleCoordinator = require('./controllers/ModuleCoordinator.js'),
 	GLOBAL = require('./GLOBAL.js');
 
+
+// Globals
+
+window.Login = Login;
+window.Utils = Utils;
+window.ModuleCoordinator = ModuleCoordinator;
+window.Easing = require('./easing.js');
+window.$ = $;
+
+GLOBAL = $.extend(GLOBAL, window.GLOBAL);
+window.GLOBAL = GLOBAL;
+
+// Polyfills
+
+window.performance = window.performance || {
+	now: Date.now
+};
+
+if (!GLOBAL.production) {
+	window.mixpanel = {
+		track: function () {},
+	};
+}
+
+// Setup and Start Introduction
+
 var _intakectrl = new Login.IntakeController();
 
 $(document).ready(function () {
-	// $(GLOBAL.viewport)[0].scrollTo(0,0);
-	
+
+	// Forgive Me - Edge is not rendering the logo correctly in opening
+	if (window.navigator.userAgent.match(/Edge/)) {
+		$('body').addClass('edge');
+	}
+
+	$(GLOBAL.viewport).scrollTop(0);
+
 	// if you simply use overflow-y: hidden, the animation is laggy 
 	// so here are some hacks to display like scrolling is allowed without 
 	// actually allowing it
@@ -31,16 +63,20 @@ $(document).ready(function () {
 	// we want manually control the scrolling so we prevent the default behavior
 	$(document).disableScrolling();
 
-	Login.initialize();
+	let scrollTransition = $.Deferred();
+
+	Login.initialize(scrollTransition);
 
 	let t = $.url(window.location.href).param('t');
 
 	if (t === undefined) {
 		Utils.UI.curtainRise(function () {
-			_intakectrl.playIntro();
+			_intakectrl.playIntro(scrollTransition);
 		}, 250);
 	}
 	else {
+		scrollTransition.resolve();
+
 		let transition = $.Deferred();
 		ModuleCoordinator.initialize(transition);
 
@@ -57,7 +93,7 @@ $(document).ready(function () {
 
 // Ensure browsers don't save the previous
 // blacked out state when navigating.
-$(window).unload(function () {
+$(window).ion('unload', function () {
 	$('.curtain').remove();
 });
 
@@ -70,26 +106,3 @@ function jumpToExplore (t, transition) {
 
 	ModuleCoordinator.seek(t, transition);
 }
-
-// Globals
-
-window.Login = Login;
-window.Utils = Utils;
-window.ModuleCoordinator = ModuleCoordinator;
-window.Easing = require('./easing.js');
-window.GLOBAL = GLOBAL;
-window.$ = $;
-
-// Polyfills
-
-window.performance = window.performance || {
-	now: Date.now
-};
-
-if (!GLOBAL.production) {
-	window.mixpanel = {
-		track: function () {},
-	};
-}
-
-

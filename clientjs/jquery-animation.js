@@ -299,7 +299,7 @@ $.fn.animationend = function (fn) {
 	return $(this).one('animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd', fn);
 };
 
-$.fn.transitionoff = function () {
+$.fn.animationoff = function () {
 	return $(this).off('animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd');
 };
 

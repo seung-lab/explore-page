@@ -15,20 +15,20 @@ let Login = {};
 let _components = {};
 let _stage_transition = $.Deferred().resolve();
 
-Login.initialize = function () {
+Login.initialize = function (transition) {
 	_components.header = new Header({ 
 		anchor: '#header',
 		name: "Header",
 		login: Login,
 	});
 
-	_components.header.enter().render();
+	_components.header.enter(transition).render();
 
 	_components.gateway = new Gateway({ 
 		anchor: '#gateway',
 		login: Login,
 	});
-	_components.gateway.enter();
+	_components.gateway.enter(transition);
 	_components.gateway.render();
 
 	_components.registration = new Registration({ 
@@ -73,7 +73,7 @@ Login.bindResizeEvents = function (stage) {
 		|| stage === 'intake'
 		|| stage === 'explore') {
 
-		$(window).ion('resize', function () {
+		$(window).ion('resize.login', function () {
 			Login.takeMeTo(stage);
 		});
 	}
@@ -108,20 +108,22 @@ Login.IntakeView = function () {
 	var _this = this;
 
 
-	_this.playIntro = function () {
+	_this.playIntro = function (transition) {
 		$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
 
 		_components.gateway.unattachSwipeEvents();
 
-		$.when(
-			$('.bumper .Es').imagesLoaded(),
-			$('.bumper .dot').imagesLoaded(),
-			$('.bumper .E').imagesLoaded()
-		)
+		let deferred = $.when(
+				$('.bumper .Es').imagesLoaded(),
+				$('.bumper .dot').imagesLoaded(),
+				$('.bumper .E').imagesLoaded()
+			)
 			.always(function () {
 				$('body').scrollTop(0); // necessary to ensure the page always starts at the top even on refresh
-			})
-			.done(function () {
+			});
+
+		setTimeout(function () {
+			deferred.done(function () {
 				$('#bumper').addClass('visible') // triggers shrinking transition
 				$('#intake-logo').addClass('shrink') // triggers shrinking transition
 
@@ -131,12 +133,17 @@ Login.IntakeView = function () {
 						easing: Easing.springFactory(.7, 1),
 					})
 					.done(function () {
+						transition.resolve();
+
+						$('#bumper').addClass('no-rule');
 						_components.gateway.attachEvents();
+						_components.gateway.preloadExplore();
 					});
-				}, 650);
+				}, 1050);
 
 				Login.bindResizeEvents('gateway');
 			});
+		}, 750);
 
 		mixpanel.track('play-intro');
 	};

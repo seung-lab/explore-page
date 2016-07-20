@@ -34,4 +34,6 @@ dist
 
 clientjs/GLOBAL.js
 assets/css/mixins.styl
+newrelic.js
+
 

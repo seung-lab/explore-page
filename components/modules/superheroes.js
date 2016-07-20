@@ -24,9 +24,11 @@ class Superheroes extends TeaTime {
 		this.mobile = args.mobile;
 		
 		let _this = this;
-		window.onresize = function () {
+
+		$(window).ion('resize.superheroes', function () {
 			_this.resize(window.innerWidth, window.innerHeight);
-		};
+ 		});
+
 		_this.resize(window.innerWidth, window.innerHeight);
 	}
 
@@ -50,6 +52,12 @@ class Superheroes extends TeaTime {
 		};
 
 		let bg = d('superheroes bg-light module');
+
+		if (_this.mobile) {
+			bg.ion('click', function () {
+				_this.next();
+			});
+		}
 
 		let image = $('<img>').attr({
 			src: GLOBAL.base_url + '/images/wonderers.png',
@@ -117,16 +125,12 @@ class Superheroes extends TeaTime {
 		let _this = this;
 
 		_this.view.play_now.ion('click', function () {
-			try {
-				mixpanel.track('play-now', {
-					from: "Superheroes",
-				});
-			}
-			catch (e) {
-				console.trace();
-			}
+			mixpanel.track('play-now', {
+				from: "Superheroes",
+			});
 
 			Utils.UI.curtainFall(function (curtain) {
+				$(window).off('unload.track');
 
 				// Fix for mobile devices in the case where you 
 				// navigate to the youtube app rather than the page.
@@ -140,7 +144,7 @@ class Superheroes extends TeaTime {
 					document.location.href = "https://www.youtube.com/watch?v=bwcuhbj2rSI";
 				}
 				else {
-					document.location.href = 'https://eyewire.org/signup';
+					document.location.href = `https://${GLOBAL.host}/signup`;
 				}
 			});
 		})
