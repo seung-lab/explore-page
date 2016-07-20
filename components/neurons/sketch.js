@@ -24,6 +24,15 @@ let _canvas = $.Deferred();
 
 let NeuronController = new NeuronCoordinator ({});
 
+// Object Values + Entries Shim
+Object.values = x =>
+    Object.keys(x).reduce((y, z) =>
+        y.push(x[z]) && y, []);
+
+Object.entries = x =>
+    Object.keys(x).reduce((y, z) =>
+        y.push([z, x[z]]) && y, []);
+
 let sprout = function (p) {
 	let	canvas,
 		_nnn,
@@ -191,6 +200,18 @@ let sprout = function (p) {
 				loop: true,
 	    	}
 		};
+
+		// Scale duration wrt screen size
+		let scale_factor = p.width > p.height 
+			? p.height
+			: p.width; // Scale by smallest dimension
+
+		let time_stretch = p.map(scale_factor, 400, 3000, 0.5, 1.25);
+			console.log(time_stretch);
+
+		Object.values(_animations).forEach(function(animation) {
+			animation.duration *= time_stretch;
+		});
 	}
 
 	function set_neurostates (animations) {
