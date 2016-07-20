@@ -45,7 +45,7 @@
 	line-height 1.5em
 	white-space normal
 	color $TEXT_BLUE_LIGHT // Optically Lighten
-	height 100px
+	height 150px
 	margin: 0
 	opacity: 0
 	
@@ -55,14 +55,14 @@
 	font-style italic
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
 	font-weight 400
-	// font-size 60px
 	text-transform none
-	line-height 1.35em
-	letter-spacing 0px
+	line-height 1.5em
+	letter-spacing 0.25px
 	
-// .galileo .caps
-// 	font-size 48px
-// 	line-height 1.35em
+.galileo .caps
+	font-size 30px
+	line-height 1.5em
+	transition $SLOW font-size
 
 .galileo .story-text-big
 	@extend .amazing .story-text
@@ -74,12 +74,6 @@
 
 	color $TEXT_BLUE_LIGHT
 	center()
-	
-.big-number.hundred:first-letter
-	letter-spacing -67.5px
-	
-.big-number.hundred
-	margin-left -5%
 
 .galileo .story-text-big .inner
 	display flex
@@ -105,41 +99,50 @@
 	font-size 6px
 	letter-spacing 5px
 	
-.galileo .story-text-big .high-text
-	@extend .galileo .story-text .text.italics
-	text-transform lowercase
-	font-size 30px
+.galileo .story-text-big .high-text	
+	font-family 'Roboto Condensed', 'Lucidia Grande', serif;
+	font-weight 700
+	text-transform uppercase
+	line-height 1.35em
+	letter-spacing 2px
+	
+	font-size 28px
+	line-height 2.5em
+	letter-spacing 2.5px
+	
+.galileo .story-text-big .preposition-text
+	@extend .galileo .story-text-big .high-text
+	line-height 2em
+	
+.galileo .story-text-big .preposition-text:before,
+.galileo .story-text-big .preposition-text:after
+	content ""
+	position absolute
+	height 0
+	border-top 3px solid $TEXT_BLUE_LIGHT
+	top 66%
+	width 125px
+
+.galileo .story-text-big .preposition-text:before
+	left 25%
+	margin-left 15px
+
+.galileo .story-text-big .preposition-text:after
+	right 25%
+	margin-right 25px
+	width 117px
 	
 .galileo .story-text-big .medium-text
-	font-size 85px
-	letter-spacing 5px
+	font-size 72px
+	letter-spacing 7px
 	line-height 0.85em
 	
 .galileo .story-text-big .low-text
-	font-size 30px
-	letter-spacing 16px
+	@extend .galileo .story-text-big .medium-text
+	letter-spacing 6px
 	
-.galileo .big-number
-	position absolute
-	top 185px
-	
-	z-index -5
-	font-size 400px
-	font-weight 400
-	letter-spacing -15px
-	margin-left -1.5%
-
-	color $BIG_NUMBER_BLUE
-	
-	width 100%
-	height 100%
-	text-align center
-	
-	transition top $FAST ease
-	transition font-size $FAST ease
-	
-.galileo .big-number.hundred
-	margin-left -5%	
+.galileo .story-text-mobile
+	top auto
 
 .neural-network
 	height 100%
@@ -202,87 +205,76 @@
 
 /* ----------- Non-Retina Screens ----------- */
 @media screen and (min-width: 400px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
-	.galileo .big-number
-		top 185px	
-		font-size 350px
-	
-	.galileo .story-text-big .high-text
-		font-size 24px
 		
 	.galileo .story-text-big .medium-text
 		font-size 72px
-	
-	.galileo .story-text-big .low-text
-		font-size 24px
 		
-	.galileo .big-number.hundred:first-letter
-		letter-spacing -67.5px
+	.galileo .caps
+		font-size 30px
 
 
 /* ----------- Retina Screens ----------- */
 @media screen and (min-width: 400px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-	.galileo .big-number
-		top 185px	
-		font-size 350px
-	
-	.galileo .story-text-big .high-text
-		font-size 24px
 		
 	.galileo .story-text-big .medium-text
 		font-size 72px
-	
-	.galileo .story-text-big .low-text
-		font-size 24px
 		
-	.galileo .big-number.hundred:first-letter
-		letter-spacing -67.5px
+	.galileo .caps
+		font-size 30px
+		
+
+// ---> Medium Screen || iPad
+
+/* ----------- Non-Retina Screens Horizontal ----------- */
+@media screen and (max-width: 768px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+	.galileo .caps
+		font-size 36px
+		
+	.galileo .story-text-big
+		transform scale(1)
+	
+	.galileo .story-text-mobile
+		top 70%
 
 
+/* ----------- Retina Screens Horizontal ----------- */
+@media screen and (max-width: 768px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+	.galileo .caps
+		font-size 36px
+		
+	.galileo .story-text-big
+		transform scale(1)
+	
+	.galileo .story-text-mobile
+		top 70%
+		
 
-// ---> Medium Screen
+// ---> Large Screen
 
 /* ----------- Non-Retina Screens ----------- */
 @media screen and (min-width: 1000px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
-	.galileo .big-number
-		top 185px
-		font-size 400px
-	
-	.galileo .big-number.hundred:first-letter
-		letter-spacing -75px
-		
-	.galileo .story-text-big .high-text
-		font-size 30px
-		
-	.galileo .story-text-big .medium-text
-		font-size 85px
-	
-	.galileo .story-text-big .low-text
-		font-size 30px
-	
 	.galileo .story-text-big .counter
 		bottom -30px
+		
+	.galileo .caps
+		font-size 42px
+		
+	.galileo .story-text-big
+		transform scale(1.25)
+		
 
 
 /* ----------- Retina Screens ----------- */
 @media screen and (min-width: 1000px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
-	.galileo .big-number
-		top 185px
-		font-size 400px
-		
-	.galileo.big-number.hundred:first-letter
-		letter-spacing -75px
-		
-	.galileo .story-text-big .high-text
-		font-size 30px
-		
-	.galileo .story-text-big .medium-text
-		font-size 85px
-	
-	.galileo .story-text-big .low-text
-		font-size 30px
-		
 	.galileo .story-text-big .counter
 		bottom -30px
+		
+	.galileo .caps
+		font-size 42px
+		
+	.galileo .story-text-big
+		transform scale(1.25)
+		
 		
 
 		
@@ -293,17 +285,6 @@
  */
 
 @media only screen and (max-device-width: 414px) and (min-resolution: 2dppx)
-		
-	.counter 
-		display none
-		
-	.galileo .big-number
-		top 175px
-		font-size 300px
-		margin-left -1.5%
-	
-	.galileo .big-number.hundred
-		margin-left -3%
 
 	.galileo .story-text .text.italics	
 		font-size 30px
@@ -315,83 +296,73 @@
 	
 	.galileo .story-text
 		white-space normal
-		width 375px
+		width 350px
+		height 210px
 		
 		center()
 		
 	.galileo .super-text
-		width 375px
+		width 350px
 		top -42px
 		font-size 30px
+		
+	.galileo .caps
+		font-size 30px
+		
+	.galileo .story-text-big
+		transform scale(0.9)
+		
+	.galileo .story-text-mobile
+		top 65%
+		
 			
 /*
  *	Set to hit an iPhone 6
  */
 			
 @media only screen and (max-device-width: 375px) and (min-resolution: 2dppx)
-
-	.galileo .big-number
-		top 185px	
-		font-size 275px
-		margin-left -1.5%
-		
-	.galileo .big-number.hundred
-		margin-left -3%
-		
-	.galileo .big-number.hundred:first-letter
-		letter-spacing -52px
 			
 	.galileo .story-text .text.italics
 		font-size 24px
-		width 325px
+		width 100%
 		white-space normal
 		
 		center()
 	
 	.galileo .story-text
 		white-space normal
-		width 325px
+		width 310px
 		
 		center()
 		
-	// .galileo .caps
-	// 	font-size 30px
-	// 	line-height 1.45em
+	.galileo .caps
+		font-size 30px
+		line-height 1.45em
 		
 	.galileo .super-text
-		width 325px
+		width 100%
 		font-size 24px
 		top -35px
 	
 	.galileo .story-text-big .medium-text
 		font-size 72px
 		
-	.galileo .story-text-big .high-text
-		font-size 24px
-	
-	.galileo .story-text-big .low-text
-		font-size 24px
+	.galileo .story-text-big
+		transform scale(0.8)
+		
+	.galileo .story-text-mobile
+		top 65%
+		
 			
 /*
  *	Set to hit an iPhone 5 + 4
  */
 			
 @media only screen and (max-device-width: 320px) and (min-resolution: 2dppx)
-
-	.galileo .big-number
-		top 190px
-		font-size 250px
-		margin-left -1.5%
 		
-	.galileo .big-number.hundred
-		margin-left -3%
-
-	.galileo.big-number.hundred:first-letter
-		letter-spacing -85px
-			
 	.galileo .story-text .text.italics
-		font-size 18px
-		width 275px
+		font-size 24px
+		width 100%
 		white-space normal
 		
 		center()
@@ -403,20 +374,19 @@
 		center()
 		
 	.galileo .super-text
-		width 275px
+		width 100%
 		font-size 18px
 		top -25px
 		
-	.galileo .story-text-big .medium-text
-		font-size 60px
+	.galileo .story-text-big
+		transform scale(0.75)
 		
-	.galileo .story-text-big .high-text
-		font-size 20px
-		line-height 1.5em
+	.galileo .story-text-big
+		transform scale(0.7)
 		
-	.galileo .story-text-big .low-text
-		font-size 18px
-		letter-spacing 14px
+	.galileo .story-text-mobile
+		top 65%
+		
 			
 
 	

@@ -146,7 +146,7 @@ ModuleCoordinator.reset = function (animation) {
 	$(window).off('scrollStart swipe unload.explore');
 	$(document).off('keydown.hotkeys');
 
-	// $(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
+	$(GLOBAL.viewport).removeClass('parallax-off'); // GPU performance boost
 
 	ModuleCoordinator.timeline.anchorToAnchor();
 

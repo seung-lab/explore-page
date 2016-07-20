@@ -597,11 +597,12 @@ function Node (args = {}) {
 		// Render the Catmul Rom Splines
 
 	this.render = function() {
+
 		p.curve(
-			_this.curve_pts[0].x, _this.curve_pts[0].y,
-			_this.curve_pts[1].x, _this.curve_pts[1].y,
-			_this.curve_pts[2].x, _this.curve_pts[2].y,
-			_this.curve_pts[3].x, _this.curve_pts[3].y
+			_this.curve_pts[0].x | 0, _this.curve_pts[0].y | 0,
+			_this.curve_pts[1].x | 0, _this.curve_pts[1].y | 0,
+			_this.curve_pts[2].x | 0, _this.curve_pts[2].y | 0,
+			_this.curve_pts[3].x | 0, _this.curve_pts[3].y | 0
 		);
 	}
 
@@ -646,7 +647,7 @@ function Node (args = {}) {
 	}
 
 	this.render_soma = function(rad) {
-		p.ellipse(_this.position.x,_this.position.y,rad,rad);
+		p.ellipse(_this.position.x | 0,_this.position.y | 0,rad | 0,rad | 0);
 	}
 
 	// ------------------------------------------------
