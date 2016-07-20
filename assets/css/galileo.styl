@@ -37,7 +37,7 @@
 	line-height 1.5em
 	white-space normal
 	color $TEXT_BLUE_LIGHT // Optically Lighten
-	height 100px
+	height 150px
 	margin: 0
 	opacity: 0
 	
@@ -48,12 +48,12 @@
 	font-family 'Vollkorn', 'Roboto Condensed', 'Lucidia Grande', serif;
 	font-weight 400
 	text-transform none
-	line-height 1.35em
-	letter-spacing 0px
+	line-height 1.5em
+	letter-spacing 0.25px
 	
 .galileo .caps
 	font-size 30px
-	line-height 1.35em
+	line-height 1.5em
 	transition $SLOW font-size
 
 .galileo .story-text-big
@@ -132,6 +132,9 @@
 .galileo .story-text-big .low-text
 	@extend .galileo .story-text-big .medium-text
 	letter-spacing 6px
+	
+.galileo .story-text-mobile
+	top auto
 
 .neural-network
 	height 100%
@@ -200,6 +203,9 @@
 		
 	.galileo .caps
 		font-size 30px
+		
+	.galileo .story-text-mobile
+		top 70%
 
 
 /* ----------- Retina Screens ----------- */
@@ -211,26 +217,35 @@
 	.galileo .caps
 		font-size 30px
 		
+	.galileo .story-text-mobile
+		top 70%
+		
 
-// ---> Medium Screen
+// ---> Medium Screen || iPad
 
 /* ----------- Non-Retina Screens Horizontal ----------- */
-@media screen and (min-width: 750px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
+@media screen and (max-width: 768px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
 	.galileo .caps
 		font-size 36px
 		
 	.galileo .story-text-big
-		transform scale(1.15)
+		transform scale(1)
+	
+	.galileo .story-text-mobile
+		top 70%
 
 
 /* ----------- Retina Screens Horizontal ----------- */
-@media screen and (min-width: 750px) and (min-resolution: 2dppx) and (min-resolution: 192dpi)
+@media screen and (max-width: 768px) and (min-resolution: 1dppx) and (min-resolution: 96dpi)
 	.galileo .caps
 		font-size 36px
 		
 	.galileo .story-text-big
-		transform scale(1.15)
-
+		transform scale(1)
+	
+	.galileo .story-text-mobile
+		top 70%
+		
 
 // ---> Large Screen
 
@@ -287,6 +302,9 @@
 		width 375px
 		top -42px
 		font-size 30px
+		
+	.galileo .story-text-mobile
+		top 70%
 			
 /*
  *	Set to hit an iPhone 6
@@ -321,6 +339,9 @@
 		
 	.galileo .story-text-big
 		transform scale(0.9)
+		
+	.galileo .story-text-mobile
+		top 70%
 			
 /*
  *	Set to hit an iPhone 5 + 4
@@ -351,6 +372,9 @@
 		
 	.galileo .story-text-big
 		transform scale(0.75)
+		
+	.galileo .story-text-mobile
+		top 70%
 			
 
 	

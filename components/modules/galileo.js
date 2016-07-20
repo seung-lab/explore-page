@@ -81,7 +81,7 @@ class Galileo extends TeaTime {
 				exit_reverse: "fs-exit-reverse",
 			},
 			{
-				text: "We’re calling on gamers to help connect the dots by creating a physical, visual 3D map of the brain.",
+				text: "We’re calling on gamers to help connect the dots by creating a visual 3D map of the brain.",
 				format: "italics",
 				enter: "fs-enter",
 				exit: "fs-exit",
@@ -302,6 +302,13 @@ class Galileo extends TeaTime {
 		}
 
 		let deferred = $.Deferred();
+
+		if (slide.index === 6 || slide.index ===  7) {
+			element.addClass('story-text-mobile');
+		} 
+		else {
+			element.removeClass('story-text-mobile');
+		}
 
 		element
 			.addClass('transition-state')
