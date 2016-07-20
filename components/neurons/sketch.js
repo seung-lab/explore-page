@@ -206,7 +206,7 @@ let sprout = function (p) {
 			? p.height
 			: p.width; // Scale by smallest dimension
 
-		let time_stretch = p.map(scale_factor, 400, 3000, 0.5, 1.25);
+		let time_stretch = p.map(scale_factor, 300, 3000, 0.85, 1.25);
 			console.log(time_stretch);
 
 		Object.values(_animations).forEach(function(animation) {
