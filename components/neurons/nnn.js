@@ -237,11 +237,9 @@ function NNN (args = {}) {
 			},
 			fadeIn: function() {
 				canvas_bg.removeClass('neural-network-fade');
-				console.log('fade-in');
 			},
 			fadeOut: function() {
 				canvas_bg.addClass('neural-network-fade');
-				console.log('fade-out');
 			},
 			isEmpty: function() {
 				if (typeof image === "undefined") {
