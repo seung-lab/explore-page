@@ -141,7 +141,7 @@ class Superheroes extends TeaTime {
 				}, 2000);
 				
 				if (_this.mobile) {
-					document.location.href = "https://www.youtube.com/watch?v=bwcuhbj2rSI";
+					document.location.href = "https://www.youtube.com/watch?v=R6WEElXC8wI";
 				}
 				else {
 					document.location.href = `https://${GLOBAL.host}/signup`;
