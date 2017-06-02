@@ -1,7 +1,7 @@
 
 let base_url = '';
 if (process.env.NODE_ENV === 'production') {
-	base_url = 'http://eyewire.org/explore'
+	base_url = 'https://eyewire.org/explore'
 }
 
 if (process.env.BASE_URL) {

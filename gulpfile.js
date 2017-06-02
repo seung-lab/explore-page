@@ -21,7 +21,7 @@ var path = require('path');
 var extend = require('node.extend');
 
 var BASEURL = argv.production 
-	? 'http://eyewire.org/explore'
+	? 'https://eyewire.org/explore'
 	: '';
 
 if (argv.baseurl) {
