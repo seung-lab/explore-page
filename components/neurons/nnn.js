@@ -206,7 +206,7 @@ function NNN (args = {}) {
 			}
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = ~~(alphaData[i] * (1 - alpha)); // Double Bitwise Not | Fast truncation for performance
+				imageData[i] = (alphaData[i] * (1 - alpha)) | 0; // Fast truncation for performance
 			}
 
 			alpha *= 0.75; // experimentally determined
@@ -225,7 +225,7 @@ function NNN (args = {}) {
 
 			// set every fourth value -> alpha to new value
 			for (let i = imageData.length - 1; i >= 3; i -= 4) { 
-				imageData[i] = ~~(imageData[i] * alpha); // Double Bitwise Not | Fast truncation for performance
+				imageData[i] = (imageData[i] * alpha) | 0; // Fast truncation for performance
 			}
 
 			alpha *= 0.975; // experimentally determined
