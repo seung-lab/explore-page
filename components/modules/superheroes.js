@@ -15,7 +15,8 @@ class Superheroes extends TeaTime {
 
 		this.slides = [
 			{
-				text: "Collaborate and compete unlock achievements for science",
+				text1: "Collaborate and compete; unlock achievements for science.",
+				text2: "Questions? support@eyewire.org 745 Atlantic Ave, Boston, MA, US",
 			}
 		];
 
@@ -35,7 +36,7 @@ class Superheroes extends TeaTime {
 	resize(w, h) {
 		var diag = Math.sqrt(w * w + h * h);
 
-		if (diag < 1300) {
+		if (diag < 1350) {
 			this.view.module.addClass('mobile');
 			this.view.module.removeClass('desktop');
 		} else {
@@ -67,9 +68,9 @@ class Superheroes extends TeaTime {
 
 		playnow.append($('<span>').text("PLAY NOW"));
 
-		let supertext = d('super-text');
 		let textcontainer = d('story-text');
-		let text = d('text');
+		let text1 = d('text1');
+		let text2 = d('text2');
 		let counter = d('counter');
 
 		let char = function (character) {
@@ -87,7 +88,7 @@ class Superheroes extends TeaTime {
 		bg.append(char('scout_guy'));
 		bg.append(char('scythe_girl'));
 
-		textcontainer.append(supertext, text); // --> Trying without counter
+		textcontainer.append(text1, text2); // --> Trying without counter
 
 		bg.append(
 			playnow,
@@ -100,8 +101,8 @@ class Superheroes extends TeaTime {
 			play_now: playnow,
 			// next: next,
 			container: textcontainer,
-			supertext: supertext,
-			text: text,
+			text1: text1,
+			text2: text2,
 			counter: counter,
 		};
 	}
@@ -159,13 +160,14 @@ class Superheroes extends TeaTime {
 
 		let slide = this.slideAt(t);
 
+		_this.view.text1.html(Utils.pyramidLineBreak(slide.text1));
+		_this.view.text2.html(Utils.pyramidLineBreak(slide.text2));
+
 		if (this.mobile) {
 			_this.view.play_now.text("LEARN MORE");
-			_this.view.text.text("Eyewire is only available for play on desktop. Tap above to see us from the TED stage.");
 		}
 		else {
 			_this.view.play_now.text("PLAY NOW");	
-			_this.view.text.html(Utils.pyramidLineBreak(slide.text));
 		}
 
 		_this.view.counter.text(`${slide.index + 1}/${this.slides.length}`);

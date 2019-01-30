@@ -15,10 +15,6 @@ class Galileo extends TeaTime {
 
 		this.slides = [
 			{
-				text: "This question has puzzled scientists for centuries",
-				format: "caps",
-			},
-			{
 				big: {
 					number: 80,
 					high: "Your brain contains",
@@ -35,27 +31,15 @@ class Galileo extends TeaTime {
 				},
 			},
 			{
-				text: "Working together these cells make you, you.",
+				text: "We may know much about the brain yet even more remains to be discovered. Researchers don’t even know precisely how many different types of neurons there are in the brain, much less how they are connected. But people like you are helping to change that.",
 				format: "italics",
 			},
 			{
-				text: "However, most of their circuits are still uncharted.",
+				text: "The citizen science game Eyewire invites anyone, anywhere to help map the brain. This free, online 3D puzzle game crowdsources neuron reconstructions. Hundreds of thousands of people have signed up.",
 				format: "italics",
 			},
 			{
-				text: "When Galileo first peered through his telescope it began a revolution in the way we see the world around us.",
-				format: "italics",
-			},
-			{
-				text: "Today, neuroscience is revolutionizing how we see the world within us.",
-				format: "italics",
-			},
-			{
-				text: "We’re calling on gamers to help connect the dots by playing a game to map the brain.",
-				format: "italics",
-			},
-			{
-				text: "What began at MIT has grown into a global community of hundreds of thousands.",
+				text: "Eyewirers have charted new circuits and discovered 6 new types of neurons, which they even got to name!",
 				format: "italics",
 			}
 		];
