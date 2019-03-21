@@ -35,6 +35,10 @@ class Galileo extends TeaTime {
 				format: "italics",
 			},
 			{
+				text: "Our Mission is to map neurons. We work to solve one of the biggest bottlenecks in neuroscience by pairing the superior human insights of gamers with AI (artificial intelligence) to reconstruct neural circuits. Eyewire gameplay directly advances Connectomics, a field of neuroscience focused on mapping and modeling information processing circuits in the brain.",
+				format: "italics",
+			},
+			{
 				text: "The citizen science game Eyewire invites anyone, anywhere to help map the brain. This free, online 3D puzzle game crowdsources neuron reconstructions. Hundreds of thousands of people have signed up.",
 				format: "italics",
 			},
