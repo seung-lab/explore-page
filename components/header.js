@@ -84,13 +84,16 @@ class Header extends Synapse {
 				d('content').text("Join Now")
 			);
 
-		container.append(logo, share, login, register);
+		let about = d("about").append($('<a>').attr("href", "https://science.eyewire.org/").attr('target', '_blank').text("about"));
+
+		container.append(logo, share, login, register, about);
 
 		return {
 			module: container,
 			logo: logo,
 			login: login,
 			register: register,
+			about: about,
 			share: {
 				container: share,
 				fb: fbshare,
@@ -154,7 +157,7 @@ class Header extends Synapse {
 			Utils.UI.curtainFall(function () {
 				$(window).off('unload.track');
 				document.location.href = `https://${GLOBAL.host}/signup`;
-			})
+			});
 		});
 
 		_this.view.logo.ion('click', function () {
@@ -247,7 +250,7 @@ class Header extends Synapse {
 			this.view.logo.addClass("invisible")
 		}
 
-		[ 'login', 'register' ].forEach(function (icon) {
+		[ 'login', 'register', 'about' ].forEach(function (icon) {
 			_this.view[icon].removeClass('visible');
 		});
 
@@ -257,7 +260,8 @@ class Header extends Synapse {
 			_this.view.login.addClass('visible');
 		}
 		else if (_this.mode === 'register') {
-			_this.view.register.addClass('visible');	
+			_this.view.register.addClass('visible');
+			_this.view.about.addClass('visible');
 		}
 		else {
 			_this.renderShare();

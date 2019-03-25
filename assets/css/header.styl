@@ -52,7 +52,8 @@ $corner_offset = 35px
 	
 .header .share,
 .header .login,
-.header .register
+.header .register,
+.header .about
 	position absolute
 	top $corner_offset
 	right $corner_offset
@@ -151,7 +152,8 @@ $corner_offset = 35px
 	border-bottom-left-radius 0px
 	
 .header .login.visible,
-.header .register.visible 
+.header .register.visible,
+.header .about.visible 
 	opacity 1
 	
 .header .login.visible:before,
@@ -215,6 +217,20 @@ $corner_offset = 35px
 	background-position 10px 12px
 	
 	margin-left 10px
+
+.header .about
+	width 160px
+	margin-top calc(45px + 10px)
+	text-align center
+
+.header .about a
+	color #4a5e72
+	text-transform uppercase
+	letter-spacing 2px
+	text-decoration none
+
+.header .about a:hover
+	text-decoration underline
 	
 /* ----------- Media Queries ----------- */
 
