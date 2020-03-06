@@ -182,33 +182,3 @@ $.fn.drag = function (fn) {
 			});
 		});
 };
-
-$.fn.disableScrolling = function () {
-	$(this).ion('wheel.disableScrolling', function (e) {
-		e.preventDefault();
-	});
-
-	$(this).ion('keydown.disableScrolling', function (evt) {
-		let key = evt.keyCode;
-
-		// right or down key or spacebar or enter
-		if (key === 39 || key === 40 || key === 32 || key === 13) { 
-			evt.preventDefault();
-			return false;
-		}
-		else if (key === 37 || key == 38) { // left or up key
-			evt.preventDefault();
-			return false;
-		}
-	});
-
-	$(this).ion('touchmove.disableScrolling', function (e) {
-		e.preventDefault();
-	});
-};
-
-$.fn.enableScrolling = function () {
-	$(this).off('wheel.disableScrolling');
-	$(this).off('keydown.disableScrolling');
-	$(this).off('touchmove.disableScrolling');
-};
